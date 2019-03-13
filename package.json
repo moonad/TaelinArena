@@ -1,0 +1,27 @@
+{
+  "name": "inferno-hello-world",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cp src/* dist; webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maiavictor/inferno-hello-world.git"
+  },
+  "author": "Victor Maia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maiavictor/inferno-hello-world/issues"
+  },
+  "homepage": "https://github.com/maiavictor/inferno-hello-world#readme",
+  "devDependencies": {
+    "inferno": "^7.1.10",
+    "inferno-hyperscript": "^7.1.10",
+    "raw-loader": "^1.0.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
+  }
+}
