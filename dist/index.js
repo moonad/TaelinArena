@@ -122,6 +122,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dis
 
 /***/ }),
 
+/***/ "./src/hooked.js":
+/*!***********************!*\
+  !*** ./src/hooked.js ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("const {Component, render} = __webpack_require__(/*! inferno */ \"./node_modules/inferno/index.esm.js\");\nconst h = __webpack_require__(/*! inferno-hyperscript */ \"./node_modules/inferno-hyperscript/dist/index.esm.js\").h;\n\nvar stateOf = {};\nconst useState = (self, state) => {\n  console.log(self);\n  const setState = newState => {\n    stateOf[self._id] = newState;\n    self.forceUpdate();\n  };\n  if (!self._id) {\n    self._id = \"x\" + Math.floor(Math.random() * (2 ** 32));\n    stateOf[self._id] = state;\n  }\n  return [stateOf[self._id], setState];\n};\n\nfunction Hooked(render) {\n  class Self extends Component {\n    constructor(props) {\n      super(props)\n    }\n    componentDidMount() {\n    }\n    render() {\n      return render(this);\n    }\n  };\n  return Self;\n};\n\nmodule.exports = {useState, Component, Hooked, h, render};\n\n\n//# sourceURL=webpack:///./src/hooked.js?");
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
@@ -129,7 +140,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dis
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const {Component, render} = __webpack_require__(/*! inferno */ \"./node_modules/inferno/index.esm.js\");\nconst h = __webpack_require__(/*! inferno-hyperscript */ \"./node_modules/inferno-hyperscript/dist/index.esm.js\").h;\n\nclass Main extends Component {\n  constructor(props) {\n    super(props)\n    this.state = {clicks: 0};\n  }\n  componentDidMount() {\n  }\n  render() {\n    return h(\"span\",\n      {onClick: () => this.setState({clicks: this.state.clicks + 1})},\n      \"Hello, world! Clicks: \" + this.state.clicks);\n  }\n}\n\nwindow.onload = () => {\n  render(h(Main), document.getElementById(\"main\"));\n};\n\n\n//# sourceURL=webpack:///./src/index.js?");
+eval("const {useState, h, render, Hooked} = __webpack_require__(/*! ./hooked.js */ \"./src/hooked.js\");\n\nconst Counter = Hooked((self) => {\n  var [count, setCount] = useState(self, 0);\n  return h(\"div\", { \n    onClick: () => setCount(count + 1)\n  }, \"[click-count: \" + count + \"]\");\n});\n\nwindow.onload = () => {\n  render(\n    h(\"div\", {}, [\n      h(Counter),\n      h(Counter),\n      h(Counter)\n    ]),\n    document.getElementById(\"main\"));\n};\n\n\n//# sourceURL=webpack:///./src/index.js?");
 
 /***/ })
 
