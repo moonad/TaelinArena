@@ -1,14 +1,21 @@
 const {useState, h, render, Hooked} = require("./hooked.js");
 
+const useDoubleCounter = () => {
+  const [isFirst, setIsFirst] = useState(true);
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
+  const increment = () => {
+    const setCount = isFirst ? setCount1 : setCount2
+    const count = isFirst ? count1 : count2
+    setCount(count + 1)
+    setIsFirst(!isFirst)
+  }
+  return [count1, count2, increment]
+}
+
 const Counter = Hooked((self) => {
-  var [count0, setCount0] = useState(0);
-  var [count1, setCount1] = useState("I");
-  return h("div", { 
-    onClick: () => {
-      setCount0(count0 + 1);
-      setCount1(count1 + "I");
-    },
-  }, "[click-counts: " + count0 + ", " + count1 + "]");
+  const [count1, count2, increment] = useDoubleCounter()
+  return h("div", {onClick: increment}, `[click-count: ${count1}, ${count2}]`);
 });
 
 window.onload = () => {
