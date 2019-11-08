@@ -1,29 +1,51 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 
+var usingId = null;
+var usingEl = null;
+var idCount = 0;
 var stateOf = {};
-const useState = (self, state) => {
-  console.log(self);
+const useState = (state) => {
+  var localId = usingId;
+  var localEl = usingEl;
+
   const setState = newState => {
-    stateOf[self._id] = newState;
-    self.forceUpdate();
+    stateOf[localId] = newState;
+    if (localEl) {
+      localEl.forceUpdate();
+      console.log("updated");
+    }
   };
-  if (!self._id) {
-    self._id = "x" + Math.floor(Math.random() * (2 ** 32));
-    stateOf[self._id] = state;
+
+  if (stateOf[localId] === undefined) {
+    stateOf[localId] = state;
   }
-  return [stateOf[self._id], setState];
+
+  usingId++;
+  return [stateOf[localId], setState];
 };
 
 function Hooked(render) {
   class Self extends Component {
     constructor(props) {
       super(props)
+      this.usingId = idCount;
+      usingEl = null;
+      usingId = idCount;
+      console.log("new el", usingId);
+      render();
+      idCount = usingId;
+      usingId = null;
     }
     componentDidMount() {
     }
     render() {
-      return render(this);
+      usingEl = this;
+      usingId = this.usingId;
+      var rendered = render(this);
+      usingEl = null;
+      usingId = null;
+      return rendered;
     }
   };
   return Self;
