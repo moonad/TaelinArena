@@ -1,29 +1,27 @@
-const {useState, h, render, Hooked} = require("./hooked.js");
+const {Component, render} = require("inferno");
+const h = require("inferno-hyperscript").h;
 
-const useDoubleCounter = () => {
-  const [isFirst, setIsFirst] = useState(true);
-  const [count1, setCount1] = useState(0);
-  const [count2, setCount2] = useState(0);
-  const increment = () => {
-    const setCount = isFirst ? setCount1 : setCount2
-    const count = isFirst ? count1 : count2
-    setCount(count + 1)
-    setIsFirst(!isFirst)
+class Counter extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {count: 0};
   }
-  return [count1, count2, increment]
-}
-
-const Counter = Hooked((self) => {
-  const [count1, count2, increment] = useDoubleCounter()
-  return h("div", {onClick: increment}, `[click-count: ${count1}, ${count2}]`);
-});
+  componentDidMount() {
+  }
+  render() {
+    return h("div",
+      {
+        onClick: () => {
+          this.setState({count: this.state.count + 1});
+        }
+      },
+      [
+        h("span", {}, "Clicks: "),
+        h("span", {}, String(this.state.count))
+      ]);
+  }
+};
 
 window.onload = () => {
-  render(
-    h("div", {}, [
-      h(Counter),
-      h(Counter),
-      h(Counter)
-    ]),
-    document.getElementById("main"));
+  render(h(Counter), document.getElementById("main"));
 };
