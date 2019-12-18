@@ -122,6 +122,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dis
 
 /***/ }),
 
+/***/ "./src/FullModArena.js":
+/*!*****************************!*\
+  !*** ./src/FullModArena.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = (function(){\n  var _FullModArena$ba7P$main = (_0=>(_0*7));\n  return _FullModArena$ba7P$main;\n})()\n\n\n//# sourceURL=webpack:///./src/FullModArena.js?");
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
@@ -129,7 +140,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _dis
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const {Component, render} = __webpack_require__(/*! inferno */ \"./node_modules/inferno/index.esm.js\");\nconst h = __webpack_require__(/*! inferno-hyperscript */ \"./node_modules/inferno-hyperscript/dist/index.esm.js\").h;\n\nclass Counter extends Component {\n  constructor(props) {\n    super(props)\n    this.state = {count: 0};\n  }\n  componentDidMount() {\n  }\n  render() {\n    return h(\"div\",\n      {\n        onClick: () => {\n          this.setState({count: this.state.count + 1});\n        }\n      },\n      [\n        h(\"span\", {}, \"Clicks: \"),\n        h(\"span\", {}, String(this.state.count))\n      ]);\n  }\n};\n\nwindow.onload = () => {\n  render(h(Counter), document.getElementById(\"main\"));\n};\n\n\n//# sourceURL=webpack:///./src/index.js?");
+eval("const {Component, render} = __webpack_require__(/*! inferno */ \"./node_modules/inferno/index.esm.js\");\nconst h = __webpack_require__(/*! inferno-hyperscript */ \"./node_modules/inferno-hyperscript/dist/index.esm.js\").h;\nconst fma = __webpack_require__(/*! ./FullModArena.js */ \"./src/FullModArena.js\");\n\nconsole.log(fma(1000));\n\nclass Counter extends Component {\n  constructor(props) {\n    super(props)\n    this.state = {count: 0};\n  }\n  componentDidMount() {\n  }\n  render() {\n    return h(\"div\",\n      {\n        onClick: () => {\n          this.setState({count: this.state.count + 1});\n        }\n      },\n      [\n        h(\"div\", {}, \"Full Mod Arena!\"),\n        h(\"span\", {}, \"Clicks: \"),\n        h(\"span\", {}, String(this.state.count))\n      ]);\n  }\n};\n\nwindow.onload = () => {\n  render(h(Counter), document.getElementById(\"main\"));\n};\n\n\n//# sourceURL=webpack:///./src/index.js?");
 
 /***/ })
 

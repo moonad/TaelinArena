@@ -1,0 +1,2 @@
+main(n : Number)
+  n .*. 7

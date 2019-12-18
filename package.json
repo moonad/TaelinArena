@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cp src/* dist; webpack"
+    "build": "cp src/* dist; node src/build.js; webpack"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,8 @@
     "raw-loader": "^1.0.0",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
+  },
+  "dependencies": {
+    "formality-lang": "^0.1.227"
   }
 }
