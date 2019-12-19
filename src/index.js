@@ -2,8 +2,6 @@ const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const fma = require("./FullModArena.js");
 
-console.log(fma(1000));
-
 class Counter extends Component {
   constructor(props) {
     super(props)
@@ -19,9 +17,10 @@ class Counter extends Component {
         }
       },
       [
-        h("div", {}, "Full Mod Arena!"),
-        h("span", {}, "Clicks: "),
-        h("span", {}, String(this.state.count))
+        h("div", {}, "FullModArena"),
+        h("div", {}, "~~ this will become a MOBA ~~"),
+        h("div", {}, String(this.state.count)),
+        h("div", {}, "<3"),
       ]);
   }
 };

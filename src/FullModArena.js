@@ -1,4 +1,5 @@
 module.exports = (function(){
-  var _FullModArena$ba7P$main = (_0=>(_0*7));
-  return _FullModArena$ba7P$main;
+  var _Test$test = 8;
+  var _FullModArena$main = (_0=>(_0*_Test$test));
+  return _FullModArena$main;
 })()

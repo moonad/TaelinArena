@@ -1,2 +1,4 @@
+import Test
+
 main(n : Number)
-  n .*. 7
+  n .*. test
