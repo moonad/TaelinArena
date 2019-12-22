@@ -1,7 +1,7 @@
-Full Mod Arena
-==============
+Taelin Arena
+============
 
-Full Mod Arena (FMA) is an Multiplayer Online Battle Arena
+Taelin Arena (FMA) is an Multiplayer Online Battle Arena
 (MOBA) developed by [Sunshine
 Cybernetics](http://sunshinecybernetics.com/). It is:
 
