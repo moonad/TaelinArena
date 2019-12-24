@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cp src/* dist; cd src; node build.js; cd ..; webpack"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -18,10 +18,11 @@
   },
   "homepage": "https://github.com/maiavictor/inferno-hello-world#readme",
   "devDependencies": {
+    "formality-loader": "^0.0.3",
     "inferno": "^7.3.3",
     "inferno-hyperscript": "^7.3.3",
     "raw-loader": "^4.0.0",
-    "webpack": "^4.41.3",
+    "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
