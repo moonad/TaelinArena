@@ -1,0 +1,53 @@
+import Nat
+import Pair
+import String
+import Unit
+
+Prop : Type
+  Pair(String, String)
+
+// Doc is a renderable document
+T Doc
+| txt(value : String)
+| num(value : Number)
+| img(
+  size : Pair(Number, Number),
+  data : Pair(Number, Number) -> Number)
+| box(
+  tag : String,
+  props : List(Prop),
+  children : List(Doc))
+
+// An event
+T Event
+| mouseclick(x : Number, y : Number)
+| mousemove(x : Number, y : Number)
+| keypress(key : Number)
+| keydown(key : Number)
+| keyup(key : Number)
+
+// App is an interactive application
+T App<A>
+| app(
+  state  : A,
+  render : (state : A) -> Doc,
+  update : (event : Event, state : A) -> A
+)
+
+// Gets the state
+get_state(A; app : App(A)) : A
+  case app
+  | app => app.state
+  : A
+
+// Renders the state
+get_render(A; app : App(A)) : A -> Doc
+  case app
+  | app => app.render
+  : A -> Doc
+
+// Updates the state
+get_update(A; app : App(A)) : Event -> A -> A
+  case app
+  | app => app.update
+  : Event -> A -> A

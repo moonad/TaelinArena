@@ -1,0 +1,10 @@
+/* The.fm defines a witness type that lifts
+ * a term to the type level
+ */
+
+// ========================================================
+// =                    Definition                        =
+// ========================================================
+
+T The<A> (x : A)
+| the (x : A) : The(A, x)

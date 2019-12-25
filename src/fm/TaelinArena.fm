@@ -1,0 +1,155 @@
+import Base
+
+// :::::::::::::::::
+// :: Extra Utils ::
+// :::::::::::::::::
+
+map_pair(A; B; fn: A -> B, p: Pair(A, A)) : Pair(B, B)
+  case p
+  | pair => pair(__ fn(p.fst), fn(p.snd))
+
+mut_fst(A0; A1; B; fn: A0 -> A1, p: Pair(A0,B)) : Pair(A1,B)
+  case p
+  | pair => pair(__ fn(p.fst), p.snd)
+
+mut_snd(A; B0; B1; fn: B0 -> B1, p: Pair(A,B0)) : Pair(A,B1)
+  case p
+  | pair => pair(__ p.fst, fn(p.snd))
+
+map_list(A; B; fn: A -> B, xs: List(A)) : List(B)
+  case xs
+  | nil  => []
+  | cons => cons(_ fn(xs.head), map_list(__ fn, xs.tail))
+
+// ::::::::::::::::
+// :: Game Logic ::
+// ::::::::::::::::
+
+Pos : Type
+  Pair(Number, Number)
+
+T GameObject
+| game_object(
+  hp: Maybe(Number),
+  pos: Pos)
+
+GameMap : Type
+  List(GameObject)
+
+T GameState
+| game_state(map : GameMap)
+
+get_pos(obj : GameObject) : Pos
+  case obj
+  | game_object => obj.pos
+
+srpx : GameObject
+  game_object(some(_ 70), pair(__ 10, 10))
+
+stanci : GameObject
+  game_object(some(_ 80), pair(__ 30, 30))
+
+demo_game_state : GameState
+  let map = [srpx, stanci]
+  game_state(map)
+
+tick_game_object(go: GameObject) : GameObject
+  case go
+  | game_object =>
+    case go.pos
+    | pair =>
+      let new_hp  = go.hp
+      let new_pos = pair(__ go.pos.fst, go.pos.snd)
+      game_object(new_hp, new_pos)
+
+tick_game_map(gm: GameMap) : GameMap
+  case gm
+  | nil  => []
+  | cons => cons(_
+    tick_game_object(gm.head),
+    tick_game_map(gm.tail))
+
+tick_game_state(gs: GameState) : GameState
+  case gs
+  | game_state => game_state(tick_game_map(gs.map))
+
+// ::::::::::::::::
+// :: Game Input ::
+// ::::::::::::::::
+
+W_KEY : Number; 119
+A_KEY : Number; 97
+S_KEY : Number; 115
+D_KEY : Number; 100
+
+T UserInput
+| key_press(key : Number)
+
+apply_input_to_game_object(key: Number, go: GameObject) : GameObject
+  case go
+  | game_object =>
+    let new_hp  = go.hp
+    let new_pos =
+      if key .==. W_KEY then
+        mut_snd(___ (x) => x .-. 10, go.pos)
+      else if key .==. A_KEY then
+        mut_fst(___ (x) => x .-. 10, go.pos)
+      else if key .==. S_KEY then
+        mut_snd(___ .+.(10), go.pos)
+      else if key .==. D_KEY then
+        mut_fst(___ .+.(10), go.pos)
+      else
+        go.pos
+    game_object(new_hp, new_pos)
+
+apply_input_to_game_state(ui: UserInput, gs: GameState) : GameState
+  case ui
+  | key_press =>
+    case gs 
+    | game_state => 
+      let T = GameObject
+      let f = apply_input_to_game_object(ui.key)
+      game_state(map_list(T; T; f, gs.map))
+
+//apply_inputs_to_game_state(ui: List(UserInput), gs: GameState) : GameState
+  //case ui
+  //| nil  => gs
+  //| cons => 
+    //let next_gs = apply_input_to_game_state(ui.head, gs)
+    //apply_inputs_to_game_state(ui.tail, next_gs)
+
+// :::::::::::::::::::
+// :: Game Graphics ::
+// :::::::::::::::::::
+
+T Renderable
+| ball(pos : Pos, rad : Number)
+
+Renderables : Type
+  List(Renderable)
+
+// Renders object
+render_game_object(go : GameObject) : Renderable
+  case go
+  | game_object => ball(go.pos, 12)
+
+// Renders game map
+render_game_map(gm : GameMap) : Renderables
+  case gm
+  | nil =>
+    []
+  | cons =>
+    let obj  = render_game_object(gm.head)
+    let rest = render_game_map(gm.tail)
+    cons(_ obj, rest)
+
+// Renders game state
+render_game_state(gs : GameState) : Renderables
+  case gs
+  | game_state => render_game_map(gs.map)
+
+main
+  pair(__ demo_game_state,
+  pair(__ tick_game_state,
+  pair(__ render_game_state,
+    apply_input_to_game_state)))

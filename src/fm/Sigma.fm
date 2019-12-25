@@ -1,0 +1,11 @@
+// Sigma.fm
+// ========
+// 
+// The Sigma type holds two elements, such that the type of
+// the second element depends on the value of the first.
+
+// Definition
+// ----------
+
+T Sigma<A, B : A -> Type>
+| sigma(fst : A, snd : B(fst))

@@ -1,0 +1,21 @@
+// Unit.fm
+// =======
+// 
+// The type with only one element.
+
+// Definition
+// ----------
+
+T Unit
+| unit
+
+// Operations
+// ----------
+
+// There is a function from any type to Unit
+to_unit(A; x : A) : Unit
+  unit
+
+// There is a function from Unit to any term
+from_unit(A; x : A, u : Unit) : A
+  x
