@@ -1,0 +1,18 @@
+// JSON.fm
+// =======
+// 
+// A JavaScript Object Notation type. This type is used for
+// interop with host languages.
+
+import List
+import String
+
+// Definition
+// ----------
+
+T JSON
+| json_null
+| json_number(value: Number)
+| json_string(value: String)
+| json_list(value : List(JSON))
+| json_object(value : List([:String, JSON]))

@@ -1,0 +1,305 @@
+import Maybe
+import Nat
+import String
+import Map
+
+Defs : Type
+  Map(Term)
+
+Name : Type
+  Bits
+
+T Term
+| typ
+| ref(name : Name)
+| var(indx : Nat)
+| all(bind : Term, body : Term)
+| lam(bind : Term, body : Term)
+| app(func : Term, argm : Term)
+| slf(type : Term)
+| neo(type : Term, expr : Term)
+| usi(expr : Term)
+| ann(type : Term, expr : Term, done : Bool)
+| lug(msge : Term, expr : Term)
+| hol(name : Name)
+
+// Stringify
+// ---------
+
+show_nat.go(n : Nat) : Concat(Char)
+  case n
+  | zero => (x) => cons(_ 'z', x)
+  | succ => (x) => cons(_ 's', show_nat.go(n.pred, x))
+  : String -> String
+
+show_nat(n : Nat) : String
+  show_nat.go(n, nil(_))
+
+show_term.go(term : Term, dep : Nat) : String -> String
+  let txt = list_to_concat(Char;)
+  case term
+  + dep : Nat
+  | typ =>
+    let type = txt("Type")
+    (x) => type(x)
+  | ref =>
+    // TODO: Name -> String
+    let name = txt("ref")
+    (x) => name(x)
+  | var =>
+    let indx = show_nat.go(term.indx)
+    (x) => indx(x)
+  | all =>
+    let txt0 = txt("(")
+    let txt1 = show_nat.go(dep)
+    let txt2 = txt(" : ")
+    let bind = show_term.go(term.bind, dep)
+    let txt3 = txt(") -> ")
+    let body = show_term.go(term.body, succ(dep))
+    (x) => txt0(txt1(txt2(bind(txt3(body(x))))))
+  | lam =>
+    let txt0 = txt("(")
+    let txt1 = show_nat.go(dep)
+    let txt2 = txt(" : ")
+    let bind = show_term.go(term.bind, dep)
+    let txt3 = txt(") => ")
+    let body = show_term.go(term.body, succ(dep))
+    (x) => txt0(txt1(txt2(bind(txt3(body(x))))))
+  | app => 
+    let txt0 = txt("(")
+    let func = show_term.go(term.func, dep)
+    let txt1 = txt(")(")
+    let argm = show_term.go(term.argm, dep)
+    let txt2 = txt(")")
+    (x) => txt0(func(txt1(argm(txt2(x)))))
+  | slf =>
+    let txt0 = txt("${}")
+    let type = show_term.go(term.type, succ(dep))
+    (x) => type(x)
+  | neo =>
+    let txt0 = txt("neo(")
+    let type = show_term.go(term.type, dep)
+    let txt1 = txt(") ")
+    let expr = show_term.go(term.expr, dep)
+    (x) => txt0(type(txt1(expr(x))))
+  | usi =>
+    let txt0 = txt("usi(")
+    let expr = show_term.go(term.expr, dep)
+    let txt1 = txt(")")
+    (x) => txt0(expr(txt1(x)))
+  | ann =>
+    let expr = show_term.go(term.expr, dep)
+    let txt0 = txt(" :: ")
+    let type = show_term.go(term.type, dep)
+    (x) => expr(txt0(type(x)))
+  | lug =>
+    let txt0 = txt("lug(")
+    let msge = show_term.go(term.msge, dep)
+    let txt1 = txt(") ")
+    let expr = show_term.go(term.expr, dep)
+    (x) => txt0(msge(txt1(expr(x))))
+  | hol =>
+    // TODO: Name -> String
+    let txt0 = txt("?")
+    (x) => txt0(x)
+  : String -> String
+
+show_term(term : Term) : String
+  show_term.go(term, zero, nil(_))
+
+// Reduction
+// ---------
+
+shift(term : Term, inc : Nat, dep : Nat) : Term
+  case term
+  | typ => typ
+  | ref => ref(term.name)
+  | var => case nat_compare(term.indx, dep) as cmp
+    + term.indx : Nat
+    | less_than    => var(term.indx)
+    | equal_to     => var(add(inc, term.indx))
+    | greater_than => var(add(inc, term.indx))
+  | all =>
+    let bind = shift(term.bind, inc, dep)
+    let body = shift(term.body, inc, succ(dep))
+    all(bind, body)
+  | lam =>
+    let bind = shift(term.bind, inc, dep)
+    let body = shift(term.body, inc, succ(dep))
+    lam(bind, body)
+  | app =>
+    let func = shift(term.func, inc, dep)
+    let argm = shift(term.argm, inc, dep)
+    app(func, argm)
+  | slf =>
+    let type = shift(term.type, inc, dep)
+    slf(type)
+  | neo =>
+    let type = shift(term.type, inc, dep)
+    let expr = shift(term.expr, inc, dep)
+    neo(type, expr)
+  | usi =>
+    let expr = shift(term.expr, inc, dep)
+    usi(expr)
+  | ann =>
+    let type = shift(term.type, inc, dep)
+    let expr = shift(term.expr, inc, dep)
+    let done = term.done
+    ann(type, expr, done)
+  | lug =>
+    let msge = shift(term.msge, inc, dep)
+    let expr = shift(term.expr, inc, dep)
+    lug(msge, expr)
+  | hol =>
+    let name = term.name
+    hol(name)
+
+subst(term : Term, val : Term, dep : Nat) : Term
+  case term
+  | typ => typ
+  | ref => ref(term.name)
+  | var => case nat_compare(term.indx, dep) as cmp
+    + term.indx : Nat
+    | less_than    => var(term.indx)
+    | equal_to     => val
+    | greater_than => var(pred(term.indx))
+  | all =>
+    let bind = subst(term.bind, val, dep)
+    let body = subst(term.body, shift(val,1n,0n), succ(dep))
+    all(bind, body)
+  | lam =>
+    let bind = subst(term.bind, val, dep)
+    let body = subst(term.body, shift(val,1n,0n), succ(dep))
+    lam(bind, body)
+  | app =>
+    let func = subst(term.func, val, dep)
+    let argm = subst(term.argm, val, dep)
+    app(func, argm)
+  | slf =>
+    let type = subst(term.type, val, dep)
+    slf(type)
+  | neo =>
+    let type = subst(term.type, val, dep)
+    let expr = subst(term.expr, val, dep)
+    neo(type, expr)
+  | usi =>
+    let expr = subst(term.expr, val, dep)
+    usi(expr)
+  | ann =>
+    let type = subst(term.type, val, dep)
+    let expr = subst(term.expr, val, dep)
+    let done = term.done
+    ann(type, expr, done)
+  | lug =>
+    let msge = subst(term.msge, val, dep)
+    let expr = subst(term.expr, val, dep)
+    lug(msge, expr)
+  | hol =>
+    let name = term.name
+    hol(name)
+
+reduce(term : Term) : Term
+  case term
+  + reduce : Term -> Term
+  | typ => typ
+  | ref => ref(term.name)
+  | var => var(term.indx)
+  | all => all(reduce(term.bind), reduce(term.body))
+  | lam => lam(hol(be), reduce(term.body))
+  | app => case reduce(term.func) as func
+    + term.argm : Term
+    + reduce : Term -> Term
+    | typ => app(typ, reduce(term.argm))
+    | ref => app(ref(func.name), reduce(term.argm))
+    | var => app(var(func.indx), reduce(term.argm))
+    | all => app(all(func.bind, func.body), reduce(term.argm))
+    | lam => reduce(subst(func.body, term.argm, 0n))
+    | app => app(app(func.func, func.argm), reduce(term.argm))
+    | slf => app(slf(func.type), reduce(term.argm))
+    | neo => app(neo(func.type, func.expr), reduce(term.argm))
+    | usi => app(usi(func.expr), reduce(term.argm))
+    | ann => app(ann(func.type, func.expr, func.done), reduce(term.argm))
+    | lug => app(lug(func.msge, func.expr), reduce(term.argm))
+    | hol => app(hol(func.name), reduce(term.argm))
+  | slf => slf(reduce(term.type))
+  | neo => reduce(term.expr)
+  | usi => reduce(term.expr)
+  | ann => reduce(term.expr)
+  | lug => reduce(term.expr)
+  | hol => hol(term.name)
+
+t2 : Term
+  lam(typ, lam(typ, app(var(1n), app(var(1n), var(0n)))))
+
+main hol
+//main show_term(reduce(app(t2,t2)))
+
+//main show_term(reduce(app(t2,t2), empty(_)))
+
+
+//T HOAS
+//| hvar(indx : Nat)
+//| hall(bind : HOAS, body : HOAS -> HOAS)
+//| hlam(body : HOAS -> HOAS)
+//| happ(func : HOAS, argm : HOAS)
+//| htyp
+
+//reduce.go(hoas : HOAS) : HOAS
+  //case hoas
+  //| hvar => hvar(hoas.indx)
+  //| hall => hall(hoas.bind, hoas.body)
+  //| hlam => hlam(hoas.body)
+  //| happ => case reduce.go(hoas.func) as fn
+    //+ reduce.go : HOAS -> HOAS
+    //+ hoas.argm : HOAS
+    //| hvar => happ(hvar(fn.indx), reduce.go(hoas.argm))
+    //| hlam => reduce.go(fn.body(hoas.argm))
+    //| happ => happ(happ(fn.func, fn.argm), reduce.go(hoas.argm))
+
+//reduce.quote(hoas : HOAS, dep : Nat) : Term
+  //case reduce.go(hoas) as hoas
+  //| hvar => var(sub(dep, succ(hoas.indx)))
+  //| hlam => lam(reduce.quote(hoas.body(hvar(dep)), succ(dep)))
+  //| happ => app(reduce.quote(hoas.func, dep), reduce.quote(hoas.argm, dep))
+
+//reduce.unquote(term : Term, ctx : List(HOAS)) : HOAS
+  //case term
+  //| var => case at(_ term.indx, ctx) as got
+    //| none => hvar(term.indx)
+    //| some => got.value
+  //| lam => hlam((x) => reduce.unquote(term.body, cons(_ x, ctx)))
+  //| app => happ(reduce.unquote(term.func, ctx), reduce.unquote(term.argm, ctx))
+
+//reduce(term : Term) : Term
+  //reduce.quote(reduce.unquote(term, nil(_)), zero)
+
+//t_n2 : Term
+  //lam(lam(app(var(1n), app(var(1n), var(0n)))))
+
+////main reduce(app(t_n2, lam(var(0n))))
+
+//main
+  //log(1n)
+  //2n
+
+////t_succ : Term
+  ////lam((n) => lam((s) => lam((z) => app(s, n))))
+
+////t_zero : Term
+  ////lam((s) => lam((z) => z))
+
+////t_n3 : Term
+  ////app(t_succ, app(t_succ, app(t_succ, t_zero)))
+
+////t_double : Term
+  ////lam((n)=>
+    ////let case_succ = lam((pred) => app(t_succ, app(t_succ, app(t_double, pred))))
+    ////let case_zero = t_zero
+    ////app(app(n, case_succ), case_zero))
+
+////t_two : Term
+  ////lam((s) => lam((z) => app(s, app(s, z))))
+
+////term.test %print(show(quote(app(t_two, t_two))))
+
+//////main term.test

@@ -1,0 +1,100 @@
+// List.fm
+// =======
+// 
+// Linked lists.
+
+import Equal
+import Maybe
+import Nat
+
+// Definition
+// ----------
+
+T List<A>
+| nil
+| cons(head : A, tail : List(A))
+
+// Operations
+// ----------
+
+head(A; x : A, xs : List(A)) : A
+  case xs
+  | nil  => x
+  | cons => xs.head
+
+tail(A; xs : List(A)) : List(A)
+  case xs
+  | nil  => nil(_)
+  | cons => xs.tail
+
+take(A; x : A, xs : List(A)) : Pair(A, List(A))
+  case xs
+  | nil  => pair(__ x, nil(_))
+  | cons => pair(__ xs.head, xs.tail)
+
+at(A; n : Nat, xs : List(A)) : Maybe(A)
+  case xs
+  + n : Nat
+  | nil  => none(_)
+  | cons => case n
+    | zero => some(_ xs.head)
+    | succ => at(_ n.pred, xs.tail)
+
+// Returns the same list
+sames(A; xs : List(A)) : List(A)
+  case xs
+  | nil  => nil(_)
+  | cons => cons(_ xs.head, sames(_ xs.tail))
+
+// Applies a function to every element of a list
+ziply(A; B; fs : List(A -> B), xs : List(A)) : List(B)
+  case fs
+  | nil  => nil(_)
+  | cons => case xs
+    | nil  => nil(_)
+    | cons => cons(_
+      fs.head(xs.head),
+      ziply(A; B; fs.tail, xs.tail))
+
+// Concatenates two lists
+concat(A; xs : List(A), ys : List(A)) : List(A)
+  case xs
+  + ys : List(A)
+  | nil  => ys
+  | cons => cons(_ xs.head, concat(_ xs.tail, ys))
+
+// Helper for reverse
+reverse.go(A; xs : List(A), rs : List(A)) : List(A)
+  case xs
+  + rs : List(A)
+  | nil  => rs
+  | cons => reverse.go(_ xs.tail, cons(A; xs.head, rs))
+
+// Reverses a list
+reverse(A; list : List(A)) : List(A)
+  reverse.go(A; list, nil(_))
+
+// Length of a list
+length(A; list : List(A)) : Nat
+  case list
+  | nil  => zero
+  | cons => succ(length(A; list.tail))
+
+// O(1) concatenator
+Concat(A : Type) : Type
+  (x : List(A)) -> List(A)
+
+// Concatenates a O(1) concatenator
+concatenate(A; xs : Concat(A), ys : Concat(A)) : Concat(A)
+  (x) => xs(ys(x))
+
+// Converts a list to a O(1) concatenator
+list_to_concat(A; xs : List(A)) : Concat(A)
+  (x) => case xs
+    + x : List(A)
+    | nil  => x
+    | cons => cons(_ xs.head, list_to_concat(_ xs.tail, x))
+
+// Converts a O(1) concatenator to a list
+concat_to_list(A; xs : Concat(A)) : List(A)
+  xs(nil(_))

@@ -1,0 +1,100 @@
+import Maybe
+import Nat
+import Number
+import String
+import Unit
+
+// Consumes a String and returns the rest and the parsed value, if any
+Parser(A) : Type
+  (str: String) -> Pair(String, Maybe(A))
+
+// Consumes nothing, returns `x`
+return(A; x: A) : Parser(A)
+  (str) => pair(__ str, some(A; x))
+
+// Errors
+throw(A;) : Parser(A)
+  (str) => pair(__ str, none(A;))
+
+// Monadic composition of two parsers
+bind(A; B; x: Parser(A), f: A -> Parser(B)) : Parser(B)
+  (str) => case x(str) as p
+    | pair => case p.snd
+      + p.fst : String
+      | none => pair(__ p.fst, none(_))
+      | some => f(p.snd.value, p.fst)
+      : Pair(String, Maybe(B))
+
+// Consumes nothing, returns the next character
+peek : Parser(Char)
+  (str) =>
+    case str
+    | nil  => pair(__ nil(_), none(_))
+    | cons => pair(__ 
+      cons(_ str.head, str.tail),
+      some(_ str.head))
+    : Pair(String, Maybe(Char))
+
+// Parses one character if possible
+next : Parser(Char)
+  (str) =>
+    case str
+    | nil  => pair(__ nil(_), none(_))
+    | cons => pair(__ str.tail, some(_ str.head))
+    : Pair(String, Maybe(Char))
+
+// If first is `chr`, return true and consumes it
+match_one(chr: Char) : Parser(Bool)
+  (str) =>
+    case str
+    | nil  => pair(__ nil(_), some(_ false))
+    | cons => case num_equal(chr, str.head) as eq
+      + str.tail : String
+      | true  => pair(__ str.tail, some(_ true))
+      | false => pair(__
+        cons(_ str.head, str.tail),
+        some(_ false))
+
+// Parses exactly this character
+parse_exact(chr: Char) : Parser(Unit)
+  do {
+    var val = next;
+    case num_equal(chr, val) as eq
+    | true  => do { return unit; }
+    | false => do { throw; }
+  }
+
+// Skip whitespaces
+skip_whites : Parser(Unit)
+  do {
+    var found_white = match_one(' ');
+    case found_white
+    | true  => skip_whites
+    | false => do { return unit; }
+  }
+
+// Parses a nat on the form SSS...Z
+parse_nat : Parser(Nat)
+  do {
+    var chr = next;
+    case num_equal(chr, 'S') as eq
+    | true => do {
+      var pred = parse_nat;
+      return succ(pred);
+    }
+    | false => do {
+      return zero;
+    }
+  }
+
+// Parses a nat tuple on the form [SSS...Z,SSS...Z]
+parse_nats : Parser(Pair(Nat, Nat))
+  do {
+    parse_exact('[');
+    var nat0 = parse_nat;
+    parse_exact(',');
+    var nat1 = parse_nat;
+    parse_exact(']');
+    return pair(__ nat0, nat1);
+  }
+
