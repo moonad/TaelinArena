@@ -1,0 +1,141 @@
+// Bool.fm
+// =======
+// 
+// A Bool represents a binary logical truth-value, i.e.,
+// it can be either true or false. 
+
+import Empty
+import Equal
+import Pair
+import Unit
+import Subset
+
+// Definition
+// ----------
+
+T Bool
+| true
+| false
+
+// Operations
+// ----------
+
+// Since bool is a finite datatype, it can be copied freely
+// this function will be implicitly auto-generated in a
+// future version of Formality
+copy_bool(b : Bool) : Pair(Bool, Bool)
+  case b
+  | true  => pair(__ true, true)
+  | false => pair(__ false, false)
+
+// Negation
+not(b: Bool) : Bool
+  case b
+  | true  => false
+  | false => true
+
+// Conjunction
+and(a: Bool, b: Bool) : Bool
+  case a
+  | true  => b
+  | false => false
+
+// Disjuction
+or(a: Bool, b: Bool) : Bool
+  case a
+  | true  => true
+  | false => b
+
+// Conjuction complement
+nand(a: Bool, b: Bool) : Bool
+  case a
+  | true  => not(b)
+  | false => true
+
+// Disjunction complement
+nor(a: Bool, b: Bool) : Bool
+  case a
+  | true  => false
+  | false => not(b)
+
+// Exclusive or
+xor(a: Bool, b: Bool) : Bool
+  case a
+  + b : Bool
+  | true  => not(b)
+  | false => b
+
+// Logical equality
+xnor(a: Bool, b: Bool) : Bool
+  case a
+  + b : Bool
+  | true  => b
+  | false => not(b)
+
+// not, with runtime fusion
+not_f(b: Bool) : Bool
+  new(Bool) (P; true, false) =>
+    case b
+    | true  => false
+    | false => true
+    : P(not_f(b))
+
+// Theorems
+// --------
+
+// From `true == false` we can derive `Empty`. Proof:
+// 1. Define a predicate `P` such that:
+//    - `P(true)`  returns Unit
+//    - `P(false)` returns Empty
+// 2. Note that `unit :: P(true)`
+// 3. But `true == false`, so `unit :: P(false)`
+// 4. Thus, `unit :: Empty`
+true_isnt_false : true != false
+  let P = (x: Bool) =>
+    case x
+    | true  => Unit
+    | false => Empty
+  (e) => unit :: rewrite P(.) with e
+
+// The symmetry of true_isnt_false
+false_isnt_true : false != true
+  let P = (x: Bool) =>
+    case x
+    | true  => Empty
+    | false => Unit
+  (e) => unit :: rewrite P(.) with e
+
+// A bool that is provably different from the input
+different_elem(a : Bool) : Bool .such_that. (b) => a != b
+  case a
+  | true  => subset(_ (b) => ? != b; ?, true_isnt_false;)
+  | false => subset(_ (b) => ? != b; ?, false_isnt_true;)
+  : Bool .such_that. (b) => a != b
+
+// Demorgan's Law: !(a || b) == !a && !b
+demorgan_0(a, b) : not(or(a,b)) == and(not(a),not(b))
+  case a
+  + b : Bool
+  | true => case b
+    | true  => equal(__)
+    | false => equal(__)
+    : not(or(true,b)) == and(not(true), not(b))
+  | false => case b
+    | true  => equal(__)
+    | false => equal(__)
+    : not(or(false,b)) == and(not(false), not(b))
+  : not(or(a,b)) == and(not(a), not(b))
+
+// Demorgan's Law: !(a && b) == !a || !b
+demorgan_1(a, b) : not(and(a,b)) == or(not(a), not(b))
+  case a
+  + b : Bool
+  | true => case b
+    | true  => equal(__)
+    | false => equal(__)
+    : not(and(true,b)) == or(not(true), not(b))
+  | false => case b
+    | true  => equal(__)
+    | false => equal(__)
+    : not(and(false,b)) == or(not(false), not(b))
+  : not(and(a,b)) == or(not(a), not(b))
