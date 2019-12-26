@@ -1,6 +1,8 @@
 Taelin Arena
 ============
 
+![Twitch Status](https://img.shields.io/twitch/status/maiavictor)
+
 Taelin Arena (FMA) is an Multiplayer Online Battle Arena
 (MOBA) developed by [Sunshine
 Cybernetics](http://sunshinecybernetics.com/). It is:
@@ -41,3 +43,11 @@ FMA was developed in a proof language, allowing important
 game aspects to be formally verified for correctness, making
 serious bugs and errors scarse. In other words, it achieves
 the highest score of code quality humanly possible.
+
+### Follow the updates!
+- [Twitter](https://twitter.com/maiavictr)
+- [YouTube](https://www.youtube.com/channel/UCWTVZkEGM3Mux8P4TtIeiEg/featured)
+- [Facebook](https://www.facebook.com/MaiaVictorDev/)
+- [Twitch - streams in Portuguese](https://www.twitch.tv/maiavictor/)
+
+### [FAQ](FAQ.md)
