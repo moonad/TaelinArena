@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: './src/index.js',
   module: {
-    rules: [{ test: /\.fm$/, loader: 'formality-loader-tmp' }]
+    rules: [{ test: /\.fm$/, loader: 'formality-loader' }]
   },
   output: {
     filename: 'index.js',
