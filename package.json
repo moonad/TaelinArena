@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack -p",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "npm install ../formality-loader/"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,7 @@
   },
   "homepage": "https://github.com/maiavictor/inferno-hello-world#readme",
   "devDependencies": {
-    "formality-loader": "^0.0.5",
+    "formality-loader-tmp": "^0.0.6",
     "html-webpack-plugin": "^3.2.0",
     "inferno": "^7.3.3",
     "inferno-hyperscript": "^7.3.3",
@@ -30,6 +31,6 @@
   },
   "dependencies": {
     "formality": "^1.0.1",
-    "formality-lang": "^0.1.228"
+    "formality-lang": "^0.1.231"
   }
 }

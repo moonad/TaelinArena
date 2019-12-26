@@ -1,13 +1,12 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 
-const taelin = require("./fm/TaelinArena.fm");
-const [
-  demo_game_state, // GameState
-  tick_game_state, // (gs : GameState) -> GameState
-  render_game_state, // (gs : GameState) -> Renderables
-  apply_input_to_game_state, // (ui : UserInput, gs : GameState) -> GameState)
-] = taelin(x => p => p(y => p => p(z => w => ([x,y,z,w]))));
+var {
+  demo_game_state,
+  tick_game_state,
+  render_game_state,
+  apply_input_to_game_state
+} = require("./fm/TaelinArena.fm");
 
 // (nil, cons) => cons((ball) => ball((pair) => pair(100, 100), 30), (nil, cons) => cons((ball) => ball((pair) => pair(200, 100), 10), (nil, cons) => cons((ball) => ball((pair) => pair(100, 200), 20), (nil, cons) => nil)))
 function get_renderables_from_fm(renderable) {
