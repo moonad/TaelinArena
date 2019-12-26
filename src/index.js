@@ -1,7 +1,7 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 
-const taelin = require("./TaelinArena.js");
+const taelin = require("./fm/TaelinArena.fm");
 const [
   demo_game_state, // GameState
   tick_game_state, // (gs : GameState) -> GameState
