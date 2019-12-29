@@ -19,17 +19,16 @@
   },
   "homepage": "https://github.com/maiavictor/inferno-hello-world#readme",
   "devDependencies": {
-    "formality-loader": "^0.0.6",
+    "formality-loader": "^0.1.0",
     "html-webpack-plugin": "^3.2.0",
     "inferno": "^7.3.3",
     "inferno-hyperscript": "^7.3.3",
     "raw-loader": "^4.0.0",
-    "webpack": "^4.41.4",
+    "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
-    "formality": "^1.0.1",
-    "formality-lang": "^0.1.231"
+    "formality-lang": "^0.1.233"
   }
 }
