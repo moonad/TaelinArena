@@ -3,8 +3,8 @@
 // 
 // Wrapper and utilities for the built-in function type.
 
-import Equal
-import Pair
+import Equal#HPWi
+import Pair#g.Jv
 
 // Definition
 // ----------

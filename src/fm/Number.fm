@@ -1,7 +1,0 @@
-import Bool
-
-num_equal(a : Number, b : Number) : Bool
-  if a .==. b then
-    true
-  else
-    false

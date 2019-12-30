@@ -6,7 +6,7 @@
 // the idea of "nullable" values, and functions that can
 // fail to produce a result.
 
-import Bool
+import Bool#2GZZ
 
 // Definition
 // ----------

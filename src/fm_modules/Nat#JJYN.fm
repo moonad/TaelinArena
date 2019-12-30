@@ -3,12 +3,12 @@
 //
 // Natural numbers.
 
-import Bool
-import Empty
-import Equal
-import Pair
-import The
-import Unit
+import Bool#2GZZ
+import Empty#qpku
+import Equal#HPWi
+import Pair#g.Jv
+import The#t1C2
+import Unit#ZcZV
 
 // Definition
 // ----------

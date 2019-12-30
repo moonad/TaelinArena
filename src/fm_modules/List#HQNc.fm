@@ -3,9 +3,9 @@
 // 
 // Linked lists.
 
-import Equal
-import Maybe
-import Nat
+import Equal#HPWi
+import Maybe#rXzW
+import Nat#JJYN
 
 // Definition
 // ----------

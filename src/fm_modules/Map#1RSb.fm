@@ -1,7 +1,7 @@
-import Bits
-import Maybe
-import Nat
-import List
+import Bits#l6Ni
+import Maybe#rXzW
+import Nat#JJYN
+import List#HQNc
 
 // A Map from Bits to values
 T Map<A>

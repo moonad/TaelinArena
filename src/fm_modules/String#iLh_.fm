@@ -3,8 +3,8 @@
 // 
 // A list of Unicode characters.
 
-import Bits
-import List
+import Bits#l6Ni
+import List#HQNc
 
 // Definition
 // ----------
@@ -18,13 +18,7 @@ String : Type
 // Operations
 // ----------
 
-Output : Type
-  String
-
-print(str : String) : Output
-  str
-
-string.test : Output
+string.test : String
   let str = "Hello, world!"
   let str = reverse(_ str)
-  print(str)
+  str

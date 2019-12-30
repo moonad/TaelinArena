@@ -6,7 +6,7 @@ var {
   tick_game_state,
   render_game_state,
   apply_input_to_game_state
-} = require("./fm/TaelinArena.fm");
+} = require("./TaelinArena.fm");
 
 // (nil, cons) => cons((ball) => ball((pair) => pair(100, 100), 30), (nil, cons) => cons((ball) => ball((pair) => pair(200, 100), 10), (nil, cons) => cons((ball) => ball((pair) => pair(100, 200), 20), (nil, cons) => nil)))
 function get_renderables_from_fm(renderable) {

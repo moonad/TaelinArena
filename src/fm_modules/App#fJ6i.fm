@@ -1,7 +1,7 @@
-import Nat
-import Pair
-import String
-import Unit
+import Nat#JJYN
+import Pair#g.Jv
+import String#iLh_
+import Unit#ZcZV
 
 Prop : Type
   Pair(String, String)

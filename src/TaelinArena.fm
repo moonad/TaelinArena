@@ -1,4 +1,4 @@
-import Base
+import Base#mbRT
 
 // :::::::::::::::::
 // :: Extra Utils ::
@@ -95,9 +95,9 @@ apply_input_to_game_object(key: Number, go: GameObject) : GameObject
       else if key .==. A_KEY then
         mut_fst(___ (x) => x .-. 10, go.pos)
       else if key .==. S_KEY then
-        mut_snd(___ .+.(10), go.pos)
+        mut_snd(___ .+.(2), go.pos)
       else if key .==. D_KEY then
-        mut_fst(___ .+.(10), go.pos)
+        mut_fst(___ .+.(2), go.pos)
       else
         go.pos
     game_object(new_hp, new_pos)

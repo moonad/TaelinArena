@@ -1,0 +1,35 @@
+import String#iLh_
+import Unit#ZcZV
+import Pair#g.Jv
+
+T Eff
+| putstr(str: String)
+| getstr
+
+T IO<A>
+| exec(eff: Eff, cont: String -> IO(A))
+| pure(val: A)
+
+return(B; val: B) : IO(B)
+  pure(B; val)
+
+bind(A; B; io: IO(A), cont: A -> IO(B)) : IO(B)
+  case io
+  | exec => exec(_ io.eff, (str) => bind(A; B; io.cont(str), cont))
+  | pure => cont(io.val)
+  
+print(str: String) : IO(Unit)
+  exec(_ putstr(str), (x) => pure(_ unit))
+
+question(qry: String) : IO(String)
+  exec(_ putstr(qry), (_) =>
+  exec(_ getstr, (x) =>
+  pure(_ x)))
+
+for(from: Number, to: Number, eff: Number -> IO(Unit)) : IO(Unit)
+  if from .==. to then
+    pure(_ unit)
+  else do {
+    eff(from)
+    for(from .+. 1, to, eff)
+  }

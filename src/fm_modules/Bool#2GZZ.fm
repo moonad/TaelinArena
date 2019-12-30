@@ -4,11 +4,11 @@
 // A Bool represents a binary logical truth-value, i.e.,
 // it can be either true or false. 
 
-import Empty
-import Equal
-import Pair
-import Unit
-import Subset
+import Empty#qpku
+import Equal#HPWi
+import Pair#g.Jv
+import Unit#ZcZV
+import Subset#Sva9
 
 // Definition
 // ----------

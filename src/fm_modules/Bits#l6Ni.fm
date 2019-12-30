@@ -3,9 +3,9 @@
 // 
 // Defines a bitstream, or binary sequence.
 
-import Equal
-import Nat
-import Pair
+import Equal#HPWi
+import Nat#JJYN
+import Pair#g.Jv
 
 // Definition
 // ----------
