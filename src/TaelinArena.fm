@@ -28,7 +28,11 @@ map_list(A; B; fn: A -> B, xs: List(A)) : List(B)
   | nil  => []
   | cons => cons(_ fn(xs.head), map_list(__ fn, xs.tail))
 
-generate_list.go(A; idx: Number, len: Number, fn: Number -> A) : List(A)
+generate_list.go(A;
+  idx : Number,
+  len : Number,
+  fn  : Number -> A
+  ) : List(A)
   if idx .==. len then
     []
   else
@@ -109,7 +113,8 @@ D_KEY : Number; 100
 T UserInput
 | key_press(key : Number)
 
-apply_input_to_game_object(key: Number, obj: GameObject) : GameObject
+apply_input_to_game_object(key: Number, obj: GameObject)
+: GameObject
   case obj
   | game_object =>
     let new_id   = obj.id
@@ -129,7 +134,8 @@ apply_input_to_game_object(key: Number, obj: GameObject) : GameObject
     let new_size = obj.size
     game_object(new_id, new_hp, new_pos, new_size)
 
-apply_input_to_game_state(ui: UserInput, gs: GameState) : GameState
+apply_input_to_game_state(ui: UserInput, gs: GameState)
+: GameState
   case ui
   | key_press =>
     case gs 
@@ -172,50 +178,80 @@ candle : List(Atom)
   let fire_col = 0xff4ac1f5
 
   // Base
-  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(-4 .+. n,0,0), wood_col)),
-  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(-4 .+. n,1,0), wood_col)),
-  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(0,-4 .+. n,0), wood_col)),
-  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(1,-4 .+. n,0), wood_col)),
+  concat(_ generate_list(Atom; 9, 
+    (n) => pair(__ v3(-4 .+. n,0,0), wood_col)),
+  concat(_ generate_list(Atom; 9, 
+    (n) => pair(__ v3(-4 .+. n,1,0), wood_col)),
+  concat(_ generate_list(Atom; 9, 
+    (n) => pair(__ v3(0,-4 .+. n,0), wood_col)),
+  concat(_ generate_list(Atom; 9, 
+    (n) => pair(__ v3(1,-4 .+. n,0), wood_col)),
 
   // Main pillar
-  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,0,n), wood_col)),
-  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(1,0,n), wood_col)),
-  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,1,n), wood_col)),
-  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(-1,0,n), wood_col)),
-  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,-1,n), wood_col)),
+  concat(_ generate_list(Atom; 18, 
+    (n) => pair(__ v3(0,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, 
+    (n) => pair(__ v3(1,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, 
+    (n) => pair(__ v3(0,1,n), wood_col)),
+  concat(_ generate_list(Atom; 18, 
+    (n) => pair(__ v3(-1,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, 
+    (n) => pair(__ v3(0,-1,n), wood_col)),
 
   // Branches (horizontal)
-  concat(_ generate_list(Atom; 6, (n) => pair(__ v3(-1 .*. n, 0, 13), wood_col))
-  concat(_ generate_list(Atom; 6, (n) => pair(__ v3(-1 .*. n, 0, 12), wood_col))
-  concat(_ generate_list(Atom; 6, (n) => pair(__ v3( 1 .*. n, 0, 13), wood_col))
-  concat(_ generate_list(Atom; 6, (n) => pair(__ v3( 1 .*. n, 0, 12), wood_col))
+  concat(_ generate_list(Atom; 6, 
+    (n) => pair(__ v3(-1 .*. n, 0, 13), wood_col))
+  concat(_ generate_list(Atom; 6, 
+    (n) => pair(__ v3(-1 .*. n, 0, 12), wood_col))
+  concat(_ generate_list(Atom; 6, 
+    (n) => pair(__ v3( 1 .*. n, 0, 13), wood_col))
+  concat(_ generate_list(Atom; 6, 
+    (n) => pair(__ v3( 1 .*. n, 0, 12), wood_col))
 
   // Branches (vertical)
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-5, 0, 13 .+. n), wood_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-6, 0, 13 .+. n), wood_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 5, 0, 13 .+. n), wood_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 6, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(-5, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(-6, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3( 5, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3( 6, 0, 13 .+. n), wood_col))
 
   // Candles
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(0, 0, 18 .+. n), candle_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(1, 0, 18 .+. n), candle_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-5, 0, 18 .+. n), candle_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-6, 0, 18 .+. n), candle_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 5, 0, 18 .+. n), candle_col))
-  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 6, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(0, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(1, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(-5, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3(-6, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3( 5, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, 
+    (n) => pair(__ v3( 6, 0, 18 .+. n), candle_col))
 
   // Fire
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(0, 0, 23 .+. n), fire_col))
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(1, 0, 23 .+. n), fire_col))
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(-5, 0, 23 .+. n), fire_col))
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(-6, 0, 23 .+. n), fire_col))
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3( 5, 0, 23 .+. n), fire_col))
-  concat(_ generate_list(Atom; 3, (n) => pair(__ v3( 6, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3(0, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3(1, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3(-5, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3(-6, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3( 5, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, 
+    (n) => pair(__ v3( 6, 0, 23 .+. n), fire_col))
 
     [])))))))))))))))))))))))))))))
 
 // Renders object
-render_game_object(obj: GameObject, time: Number) : Renderable
+render_game_object(obj: GameObject, time: Number)
+: Renderable
   case obj
   | game_object =>
     let w = 8

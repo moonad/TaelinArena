@@ -14,7 +14,6 @@ var now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
-// (nil, cons) => cons((ball) => ball((pair) => pair(100, 100), 30), (nil, cons) => cons((ball) => ball((pair) => pair(200, 100), 10), (nil, cons) => cons((ball) => ball((pair) => pair(100, 200), 20), (nil, cons) => nil)))
 function get_renderables_from_fm(renderable) {
   let case_nil  = [];
   let case_cons = (head) => (tail) => {
@@ -24,7 +23,8 @@ function get_renderables_from_fm(renderable) {
       vox: vox,
     });
     var renderable = head(case_voxel);
-    return [renderable].concat(get_renderables_from_fm(tail));
+    return [renderable]
+      .concat(get_renderables_from_fm(tail));
   };
   return renderable(case_nil)(case_cons);
 };
@@ -42,10 +42,11 @@ class Counter extends Component {
         this.setState({count: this.state.count + 1});
       }
     }, [
-      h("div", {style: {"font-weight": "bold"}}, "TaelinArena"),
+      h("div", {
+          style: {"font-weight": "bold"}
+        },
+        "TaelinArena #" + String(this.state.count)),
       h("div", {}, "Esse site se tornará um MOBA <3"),
-      h("div", {}, String(this.state.count)),
-      //h("div", {}, String("Pos is: " + JSON.stringify(pos)))
     ]);
   }
 };
@@ -63,30 +64,29 @@ window.onload = () => {
   canvas.style.border = "1px solid black";
   canvas.style["image-rendering"] = "pixelated";
   var context = canvas.getContext("2d");
-  canvas.image_data = context.getImageData(0, 0, canvas.width, canvas.height);
-  canvas.image_buf  = new ArrayBuffer(canvas.image_data.data.length);
-  canvas.image_u8   = new Uint8ClampedArray(canvas.image_buf);
-  canvas.image_u32  = new Uint32Array(canvas.image_buf);
-  canvas.depth_u32  = new Uint32Array(canvas.image_u32.length);
+  canvas.image_data =
+    context.getImageData(0, 0, canvas.width, canvas.height);
+  canvas.image_buf =
+    new ArrayBuffer(canvas.image_data.data.length);
+  canvas.image_u8 =
+    new Uint8ClampedArray(canvas.image_buf);
+  canvas.image_u32 =
+    new Uint32Array(canvas.image_buf);
+  canvas.depth_u32 =
+    new Uint32Array(canvas.image_u32.length);
   canvas.draw = () => {
     canvas.image_data.data.set(canvas.image_u8);
     context.putImageData(canvas.image_data, 0, 0);
   }
   document.body.appendChild(canvas);
 
-  // Renders a pink screen
-  //for (var j = 0; j < canvas.height; ++j) {
-    //for (var i = 0; i < canvas.width; ++i) {
-      //canvas.image_u32[j * 256 + i] = 0xFFAAAAFF;
-    //}
-  //};
-  //canvas.draw();
-
   // Keys that are pressed
   var key = {};
   document.body.onkeyup = (e) => key[e.key] = 0;
   document.body.onkeypress = (e) => {
-    game_state = apply_input_to_game_state(t=>t(e.keyCode))(game_state);
+    game_state = apply_input_to_game_state
+      (t=>t(e.keyCode))
+      (game_state);
     key[e.key] = 1;
     //console.log(e.keyCode);
   };
@@ -115,10 +115,15 @@ window.onload = () => {
     game_state = tick_game_state(game_state);
 
     // Converts game state to renderables
-    var renderables = get_renderables_from_fm(render_game_state(game_state)(now()));
+    var renderables =
+      get_renderables_from_fm(
+        render_game_state(game_state)(now()));
 
     // Position of the player's object
-    var hero_pos = get_object_position(0)(game_state)(x => y => z => ({x,y,z}));
+    var hero_pos =
+      get_object_position
+        (0)
+        (game_state)(x => y => z => ({x,y,z}));
 
     // Clears screen
     for (var i = 0; i < canvas.width * canvas.height; ++i) {
@@ -145,12 +150,21 @@ window.onload = () => {
                 x = vlen * Math.cos(vang + now());
                 y = vlen * Math.sin(vang + now());
 
-                var sx = Math.floor(pos_x + x - z / Math.sqrt(3) + canvas.width*0.5 - hero_pos.x);
-                var sy = Math.floor(pos_y + y - z / Math.sqrt(3) + canvas.height*0.5 - hero_pos.y);
-                var d  = canvas.depth_u32[sy * canvas.width + sx] - 65536;
+                var sx = Math.floor(pos_x + x
+                  - z / Math.sqrt(3)
+                  + canvas.width*0.5 - hero_pos.x);
+                var sy =
+                  Math.floor(pos_y + y
+                    - z / Math.sqrt(3) + canvas.height*0.5
+                    - hero_pos.y);
+                var d = canvas.depth_u32[  
+                  sy * canvas.width + sx]
+                  - 65536;
                 if (z > d) {
-                  canvas.depth_u32[sy * canvas.width + sx] = Math.floor(z + 65536);
-                  canvas.image_u32[sy * canvas.width + sx] = col;
+                  canvas.depth_u32[sy * canvas.width + sx] =
+                    Math.floor(z + 65536);
+                  canvas.image_u32[sy * canvas.width + sx] =
+                    col;
                 }
               }));
               go(tail);
@@ -164,5 +178,4 @@ window.onload = () => {
     canvas.draw();
 
   }, 1000 / 24);
-
 };
