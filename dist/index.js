@@ -2305,19 +2305,25 @@ var {
   demo_game_state,
   tick_game_state,
   render_game_state,
-  apply_input_to_game_state
+  apply_input_to_game_state,
+  get_object_position,
 } = __webpack_require__(3);
+
+var now = (() => {
+  var init_time = Date.now()/1000;
+  return () => Date.now()/1000 - init_time;
+})();
 
 // (nil, cons) => cons((ball) => ball((pair) => pair(100, 100), 30), (nil, cons) => cons((ball) => ball((pair) => pair(200, 100), 10), (nil, cons) => cons((ball) => ball((pair) => pair(100, 200), 20), (nil, cons) => nil)))
 function get_renderables_from_fm(renderable) {
   let case_nil  = [];
   let case_cons = (head) => (tail) => {
-    let case_ball = pos => rad => ({
-      ctr: "ball",
-      pos: pos(x => y => ({x,y})),
-      rad: rad
+    let case_voxel = pos => vox => ({
+      ctr: "voxel",
+      pos: pos(x => y => z => ({x,y,z})),
+      vox: vox,
     });
-    var renderable = head(case_ball);
+    var renderable = head(case_voxel);
     return [renderable].concat(get_renderables_from_fm(tail));
   };
   return renderable(case_nil)(case_cons);
@@ -2350,13 +2356,31 @@ window.onload = () => {
   // Renders site using Inferno
   render(h(Counter), document.getElementById("main"));
 
-  // Renders the canvas
+  // Creates canvas and inserts on page
   var canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d");
   canvas.width = 256;
   canvas.height = 256;
   canvas.style.border = "1px solid black";
+  canvas.style["image-rendering"] = "pixelated";
+  var context = canvas.getContext("2d");
+  canvas.image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+  canvas.image_buf  = new ArrayBuffer(canvas.image_data.data.length);
+  canvas.image_u8   = new Uint8ClampedArray(canvas.image_buf);
+  canvas.image_u32  = new Uint32Array(canvas.image_buf);
+  canvas.depth_u32  = new Uint32Array(canvas.image_u32.length);
+  canvas.draw = () => {
+    canvas.image_data.data.set(canvas.image_u8);
+    context.putImageData(canvas.image_data, 0, 0);
+  }
   document.body.appendChild(canvas);
+
+  // Renders a pink screen
+  //for (var j = 0; j < canvas.height; ++j) {
+    //for (var i = 0; i < canvas.width; ++i) {
+      //canvas.image_u32[j * 256 + i] = 0xFFAAAAFF;
+    //}
+  //};
+  //canvas.draw();
 
   // Keys that are pressed
   var key = {};
@@ -2367,45 +2391,77 @@ window.onload = () => {
     //console.log(e.keyCode);
   };
 
+  // FPS metering
+  var last_fps_print = now();
+  var fps_count = 0;
+
+  // Camera
+  var cam_pos = {x: 0, y: 0, z: 0};
+
   // Initial state of the game
-  var dir = {x: 0, y: 0}; // player dir
-  var pos = {x: 128, y: 128}; // player pos
   var game_state = demo_game_state;
 
   // Main loop of the game
   setInterval(function main_loop() {
-    // Updates player position
-    dir.x = Number(key.d||0) - Number(key.a||0);
-    dir.y = Number(key.s||0) - Number(key.w||0);
-    pos.x = pos.x + dir.x;
-    pos.y = pos.y + dir.y;
-
-    // Renders player
-    context.clearRect(0, 0, 256, 256);
-    context.beginPath();
-    context.arc(pos.x, pos.y, 4, 0, 2 * Math.PI);
-    context.stroke();
+    // Updates the FPS counter
+    ++fps_count;
+    if (now() > last_fps_print + 1) {
+      document.title = "FPS " + fps_count;
+      fps_count = 0;
+      last_fps_print = now();
+    };
 
     // Updates game state
     game_state = tick_game_state(game_state);
 
     // Converts game state to renderables
-    var renderables = get_renderables_from_fm(render_game_state(game_state));
+    var renderables = get_renderables_from_fm(render_game_state(game_state)(now()));
+
+    // Position of the player's object
+    var hero_pos = get_object_position(0)(game_state)(x => y => z => ({x,y,z}));
+
+    // Clears screen
+    for (var i = 0; i < canvas.width * canvas.height; ++i) {
+      canvas.image_u32[i] = 0x00000000;
+      canvas.depth_u32[i] = 0;
+    };
+    //context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draws renderables on screen
     for (var i = 0; i < renderables.length; ++i) {
       var renderable = renderables[i];
       switch (renderable.ctr) {
-        case "ball":
-          var ball_x = renderable.pos.x;
-          var ball_y = renderable.pos.y;
-          var rad    = renderable.rad;
-          context.beginPath();
-          context.arc(ball_x, ball_y, rad, 0, 2 * Math.PI);
-          context.stroke();
-        break;
+        case "voxel":
+          var pos_x = renderable.pos.x;
+          var pos_y = renderable.pos.y;
+          var pos_z = renderable.pos.z;
+          var vox   = renderable.vox;
+          (function go(vox) {
+            let case_nil  = null;
+            let case_cons = head => tail => {
+              head(pos => col => pos(x => y => z => {
+                var vlen = Math.sqrt(x*x + y*y);
+                var vang = Math.atan2(y, x);
+                x = vlen * Math.cos(vang + now());
+                y = vlen * Math.sin(vang + now());
+
+                var sx = Math.floor(pos_x + x - z / Math.sqrt(3) + canvas.width*0.5 - hero_pos.x);
+                var sy = Math.floor(pos_y + y - z / Math.sqrt(3) + canvas.height*0.5 - hero_pos.y);
+                var d  = canvas.depth_u32[sy * canvas.width + sx] - 65536;
+                if (z > d) {
+                  canvas.depth_u32[sy * canvas.width + sx] = Math.floor(z + 65536);
+                  canvas.image_u32[sy * canvas.width + sx] = col;
+                }
+              }));
+              go(tail);
+            };
+            return vox(case_nil)(case_cons);
+          })(vox);
+          break;
       };
-    }
+    };
+
+    canvas.draw();
 
   }, 1000 / 24);
 
@@ -2551,27 +2607,33 @@ function h(_tag, _props, _children) {
 /***/ (function(module, exports) {
 
 module.exports = (function(){
-  var _Pair$g_Jv$pair = (_4=>(_5=>(_6=>_6(_4)(_5))));
-  var _TaelinArena$map_pair = (_0=>(_1=>_1((_2=>(_3=>_Pair$g_Jv$pair(_0(_2))(_0(_3)))))));
-  var _TaelinArena$mut_fst = (_0=>(_1=>_1((_2=>(_3=>_Pair$g_Jv$pair(_0(_2))(_3))))));
-  var _TaelinArena$mut_snd = (_0=>(_1=>_1((_2=>(_3=>_Pair$g_Jv$pair(_2)(_0(_3)))))));
+  var _TaelinArena$V3 = undefined;
+  var _TaelinArena$v3 = (_0=>(_1=>(_2=>(_3=>_3(_0)(_1)(_2)))));
+  var _TaelinArena$map_v3 = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_0(_2))(_0(_3))(_0(_4))))))));
+  var _TaelinArena$mut_x = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_0(_2))(_3)(_4)))))));
+  var _TaelinArena$mut_y = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_2)(_0(_3))(_4)))))));
+  var _TaelinArena$mut_z = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_2)(_3)(_0(_4))))))));
   var _List$HQNc$nil = (_2=>(_3=>_2));
   var _List$HQNc$cons = (_4=>(_5=>(_6=>(_7=>_7(_4)(_5)))));
   var _TaelinArena$map_list = (_0=>(_1=>_1(_List$HQNc$nil)((_2=>(_3=>_List$HQNc$cons(_0(_2))(_TaelinArena$map_list(_0)(_3)))))));
-  var _Pair$g_Jv$Pair = (_0=>(_1=>undefined));
-  var _TaelinArena$Pos = _Pair$g_Jv$Pair(undefined)(undefined);
+  var _TaelinArena$generate_list_go = (_0=>(_1=>(_2=>((_0===_1? 1 : 0)?_List$HQNc$nil:_List$HQNc$cons(_2(_0))(_TaelinArena$generate_list_go((_0+1))(_1)(_2))))));
+  var _TaelinArena$generate_list = (_0=>(_1=>_TaelinArena$generate_list_go(0)(_0)(_1)));
   var _TaelinArena$GameObject = undefined;
-  var _TaelinArena$game_object = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$game_object = (_0=>(_1=>(_2=>(_3=>(_4=>_4(_0)(_1)(_2)(_3))))));
   var _List$HQNc$List = (_0=>undefined);
   var _TaelinArena$GameMap = _List$HQNc$List(_TaelinArena$GameObject);
   var _TaelinArena$GameState = undefined;
   var _TaelinArena$game_state = (_0=>(_1=>_1(_0)));
-  var _TaelinArena$get_pos = (_0=>_0((_1=>(_2=>_2))));
+  var _TaelinArena$get_pos = (_0=>_0((_1=>(_2=>(_3=>(_4=>_3))))));
+  var _TaelinArena$SRPX = 0;
+  var _TaelinArena$STANCI = 1;
+  var _TaelinArena$NEELIX = 2;
   var _Maybe$rXzW$some = (_0=>(_1=>(_2=>_2(_0))));
-  var _TaelinArena$srpx = _TaelinArena$game_object(_Maybe$rXzW$some(70))(_Pair$g_Jv$pair(10)(10));
-  var _TaelinArena$stanci = _TaelinArena$game_object(_Maybe$rXzW$some(80))(_Pair$g_Jv$pair(30)(30));
-  var _TaelinArena$demo_game_state = _TaelinArena$game_state(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$nil)));
-  var _TaelinArena$tick_game_object = (_0=>_0((_1=>(_2=>_2((_3=>(_4=>_TaelinArena$game_object(_1)(_Pair$g_Jv$pair(_3)(_4)))))))));
+  var _TaelinArena$srpx = _TaelinArena$game_object(0)(_Maybe$rXzW$some(70))(_TaelinArena$v3(96)(96)(0))(_TaelinArena$v3(12)(12)(18));
+  var _TaelinArena$stanci = _TaelinArena$game_object(1)(_Maybe$rXzW$some(90))(_TaelinArena$v3(64)(64)(0))(_TaelinArena$v3(12)(12)(12));
+  var _TaelinArena$neelix = _TaelinArena$game_object(2)(_Maybe$rXzW$some(7000))(_TaelinArena$v3(128)(128)(0))(_TaelinArena$v3(6)(6)(6));
+  var _TaelinArena$demo_game_state = _TaelinArena$game_state(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$cons(_TaelinArena$neelix)(_List$HQNc$nil))));
+  var _TaelinArena$tick_game_object = (_0=>_0((_1=>(_2=>(_3=>(_4=>_3((_5=>(_6=>(_7=>_TaelinArena$game_object(_1)(_2)(_TaelinArena$v3(_5)(_6)(_7))(_4)))))))))));
   var _TaelinArena$tick_game_map = (_0=>_0(_List$HQNc$nil)((_1=>(_2=>_List$HQNc$cons(_TaelinArena$tick_game_object(_1))(_TaelinArena$tick_game_map(_2))))));
   var _TaelinArena$tick_game_state = (_0=>_0((_1=>_TaelinArena$game_state(_TaelinArena$tick_game_map(_1)))));
   var _TaelinArena$W_KEY = 119;
@@ -2580,29 +2642,45 @@ module.exports = (function(){
   var _TaelinArena$D_KEY = 100;
   var _TaelinArena$UserInput = undefined;
   var _TaelinArena$key_press = (_0=>(_1=>_1(_0)));
-  var _TaelinArena$apply_input_to_game_object = (_0=>(_1=>_1((_2=>(_3=>_TaelinArena$game_object(_2)(((_0===_TaelinArena$W_KEY? 1 : 0)?_TaelinArena$mut_snd((_4=>(_4-10)))(_3):((_0===_TaelinArena$A_KEY? 1 : 0)?_TaelinArena$mut_fst((_4=>(_4-10)))(_3):((_0===_TaelinArena$S_KEY? 1 : 0)?_TaelinArena$mut_snd((_4=>(_5=>(_4+_5)))(2))(_3):((_0===_TaelinArena$D_KEY? 1 : 0)?_TaelinArena$mut_fst((_4=>(_5=>(_4+_5)))(50))(_3):_3))))))))));
-  var _TaelinArena$apply_input_to_game_state = (_0=>(_1=>_0((_2=>_1((_3=>_TaelinArena$game_state(_TaelinArena$map_list(_TaelinArena$apply_input_to_game_object(_2))(_3))))))));
+  var _TaelinArena$apply_input_to_game_object = (_0=>(_1=>_1((_2=>(_3=>(_4=>(_5=>_TaelinArena$game_object(_2)(_3)(((_0===_TaelinArena$W_KEY? 1 : 0)?_TaelinArena$mut_y((_6=>(_6-2)))(_4):((_0===_TaelinArena$A_KEY? 1 : 0)?_TaelinArena$mut_x((_6=>(_6-2)))(_4):((_0===_TaelinArena$S_KEY? 1 : 0)?_TaelinArena$mut_y((_6=>(_6+2)))(_4):((_0===_TaelinArena$D_KEY? 1 : 0)?_TaelinArena$mut_x((_6=>(_6+2)))(_4):_4)))))(_5))))))));
+  var _TaelinArena$apply_input_to_game_state = (_0=>(_1=>_0((_2=>_1((_3=>_TaelinArena$game_state(_3(_List$HQNc$nil)((_4=>(_5=>_List$HQNc$cons(_TaelinArena$apply_input_to_game_object(_2)(_4))(_5)))))))))));
+  var _TaelinArena$Color = undefined;
   var _TaelinArena$Renderable = undefined;
-  var _TaelinArena$ball = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$voxel = (_0=>(_1=>(_2=>_2(_0)(_1))));
   var _TaelinArena$Renderables = _List$HQNc$List(_TaelinArena$Renderable);
-  var _TaelinArena$render_game_object = (_0=>_0((_1=>(_2=>_TaelinArena$ball(_2)(12)))));
-  var _TaelinArena$render_game_map = (_0=>_0(_List$HQNc$nil)((_1=>(_2=>_List$HQNc$cons(_TaelinArena$render_game_object(_1))(_TaelinArena$render_game_map(_2))))));
-  var _TaelinArena$render_game_state = (_0=>_0((_1=>_TaelinArena$render_game_map(_1))));
-  var _TaelinArena$main = _Pair$g_Jv$pair(_TaelinArena$demo_game_state)(_Pair$g_Jv$pair(_TaelinArena$tick_game_state)(_Pair$g_Jv$pair(_TaelinArena$render_game_state)(_TaelinArena$apply_input_to_game_state)));
+  var _Pair$g_Jv$Pair = (_0=>(_1=>undefined));
+  var _TaelinArena$Atom = _Pair$g_Jv$Pair(_TaelinArena$V3)(_TaelinArena$Color);
+  var _List$HQNc$concat = (_0=>(_1=>_0((_2=>_2))((_2=>(_3=>(_4=>_List$HQNc$cons(_2)(_List$HQNc$concat(_3)(_4))))))(_1)));
+  var _Pair$g_Jv$pair = (_1=>(_2=>(_3=>_3(_1)(_2))));
+  var _TaelinArena$candle = _List$HQNc$concat(_TaelinArena$generate_list(9)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((-4+_0))(0)(0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(9)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((-4+_0))(1)(0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(9)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)((-4+_0))(0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(9)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(1)((-4+_0))(0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(18)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)(0)(_0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(18)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(1)(0)(_0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(18)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)(1)(_0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(18)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-1)(0)(_0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(18)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)(-1)(_0))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(6)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((-1*_0))(0)(13))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(6)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((-1*_0))(0)(12))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(6)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((1*_0))(0)(13))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(6)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3((1*_0))(0)(12))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-5)(0)((13+_0)))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-6)(0)((13+_0)))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(5)(0)((13+_0)))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(6)(0)((13+_0)))(4280231215))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(1)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-5)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-6)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(5)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(5)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(6)(0)((18+_0)))(4288341755))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(0)(0)((23+_0)))(4283089397))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(1)(0)((23+_0)))(4283089397))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-5)(0)((23+_0)))(4283089397))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(-6)(0)((23+_0)))(4283089397))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(5)(0)((23+_0)))(4283089397))))(_List$HQNc$concat(_TaelinArena$generate_list(3)((_0=>_Pair$g_Jv$pair(_TaelinArena$v3(6)(0)((23+_0)))(4283089397))))(_List$HQNc$nil)))))))))))))))))))))))))))));
+  var _TaelinArena$render_game_object = (_0=>(_1=>_0((_2=>(_3=>(_4=>(_5=>_TaelinArena$voxel(_4)(((_2===2? 1 : 0)?_TaelinArena$candle:_TaelinArena$generate_list((8*(8*8)))((_6=>_Pair$g_Jv$pair(_TaelinArena$v3((_6%8))((((_6/8)%8)<<0))((((_6/8)/8)<<0)))(((_2===0? 1 : 0)?4278190335:((_2===1? 1 : 0)?4278255360:((_2===2? 1 : 0)?4294901760:4278190080)))))))))))))));
+  var _TaelinArena$render_game_map = (_0=>(_1=>_0(_List$HQNc$nil)((_2=>(_3=>_List$HQNc$cons(_TaelinArena$render_game_object(_2)(_1))(_TaelinArena$render_game_map(_3)(_1)))))));
+  var _TaelinArena$render_game_state = (_0=>(_1=>_0((_2=>_TaelinArena$render_game_map(_2)(_1)))));
+  var _TaelinArena$get_object_position_from_map = (_0=>(_1=>_1(_TaelinArena$v3(0)(0)(0))((_2=>(_3=>_2((_4=>(_5=>(_6=>(_7=>((_4===_0? 1 : 0)?_6:_TaelinArena$get_object_position_from_map(_0)(_3))))))))))));
+  var _TaelinArena$get_object_position = (_0=>(_1=>_1((_2=>_TaelinArena$get_object_position_from_map(_0)(_2)))));
+  var _TaelinArena$main = _Pair$g_Jv$pair(_TaelinArena$demo_game_state)(_Pair$g_Jv$pair(_TaelinArena$tick_game_state)(_Pair$g_Jv$pair(_TaelinArena$render_game_state)(_Pair$g_Jv$pair(_TaelinArena$get_object_position)(_TaelinArena$apply_input_to_game_state))));
   return {
-    'map_pair':_TaelinArena$map_pair,
-    'mut_fst':_TaelinArena$mut_fst,
-    'mut_snd':_TaelinArena$mut_snd,
+    'V3':_TaelinArena$V3,
+    'v3':_TaelinArena$v3,
+    'map_v3':_TaelinArena$map_v3,
+    'mut_x':_TaelinArena$mut_x,
+    'mut_y':_TaelinArena$mut_y,
+    'mut_z':_TaelinArena$mut_z,
     'map_list':_TaelinArena$map_list,
-    'Pos':_TaelinArena$Pos,
+    'generate_list.go':_TaelinArena$generate_list_go,
+    'generate_list':_TaelinArena$generate_list,
     'GameObject':_TaelinArena$GameObject,
     'game_object':_TaelinArena$game_object,
     'GameMap':_TaelinArena$GameMap,
     'GameState':_TaelinArena$GameState,
     'game_state':_TaelinArena$game_state,
     'get_pos':_TaelinArena$get_pos,
+    'SRPX':_TaelinArena$SRPX,
+    'STANCI':_TaelinArena$STANCI,
+    'NEELIX':_TaelinArena$NEELIX,
     'srpx':_TaelinArena$srpx,
     'stanci':_TaelinArena$stanci,
+    'neelix':_TaelinArena$neelix,
     'demo_game_state':_TaelinArena$demo_game_state,
     'tick_game_object':_TaelinArena$tick_game_object,
     'tick_game_map':_TaelinArena$tick_game_map,
@@ -2615,12 +2693,17 @@ module.exports = (function(){
     'key_press':_TaelinArena$key_press,
     'apply_input_to_game_object':_TaelinArena$apply_input_to_game_object,
     'apply_input_to_game_state':_TaelinArena$apply_input_to_game_state,
+    'Color':_TaelinArena$Color,
     'Renderable':_TaelinArena$Renderable,
-    'ball':_TaelinArena$ball,
+    'voxel':_TaelinArena$voxel,
     'Renderables':_TaelinArena$Renderables,
+    'Atom':_TaelinArena$Atom,
+    'candle':_TaelinArena$candle,
     'render_game_object':_TaelinArena$render_game_object,
     'render_game_map':_TaelinArena$render_game_map,
     'render_game_state':_TaelinArena$render_game_state,
+    'get_object_position_from_map':_TaelinArena$get_object_position_from_map,
+    'get_object_position':_TaelinArena$get_object_position,
     'main':_TaelinArena$main
   };
 })()

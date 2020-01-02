@@ -4,34 +4,49 @@ import Base#mbRT
 // :: Extra Utils ::
 // :::::::::::::::::
 
-map_pair(A; B; fn: A -> B, p: Pair(A, A)) : Pair(B, B)
-  case p
-  | pair => pair(__ fn(p.fst), fn(p.snd))
+T V3
+| v3(x: Number, y: Number, z: Number) 
 
-mut_fst(A0; A1; B; fn: A0 -> A1, p: Pair(A0,B)) : Pair(A1,B)
-  case p
-  | pair => pair(__ fn(p.fst), p.snd)
+map_v3(fn: Number -> Number, v: V3) : V3
+  case v
+  | v3 => v3(fn(v.x), fn(v.y), fn(v.z))
 
-mut_snd(A; B0; B1; fn: B0 -> B1, p: Pair(A,B0)) : Pair(A,B1)
-  case p
-  | pair => pair(__ p.fst, fn(p.snd))
+mut_x(fn: Number -> Number, v: V3) : V3
+  case v
+  | v3 => v3(fn(v.x), v.y, v.z)
+
+mut_y(fn: Number -> Number, v: V3) : V3
+  case v
+  | v3 => v3(v.x, fn(v.y), v.z)
+
+mut_z(fn: Number -> Number, v: V3) : V3
+  case v
+  | v3 => v3(v.x, v.y, fn(v.z))
 
 map_list(A; B; fn: A -> B, xs: List(A)) : List(B)
   case xs
   | nil  => []
   | cons => cons(_ fn(xs.head), map_list(__ fn, xs.tail))
 
+generate_list.go(A; idx: Number, len: Number, fn: Number -> A) : List(A)
+  if idx .==. len then
+    []
+  else
+    cons(_ fn(idx), generate_list.go(A; idx .+. 1, len, fn))
+
+generate_list(A; len: Number, fn: Number -> A) : List(A)
+  generate_list.go(A; 0, len, fn)
+
 // ::::::::::::::::
 // :: Game Logic ::
 // ::::::::::::::::
 
-Pos : Type
-  Pair(Number, Number)
-
 T GameObject
 | game_object(
+  id: Number,
   hp: Maybe(Number),
-  pos: Pos)
+  pos: V3,
+  size: V3)
 
 GameMap : Type
   List(GameObject)
@@ -39,28 +54,37 @@ GameMap : Type
 T GameState
 | game_state(map : GameMap)
 
-get_pos(obj : GameObject) : Pos
+get_pos(obj : GameObject) : V3
   case obj
   | game_object => obj.pos
 
+SRPX : Number; 0
+STANCI : Number; 1
+NEELIX : Number; 2
+
 srpx : GameObject
-  game_object(some(_ 70), pair(__ 10, 10))
+  game_object(0, some(_ 70), v3(96, 96, 0), v3(12,12,18))
 
 stanci : GameObject
-  game_object(some(_ 80), pair(__ 30, 30))
+  game_object(1, some(_ 90), v3(64, 64, 0), v3(12,12,12))
+
+neelix : GameObject
+  game_object(2, some(_ 7000), v3(128, 128, 0), v3(6,6,6))
 
 demo_game_state : GameState
-  let map = [srpx, stanci]
+  let map = [srpx, stanci, neelix]
   game_state(map)
 
 tick_game_object(go: GameObject) : GameObject
   case go
   | game_object =>
     case go.pos
-    | pair =>
-      let new_hp  = go.hp
-      let new_pos = pair(__ go.pos.fst, go.pos.snd)
-      game_object(new_hp, new_pos)
+    | v3 =>
+      let new_id   = go.id
+      let new_hp   = go.hp
+      let new_pos  = v3(go.pos.x, go.pos.y, go.pos.z)
+      let new_size = go.size
+      game_object(new_id, new_hp, new_pos, new_size)
 
 tick_game_map(gm: GameMap) : GameMap
   case gm
@@ -85,22 +109,25 @@ D_KEY : Number; 100
 T UserInput
 | key_press(key : Number)
 
-apply_input_to_game_object(key: Number, go: GameObject) : GameObject
-  case go
+apply_input_to_game_object(key: Number, obj: GameObject) : GameObject
+  case obj
   | game_object =>
-    let new_hp  = go.hp
-    let new_pos =
+    let new_id   = obj.id
+    let new_hp   = obj.hp
+    let new_pos  =
+      let spd = 2
       if key .==. W_KEY then
-        mut_snd(___ (x) => x .-. 10, go.pos)
+        mut_y((x) => x .-. spd, obj.pos)
       else if key .==. A_KEY then
-        mut_fst(___ (x) => x .-. 10, go.pos)
+        mut_x((x) => x .-. spd, obj.pos)
       else if key .==. S_KEY then
-        mut_snd(___ .+.(2), go.pos)
+        mut_y((x) => x .+. spd, obj.pos)
       else if key .==. D_KEY then
-        mut_fst(___ .+.(2), go.pos)
+        mut_x((x) => x .+. spd, obj.pos)
       else
-        go.pos
-    game_object(new_hp, new_pos)
+        obj.pos
+    let new_size = obj.size
+    game_object(new_id, new_hp, new_pos, new_size)
 
 apply_input_to_game_state(ui: UserInput, gs: GameState) : GameState
   case ui
@@ -109,7 +136,9 @@ apply_input_to_game_state(ui: UserInput, gs: GameState) : GameState
     | game_state => 
       let T = GameObject
       let f = apply_input_to_game_object(ui.key)
-      game_state(map_list(T; T; f, gs.map))
+      game_state(case gs.map
+        | nil  => []
+        | cons => cons(_ f(gs.map.head), gs.map.tail))
 
 //apply_inputs_to_game_state(ui: List(UserInput), gs: GameState) : GameState
   //case ui
@@ -122,34 +151,128 @@ apply_input_to_game_state(ui: UserInput, gs: GameState) : GameState
 // :: Game Graphics ::
 // :::::::::::::::::::
 
-T Renderable
-| ball(pos : Pos, rad : Number)
+Color : Type
+  Number
 
+T Renderable
+| voxel(
+  pos: V3,
+  vox: List(Pair(V3, Color))
+  )
+  
 Renderables : Type
   List(Renderable)
 
+Atom : Type
+  Pair(V3, Color)
+
+candle : List(Atom)
+  let candle_col = 0xff9ae6fb
+  let wood_col = 0xff1f252f
+  let fire_col = 0xff4ac1f5
+
+  // Base
+  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(-4 .+. n,0,0), wood_col)),
+  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(-4 .+. n,1,0), wood_col)),
+  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(0,-4 .+. n,0), wood_col)),
+  concat(_ generate_list(Atom; 9, (n) => pair(__ v3(1,-4 .+. n,0), wood_col)),
+
+  // Main pillar
+  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(1,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,1,n), wood_col)),
+  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(-1,0,n), wood_col)),
+  concat(_ generate_list(Atom; 18, (n) => pair(__ v3(0,-1,n), wood_col)),
+
+  // Branches (horizontal)
+  concat(_ generate_list(Atom; 6, (n) => pair(__ v3(-1 .*. n, 0, 13), wood_col))
+  concat(_ generate_list(Atom; 6, (n) => pair(__ v3(-1 .*. n, 0, 12), wood_col))
+  concat(_ generate_list(Atom; 6, (n) => pair(__ v3( 1 .*. n, 0, 13), wood_col))
+  concat(_ generate_list(Atom; 6, (n) => pair(__ v3( 1 .*. n, 0, 12), wood_col))
+
+  // Branches (vertical)
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-5, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-6, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 5, 0, 13 .+. n), wood_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 6, 0, 13 .+. n), wood_col))
+
+  // Candles
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(0, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(1, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-5, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3(-6, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 5, 0, 18 .+. n), candle_col))
+  concat(_ generate_list(Atom; 5, (n) => pair(__ v3( 6, 0, 18 .+. n), candle_col))
+
+  // Fire
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(0, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(1, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(-5, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3(-6, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3( 5, 0, 23 .+. n), fire_col))
+  concat(_ generate_list(Atom; 3, (n) => pair(__ v3( 6, 0, 23 .+. n), fire_col))
+
+    [])))))))))))))))))))))))))))))
+
 // Renders object
-render_game_object(go : GameObject) : Renderable
-  case go
-  | game_object => ball(go.pos, 12)
+render_game_object(obj: GameObject, time: Number) : Renderable
+  case obj
+  | game_object =>
+    let w = 8
+    let h = 8
+    let d = 8
+    voxel(obj.pos,
+      if obj.id .==. 2 then
+        candle
+      else
+        generate_list(
+          Pair(V3,Color);
+          w .*. h .*. d,
+          (n) =>
+            let x = n .%. w
+            let y = ((n ./. w) .%. h) .<<. 0
+            let z = ((n ./. w) ./. h) .<<. 0
+            let c = if      obj.id .==. 0 then 0xFF0000FF
+                    else if obj.id .==. 1 then 0xFF00FF00
+                    else if obj.id .==. 2 then 0xFFFF0000
+                    else 0xFF000000
+            pair(__ v3(x, y, z), c)))
 
 // Renders game map
-render_game_map(gm : GameMap) : Renderables
+render_game_map(gm: GameMap, time: Number) : Renderables
   case gm
   | nil =>
     []
   | cons =>
-    let obj  = render_game_object(gm.head)
-    let rest = render_game_map(gm.tail)
+    let obj  = render_game_object(gm.head, time)
+    let rest = render_game_map(gm.tail, time)
     cons(_ obj, rest)
 
 // Renders game state
-render_game_state(gs : GameState) : Renderables
+render_game_state(gs: GameState, time: Number) : Renderables
   case gs
-  | game_state => render_game_map(gs.map)
+  | game_state => render_game_map(gs.map, time)
+
+// Gets the position of an object on the game map
+get_object_position_from_map(id: Number, gm: GameMap) : V3
+  case gm
+  | nil  => v3(0,0,0)
+  | cons =>
+    case gm.head
+    | game_object => 
+      if gm.head.id .==. id then
+        gm.head.pos
+      else
+        get_object_position_from_map(id, gm.tail)
+        
+// Gets the position of an object on the game state
+get_object_position(id: Number, gs: GameState) : V3
+  case gs
+  | game_state => get_object_position_from_map(id, gs.map)
 
 main
   pair(__ demo_game_state,
   pair(__ tick_game_state,
   pair(__ render_game_state,
-    apply_input_to_game_state)))
+  pair(__ get_object_position,
+    apply_input_to_game_state))))
