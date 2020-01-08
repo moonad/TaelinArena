@@ -2,10 +2,16 @@ const oct = require("./octree.js");
 
 module.exports = function canvox() {
   var canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  canvas.style.border = "1px solid black";
+  var scale = 2;
+  canvas.width = window.innerWidth / scale;
+  canvas.height = window.innerHeight / scale;
+  canvas.style.width = (canvas.width * scale) + "px";
+  canvas.style.height = (canvas.height * scale) + "px";
+
+  //canvas.style.border = "1px solid black";
   canvas.style["image-rendering"] = "pixelated";
+  //canvas.style.width = "512px";
+  //canvas.style.height = "512px";
   var context = canvas.getContext("2d");
   canvas.image_data =
     context.getImageData(0, 0, canvas.width, canvas.height);
@@ -57,7 +63,15 @@ module.exports = function canvox() {
           var sx  = Math.floor(hx + W*0.5 - (hz+512)/S3);
           var sy  = Math.floor(hy + H*0.5 - (hz+512)/S3);
           var si  = sy * W + sx;
-          voxels[i*2+1] = 0xFF8888FF;
+          var col = voxels[i*2+1];
+          var r   = col & 0xFF;
+          var g   = (col >>> 8) & 0xFF;
+          var b   = (col >>> 16) & 0xFF;
+          var r   = (r * 0.8) >>> 0;
+          var g   = (g * 0.8) >>> 0;
+          var b   = (b * 0.8) >>> 0;
+          var col = r | (g << 8) | (b << 16) | 0xFF000000;
+          voxels[i*2+1] = col;
           canvas.image_u32[si] = 0xFFE8E8E8;
           clear.push(si);
           break;
@@ -65,20 +79,20 @@ module.exports = function canvox() {
     }
 
     // Casts some light
-    for (var y = -8; y < 8; y += 1) {
-      for (var z = -512+8; z < -512+24; z += 1) {
-        var hit = oct.march(100,y,z,-1,0,0,tree);
-        switch (hit.ctr) {
-          case oct.HIT:
-            voxels[hit.val*2+1] = 0xFF0000FF;
-            break;
-          case oct.MIS:
-            break;
-          case oct.PAS:
-            break;
-        }
-      }
-    }
+    //for (var y = -8; y < 8; y += 1) {
+      //for (var z = -512+8; z < -512+24; z += 1) {
+        //var hit = oct.march(100,y,z,-1,0,0,tree);
+        //switch (hit.ctr) {
+          //case oct.HIT:
+            //voxels[hit.val*2+1] = 0xFF0000FF;
+            //break;
+          //case oct.MIS:
+            //break;
+          //case oct.PAS:
+            //break;
+        //}
+      //}
+    //}
 
 
     // Draws all voxels to buffers

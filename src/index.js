@@ -1,8 +1,20 @@
+// HTML Rendering
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
+
+// Voxel Rendering
 const oct = require("./octree.js");
 const canvox = require("./canvox.js");
 
+// Voxel Models
+const spritestack = require("./spritestack.js");
+const load_model = name => {
+  var model_json = require("./models/"+name+".json");
+  return spritestack.model_to_voxels(model_json);
+};
+const model = load_model("fantasy");
+
+// Taelin Arena
 var {
   demo_game_state,
   tick_game_state,
@@ -117,23 +129,47 @@ window.onload = () => {
 
     // Creates list of voxels
     var voxels = [];
-    for (var x = -16; x < 16; ++x) {
-      for (var y = -16; y < 16; ++y) {
-        for (var z = -512; z < -512+32; ++z) {
-          var pl = Math.sqrt(x*x+y*y);
-          var pa = Math.atan2(y,x);
+    //for (var x = -16; x < 16; ++x) {
+      //for (var y = -16; y < -14; ++y) {
+        //for (var z = -512; z < -512+32; ++z) {
+          //var pl = Math.sqrt(x*x+y*y);
+          //var pa = Math.atan2(y,x);
+          //var px = pl * Math.cos(pa + T);
+          //var py = pl * Math.sin(pa + T);
+          //var pz = z;
+          //var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+          //var col = 0xFFAAAAFF;
+          //voxels[voxels.length] = pos;
+          //voxels[voxels.length] = col;
+        //}
+      //}
+    //}
+
+    for (var X = -1; X <= 1; ++X) {
+      for (var Y = -0; Y <= 0; ++Y) {
+        for (var i = 0; i < model.length; ++i) {
+          var [{x,y,z},col] = model[i];
+          var sc = 0.75;
+          var px = x * sc + (X * 48);
+          var py = y * sc + (Y * 48);
+          var pz = (z + 66) * sc;
+
+          var pl = Math.sqrt(px*px+py*py);
+          var pa = Math.atan2(py,px);
           var px = pl * Math.cos(pa + T);
           var py = pl * Math.sin(pa + T);
-          var pos
-            = (px + 512) << 20
-            | (py + 512) << 10
-            | (z + 512);
-          var col = 0xFFAAAAFF;
+
+          var pz = -512 + pz;
+          var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+          //console.log(px,py,pz,pos);
+          var col = col + 0xFF000000;
           voxels[voxels.length] = pos;
           voxels[voxels.length] = col;
         }
       }
     }
+    
+    console.log(voxels.length);
 
     canvas.draw(voxels);
 
