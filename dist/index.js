@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2296,10 +2296,338 @@ if (false) {}
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+// Format: a Tree can be either Nil, Tip or Oct. Nil holds
+// nothing. TIP holds a value. Oct holds 8 Trees. The memory
+// is organized in blocks if 8 uint32, plus a root pointer.
+// A pointer is represented as an uint32, where the first
+// two bits represent the constructor it points to, and the
+// last 30 bits represent its data. For a `Tip`, it is the
+// value. For an `oct`, it is an index. The tree has an
+// exact depth of 10, allowing 1024x1024x1024 values to be
+// stored.
+
+const min = Math.min;
+const max = Math.max;
+const flr = Math.floor;
+const p32 = 2 ** 32;
+const q32 = 1 / p32;
+const eps = 1 / 65536;
+
+const CTR = 0xC0000000;
+const VAL = 0x3FFFFFFF;
+
+const NIL = 0x00000000;
+const TIP = 0x40000000;
+const OCT = 0x80000000;
+
+function empty() {
+  return [NIL, NIL, NIL, NIL, NIL, NIL, NIL, NIL];
+};
+
+function insert(px, py, pz, col, oct) {
+  px = (px + 512) >>> 0;
+  py = (py + 512) >>> 0;
+  pz = (pz + 512) >>> 0;
+  var idx = 0;
+  for (var bit = 9; bit >= 0; bit = bit - 1) {
+    var slt
+      = (((px >>> bit) & 1) << 2)
+      | (((py >>> bit) & 1) << 1)
+      | (((pz >>> bit) & 1) << 0);
+    if (bit === 0) {
+      oct[idx+slt] = TIP | col;
+    } else {
+      var nod = oct[idx+slt];
+      var ctr = (nod&CTR)>>>0;
+      var val = (nod&VAL)>>>0;
+      if (ctr === NIL) {
+        oct[idx+slt] = OCT | oct.length;
+        idx = oct.length;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+        oct[oct.length] = NIL;
+      } else {
+        idx = val;
+      }
+    }
+  }
+};
+
+const NOP = 0x00000000;
+const GOT = 0x40000000;
+
+// Lookup returns either GOT(col) or NOP(lvl). GOT contains
+// the found color. NOP contains the how many levels above
+// the contained color it stopped.
+function lookup(px, py, pz, oct) {
+  px = (px + 512) >>> 0;
+  py = (py + 512) >>> 0;
+  pz = (pz + 512) >>> 0;
+  var idx = 0;
+  for (var bit = 9; bit >= 0; bit = bit - 1) {
+    var slt
+      = (((px >>> bit) & 1) << 2)
+      | (((py >>> bit) & 1) << 1)
+      | (((pz >>> bit) & 1) << 0);
+    if (bit === 0) {
+      // No need to deconstruct because NIL/TIP have the
+      // same constructor labels as NOP/GOT.
+      return oct[idx+slt];
+    } else {
+      var nod = oct[idx+slt];
+      var ctr = (nod&CTR)>>>0;
+      if (ctr !== NIL) {
+        idx = (nod&VAL)>>>0;
+      } else {
+        return NOP | bit;
+      }
+    }
+  };
+};
+
+// Converts an octree to a string
+function show(oct, ptr = OCT, lvl = 0) {
+  var ctr = (ptr & 0xC0000000) >>> 0;
+  var val = (ptr & 0x3FFFFFFF) >>> 0;
+  var str = "";
+  for (var j = 0; j < lvl; ++j) {
+    str += j === lvl-1 ? "+" : "-";
+  }
+  switch (ctr) {
+    case NIL:
+      return str + "\n";
+    case TIP:
+      //for (var j = 0; j < lvl; ++j) {
+        //str += "-";
+      //}
+      return str + "0x"+val.toString(16) + "\n";
+    case OCT:
+      str += "oct\n";
+      for (var i = 0; i < 8; ++i) {
+        str += show(oct, oct[val+i], lvl+1);
+      }
+      return str;
+  }
+};
+
+// Moves a ray through a direction and returns the distance
+// traveled until it hits the surface of the box. The ray
+// can start inside. If it never hits, returns infinite.
+function intersect(
+  ray_pos_x, ray_pos_y, ray_pos_z,
+  ray_dir_x, ray_dir_y, ray_dir_z,
+  box_pos_x, box_pos_y, box_pos_z,
+  box_siz_x, box_siz_y, box_siz_z) {
+  var box_min_x = box_pos_x - box_siz_x * 0.5;
+  var box_min_y = box_pos_y - box_siz_y * 0.5;
+  var box_min_z = box_pos_z - box_siz_z * 0.5;
+  var box_max_x = box_pos_x + box_siz_x * 0.5;
+  var box_max_y = box_pos_y + box_siz_y * 0.5;
+  var box_max_z = box_pos_z + box_siz_z * 0.5;
+  var kx = 1 / ray_dir_x;
+  var ky = 1 / ray_dir_y;
+  var kz = 1 / ray_dir_z;
+  var t1 = (box_min_x - ray_pos_x) * kx || -Infinity;
+  var t2 = (box_max_x - ray_pos_x) * kx || Infinity;
+  var t3 = (box_min_y - ray_pos_y) * ky || -Infinity;
+  var t4 = (box_max_y - ray_pos_y) * ky || Infinity;
+  var t5 = (box_min_z - ray_pos_z) * kz || -Infinity;
+  var t6 = (box_max_z - ray_pos_z) * kz || Infinity;
+  var t7 = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+  var t8 = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+  var t9 = (t8<0.0 || t7>t8) ? Infinity : t7<0.0 ? t8 : t7;
+  return t9;
+};
+
+const HIT = 0;
+const PAS = 1;
+const MIS = 2;
+
+// Marches through an octree until it hits a value. Returns
+// `HIT(pos,val)` if it hits, with `pos` being the value
+// position (not the ray position) and `val` being its
+// value. If it never hits the octree, returns `MIS`. If it
+// hits but passes through, returns `PAS`.
+function march(rx,ry,rz,dx,dy,dz,oct) {
+
+  // Enters the octree
+  if ( rx >= 512 || ry >= 512 || rz >= 512
+    || rx < -512 || ry < -512 || rz < -512) {
+    //console.log("entering");
+    var ht = intersect(rx,ry,rz,dx,dy,dz,0,0,0,1024,1024,1024);
+    if (ht !== Infinity) {
+      rx = rx + dx*ht;
+      ry = ry + dy*ht;
+      rz = rz + dz*ht;
+    } else {
+      return {ctr: MIS};
+    }
+  }
+
+  // Marches through it
+  while (
+    !( rx >= 512 || ry >= 512 || rz >= 512
+    || rx < -512 || ry < -512 || rz < -512)) {
+    rx += dx*eps;
+    ry += dy*eps;
+    rz += dz*eps;
+    var got = lookup(rx, ry, rz, oct);
+    if (((got&CTR)>>>0) === NOP) {
+      // If the ray isn't colliding with a value, thus
+      // computes the bounds of the box around the ray on
+      // the octree, using the "number of levels above the
+      // color" returned by the lookup function.
+      var lv = 10 - ((((got&VAL)>>>0) * q32) >>> 0);
+      var bl = 1024 >>> lv; // box size
+      var bq = 1/bl;
+      var bx = ((((rx+512)*bq)>>>0)+0.5)*bl-512;
+      var by = ((((ry+512)*bq)>>>0)+0.5)*bl-512;
+      var bz = ((((rz+512)*bq)>>>0)+0.5)*bl-512;
+      var ht = intersect(rx,ry,rz,dx,dy,dz,bx,by,bz,bl,bl,bl);
+      if (ht !== Infinity) {
+        rx = rx + dx*ht;
+        ry = ry + dy*ht;
+        rz = rz + dz*ht;
+      } else {
+        //console.log(bx,by,bz,"|",bl);
+        //console.log("aff", rx-dx*eps,ry-dy*eps,rz-dz*eps, got, (got&VAL)>>>0);
+        break;
+        //return {ctr: MIS};
+      }
+    } else {
+      //console.log("hit",rx,ry,rz,lookup(rx,ry,rz,oct));
+      return {
+        //pos: {
+          //x: rx - dx*eps,
+          //y: ry - dy*eps,
+          //z: rz - dz*eps
+        //},
+        ctr: HIT,
+        pos: {
+          x: Math.floor(rx),
+          y: Math.floor(ry),
+          z: Math.floor(rz),
+        },
+        val: (got&VAL)>>>0
+      };
+    }
+  }
+
+  // Passed through
+  return {
+    ctr: PAS, 
+    pos: {
+      x: rx - dx*eps,
+      y: ry - dy*eps,
+      z: rz - dz*eps,
+    }
+  };
+};
+
+module.exports = {
+  CTR,
+  VAL,
+  NIL,
+  TIP,
+  OCT,
+  empty,
+  insert,
+  NOP,
+  GOT,
+  lookup,
+  march,
+  HIT,
+  MIS,
+  PAS,
+  show,
+};
+
+//var t = empty();
+//var hit = march(100,-512,0, -1,0,0, t);
+//console.log(hit);
+//for (var z = -16; z < 16; ++z) {
+  //for (var y = -16; y < 16; ++y) {
+    //for (var x = -16; x < 16; ++x) {
+      //insert(x,y,z,1,t);
+    //}
+  //}
+//}
+//var s = 0;
+//for (var i = 0; i < 5000000; ++i) {
+  //s += march(60,0,0, -1,0,0, t).val;
+//};
+//console.log(s);
+//console.log(march(-60,0,0, -1,0,0, t));
+
+//console.log(
+  //intersect(
+    //511.99998474121094,0,0,
+    //-1,0,0,
+    //384,128,128,
+    //256,256,256));
+    
+//console.log(
+  //intersect(
+    //9.9999,0,0,
+    //-1,0,0,
+    //0,0,0,
+    //20,20,20));
+
+//console.log(intersect(
+  //0,0,0,
+  //1,0,0,
+  //0,0,0,
+  //30,64,64));
+
+
+//var t = empty();
+//var L = 10000000;
+//var T = Date.now();
+//for (var i = 0; i < L; ++i) {
+  //var x = i % 1024 - 512;
+  //var y = Math.floor(i / 1024) % 1024 - 512;
+  //var z = Math.floor(i / 1024 / 1024) - 512;
+  //insert(x,y,z,1,t);
+//}
+//console.log((Date.now() - T)+"ms"); T = Date.now();
+//var s = 0;
+//for (var i = 0; i < L; ++i) {
+  //var x = i % 1024 - 512;
+  //var y = Math.floor(i / 1024) % 1024 - 512;
+  //var z = Math.floor(i / 1024 / 1024) - 512;
+  //s += lookup(x,y,z,t)&VAL;
+//}
+//console.log(s);
+//console.log((Date.now() - T)+"ms"); T = Date.now();
+
+//insert(0, 0, 0, 0x1, t);
+//insert(1, 0, 0, 0x2, t);
+//insert(0, 1, 0, 0x3, t);
+//insert(1, 1, 0, 0x4, t);
+//insert(0, 0, 1, 0x5, t);
+//insert(1, 0, 1, 0x6, t);
+//insert(0, 1, 1, 0x7, t);
+//insert(1, 1, 1, 0x8, t);
+//insert(1023, 1023, 1023, 0x9, t);
+//console.log(show(t));
+//console.log(lookup(2,0,0,t));
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const {Component, render} = __webpack_require__(0);
-const h = __webpack_require__(2).h;
+const h = __webpack_require__(3).h;
+const oct = __webpack_require__(1);
+const canvox = __webpack_require__(4);
 
 var {
   demo_game_state,
@@ -2307,7 +2635,7 @@ var {
   render_game_state,
   apply_input_to_game_state,
   get_object_position,
-} = __webpack_require__(3);
+} = __webpack_require__(5);
 
 var now = (() => {
   var init_time = Date.now()/1000;
@@ -2358,26 +2686,7 @@ window.onload = () => {
   render(h(Counter), document.getElementById("main"));
 
   // Creates canvas and inserts on page
-  var canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  canvas.style.border = "1px solid black";
-  canvas.style["image-rendering"] = "pixelated";
-  var context = canvas.getContext("2d");
-  canvas.image_data =
-    context.getImageData(0, 0, canvas.width, canvas.height);
-  canvas.image_buf =
-    new ArrayBuffer(canvas.image_data.data.length);
-  canvas.image_u8 =
-    new Uint8ClampedArray(canvas.image_buf);
-  canvas.image_u32 =
-    new Uint32Array(canvas.image_buf);
-  canvas.depth_u32 =
-    new Uint32Array(canvas.image_u32.length);
-  canvas.draw = () => {
-    canvas.image_data.data.set(canvas.image_u8);
-    context.putImageData(canvas.image_data, 0, 0);
-  }
+  var canvas = canvox();
   document.body.appendChild(canvas);
 
   // Keys that are pressed
@@ -2401,7 +2710,7 @@ window.onload = () => {
   // Initial state of the game
   var game_state = demo_game_state;
 
-  // Main loop of the game
+  //Main loop of the game
   setInterval(function main_loop() {
     // Updates the FPS counter
     ++fps_count;
@@ -2425,64 +2734,41 @@ window.onload = () => {
         (0)
         (game_state)(x => y => z => ({x,y,z}));
 
-    // Clears screen
-    for (var i = 0; i < canvas.width * canvas.height; ++i) {
-      canvas.image_u32[i] = 0x00000000;
-      canvas.depth_u32[i] = 0;
-    };
-    //context.clearRect(0, 0, canvas.width, canvas.height);
+    var W   = canvas.width;
+    var H   = canvas.height;
+    var S3  = Math.sqrt(3);
+    var Q3  = 1/S3;
+    var T   = Date.now()/1000;
+    var eps = 1/65536;
 
-    // Draws renderables on screen
-    for (var i = 0; i < renderables.length; ++i) {
-      var renderable = renderables[i];
-      switch (renderable.ctr) {
-        case "voxel":
-          var pos_x = renderable.pos.x;
-          var pos_y = renderable.pos.y;
-          var pos_z = renderable.pos.z;
-          var vox   = renderable.vox;
-          (function go(vox) {
-            let case_nil  = null;
-            let case_cons = head => tail => {
-              head(pos => col => pos(x => y => z => {
-                var vlen = Math.sqrt(x*x + y*y);
-                var vang = Math.atan2(y, x);
-                x = vlen * Math.cos(vang + now());
-                y = vlen * Math.sin(vang + now());
+    // Creates list of voxels
+    var voxels = [];
+    for (var x = -16; x < 16; ++x) {
+      for (var y = -16; y < 16; ++y) {
+        for (var z = -512; z < -512+32; ++z) {
+          var pl = Math.sqrt(x*x+y*y);
+          var pa = Math.atan2(y,x);
+          var px = pl * Math.cos(pa + T);
+          var py = pl * Math.sin(pa + T);
+          var pos
+            = (px + 512) << 20
+            | (py + 512) << 10
+            | (z + 512);
+          var col = 0xFFAAAAFF;
+          voxels[voxels.length] = pos;
+          voxels[voxels.length] = col;
+        }
+      }
+    }
 
-                var sx = Math.floor(pos_x + x
-                  - z / Math.sqrt(3)
-                  + canvas.width*0.5 - hero_pos.x);
-                var sy =
-                  Math.floor(pos_y + y
-                    - z / Math.sqrt(3) + canvas.height*0.5
-                    - hero_pos.y);
-                var d = canvas.depth_u32[  
-                  sy * canvas.width + sx]
-                  - 65536;
-                if (z > d) {
-                  canvas.depth_u32[sy * canvas.width + sx] =
-                    Math.floor(z + 65536);
-                  canvas.image_u32[sy * canvas.width + sx] =
-                    col;
-                }
-              }));
-              go(tail);
-            };
-            return vox(case_nil)(case_cons);
-          })(vox);
-          break;
-      };
-    };
-
-    canvas.draw();
+    canvas.draw(voxels);
 
   }, 1000 / 24);
 };
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2616,7 +2902,128 @@ function h(_tag, _props, _children) {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const oct = __webpack_require__(1);
+
+module.exports = function canvox() {
+  var canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  canvas.style.border = "1px solid black";
+  canvas.style["image-rendering"] = "pixelated";
+  var context = canvas.getContext("2d");
+  canvas.image_data =
+    context.getImageData(0, 0, canvas.width, canvas.height);
+  canvas.image_buf =
+    new ArrayBuffer(canvas.image_data.data.length);
+  canvas.image_u8 =
+    new Uint8ClampedArray(canvas.image_buf);
+  canvas.image_u32 =
+    new Uint32Array(canvas.image_buf);
+  canvas.depth_u32 =
+    new Uint32Array(canvas.image_u32.length);
+  canvas.draw = (voxels) => {
+    var W  = canvas.width;
+    var H  = canvas.height;
+    var S3 = Math.sqrt(3);
+    var Q3 = 1/S3;
+
+    // Puts all voxels on voxtree
+    var tree = oct.empty();
+    for (var i = 0; i < voxels.length / 2; ++i) {
+      var pos = voxels[i*2+0];
+      var col = voxels[i*2+1];
+      var vx  = ((pos >>> 20) & 0x3FF) - 512;
+      var vy  = ((pos >>> 10) & 0x3FF) - 512;
+      var vz  = ((pos >>>  0) & 0x3FF) - 512;
+      oct.insert(vx,vy,vz,i,tree);
+    }
+
+    // Casts shadows
+    var clear = [];
+    for (var i = 0; i < voxels.length / 2; ++i) {
+      var pos = voxels[i*2+0];
+      var col = voxels[i*2+1];
+      var vx  = ((pos >>> 20) & 0x3FF) - 512;
+      var vy  = ((pos >>> 10) & 0x3FF) - 512;
+      var vz  = ((pos >>>  0) & 0x3FF) - 512;
+      var dx  = -Q3;
+      var dy  = Q3;
+      var dz  = -Q3;
+      var rx  = vx + 0.5 + dx;
+      var ry  = vy + 0.5 + dy;
+      var rz  = vz + 0.5 + dz;
+      var hit = oct.march(rx,ry,rz,dx,dy,dz,tree);
+      switch (hit.ctr) {
+        case oct.PAS:
+          var hx  = hit.pos.x;
+          var hy  = hit.pos.y;
+          var hz  = hit.pos.z;
+          var sx  = Math.floor(hx + W*0.5 - (hz+512)/S3);
+          var sy  = Math.floor(hy + H*0.5 - (hz+512)/S3);
+          var si  = sy * W + sx;
+          voxels[i*2+1] = 0xFF8888FF;
+          canvas.image_u32[si] = 0xFFE8E8E8;
+          clear.push(si);
+          break;
+      }
+    }
+
+    // Casts some light
+    for (var y = -8; y < 8; y += 1) {
+      for (var z = -512+8; z < -512+24; z += 1) {
+        var hit = oct.march(100,y,z,-1,0,0,tree);
+        switch (hit.ctr) {
+          case oct.HIT:
+            voxels[hit.val*2+1] = 0xFF0000FF;
+            break;
+          case oct.MIS:
+            break;
+          case oct.PAS:
+            break;
+        }
+      }
+    }
+
+
+    // Draws all voxels to buffers
+    for (var i = 0; i < voxels.length / 2; ++i) {
+      var pos = voxels[i*2+0];
+      var col = voxels[i*2+1];
+      var vx  = ((pos >>> 20) & 0x3FF) - 512;
+      var vy  = ((pos >>> 10) & 0x3FF) - 512;
+      var vz  = ((pos >>>  0) & 0x3FF) - 512;
+      var sx  = Math.floor(vx + W*0.5 - (vz+512)/S3);
+      var sy  = Math.floor(vy + H*0.5 - (vz+512)/S3);
+      var sz  = vz;
+      var si  = sy * W + sx;
+      var sd  = canvas.depth_u32[si] - 512;
+      if (sz > sd) {
+        canvas.image_u32[si] = col;
+        canvas.depth_u32[si] = sz + 512;
+        clear.push(si);
+      }
+    }
+
+    // Draws buffers to screen
+    canvas.image_data.data.set(canvas.image_u8);
+    context.putImageData(canvas.image_data, 0, 0);
+
+    // Clears buffers
+    for (var i = 0; i < clear.length; ++i) {
+      canvas.image_u32[clear[i]] = 0;
+      canvas.depth_u32[clear[i]] = 0;
+    }
+  };
+  
+  return canvas;
+};
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = (function(){

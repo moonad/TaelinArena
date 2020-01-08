@@ -1,5 +1,7 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
+const oct = require("./octree.js");
+const canvox = require("./canvox.js");
 
 var {
   demo_game_state,
@@ -58,26 +60,7 @@ window.onload = () => {
   render(h(Counter), document.getElementById("main"));
 
   // Creates canvas and inserts on page
-  var canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  canvas.style.border = "1px solid black";
-  canvas.style["image-rendering"] = "pixelated";
-  var context = canvas.getContext("2d");
-  canvas.image_data =
-    context.getImageData(0, 0, canvas.width, canvas.height);
-  canvas.image_buf =
-    new ArrayBuffer(canvas.image_data.data.length);
-  canvas.image_u8 =
-    new Uint8ClampedArray(canvas.image_buf);
-  canvas.image_u32 =
-    new Uint32Array(canvas.image_buf);
-  canvas.depth_u32 =
-    new Uint32Array(canvas.image_u32.length);
-  canvas.draw = () => {
-    canvas.image_data.data.set(canvas.image_u8);
-    context.putImageData(canvas.image_data, 0, 0);
-  }
+  var canvas = canvox();
   document.body.appendChild(canvas);
 
   // Keys that are pressed
@@ -101,7 +84,7 @@ window.onload = () => {
   // Initial state of the game
   var game_state = demo_game_state;
 
-  // Main loop of the game
+  //Main loop of the game
   setInterval(function main_loop() {
     // Updates the FPS counter
     ++fps_count;
@@ -125,57 +108,34 @@ window.onload = () => {
         (0)
         (game_state)(x => y => z => ({x,y,z}));
 
-    // Clears screen
-    for (var i = 0; i < canvas.width * canvas.height; ++i) {
-      canvas.image_u32[i] = 0x00000000;
-      canvas.depth_u32[i] = 0;
-    };
-    //context.clearRect(0, 0, canvas.width, canvas.height);
+    var W   = canvas.width;
+    var H   = canvas.height;
+    var S3  = Math.sqrt(3);
+    var Q3  = 1/S3;
+    var T   = Date.now()/1000;
+    var eps = 1/65536;
 
-    // Draws renderables on screen
-    for (var i = 0; i < renderables.length; ++i) {
-      var renderable = renderables[i];
-      switch (renderable.ctr) {
-        case "voxel":
-          var pos_x = renderable.pos.x;
-          var pos_y = renderable.pos.y;
-          var pos_z = renderable.pos.z;
-          var vox   = renderable.vox;
-          (function go(vox) {
-            let case_nil  = null;
-            let case_cons = head => tail => {
-              head(pos => col => pos(x => y => z => {
-                var vlen = Math.sqrt(x*x + y*y);
-                var vang = Math.atan2(y, x);
-                x = vlen * Math.cos(vang + now());
-                y = vlen * Math.sin(vang + now());
+    // Creates list of voxels
+    var voxels = [];
+    for (var x = -16; x < 16; ++x) {
+      for (var y = -16; y < 16; ++y) {
+        for (var z = -512; z < -512+32; ++z) {
+          var pl = Math.sqrt(x*x+y*y);
+          var pa = Math.atan2(y,x);
+          var px = pl * Math.cos(pa + T);
+          var py = pl * Math.sin(pa + T);
+          var pos
+            = (px + 512) << 20
+            | (py + 512) << 10
+            | (z + 512);
+          var col = 0xFFAAAAFF;
+          voxels[voxels.length] = pos;
+          voxels[voxels.length] = col;
+        }
+      }
+    }
 
-                var sx = Math.floor(pos_x + x
-                  - z / Math.sqrt(3)
-                  + canvas.width*0.5 - hero_pos.x);
-                var sy =
-                  Math.floor(pos_y + y
-                    - z / Math.sqrt(3) + canvas.height*0.5
-                    - hero_pos.y);
-                var d = canvas.depth_u32[  
-                  sy * canvas.width + sx]
-                  - 65536;
-                if (z > d) {
-                  canvas.depth_u32[sy * canvas.width + sx] =
-                    Math.floor(z + 65536);
-                  canvas.image_u32[sy * canvas.width + sx] =
-                    col;
-                }
-              }));
-              go(tail);
-            };
-            return vox(case_nil)(case_cons);
-          })(vox);
-          break;
-      };
-    };
-
-    canvas.draw();
+    canvas.draw(voxels);
 
   }, 1000 / 24);
 };
