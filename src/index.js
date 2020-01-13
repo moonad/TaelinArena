@@ -12,7 +12,12 @@ const load_model = name => {
   var model_json = require("./models/"+name+".json");
   return spritestack.model_to_voxels(model_json);
 };
-const model = load_model("fantasy");
+const model0 = load_model("ferumbras");
+const model1 = load_model("wizard");
+const model2 = load_model("wizard_of_legends");
+const model3 = load_model("fantasy");
+const model4 = load_model("cylinder");
+//const model3 = load_model("xtest");
 
 // Taelin Arena
 var {
@@ -145,31 +150,33 @@ window.onload = () => {
       //}
     //}
 
-    for (var X = -1; X <= 1; ++X) {
-      for (var Y = -0; Y <= 0; ++Y) {
-        for (var i = 0; i < model.length; ++i) {
-          var [{x,y,z},col] = model[i];
-          var sc = 0.75;
-          var px = x * sc + (X * 48);
-          var py = y * sc + (Y * 48);
-          var pz = (z + 66) * sc;
+    //var T = Math.PI * 0.25;
+    [model0,model1,model2,model3,model4].forEach((model,X) => {
+      for (var i = 0; i < model.length; ++i) {
+        var T = Math.PI*0.25;
+        var [{x,y,z},col] = model[i];
+        var sc = 1;
+        var cx = (X - 2.0) * 48;
+        var cy = 0;
+        var px = cx + x * sc;
+        var py = cy + y * sc;
+        var pz = (z + 66) * sc;
 
-          var pl = Math.sqrt(px*px+py*py);
-          var pa = Math.atan2(py,px);
-          var px = pl * Math.cos(pa + T);
-          var py = pl * Math.sin(pa + T);
+        var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+        var pa = Math.atan2(py-cy,px-cx);
+        var px = cx + pl * Math.cos(pa+T) + 0.5;
+        var py = cy + pl * Math.sin(pa+T) + 0.5;
 
-          var pz = -512 + pz;
-          var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
-          //console.log(px,py,pz,pos);
-          var col = col + 0xFF000000;
-          voxels[voxels.length] = pos;
-          voxels[voxels.length] = col;
-        }
+        var pz = -512 + pz;
+        var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+        //console.log(px,py,pz,pos);
+        var col = col + 0xFF000000;
+        voxels[voxels.length] = pos;
+        voxels[voxels.length] = col;
       }
-    }
+    });
     
-    console.log(voxels.length);
+    //console.log(voxels.length);
 
     canvas.draw(voxels);
 
