@@ -134,40 +134,26 @@ window.onload = () => {
 
     // Creates list of voxels
     var voxels = [];
-    //for (var x = -16; x < 16; ++x) {
-      //for (var y = -16; y < -14; ++y) {
-        //for (var z = -512; z < -512+32; ++z) {
-          //var pl = Math.sqrt(x*x+y*y);
-          //var pa = Math.atan2(y,x);
-          //var px = pl * Math.cos(pa + T);
-          //var py = pl * Math.sin(pa + T);
-          //var pz = z;
-          //var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
-          //var col = 0xFFAAAAFF;
-          //voxels[voxels.length] = pos;
-          //voxels[voxels.length] = col;
-        //}
-      //}
-    //}
 
     //var T = Math.PI * 0.25;
-    [model0,model1,model2,model3,model4].forEach((model,X) => {
+    var models = [model0,model1,model2,model3];
+    models.forEach((model,X) => {
       for (var i = 0; i < model.length; ++i) {
-        var T = Math.PI*0.25;
+        //var T = Math.PI*0.25;
         var [{x,y,z},col] = model[i];
         var sc = 1;
-        var cx = (X - 2.0) * 48;
+        var cx = (X-(models.length-1)/2)*48;
         var cy = 0;
+        var cz = 0;
         var px = cx + x * sc;
         var py = cy + y * sc;
-        var pz = (z + 66) * sc;
+        var pz = cz + z * sc;
 
         var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
         var pa = Math.atan2(py-cy,px-cx);
         var px = cx + pl * Math.cos(pa+T) + 0.5;
         var py = cy + pl * Math.sin(pa+T) + 0.5;
 
-        var pz = -512 + pz;
         var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
         //console.log(px,py,pz,pos);
         var col = col + 0xFF000000;

@@ -13,7 +13,8 @@ const max = Math.max;
 const flr = Math.floor;
 const p32 = 2 ** 32;
 const q32 = 1 / p32;
-const eps = 1 / 65536;
+//const eps = 1 / 65536;
+const eps = 0.00001526;
 
 const CTR = 0xC0000000;
 const VAL = 0x3FFFFFFF;
@@ -117,6 +118,26 @@ function show(oct, ptr = OCT, lvl = 0) {
   }
 };
 
+
+// This isn't used, but is here for documentation purposes.
+// In order for the intersection function below to work in
+// cases such as `intersect(-100,5,0, 1,0,0, 0,0,0,
+// 10,10,10)`, i.e., when you're firing the ray towards the
+// box in the plane of one of its faces, we must have
+// caution on how we perform the division to get each `t`.
+// If we divide `a` by 0, then we must return `-inf` if
+// `a<0`, `+inf` if `a>0`, and `k` if `a==0`. In JavaScript,
+// this can be performed as `a / b || k`, so we do that
+// instead, since it is faster, but on WebGL, we need to use
+// this division algorithm.
+function div(a, b, k) {
+  if (b === 0) {
+    return a > 0.0 ? Infinity : a < 0.0 ? -Infinity : k;
+  } else {
+    return a / b;
+  }
+}
+
 // Moves a ray through a direction and returns the distance
 // traveled until it hits the surface of the box. The ray
 // can start inside. If it never hits, returns infinite.
@@ -131,15 +152,12 @@ function intersect(
   var box_max_x = box_pos_x + box_siz_x * 0.5;
   var box_max_y = box_pos_y + box_siz_y * 0.5;
   var box_max_z = box_pos_z + box_siz_z * 0.5;
-  var kx = 1 / ray_dir_x;
-  var ky = 1 / ray_dir_y;
-  var kz = 1 / ray_dir_z;
-  var t1 = (box_min_x - ray_pos_x) * kx || -Infinity;
-  var t2 = (box_max_x - ray_pos_x) * kx || Infinity;
-  var t3 = (box_min_y - ray_pos_y) * ky || -Infinity;
-  var t4 = (box_max_y - ray_pos_y) * ky || Infinity;
-  var t5 = (box_min_z - ray_pos_z) * kz || -Infinity;
-  var t6 = (box_max_z - ray_pos_z) * kz || Infinity;
+  var t1 = (box_min_x - ray_pos_x) / ray_dir_x || -Infinity;
+  var t2 = (box_max_x - ray_pos_x) / ray_dir_x || Infinity;
+  var t3 = (box_min_y - ray_pos_y) / ray_dir_y || -Infinity;
+  var t4 = (box_max_y - ray_pos_y) / ray_dir_y || Infinity;
+  var t5 = (box_min_z - ray_pos_z) / ray_dir_z || -Infinity;
+  var t6 = (box_max_z - ray_pos_z) / ray_dir_z || Infinity;
   var t7 = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
   var t8 = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
   var t9 = (t8<0.0 || t7>t8) ? Infinity : t7<0.0 ? t8 : t7;
@@ -158,14 +176,14 @@ const MIS = 2;
 function march(rx,ry,rz,dx,dy,dz,oct) {
 
   // Enters the octree
-  if ( rx >= 512 || ry >= 512 || rz >= 512
-    || rx < -512 || ry < -512 || rz < -512) {
-    //console.log("entering");
+  if ( rx >=  512 || ry >=  512 || rz >=  512
+    || rx <= -512 || ry <= -512 || rz <= -512) {
     var ht = intersect(rx,ry,rz,dx,dy,dz,0,0,0,1024,1024,1024);
     if (ht !== Infinity) {
-      rx = rx + dx*ht;
-      ry = ry + dy*ht;
-      rz = rz + dz*ht;
+      rx = rx + dx*ht + dx*eps;
+      ry = ry + dy*ht + dy*eps;
+      rz = rz + dz*ht + dz*eps;
+      //console.log("enter",rx,ry,rz);
     } else {
       return {ctr: MIS};
     }
@@ -173,8 +191,8 @@ function march(rx,ry,rz,dx,dy,dz,oct) {
 
   // Marches through it
   while (
-    !( rx >= 512 || ry >= 512 || rz >= 512
-    || rx < -512 || ry < -512 || rz < -512)) {
+    !( rx >=  512 || ry >=  512 || rz >=  512
+    || rx <= -512 || ry <= -512 || rz <= -512)) {
     rx += dx*eps;
     ry += dy*eps;
     rz += dz*eps;
@@ -184,7 +202,10 @@ function march(rx,ry,rz,dx,dy,dz,oct) {
       // computes the bounds of the box around the ray on
       // the octree, using the "number of levels above the
       // color" returned by the lookup function.
-      var lv = 10 - ((((got&VAL)>>>0) * q32) >>> 0);
+      var lv = 10 - (got&VAL);
+      //if (lv !== 10) {
+        //console.log("???", lv);
+      //}
       var bl = 1024 >>> lv; // box size
       var bq = 1/bl;
       var bx = ((((rx+512)*bq)>>>0)+0.5)*bl-512;
@@ -248,6 +269,20 @@ module.exports = {
   PAS,
   show,
 };
+
+
+var oct = module.exports;
+var tree = oct.empty();
+for (var k = -8; k < 8; ++k) {
+  for (var j = -8; j < 8; ++j) {
+    for (var i = -8; i < 8; ++i) {
+      oct.insert(i,j,k,0xFF,tree);
+    }
+  }
+}
+
+//console.log(oct.march(-1000,0,0,1,0,0,tree));
+//console.log(oct.march(1000,0,0,-1,0,0,tree));
 
 //var t = empty();
 //var hit = march(100,-512,0, -1,0,0, t);

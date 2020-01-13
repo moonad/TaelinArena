@@ -33,15 +33,15 @@ function model_to_voxels(model) {
           var y = ((n/size[0])>>>0) % size[0] - size[1]/2;
           var z = ((n/(size[0]*size[1]))>>>0) - size[2]/2;
           var pos = {x,y,z};
-          var col = model.palette[cid - 1];
+          var col = (model.palette[cid-1]<<8) | 0xFF;
           var r = Math.floor(col / 65536);
           var g = Math.floor(col / 256) % 256;
           var b = col % 256;
-          var col = {r,g,b};
-          var col = 0xFF000000;
-          var col = col + r;
-          var col = col + (g << 8);
-          var col = col + (b << 16);
+          //var col = {r,g,b};
+          //var col = 0xFF000000;
+          //var col = col + r;
+          //var col = col + (g << 8);
+          //var col = col + (b << 16);
           voxels.push([pos,col]);
         }
       }
