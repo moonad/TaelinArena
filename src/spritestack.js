@@ -3,6 +3,13 @@
 function model_to_voxels(model) {
   var voxels = [];
 
+  console.log(model.palette.map(x => x.toString(16)));
+  var col = (model.palette[1]) | 0xFF;
+  var r = Math.floor(col / 65536);
+  var g = Math.floor(col / 256) % 256;
+  var b = col % 256;
+  console.log(col,r,g,b);
+
   // A model has many parts
   for (var m = 0; m < model.parts.length; ++m) {
 
@@ -34,9 +41,9 @@ function model_to_voxels(model) {
           var z = ((n/(size[0]*size[1]))>>>0) - size[2]/2;
           var pos = {x,y,z};
           var col = (model.palette[cid-1]<<8) | 0xFF;
-          var r = Math.floor(col / 65536);
-          var g = Math.floor(col / 256) % 256;
-          var b = col % 256;
+          //var r = Math.floor(col / 65536);
+          //var g = Math.floor(col / 256) % 256;
+          //var b = col % 256;
           //var col = {r,g,b};
           //var col = 0xFF000000;
           //var col = col + r;

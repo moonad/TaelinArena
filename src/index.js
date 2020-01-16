@@ -16,8 +16,7 @@ const model0 = load_model("ferumbras");
 const model1 = load_model("wizard");
 const model2 = load_model("wizard_of_legends");
 const model3 = load_model("fantasy");
-const model4 = load_model("cylinder");
-//const model3 = load_model("xtest");
+const model4 = load_model("lyn");
 
 // Taelin Arena
 var {
@@ -136,7 +135,9 @@ window.onload = () => {
     var voxels = [];
 
     //var T = Math.PI * 0.25;
-    var models = [model0,model1,model2,model3];
+    var models = [
+      model4,
+    ];
     models.forEach((model,X) => {
       for (var i = 0; i < model.length; ++i) {
         //var T = Math.PI*0.25;
@@ -156,11 +157,12 @@ window.onload = () => {
 
         var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
         //console.log(px,py,pz,pos);
-        var col = col + 0xFF000000;
+        var col = col | 0x000000FF;
         voxels[voxels.length] = pos;
         voxels[voxels.length] = col;
       }
     });
+    console.log(voxels.length);
     
     //console.log(voxels.length);
 

@@ -18,17 +18,17 @@ function build_voxel_octree(voxels) {
 };
 
 module.exports = function canvox() {
-  const MODE = "CPU";
+  const MODE = "GPU";
 
   var cam = {
-    pos   : {x:0, y:-1000, z:0},
+    pos   : {x:0, y:-1000, z:1000},
     right : {x:0.5, y:0, z:0},
     down  : {x:0, y:0, z:0.5},
-    front : {x:0, y:1, z:0},
+    front : {x:0, y:1, z:-1},
   };
 
   var scr = {
-    siz: {x:256, y:256},
+    siz: {x:512, y:512},
     dim: {x:512, y:512},
   };
 
