@@ -12,11 +12,28 @@ const load_model = name => {
   var model_json = require("./models/"+name+".json");
   return spritestack.model_to_voxels(model_json);
 };
-const model0 = load_model("ferumbras");
-const model1 = load_model("wizard");
-const model2 = load_model("wizard_of_legends");
-const model3 = load_model("fantasy");
-const model4 = load_model("lyn");
+var croni = {
+  feet:-64,
+  anim:[
+    load_model("croni_idle0"),
+    load_model("croni_idle1"),
+    load_model("croni_idle2"),
+    load_model("croni_idle3"),
+    load_model("croni_idle4"),
+    load_model("croni_idle5"),
+    load_model("croni_idle6"),
+    load_model("croni_idle7"),
+    load_model("croni_idle8"),
+    load_model("croni_idle9"),
+    load_model("croni_idle10"),
+    load_model("croni_idle11"),
+  ]
+};
+var lyn = {
+  feet:-56,
+  anim:[load_model("lyn")]
+};
+var hero = {...croni};
 
 // Taelin Arena
 var {
@@ -56,16 +73,45 @@ class Counter extends Component {
   }
   render() {
     return h("div", {
+      style: {
+        "position": "absolute",
+        "display": "flex",
+        "flex-flow": "row nowrap",
+        "justify-content": "center",
+        "width": "100%",
+        "margin": "2px",
+        "font-size": "16px",
+        "font-family": "monospace",
+        "font-weight": "bold",
+      },
       onClick: () => {
         this.setState({count: this.state.count + 1});
       }
     }, [
-      h("div", {
-          style: {"font-weight": "bold"}
+      h("span", {}, "Taelin Arena"),
+      h("input", {
+        type: "file",
+        multiple: true,
+        style: {
+          position: "fixed",
+          bottom: "0px",
+          left: "0px",
         },
-        "TaelinArena #" + String(this.state.count)),
-      h("div", {}, "Esse site se tornará um MOBA <3"),
-    ]);
+        onchange: (e) => {
+          hero = {feet:-64, anim:[]};
+          var input = e.target;
+          for (let i = 0; i < input.files.length; ++i) {
+            let reader = new FileReader();
+            reader.onload = () => {
+              hero.anim[i]
+                = spritestack.model_to_voxels(
+                  JSON.parse(reader.result));
+            };
+            reader.readAsText(input.files[i]);
+          };
+        }
+      }),
+    ])
   }
 };
 
@@ -87,18 +133,15 @@ window.onload = () => {
       (t=>t(e.keyCode))
       (game_state);
     key[e.key] = 1;
-    //console.log(e.keyCode);
   };
 
   // FPS metering
   var last_fps_print = now();
   var fps_count = 0;
 
-  // Camera
-  var cam_pos = {x: 0, y: 0, z: 0};
-
   // Initial state of the game
   var game_state = demo_game_state;
+  var debug = {pos: {x:0,y:0,z:0}, vel: {x:0,y:0,z:0}, ang: 0};
 
   //Main loop of the game
   setInterval(function main_loop() {
@@ -124,49 +167,63 @@ window.onload = () => {
         (0)
         (game_state)(x => y => z => ({x,y,z}));
 
-    var W   = canvas.width;
-    var H   = canvas.height;
-    var S3  = Math.sqrt(3);
-    var Q3  = 1/S3;
-    var T   = Date.now()/1000;
-    var eps = 1/65536;
+    // Debug
+    if (key[" "] && debug.vel.z === 0) {
+      debug.vel.z = 8;
+    }
+    debug.vel.x = ((key.d||0) - (key.a||0))*8;
+    debug.vel.y = ((key.w||0) - (key.s||0))*8;
+    debug.vel.z = debug.vel.z - 2;
+    debug.pos.x += debug.vel.x;
+    debug.pos.y += debug.vel.y;
+    debug.pos.z += debug.vel.z;
+    if (debug.vel.x !== 0 || debug.vel.y !== 0) {
+      debug.ang = Math.atan2(debug.vel.y,debug.vel.x) + Math.PI*0.5;
+    }
+    if (debug.pos.z <= 0) {
+      debug.pos.z = 0;
+      debug.vel.z = 0;
+    }
 
     // Creates list of voxels
     var voxels = [];
+    var T = Date.now()/1000;
 
-    //var T = Math.PI * 0.25;
     var models = [
-      model4,
+      hero,
+      lyn,
     ];
     models.forEach((model,X) => {
-      for (var i = 0; i < model.length; ++i) {
-        //var T = Math.PI*0.25;
-        var [{x,y,z},col] = model[i];
+      var feet = model.feet;
+      var frame = model.anim[Math.floor((T*10) % model.anim.length)];
+      for (var i = 0; i < frame.length; ++i) {
+        var [{x,y,z},col] = frame[i];
         var sc = 1;
-        var cx = (X-(models.length-1)/2)*48;
-        var cy = 0;
-        var cz = 0;
+        if (X === 0) {
+          var cx = debug.pos.x;
+          var cy = debug.pos.y;
+          var cz = debug.pos.z - feet;
+        } else {
+          var cx = 0;
+          var cy = 0;
+          var cz = -feet;
+        }
         var px = cx + x * sc;
         var py = cy + y * sc;
         var pz = cz + z * sc;
-
         var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
         var pa = Math.atan2(py-cy,px-cx);
-        var px = cx + pl * Math.cos(pa+T) + 0.5;
-        var py = cy + pl * Math.sin(pa+T) + 0.5;
-
+        var da = X === 0 ? debug.ang : 0;
+        var px = cx + pl * Math.cos(pa+(X===0?0:T)+da) + 0.5;
+        var py = cy + pl * Math.sin(pa+(X===0?0:T)+da) + 0.5;
         var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
-        //console.log(px,py,pz,pos);
         var col = col | 0x000000FF;
         voxels[voxels.length] = pos;
         voxels[voxels.length] = col;
       }
     });
-    console.log(voxels.length);
-    
-    //console.log(voxels.length);
 
-    canvas.draw(voxels);
+    canvas.draw({voxels});
 
-  }, 1000 / 24);
+  }, 1000 / 10);
 };

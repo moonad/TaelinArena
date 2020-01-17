@@ -17,43 +17,67 @@ function build_voxel_octree(voxels) {
   return tree;
 };
 
-module.exports = function canvox() {
-  const MODE = "GPU";
+function setup_cam(cam) {
+  var W = window.innerWidth;
+  var H = window.innerHeight;
+  //var W = 300;
+  //var H = 300;
+  var T = Date.now()/1000;
+  if (!cam) {
+    var ang = Math.PI * 1/8;
+    var cos = Math.cos(ang);
+    var sin = Math.sin(ang);
+    var front = {x:0, y:cos, z:-sin};
+    var right = {x:1, y:0, z:0};
+    var down = {x:0, y:-sin, z:-cos};
+    var pos = {x:0,y:-2048*cos,z:2048*sin};
+    var cam = {
+      pos   : pos, // center pos
+      right : right, // right direction
+      down  : down, // down direction
+      front : front, // front direction
+      size  : {x:W*0.5, y:H*0.5}, // world size
+      port  : {x:W, y:H}, // browser size
+      res   : 1, // rays_per_pixel = res^2
+    };
+  } else {
+    var cam = cam;
+  }
+  return cam;
+};
 
-  var cam = {
-    pos   : {x:0, y:-1000, z:1000},
-    right : {x:0.5, y:0, z:0},
-    down  : {x:0, y:0, z:0.5},
-    front : {x:0, y:1, z:-1},
-  };
-
-  var scr = {
-    siz: {x:512, y:512},
-    dim: {x:512, y:512},
-  };
+module.exports = function canvox(opts = {}) {
+  const mode = window.mode || opts.mode || "GPU";
 
   var canvas = document.createElement("canvas");
-  canvas.width = scr.siz.x;
-  canvas.height = scr.siz.y;
-  canvas.style.border = "0px solid gray";
+  //canvas.style.border = "1px solid gray";
   canvas.style["image-rendering"] = "pixelated";
-  canvas.style.width = scr.dim.x + "px";
-  canvas.style.height = scr.dim.y + "px";
 
   // CPU MODE
-  if (MODE === "CPU") {
+  if (mode === "CPU") {
     var context = canvas.getContext("2d");
-    canvas.image_data = context.getImageData(0, 0, scr.siz.x, scr.siz.y);
-    canvas.image_buf = new ArrayBuffer(canvas.image_data.data.length);
-    canvas.image_u8 = new Uint8ClampedArray(canvas.image_buf);
-    canvas.image_u32 = new Uint32Array(canvas.image_buf);
-    canvas.draw = (voxels) => {
+    canvas.draw = ({voxels, cam}) => {
+      // Camera and viewport
+      var cam = setup_cam(opts.cam);
+
+      // Canvas setup
+      canvas.width = cam.size.x * cam.res;
+      canvas.height = cam.size.y * cam.res;
+      canvas.style.width = cam.port.x + "px";
+      canvas.style.height = cam.port.y + "px";
+      if (!canvas.image_data) {
+        canvas.image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+        canvas.image_buf = new ArrayBuffer(canvas.image_data.data.length);
+        canvas.image_u8 = new Uint8ClampedArray(canvas.image_buf);
+        canvas.image_u32 = new Uint32Array(canvas.image_buf);
+      }
+
       // Builds voxel octree
       var tree = build_voxel_octree(voxels);
 
       // For each pixel on the screen
-      var dx = 2 / scr.siz.x;
-      var dy = 2 / scr.siz.y;
+      var dx = 2 / (cam.size.x * cam.res);
+      var dy = 2 / (cam.size.y * cam.res);
       for (var scr_pos_y = -1; scr_pos_y <= 1; scr_pos_y += dy) {
         for (var scr_pos_x = -1; scr_pos_x < 1; scr_pos_x += dx) {
 
@@ -61,12 +85,12 @@ module.exports = function canvox() {
           var ray_pos_x = cam.pos.x;
           var ray_pos_y = cam.pos.y;
           var ray_pos_z = cam.pos.z;
-          ray_pos_x += cam.right.x * scr.siz.x * scr_pos_x;
-          ray_pos_y += cam.right.y * scr.siz.x * scr_pos_x;
-          ray_pos_z += cam.right.z * scr.siz.x * scr_pos_x;
-          ray_pos_x += cam.down.x  * scr.siz.y * scr_pos_y;
-          ray_pos_y += cam.down.y  * scr.siz.y * scr_pos_y;
-          ray_pos_z += cam.down.z  * scr.siz.y * scr_pos_y;
+          ray_pos_x += cam.right.x*cam.size.x*scr_pos_x*0.5;
+          ray_pos_y += cam.right.y*cam.size.x*scr_pos_x*0.5;
+          ray_pos_z += cam.right.z*cam.size.x*scr_pos_x*0.5;
+          ray_pos_x += cam.down.x *cam.size.y*scr_pos_y*0.5;
+          ray_pos_y += cam.down.y *cam.size.y*scr_pos_y*0.5;
+          ray_pos_z += cam.down.z *cam.size.y*scr_pos_y*0.5;
 
           // Computes ray direction
           var ray_dir_x = cam.front.x;
@@ -80,9 +104,9 @@ module.exports = function canvox() {
             tree);
 
           // Renders to screen
-          var j = Math.floor((1-(scr_pos_y+1)/2)*scr.siz.y-1);
-          var i = Math.floor((scr_pos_x+1)/2*scr.siz.x);
-          var n = j * scr.siz.x + i;
+          var j = Math.floor((scr_pos_y+1)/2*(cam.size.y*cam.res));
+          var i = Math.floor((scr_pos_x+1)/2*(cam.size.x*cam.res));
+          var n = j * Math.floor(cam.size.x*cam.res) + i;
           switch (hit.ctr) {
             case oct.HIT:
               var pos = hit.pos;
@@ -104,7 +128,7 @@ module.exports = function canvox() {
   };
 
   // GPU MODE
-  if (MODE === "GPU") {
+  if (mode === "GPU") {
     var gl = canvas.getContext('webgl2');
 
     var vertices = [-1,1,0,-1,-1,0,1,-1,0,-1,1,0,1,1,0,1,-1,0,];
@@ -126,6 +150,7 @@ module.exports = function canvox() {
       out vec3 scr_pos;
       void main(void) {
         scr_pos = coordinates;
+        scr_pos.y = - scr_pos.y;
         gl_Position = vec4(coordinates, 1.0);
       }
     `;
@@ -295,8 +320,8 @@ module.exports = function canvox() {
         vec3 ray_pos;
         vec3 ray_dir;
         ray_pos = cam_pos;
-        ray_pos = ray_pos + cam_right*scr_siz.x*scr_pos.x;
-        ray_pos = ray_pos + cam_down*scr_siz.y*scr_pos.y;
+        ray_pos = ray_pos + cam_right*scr_siz.x*scr_pos.x*0.5;
+        ray_pos = ray_pos + cam_down*scr_siz.y*scr_pos.y*0.5;
         ray_dir = cam_front;
 
         //ray_pos = vec3(0.0, -1000.0, 0.0);
@@ -367,7 +392,18 @@ module.exports = function canvox() {
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0); 
     gl.enableVertexAttribArray(coord);
       
-    canvas.draw = function(voxels) {
+    canvas.draw = function({voxels,cam}) {
+      var cam = setup_cam(cam);
+
+      // Canvas setup
+      // TODO: why odd widths won't work?
+      canvas.width = cam.size.x * cam.res;
+      canvas.height = cam.size.y * cam.res;
+      canvas.width -= canvas.width % 2;
+      canvas.height -= canvas.height % 2;
+      canvas.style.width = cam.port.x + "px";
+      canvas.style.height = cam.port.y + "px";
+
       // Builds voxel octree
       var tree = build_voxel_octree(voxels);
 
@@ -398,7 +434,7 @@ module.exports = function canvox() {
         [cam.front.x, cam.front.y, cam.front.z]);
       gl.uniform2fv(
         gl.getUniformLocation(shader,"scr_siz"),
-        [scr.siz.x, scr.siz.y]);
+        [cam.size.x, cam.size.y]);
 
       // Renders screen
       gl.viewport(0,0,canvas.width,canvas.height);
