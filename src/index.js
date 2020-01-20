@@ -29,40 +29,39 @@ var croni = {
     load_model("croni_idle11"),
   ]
 };
+
 var lyn = {
   feet:-56,
   anim:[load_model("lyn")]
 };
+
 var hero = {...croni};
 
 // Taelin Arena
 var {
-  demo_game_state,
-  tick_game_state,
-  render_game_state,
-  apply_input_to_game_state,
-  get_object_position,
+  demo_game,
+  tick_game,
+  input_game,
+  map_game_objects,
+
+  // Object accessors
+  get_object_id,
+  get_object_hp,
+  get_object_pos,
+  get_object_dir,
+  get_object_vel,
+  get_object_size,
+
+  // Vector accessors
+  get_x,
+  get_y,
+  get_z,
 } = require("./TaelinArena.fm");
 
 var now = (() => {
   var init_time = Date.now()/1000;
   return () => Date.now()/1000 - init_time;
 })();
-
-function get_renderables_from_fm(renderable) {
-  let case_nil  = [];
-  let case_cons = (head) => (tail) => {
-    let case_voxel = pos => vox => ({
-      ctr: "voxel",
-      pos: pos(x => y => z => ({x,y,z})),
-      vox: vox,
-    });
-    var renderable = head(case_voxel);
-    return [renderable]
-      .concat(get_renderables_from_fm(tail));
-  };
-  return renderable(case_nil)(case_cons);
-};
 
 class Counter extends Component {
   constructor(props) {
@@ -127,11 +126,34 @@ window.onload = () => {
 
   // Keys that are pressed
   var key = {};
-  document.body.onkeyup = (e) => key[e.key] = 0;
+  document.body.onkeyup = (e) => {
+    var event = t => {
+      var id = 0;
+      var dir;
+      switch (e.key) {
+        case "a": dir = t => t(0)(0)(0); break;
+        case "s": dir = t => t(0)(0)(0); break;
+        case "d": dir = t => t(0)(0)(0); break;
+        case "w": dir = t => t(0)(0)(0); break;
+      };
+      return t(id)(dir);
+    };
+    game = input_game(event)(game);
+    key[e.key] = 0;
+  };
   document.body.onkeypress = (e) => {
-    game_state = apply_input_to_game_state
-      (t=>t(e.keyCode))
-      (game_state);
+    var event = t => {
+      var id = 0;
+      var dir;
+      switch (e.key) {
+        case "a": dir = t => t(-4)(0)(0); break;
+        case "s": dir = t => t(0)(4)(0); break;
+        case "d": dir = t => t(4)(0)(0); break;
+        case "w": dir = t => t(0)(-4)(0); break;
+      };
+      return t(id)(dir);
+    };
+    game = input_game(event)(game);
     key[e.key] = 1;
   };
 
@@ -140,10 +162,9 @@ window.onload = () => {
   var fps_count = 0;
 
   // Initial state of the game
-  var game_state = demo_game_state;
-  var debug = {pos: {x:0,y:0,z:0}, vel: {x:0,y:0,z:0}, ang: 0};
+  var game = demo_game;
 
-  //Main loop of the game
+  // Main loop of the game
   setInterval(function main_loop() {
     // Updates the FPS counter
     ++fps_count;
@@ -154,55 +175,69 @@ window.onload = () => {
     };
 
     // Updates game state
-    game_state = tick_game_state(game_state);
-
-    // Converts game state to renderables
-    var renderables =
-      get_renderables_from_fm(
-        render_game_state(game_state)(now()));
-
-    // Position of the player's object
-    var hero_pos =
-      get_object_position
-        (0)
-        (game_state)(x => y => z => ({x,y,z}));
-
-    // Debug
-    if (key[" "] && debug.vel.z === 0) {
-      debug.vel.z = 8;
-    }
-    debug.vel.x = ((key.d||0) - (key.a||0))*8;
-    debug.vel.y = ((key.w||0) - (key.s||0))*8;
-    debug.vel.z = debug.vel.z - 2;
-    debug.pos.x += debug.vel.x;
-    debug.pos.y += debug.vel.y;
-    debug.pos.z += debug.vel.z;
-    if (debug.vel.x !== 0 || debug.vel.y !== 0) {
-      debug.ang = Math.atan2(debug.vel.y,debug.vel.x) + Math.PI*0.5;
-    }
-    if (debug.pos.z <= 0) {
-      debug.pos.z = 0;
-      debug.vel.z = 0;
-    }
+    game = tick_game(game);
 
     // Creates list of voxels
     var voxels = [];
     var T = Date.now()/1000;
 
+    // Renders the game
+    map_game_objects(function(object) {
+      var id = get_object_id(object);
+      var hp = get_object_hp(object);
+      var pos = get_object_pos(object);
+      var dir = get_object_dir(object);
+      var vel = get_object_vel(object);
+      var size = get_object_size(object);
+      var pos_x = get_x(pos);
+      var pos_y = get_y(pos);
+      var pos_z = get_z(pos);
+      var model = croni;
+      var feet = model.feet;
+      var anims = model.anim.length;
+      var frame = model.anim[Math.floor((T*10) % anims)];
+      for (var i = 0; i < frame.length; ++i) {
+        var [{x,y,z},col] = frame[i];
+        var cx = pos_x;
+        var cy = pos_y;
+        var cz = pos_z;
+        var px = cx + x;
+        var py = cy + y;
+        var pz = cz + z;
+        //var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+        //var pa = Math.atan2(py-cy,px-cx);
+        //var da = X === 0 ? debug.ang : 0;
+        //var px = cx + pl * Math.cos(pa+(X===0?0:T)+da) + 0.5;
+        //var py = cy + pl * Math.sin(pa+(X===0?0:T)+da) + 0.5;
+        var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+        var col = col | 0x000000FF;
+        voxels[voxels.length] = pos;
+        voxels[voxels.length] = col;
+      }
+    })(game);
+
+
+    
+    
+
+
+    /*
     var models = [
       hero,
       lyn,
     ];
     models.forEach((model,X) => {
       var feet = model.feet;
-      var frame = model.anim[Math.floor((T*10) % model.anim.length)];
+      var frame = model.anim[
+        Math.floor((T*10)
+        % model.anim.length)];
       for (var i = 0; i < frame.length; ++i) {
         var [{x,y,z},col] = frame[i];
         var sc = 1;
         if (X === 0) {
-          var cx = debug.pos.x;
-          var cy = debug.pos.y;
-          var cz = debug.pos.z - feet;
+          var cx = hero_pos.x;
+          var cy = hero_pos.y;
+          var cz = hero_pos.z - feet;
         } else {
           var cx = 0;
           var cy = 0;
@@ -222,6 +257,7 @@ window.onload = () => {
         voxels[voxels.length] = col;
       }
     });
+    */
 
     canvas.draw({voxels});
 

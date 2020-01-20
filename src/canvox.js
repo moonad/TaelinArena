@@ -24,7 +24,10 @@ function setup_cam(cam) {
   //var H = 300;
   var T = Date.now()/1000;
   if (!cam) {
-    var ang = Math.PI * 1/8;
+    var ang = Math.PI * 1/4 + Math.sin(T) * Math.PI * 0.2;
+    //45 graus +- 36 pi
+    //45-36 a 45+36
+
     var cos = Math.cos(ang);
     var sin = Math.sin(ang);
     var front = {x:0, y:cos, z:-sin};
@@ -38,7 +41,7 @@ function setup_cam(cam) {
       front : front, // front direction
       size  : {x:W*0.5, y:H*0.5}, // world size
       port  : {x:W, y:H}, // browser size
-      res   : 1, // rays_per_pixel = res^2
+      res   : 1.0, // rays_per_pixel = res^2
     };
   } else {
     var cam = cam;
