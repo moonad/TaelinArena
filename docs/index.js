@@ -2673,30 +2673,41 @@ const load_model = name => {
   var model_json = __webpack_require__(6)("./"+name+".json");
   return spritestack.model_to_voxels(model_json);
 };
-var croni = {
-  feet:-64,
-  anim:[
-    load_model("croni_idle0"),
-    load_model("croni_idle1"),
-    load_model("croni_idle2"),
-    load_model("croni_idle3"),
-    load_model("croni_idle4"),
-    load_model("croni_idle5"),
-    load_model("croni_idle6"),
-    load_model("croni_idle7"),
-    load_model("croni_idle8"),
-    load_model("croni_idle9"),
-    load_model("croni_idle10"),
-    load_model("croni_idle11"),
-  ]
+var CRONI_IDLE = 0;
+var LYN_IDLE = 1;
+var FANTASY_IDLE = 2;
+var ARCHER_IDLE = 3;
+var animations = {
+  [CRONI_IDLE]: {
+    pivot: {x:0, y:0, z:-64},
+    frames: [
+      load_model("croni_idle0"),
+      load_model("croni_idle1"),
+      load_model("croni_idle2"),
+      load_model("croni_idle3"),
+      load_model("croni_idle4"),
+      load_model("croni_idle5"),
+      load_model("croni_idle6"),
+      load_model("croni_idle7"),
+      load_model("croni_idle8"),
+      load_model("croni_idle9"),
+      load_model("croni_idle10"),
+      load_model("croni_idle11"),
+    ]
+  },
+  [LYN_IDLE]: {
+    pivot: {x:0, y:0, z:-56},
+    frames: [load_model("lyn")]
+  },
+  [FANTASY_IDLE]: {
+    pivot: {x:0, y:0, z:-64},
+    frames: [load_model("fantasy")]
+  },
+  [ARCHER_IDLE]: {
+    pivot: {x:0, y:0, z:-64},
+    frames: [load_model("archer")]
+  },
 };
-
-var lyn = {
-  feet:-56,
-  anim:[load_model("lyn")]
-};
-
-var hero = {...croni};
 
 // Taelin Arena
 var {
@@ -2711,7 +2722,8 @@ var {
   get_object_pos,
   get_object_dir,
   get_object_vel,
-  get_object_size,
+  get_object_box,
+  get_object_spr,
 
   // Vector accessors
   get_x,
@@ -2724,7 +2736,7 @@ var now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
-class Counter extends Component {
+class Main extends Component {
   constructor(props) {
     super(props)
     this.state = {count: 0};
@@ -2749,28 +2761,27 @@ class Counter extends Component {
       }
     }, [
       h("span", {}, "Taelin Arena"),
-      h("input", {
-        type: "file",
-        multiple: true,
-        style: {
-          position: "fixed",
-          bottom: "0px",
-          left: "0px",
-        },
-        onchange: (e) => {
-          hero = {feet:-64, anim:[]};
-          var input = e.target;
-          for (let i = 0; i < input.files.length; ++i) {
-            let reader = new FileReader();
-            reader.onload = () => {
-              hero.anim[i]
-                = spritestack.model_to_voxels(
-                  JSON.parse(reader.result));
-            };
-            reader.readAsText(input.files[i]);
-          };
-        }
-      }),
+      //h("input", {
+        //type: "file",
+        //multiple: true,
+        //style: {
+          //position: "fixed",
+          //bottom: "0px",
+          //left: "0px",
+        //},
+        //onchange: (e) => {
+          //var input = e.target;
+          //for (let i = 0; i < input.files.length; ++i) {
+            //let reader = new FileReader();
+            //reader.onload = () => {
+              //hero.anim[i]
+                //= spritestack.model_to_voxels(
+                  //JSON.parse(reader.result));
+            //};
+            //reader.readAsText(input.files[i]);
+          //};
+        //}
+      //}),
     ])
   }
 };
@@ -2779,7 +2790,7 @@ class Counter extends Component {
 
 window.onload = () => {
   // Renders site using Inferno
-  render(h(Counter), document.getElementById("main"));
+  render(h(Main), document.getElementById("main"));
 
   // Creates canvas and inserts on page
   var canvas = canvox();
@@ -2787,35 +2798,30 @@ window.onload = () => {
 
   // Keys that are pressed
   var key = {};
-  document.body.onkeyup = (e) => {
+  var refresh_game_pad = () => {
+    var key_d = key.d||0;
+    var key_a = key.a||0;
+    var key_w = key.w||0;
+    var key_s = key.s||0;
     var event = t => {
       var id = 0;
-      var dir;
-      switch (e.key) {
-        case "a": dir = t => t(0)(0)(0); break;
-        case "s": dir = t => t(0)(0)(0); break;
-        case "d": dir = t => t(0)(0)(0); break;
-        case "w": dir = t => t(0)(0)(0); break;
-      };
+      var dir = t => {
+        var x = (key_d||0) - (key_a||0);
+        var y = (key_w||0) - (key_s||0);
+        var z = 0;
+        return t(x)(y)(0);
+      }
       return t(id)(dir);
     };
     game = input_game(event)(game);
+  };
+  document.body.onkeyup = (e) => {
     key[e.key] = 0;
+    refresh_game_pad();
   };
   document.body.onkeypress = (e) => {
-    var event = t => {
-      var id = 0;
-      var dir;
-      switch (e.key) {
-        case "a": dir = t => t(-4)(0)(0); break;
-        case "s": dir = t => t(0)(4)(0); break;
-        case "d": dir = t => t(4)(0)(0); break;
-        case "w": dir = t => t(0)(-4)(0); break;
-      };
-      return t(id)(dir);
-    };
-    game = input_game(event)(game);
     key[e.key] = 1;
+    refresh_game_pad();
   };
 
   // FPS metering
@@ -2849,37 +2855,54 @@ window.onload = () => {
       var pos = get_object_pos(object);
       var dir = get_object_dir(object);
       var vel = get_object_vel(object);
-      var size = get_object_size(object);
+      var box = get_object_box(object);
+      var spr = get_object_spr(object);
+      var ang = Math.atan2(get_y(dir), get_x(dir));
+      var ang = ang + Math.PI*0.5;
       var pos_x = get_x(pos);
       var pos_y = get_y(pos);
       var pos_z = get_z(pos);
-      var model = croni;
-      var feet = model.feet;
-      var anims = model.anim.length;
-      var frame = model.anim[Math.floor((T*10) % anims)];
-      for (var i = 0; i < frame.length; ++i) {
-        var [{x,y,z},col] = frame[i];
-        var cx = pos_x;
-        var cy = pos_y;
-        var cz = pos_z;
-        var px = cx + x;
-        var py = cy + y;
-        var pz = cz + z;
-        //var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-        //var pa = Math.atan2(py-cy,px-cx);
-        //var da = X === 0 ? debug.ang : 0;
-        //var px = cx + pl * Math.cos(pa+(X===0?0:T)+da) + 0.5;
-        //var py = cy + pl * Math.sin(pa+(X===0?0:T)+da) + 0.5;
-        var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
-        var col = col | 0x000000FF;
-        voxels[voxels.length] = pos;
-        voxels[voxels.length] = col;
-      }
+      var case_model = anim_id => {
+        var spr = animations[anim_id||0];
+        var feet = spr.pivot.z;
+        var frames = spr.frames.length;
+        var frame = spr.frames[Math.floor((T*10) % frames)];
+        for (var i = 0; i < frame.length; ++i) {
+          var [{x,y,z},col] = frame[i];
+          var cx = pos_x;
+          var cy = pos_y;
+          var cz = pos_z;
+          var px = cx + x;
+          var py = cy + y;
+          var pz = cz + z;
+          var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+          var pa = Math.atan2(py-cy,px-cx);
+          var px = cx + pl * Math.cos(pa + ang) + 0.5;
+          var py = cy + pl * Math.sin(pa + ang) + 0.5;
+          var pz = cz + z;
+          var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+          var col = col | 0x000000FF;
+          voxels[voxels.length] = pos;
+          voxels[voxels.length] = col;
+        }
+      };
+      var case_shape = rad => {
+        for (var j = -rad; j <= rad; ++j) {
+          for (var i = -rad; i <= rad; ++i) {
+            if (i*i+j*j < rad*rad) {
+              var px = pos_x + i;
+              var py = pos_y + j;
+              var pz = -64;
+              var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+              var col = 0xFFAAAAFF;
+              voxels[voxels.length] = pos;
+              voxels[voxels.length] = col;
+            }
+          }
+        }
+      };
+      spr(case_model)(case_shape);
     })(game);
-
-
-    
-    
 
 
     /*
@@ -2922,7 +2945,7 @@ window.onload = () => {
 
     canvas.draw({voxels});
 
-  }, 1000 / 10);
+  }, 1000 / 24);
 };
 
 
@@ -3090,7 +3113,8 @@ function setup_cam(cam) {
   //var H = 300;
   var T = Date.now()/1000;
   if (!cam) {
-    var ang = Math.PI * 1/4 + Math.sin(T) * Math.PI * 0.2;
+    //var ang = Math.PI * 1/4 + Math.sin(T) * Math.PI * 0.2;
+    var ang = Math.PI * 1/4;
     //45 graus +- 36 pi
     //45-36 a 45+36
 
@@ -3784,26 +3808,61 @@ module.exports = (function(){
   var _TaelinArena$mut_y = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_2)(_0(_3))(_4)))))));
   var _TaelinArena$mut_z = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3(_2)(_3)(_0(_4))))))));
   var _TaelinArena$add_v3 = (_0=>(_1=>_0((_2=>(_3=>(_4=>_1((_5=>(_6=>(_7=>_TaelinArena$v3((_2+_5))((_3+_6))((_4+_7))))))))))));
+  var _TaelinArena$mul_v3 = (_0=>(_1=>_0((_2=>(_3=>(_4=>_1((_5=>(_6=>(_7=>_TaelinArena$v3((_2*_5))((_3*_6))((_4*_7))))))))))));
+  var _TaelinArena$len_v3 = (_0=>_0((_1=>(_2=>(_3=>((((0+(_1*_1))+(_2*_2))+(_3*_3))**0.5))))));
+  var _TaelinArena$scale_v3 = (_0=>(_1=>_1((_2=>(_3=>(_4=>_TaelinArena$v3((_2*_0))((_3*_0))((_4*_0))))))));
+  var _TaelinArena$Segment = undefined;
+  var _TaelinArena$segment = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$Line = undefined;
+  var _TaelinArena$line = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$Circle = undefined;
+  var _TaelinArena$circle = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$Boundary = undefined;
+  var _TaelinArena$boundary = (_0=>(_1=>_1(_0)));
+  var _TaelinArena$max = (_13=>(_14=>((_13>_14)?_13:_14)));
+  var _TaelinArena$min = (_13=>(_14=>((_13<_14)?_13:_14)));
+  var _TaelinArena$point_segment_sqrdist = (_0=>(_1=>_1((_2=>(_3=>_2((_4=>(_5=>(_6=>_3((_7=>(_8=>(_9=>_0((_10=>(_11=>(_12=>((0+((_10-(_4+(_TaelinArena$max(0)(_TaelinArena$min(1)((((0+((_10-_4)*(_7-_4)))+((_11-_5)*(_8-_5)))/((0+((_4-_7)**2))+((_5-_8)**2)))))*(_7-_4))))**2))+((_11-(_5+(_TaelinArena$max(0)(_TaelinArena$min(1)((((0+((_10-_4)*(_7-_4)))+((_11-_5)*(_8-_5)))/((0+((_4-_7)**2))+((_5-_8)**2)))))*(_8-_5))))**2)))))))))))))))))));
+  var _TaelinArena$point_segment_dist = (_0=>(_1=>(_TaelinArena$point_segment_dist(_0)(_1)**0.5)));
+  var _Maybe$rXzW$none = (_15=>(_16=>_15));
+  var _Maybe$rXzW$some = (_15=>(_16=>(_17=>_17(_15))));
+  var _Pair$g_Jv$pair = (_15=>(_16=>(_17=>_17(_15)(_16))));
+  var _TaelinArena$circle_line_intersection = (_0=>(_1=>_0((_2=>(_3=>_1((_4=>(_5=>_2((_6=>(_7=>(_8=>_4((_9=>(_10=>(_11=>_5((_12=>(_13=>(_14=>(((((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))<0)|(((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))===0? 1 : 0))?_Maybe$rXzW$none:_Maybe$rXzW$some(_Pair$g_Jv$pair(_TaelinArena$v3(((((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*_13)-(((_13<0)?(0-_12):_12)*(((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))**0.5)))+_6))(((((0-(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7))))*_12)-(((_13<0)?(0-_13):_13)*(((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))**0.5)))+_7))(0))(_TaelinArena$v3(((((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*_13)+(((_13<0)?(0-_12):_12)*(((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))**0.5)))+_6))(((((0-(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7))))*_12)+(((_13<0)?(0-_13):_13)*(((_3*_3)-((((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))*(((_9-_6)*((_10+_13)-_7))-(((_9+_12)-_6)*(_10-_7)))))**0.5)))+_7))(0))))))))))))))))))))))));
+  var _List$HQNc$cons = (_9=>(_10=>(_11=>(_12=>_12(_9)(_10)))));
+  var _TaelinArena$circle_boundary_intersects = (_0=>(_1=>_1((_2=>_0((_3=>(_4=>_2(0)((_5=>(_6=>_6(0)((_7=>(_8=>((_TaelinArena$point_segment_sqrdist(_3)(_TaelinArena$segment(_5)(_7))<(_4*_4))?1:_TaelinArena$circle_boundary_intersects(_0)(_TaelinArena$boundary(_List$HQNc$cons(_7)(_8)))))))))))))))));
   var _List$HQNc$nil = (_2=>(_3=>_2));
-  var _List$HQNc$cons = (_4=>(_5=>(_6=>(_7=>_7(_4)(_5)))));
   var _TaelinArena$map_list = (_0=>(_1=>_1(_List$HQNc$nil)((_2=>(_3=>_List$HQNc$cons(_0(_2))(_TaelinArena$map_list(_0)(_3)))))));
   var _TaelinArena$generate_list_go = (_0=>(_1=>(_2=>((_0===_1? 1 : 0)?_List$HQNc$nil:_List$HQNc$cons(_2(_0))(_TaelinArena$generate_list_go((_0+1))(_1)(_2))))));
   var _TaelinArena$generate_list = (_0=>(_1=>_TaelinArena$generate_list_go(0)(_0)(_1)));
+  var _TaelinArena$Hitbox = undefined;
+  var _TaelinArena$circbox = (_0=>(_1=>(_2=>_1(_0))));
+  var _TaelinArena$polybox = (_0=>(_1=>(_2=>_2(_0))));
   var _TaelinArena$ObjectId = undefined;
+  var _TaelinArena$Sprite = undefined;
+  var _TaelinArena$model = (_0=>(_1=>(_2=>_1(_0))));
+  var _TaelinArena$shape = (_0=>(_1=>(_2=>_2(_0))));
   var _TaelinArena$GameObject = undefined;
-  var _TaelinArena$game_object = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_6(_0)(_1)(_2)(_3)(_4)(_5))))))));
-  var _TaelinArena$get_object_id = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_1))))))));
-  var _TaelinArena$get_object_hp = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_2))))))));
-  var _TaelinArena$get_object_pos = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_3))))))));
-  var _TaelinArena$get_object_dir = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_4))))))));
-  var _TaelinArena$get_object_vel = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_5))))))));
-  var _TaelinArena$get_object_size = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>_6))))))));
-  var _TaelinArena$mut_object_dir = (_0=>(_1=>_1((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_TaelinArena$game_object(_2)(_3)(_4)(_0(_5))(_6)(_7))))))))));
+  var _TaelinArena$game_object = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_8(_0)(_1)(_2)(_3)(_4)(_5)(_6)(_7))))))))));
+  var _TaelinArena$mut_object_fields = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_8((_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>_TaelinArena$game_object(_0(_9))(_1(_10))(_2(_11))(_3(_12))(_4(_13))(_5(_14))(_6(_15))(_7(_16))))))))))))))))))));
+  var _TaelinArena$get_object_id = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_1))))))))));
+  var _TaelinArena$get_object_hp = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_2))))))))));
+  var _TaelinArena$get_object_pos = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_3))))))))));
+  var _TaelinArena$get_object_spd = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_4))))))))));
+  var _TaelinArena$get_object_dir = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_5))))))))));
+  var _TaelinArena$get_object_vel = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_6))))))))));
+  var _TaelinArena$get_object_box = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_7))))))))));
+  var _TaelinArena$get_object_spr = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_8))))))))));
+  var _Function$3v_K$id = (_2=>_2);
+  var _TaelinArena$mut_object_id = (_0=>(_1=>_TaelinArena$mut_object_fields(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_hp = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_pos = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_spd = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_dir = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_vel = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_box = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_Function$3v_K$id)(_1)));
+  var _TaelinArena$mut_object_spr = (_0=>(_1=>_TaelinArena$mut_object_fields(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_Function$3v_K$id)(_0)(_1)));
   var _List$HQNc$List = (_0=>undefined);
   var _TaelinArena$GameMap = _List$HQNc$List(_TaelinArena$GameObject);
-  var _Maybe$rXzW$none = (_2=>(_3=>_2));
-  var _Maybe$rXzW$some = (_10=>(_11=>(_12=>_12(_10))));
-  var _TaelinArena$get_object_from_map = (_0=>(_1=>_1(_Maybe$rXzW$none)((_2=>(_3=>_2((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>((_4===_0? 1 : 0)?_Maybe$rXzW$some(_2):_TaelinArena$get_object_from_map(_0)(_3))))))))))))));
+  var _TaelinArena$get_object_from_map = (_0=>(_1=>_1(_Maybe$rXzW$none)((_2=>(_3=>_2((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>((_4===_0? 1 : 0)?_Maybe$rXzW$some(_2):_TaelinArena$get_object_from_map(_0)(_3))))))))))))))));
   var _TaelinArena$Game = undefined;
   var _TaelinArena$game = (_0=>(_1=>_1(_0)));
   var _TaelinArena$get_game_map = (_0=>_0((_1=>_1)));
@@ -3812,16 +3871,17 @@ module.exports = (function(){
   var _TaelinArena$SRPX = 0;
   var _TaelinArena$STANCI = 1;
   var _TaelinArena$NEELIX = 2;
-  var _TaelinArena$srpx = _TaelinArena$game_object(0)(70)(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(12)(12)(18));
-  var _TaelinArena$stanci = _TaelinArena$game_object(1)(90)(_TaelinArena$v3(64)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(12)(12)(12));
-  var _TaelinArena$neelix = _TaelinArena$game_object(2)(700)(_TaelinArena$v3(-64)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(6)(6)(6));
-  var _TaelinArena$belanna = _TaelinArena$game_object(3)(80)(_TaelinArena$v3(0)(64)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$v3(6)(6)(6));
+  var _TaelinArena$BELANNA = 3;
+  var _TaelinArena$srpx = _TaelinArena$game_object(0)(70)(_TaelinArena$v3(0)(0)(0))(0)(_TaelinArena$v3(0)(-1)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$circbox(12))(_TaelinArena$model(0));
+  var _TaelinArena$stanci = _TaelinArena$game_object(1)(90)(_TaelinArena$v3(64)(0)(0))(0)(_TaelinArena$v3(-1)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$circbox(10))(_TaelinArena$model(1));
+  var _TaelinArena$neelix = _TaelinArena$game_object(2)(700)(_TaelinArena$v3(-64)(0)(0))(0)(_TaelinArena$v3(-1)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$circbox(8))(_TaelinArena$model(2));
+  var _TaelinArena$belanna = _TaelinArena$game_object(3)(80)(_TaelinArena$v3(0)(64)(0))(0)(_TaelinArena$v3(-1)(0)(0))(_TaelinArena$v3(0)(0)(0))(_TaelinArena$circbox(8))(_TaelinArena$shape(12));
   var _TaelinArena$demo_game = _TaelinArena$game(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$cons(_TaelinArena$neelix)(_List$HQNc$cons(_TaelinArena$belanna)(_List$HQNc$nil)))));
   var _TaelinArena$GameEvent = undefined;
   var _TaelinArena$game_move = (_0=>(_1=>(_2=>_2(_0)(_1))));
   var _TaelinArena$map_game_objects = (_0=>(_1=>_TaelinArena$game(_TaelinArena$map_list(_0)(_TaelinArena$get_game_map(_1)))));
-  var _TaelinArena$input_game = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$map_game_objects((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>((_2===_5? 1 : 0)?_TaelinArena$mut_object_dir((_11=>_3))(_4):_4))))))))))(_1))))));
-  var _TaelinArena$tick_game = (_0=>_TaelinArena$map_game_objects((_1=>_1((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_TaelinArena$game_object(_2)(_3)(_TaelinArena$add_v3(_4)(_5))(_5)(_6)(_7))))))))))(_0));
+  var _TaelinArena$input_game = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$map_game_objects((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>((_2===_5? 1 : 0)?_TaelinArena$mut_object_spd(((_TaelinArena$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>4)))(_TaelinArena$mut_object_dir(((_TaelinArena$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)):_4))))))))))))(_1))))));
+  var _TaelinArena$tick_game = (_0=>_TaelinArena$map_game_objects((_1=>_1((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_TaelinArena$game_object(_2)(_3)(_TaelinArena$add_v3(_4)(_TaelinArena$scale_v3(_5)(_6)))(_5)(_6)(_7)(_8)(_9))))))))))))(_0));
   return {
     'V3':_TaelinArena$V3,
     'v3':_TaelinArena$v3,
@@ -3833,19 +3893,52 @@ module.exports = (function(){
     'mut_y':_TaelinArena$mut_y,
     'mut_z':_TaelinArena$mut_z,
     'add_v3':_TaelinArena$add_v3,
+    'mul_v3':_TaelinArena$mul_v3,
+    'len_v3':_TaelinArena$len_v3,
+    'scale_v3':_TaelinArena$scale_v3,
+    'Segment':_TaelinArena$Segment,
+    'segment':_TaelinArena$segment,
+    'Line':_TaelinArena$Line,
+    'line':_TaelinArena$line,
+    'Circle':_TaelinArena$Circle,
+    'circle':_TaelinArena$circle,
+    'Boundary':_TaelinArena$Boundary,
+    'boundary':_TaelinArena$boundary,
+    'point_segment_sqrdist':_TaelinArena$point_segment_sqrdist,
+    'point_segment_dist':_TaelinArena$point_segment_dist,
+    'circle_line_intersection':_TaelinArena$circle_line_intersection,
+    'circle_boundary_intersects':_TaelinArena$circle_boundary_intersects,
     'map_list':_TaelinArena$map_list,
     'generate_list.go':_TaelinArena$generate_list_go,
     'generate_list':_TaelinArena$generate_list,
+    'min':_TaelinArena$min,
+    'max':_TaelinArena$max,
+    'Hitbox':_TaelinArena$Hitbox,
+    'circbox':_TaelinArena$circbox,
+    'polybox':_TaelinArena$polybox,
     'ObjectId':_TaelinArena$ObjectId,
+    'Sprite':_TaelinArena$Sprite,
+    'model':_TaelinArena$model,
+    'shape':_TaelinArena$shape,
     'GameObject':_TaelinArena$GameObject,
     'game_object':_TaelinArena$game_object,
+    'mut_object_fields':_TaelinArena$mut_object_fields,
     'get_object_id':_TaelinArena$get_object_id,
     'get_object_hp':_TaelinArena$get_object_hp,
     'get_object_pos':_TaelinArena$get_object_pos,
+    'get_object_spd':_TaelinArena$get_object_spd,
     'get_object_dir':_TaelinArena$get_object_dir,
     'get_object_vel':_TaelinArena$get_object_vel,
-    'get_object_size':_TaelinArena$get_object_size,
+    'get_object_box':_TaelinArena$get_object_box,
+    'get_object_spr':_TaelinArena$get_object_spr,
+    'mut_object_id':_TaelinArena$mut_object_id,
+    'mut_object_hp':_TaelinArena$mut_object_hp,
+    'mut_object_pos':_TaelinArena$mut_object_pos,
+    'mut_object_spd':_TaelinArena$mut_object_spd,
     'mut_object_dir':_TaelinArena$mut_object_dir,
+    'mut_object_vel':_TaelinArena$mut_object_vel,
+    'mut_object_box':_TaelinArena$mut_object_box,
+    'mut_object_spr':_TaelinArena$mut_object_spr,
     'GameMap':_TaelinArena$GameMap,
     'get_object_from_map':_TaelinArena$get_object_from_map,
     'Game':_TaelinArena$Game,
@@ -3856,6 +3949,7 @@ module.exports = (function(){
     'SRPX':_TaelinArena$SRPX,
     'STANCI':_TaelinArena$STANCI,
     'NEELIX':_TaelinArena$NEELIX,
+    'BELANNA':_TaelinArena$BELANNA,
     'srpx':_TaelinArena$srpx,
     'stanci':_TaelinArena$stanci,
     'neelix':_TaelinArena$neelix,

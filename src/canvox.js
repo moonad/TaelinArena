@@ -24,7 +24,8 @@ function setup_cam(cam) {
   //var H = 300;
   var T = Date.now()/1000;
   if (!cam) {
-    var ang = Math.PI * 1/4 + Math.sin(T) * Math.PI * 0.2;
+    //var ang = Math.PI * 1/4 + Math.sin(T) * Math.PI * 0.2;
+    var ang = Math.PI * 1/4;
     //45 graus +- 36 pi
     //45-36 a 45+36
 
