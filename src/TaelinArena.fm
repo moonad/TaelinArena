@@ -1,263 +1,6 @@
 import Base#mbRT
-
-// ::::::::::::::
-// :: Geometry ::
-// ::::::::::::::
-
-T V3
-| v3(x: Number, y: Number, z: Number) 
-
-map_v3(fn: Number -> Number, v: V3) : V3
-  case v | v3 =>
-  v3(fn(v.x), fn(v.y), fn(v.z))
-
-// Vector accessors and mutters
-get_x(v: V3)
-  case v | v3 =>
-  v.x
-
-get_y(v: V3)
-  case v | v3 =>
-  v.y
-
-get_z(v: V3)
-  case v | v3 =>
-  v.z
-
-mut_x(fn: Number -> Number, v: V3)
-  case v | v3 =>
-  v3(fn(v.x), v.y, v.z)
-
-mut_y(fn: Number -> Number, v: V3)
-  case v | v3 =>
-  v3(v.x, fn(v.y), v.z)
-
-mut_z(fn: Number -> Number, v: V3)
-  case v | v3 =>
-  v3(v.x, v.y, fn(v.z))
-
-sub_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
-  v3(a.x .-. b.x, a.y .-. b.y, a.z .-. b.z)
-
-add_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
-  v3(a.x .+. b.x, a.y .+. b.y, a.z .+. b.z)
-
-mul_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
-  v3(a.x .*. b.x, a.y .*. b.y, a.z .*. b.z)
-
-len_v3(a: V3) : Number
-  case a | v3 =>
-  let sqr = 0
-  let sqr = sqr .+. (a.x .*. a.x)
-  let sqr = sqr .+. (a.y .*. a.y)
-  let sqr = sqr .+. (a.z .*. a.z)
-  let sqr = sqr .**. 0.5
-  sqr
-    
-norm_v3(a: V3) : V3
-  let l = len_v3(a)
-  case a | v3 =>
-  v3(a.x ./. l, a.y ./. l, a.z ./. l)
-
-scale_v3(x: Number, a: V3)
-  case a
-  | v3 => v3(a.x .*. x, a.y .*. x, a.z .*. x)
-
-dot_v3(a: V3, b: V3) : Number
-  case a | v3 =>
-  case b | v3 =>
-  let d = 0
-  let d = d .+. (a.x .*. b.x)
-  let d = d .+. (a.y .*. b.y)
-  let d = d .+. (a.z .*. b.z)
-  d
-
-sqrdist_v3(a: V3, b: V3) : Number
-  case a | v3 =>
-  case b | v3 =>
-  let d = 0
-  let d = d .+. ((a.x .-. b.x) .**. 2)
-  let d = d .+. ((a.y .-. b.y) .**. 2)
-  let d = d .+. ((a.z .-. b.z) .**. 2)
-  d
-
-// A finite line segment between two points
-T Segment
-| segment(a: V3, b: V3)
-
-// An infinite line
-T Line
-| line(pos: V3, dir: V3)
-
-// A circle/sphere
-T Circle
-| circle(pos: V3, rad: Number)
-
-// The boundary of a polygon
-T Boundary
-| boundary(points: List(V3))
-
-// Squared distance between a point and a segment
-point_segment_sqrdist(p: V3, s: Segment) : Number
-  case s | segment =>
-  case s.a as a | v3 =>
-  case s.b as b | v3 => 
-  case p | v3 =>
-    let l = 0
-    let l = l .+. ((a.x .-. b.x) .**. 2)
-    let l = l .+. ((a.y .-. b.y) .**. 2)
-    let t = 0
-    let t = t .+. ((p.x .-. a.x) .*. (b.x .-. a.x))
-    let t = t .+. ((p.y .-. a.y) .*. (b.y .-. a.y))
-    let t = t ./. l
-    let t = max(0, min(1, t))
-    let d = 0
-    let k = (p.x .-. (a.x .+. (t .*. (b.x .-. a.x)))) .**. 2
-    let d = d .+. k
-    let k = (p.y .-. (a.y .+. (t .*. (b.y .-. a.y)))) .**. 2
-    let d = d .+. k
-    d
-
-// Distance between a point and a segment
-point_segment_dist(p: V3, s: Segment): Number
-  point_segment_dist(p, s) .**. 0.5
-
-// The two intersection points of a circle and a line
-circle_line_intersection(circle: Circle, line: Line)
-: Maybe(Pair(V3,V3))
-  case circle | circle =>
-  case line | line =>
-  case circle.pos | v3 =>
-  case line.pos | v3 =>
-  case line.dir | v3 =>
-  let cx = circle.pos.x
-  let cy = circle.pos.y
-  let dx = line.dir.x
-  let dy = line.dir.y
-  let x1 = line.pos.x .-. cx
-  let y1 = line.pos.y .-. cy
-  let x2 = (line.pos.x .+. dx) .-. cx
-  let y2 = (line.pos.y .+. dy) .-. cy
-  let dd = (x1 .*. y2) .-. (x2 .*. y1)
-  let de = (circle.rad .*. circle.rad) .-. (dd .*. dd) 
-  if (de .<. 0) .|. (de .==. 0) then
-    none(_)
-  else
-    let sx = if dy .<. 0 then 0 .-. dx else dx
-    let sy = if dy .<. 0 then 0 .-. dy else dy
-    let px = sx .*. (de .**. 0.5)
-    let py = sy .*. (de .**. 0.5)
-    let qx = dd .*. dy
-    let qy = (0 .-. dd) .*. dx
-    let ax = qx .-. px
-    let ay = qy .-. py
-    let bx = qx .+. px
-    let by = qy .+. py
-    let ux = ax .+. cx
-    let uy = ay .+. cy
-    let vx = bx .+. cx
-    let vy = by .+. cy
-    some(_ pair(__ v3(ux,uy,0), v3(vx,vy,0)))
-
-circle_circle_hitpos(a: Circle, d: V3, b: Circle): Maybe(V3)
-  case a | circle =>
-  case b | circle =>
-  let r = a.rad
-  let c = circle(b.pos, a.rad .+. b.rad)
-  let l = line(a.pos, norm_v3(d))
-  let p = circle_line_intersection(c, l)
-  case p
-  | none => none(_)
-  | some =>
-    case p.value as p | pair =>
-    let d0 = sqrdist_v3(a.pos, p.fst)
-    let d1 = sqrdist_v3(a.pos, p.snd)
-    let cp = if d0 .<. d1 then p.fst else p.snd
-    let dp = dot_v3(d, sub_v3(cp, a.pos))
-    if dp .>. 0 then
-      some(_ cp)
-    else
-      none(_)
-
-main circle_circle_hitpos
-
-  //var r = a.rad + b.rad;
-  //let c = {pos:b.pos, rad:a.rad+b.rad};
-  //let l = {pos:a.pos, dir: norm(dir)};
-  //var p = circle_line_intersection(c, l);
-  //if (p) {
-    //var d0 = sqrdist(a.pos, p[0]);
-    //var d1 = sqrdist(a.pos, p[1]);
-    //var cp = d0 < d1 ? p[0] : p[1];
-    //var dp = dot_v3(dir, sub(cp, a.pos))
-    ////console.log(d0, d1, p[0], p[1]);
-    //return dp > 0 ? cp : null;
-  //} else {
-    //return null;
-  //}
-
-// Circle-boundary intersection test
-circle_boundary_intersects(c: Circle, b: Boundary): Number
-  case b | boundary =>
-  case c | circle =>
-  case b.points as l0
-  | nil => 0
-  | cons => case l0.tail as l1
-    | nil => 0
-    | cons => 
-      let p0 = l0.head
-      let p1 = l1.head
-      let sg = segment(p0, p1)
-      let cd = point_segment_sqrdist(c.pos, sg)
-      if cd .<. (c.rad .*. c.rad) then
-        1
-      else
-        let boun = boundary(cons(_ l1.head, l1.tail))
-        circle_boundary_intersects(c, boun)
-    
-// :::::::::::
-// :: Extra ::
-// :::::::::::
-
-map_list(A; B; fn: A -> B, xs: List(A)) : List(B)
-  case xs
-  | nil  => []
-  | cons => cons(_ fn(xs.head), map_list(__ fn, xs.tail))
-
-generate_list.go(A;
-  idx : Number,
-  len : Number,
-  fn  : Number -> A
-) : List(A)
-  if idx .==. len then
-    []
-  else
-    cons(_ fn(idx), generate_list.go(A; idx .+. 1, len, fn))
-
-generate_list(A; len: Number, fn: Number -> A) : List(A)
-  generate_list.go(A; 0, len, fn)
-
-min(a: Number, b: Number) : Number
-  if a .<. b then
-    a
-  else
-    b
-
-max(a: Number, b: Number) : Number
-  if a .>. b then
-    a
-  else
-    b
-
-// ::::::::::::::::
-// :: Game Logic ::
-// ::::::::::::::::
+import Geometry
+import Extra
 
 // :: COLLISION ::
 
@@ -271,11 +14,7 @@ ObjectId : Type
   Number
 
 T Sprite
-| model(id: Number)
-| shape(rad: Number)
-
-//AnimationId : Type
-  //Number
+| sprite(id: Number)
 
 T GameObject
 | game_object(
@@ -300,51 +39,50 @@ mut_object_fields(
   spr: Sprite -> Sprite,
   obj: GameObject
 ) : GameObject
-  case obj
-  | game_object =>
-    let id  = id(obj.id)
-    let hp  = hp(obj.hp)
-    let pos = pos(obj.pos)
-    let spd = spd(obj.spd)
-    let dir = dir(obj.dir)
-    let vel = vel(obj.vel)
-    let box = box(obj.box)
-    let spr = spr(obj.spr)
-    game_object(id,hp,pos,spd,dir,vel,box,spr)
+  case obj | game_object =>
+  let id  = id(obj.id)
+  let hp  = hp(obj.hp)
+  let pos = pos(obj.pos)
+  let spd = spd(obj.spd)
+  let dir = dir(obj.dir)
+  let vel = vel(obj.vel)
+  let box = box(obj.box)
+  let spr = spr(obj.spr)
+  game_object(id,hp,pos,spd,dir,vel,box,spr)
 
 // Object accessors / mutters
 
 get_object_id(obj: GameObject)
-  case obj
-  | game_object => obj.id
+  case obj | game_object =>
+  obj.id
 
 get_object_hp(obj: GameObject)
-  case obj
-  | game_object => obj.hp
+  case obj | game_object =>
+  obj.hp
 
 get_object_pos(obj: GameObject)
-  case obj
-  | game_object => obj.pos
+  case obj | game_object =>
+  obj.pos
 
 get_object_spd(obj: GameObject)
-  case obj
-  | game_object => obj.spd
+  case obj | game_object =>
+  obj.spd
 
 get_object_dir(obj: GameObject)
-  case obj
-  | game_object => obj.dir
+  case obj | game_object =>
+  obj.dir
 
 get_object_vel(obj: GameObject)
-  case obj
-  | game_object => obj.vel
+  case obj | game_object =>
+  obj.vel
 
 get_object_box(obj: GameObject)
-  case obj
-  | game_object => obj.box
+  case obj | game_object =>
+  obj.box
 
 get_object_spr(obj: GameObject)
-  case obj
-  | game_object => obj.spr
+  case obj | game_object =>
+  obj.spr
 
 mut_object_id(fn: ObjectId -> ObjectId , obj: GameObject)
   mut_object_fields(
@@ -405,12 +143,11 @@ get_object_from_map(id: ObjectId, gm: GameMap)
   case gm
   | nil  => none(_)
   | cons =>
-    case gm.head
-    | game_object => 
-      if gm.head.id .==. id then
-        some(_ gm.head)
-      else
-        get_object_from_map(id, gm.tail)
+    case gm.head | game_object => 
+    if gm.head.id .==. id then
+      some(_ gm.head)
+    else
+      get_object_from_map(id, gm.tail)
 
 // :: GAME ::
 
@@ -418,18 +155,19 @@ T Game
 | game(map : GameMap)
 
 get_game_map(game: Game) : GameMap
-  case game
-  | game => game.map
+  case game | game =>
+  game.map
 
-get_object_position(id: ObjectId, gs: Game) : V3
-  case get_object(id, gs) as got
+// Gets an object by its id
+get_object_by_id(id: ObjectId, gs: Game) : Maybe(GameObject)
+  case gs | game =>
+  get_object_from_map(id, gs.map)
+
+// Gets the position of an object by its id
+get_position_by_id(id: ObjectId, gs: Game) : V3
+  case get_object_by_id(id, gs) as got
   | none => v3(0,0,0)
   | some => get_object_pos(got.value)
-
-// Gets the position of an object on the game state
-get_object(id: ObjectId, gs: Game) : Maybe(GameObject)
-  case gs
-  | game => get_object_from_map(id, gs.map)
 
 // :: TESTS ::
 
@@ -446,7 +184,7 @@ srpx : GameObject
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(12)
-  let spr = model(0)
+  let spr = sprite(0)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
 stanci : GameObject
@@ -457,7 +195,7 @@ stanci : GameObject
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(10)
-  let spr = model(1)
+  let spr = sprite(1)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
 neelix : GameObject
@@ -469,7 +207,7 @@ neelix : GameObject
   let vel = v3(0, 0, 0)
   let box = v3(6,6,6)
   let box = circbox(8)
-  let spr = model(2)
+  let spr = sprite(2)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
 belanna : GameObject
@@ -479,17 +217,15 @@ belanna : GameObject
   let spd = 0
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(8)
-  let spr = shape(12)
+  let box = circbox(12)
+  let spr = sprite(3)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
 demo_game : Game
   let map = [srpx, stanci, neelix, belanna]
   game(map)
 
-// ::::::::::::::::
-// :: Game Input ::
-// ::::::::::::::::
+// GAME INPUT
 
 T GameEvent
 | game_move(id: ObjectId, dir: V3)
@@ -506,70 +242,68 @@ input_game(event: GameEvent, gm: Game) : Game
   case event
   | game_move =>
     let fn = (obj) =>
-      case obj
-      | game_object =>
-        // If this is this event's target object
-        if event.id .==. obj.id then
-          // Change its direction if analog isn't centered
-          let dir_fn =
-            if len_v3(event.dir) .==. 0 then
-              (old_dir) => old_dir
-            else
-              (old_dir) => event.dir
-          // Set its speed if analog isn't centered
-          let spd_fn =
-            if len_v3(event.dir) .==. 0 then
-              (old_spd) => 0
-            else
-              (old_spd) => 4
-          // Modify the object with the logic above
-          let obj = mut_object_dir(dir_fn, obj)
-          let obj = mut_object_spd(spd_fn, obj)
-          obj
-        else
-          obj
+      case obj | game_object =>
+      // If this is this event's target object
+      if event.id .==. obj.id then
+        // Change its direction if analog isn't centered
+        let dir_fn =
+          if len_v3(event.dir) .==. 0 then
+            (old_dir) => old_dir
+          else
+            (old_dir) => event.dir
+        // Set its speed if analog isn't centered
+        let spd_fn =
+          if len_v3(event.dir) .==. 0 then
+            (old_spd) => 0
+          else
+            (old_spd) => 4
+        // Modify the object with the logic above
+        let obj = mut_object_dir(dir_fn, obj)
+        let obj = mut_object_spd(spd_fn, obj)
+        obj
+      else
+        obj
     map_game_objects(fn, gm)
+
+// Tick-wise interaction of `a` with `b`
+interact_with(this:GameObject, that:GameObject): GameObject
+  case this | game_object =>
+  case that | game_object =>
+  case this.box
+  | circbox => 
+    case that.box
+    | circbox =>  
+      let dst = dist_v3(this.pos, that.pos)
+      let rad = this.box.rad .+. that.box.rad
+      if (dst .>. that.box.rad) .&. (dst .<. rad) then
+        let out_dir = norm_v3(sub_v3(this.pos, that.pos))
+        let out_vec = scale_v3(rad .-. dst, out_dir)
+        let new_pos = add_v3(this.pos, out_vec)
+        mut_object_pos((old) => new_pos, this)
+      else
+        this
+    | polybox =>
+      this
+  | polybox =>
+    this
 
 // Game's main loop
 tick_game(gm: Game) : Game
-  let fn = (obj) =>
-    case obj
-    | game_object =>
-      let new_id  = obj.id
-      let new_hp  = obj.hp
-      let add_pos = scale_v3(obj.spd, obj.dir)
-      let new_pos = add_v3(obj.pos, add_pos)
-      let new_spd = obj.spd
-      let new_dir = obj.dir
-      let new_vel = obj.vel
-      let new_box = obj.box
-      let new_spr = obj.spr
-      game_object(
-        new_id, new_hp, new_pos, new_spd,
-        new_dir, new_vel, new_box, new_spr)
-  map_game_objects(fn, gm)
-
-//main
-  //let a = v3(0,0,0)
-  //let b = v3(1,0,0)
-  //let p = v3(3,0,0)
-  //segment_point_distance(a,b,p)
-
-//function dist_sqr(a, b, p) {
-  //var l = (a.x-b.x)**2 + (a.y-b.y)**2;
-  //var t = ((p.x-a.x)*(b.x-a.x)+(p.y-a.y)*(b.y-a.y))/l;
-  //var t = Math.max(0, Math.min(1, t));
-  //var d = 0;
-  //var d = d + (p.x-(a.x+t*(b.x-a.x)))**2
-  //var d = d + (p.y-(a.y+t*(b.y-a.y)))**2;
-  //return d;
-//}
-
-
-
-
-
-
-
-
-
+  case gm | game =>
+  let tick = (obj) =>
+    case obj | game_object =>
+    let new_id  = obj.id
+    let new_hp  = obj.hp
+    let new_spd = obj.spd
+    let new_dir = obj.dir
+    let new_vel = obj.vel
+    let new_box = obj.box
+    let new_spr = obj.spr
+    let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
+    let trg_pos = v3(0,64,0)
+    let new_obj = game_object(
+      new_id, new_hp, new_pos, new_spd,
+      new_dir, new_vel, new_box, new_spr)
+    let int_fun = (that, this) => interact_with(this, that)
+    fold_list(GameObject; _ new_obj, int_fun, gm.map)
+  game(map_list(GameObject; _ tick, gm.map))
