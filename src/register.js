@@ -177,10 +177,10 @@ class Register extends Component {
             name: this.name,
             addr: this.wlet.address,
           }).then((res) => {
-            switch (res.ctor) {
+            switch (res.ctr) {
               case "err": 
                 this.phase = "error";
-                this.error = res.error;
+                this.error = res.err;
                 break;
               case "ok":
                 this.phase = "done";

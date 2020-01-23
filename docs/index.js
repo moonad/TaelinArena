@@ -2805,9 +2805,9 @@ Object.defineProperty(Duplex.prototype, 'destroyed', {
 
 
 
-var base64 = __webpack_require__(67)
-var ieee754 = __webpack_require__(68)
-var isArray = __webpack_require__(69)
+var base64 = __webpack_require__(66)
+var ieee754 = __webpack_require__(67)
+var isArray = __webpack_require__(68)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -5491,7 +5491,7 @@ function _isUint8Array(obj) {
 /*<replacement>*/
 
 
-var debugUtil = __webpack_require__(76);
+var debugUtil = __webpack_require__(75);
 
 var debug;
 
@@ -5503,7 +5503,7 @@ if (debugUtil && debugUtil.debuglog) {
 /*</replacement>*/
 
 
-var BufferList = __webpack_require__(77);
+var BufferList = __webpack_require__(76);
 
 var destroyImpl = __webpack_require__(18);
 
@@ -6440,7 +6440,7 @@ Readable.prototype.wrap = function (stream) {
 if (typeof Symbol === 'function') {
   Readable.prototype[Symbol.asyncIterator] = function () {
     if (createReadableStreamAsyncIterator === undefined) {
-      createReadableStreamAsyncIterator = __webpack_require__(80);
+      createReadableStreamAsyncIterator = __webpack_require__(79);
     }
 
     return createReadableStreamAsyncIterator(this);
@@ -6542,7 +6542,7 @@ function endReadableNT(state, stream) {
 if (typeof Symbol === 'function') {
   Readable.from = function (iterable, opts) {
     if (from === undefined) {
-      from = __webpack_require__(81);
+      from = __webpack_require__(80);
     }
 
     return from(Readable, iterable, opts);
@@ -7229,7 +7229,7 @@ Writable.WritableState = WritableState;
 /*<replacement>*/
 
 var internalUtil = {
-  deprecate: __webpack_require__(79)
+  deprecate: __webpack_require__(78)
 };
 /*</replacement>*/
 
@@ -8382,7 +8382,6 @@ function done(stream, er, data) {
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// HTML Rendering
 const {Component, render} = __webpack_require__(0);
 const h = __webpack_require__(8).h;
 const oct = __webpack_require__(9);
@@ -8391,11 +8390,133 @@ const TA = __webpack_require__(25);
 const extra = __webpack_require__(10);
 const ethers = __webpack_require__(11);
 const request = __webpack_require__(12);
+const SimplePeer = __webpack_require__(65);
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
 
-const Register = __webpack_require__(65);
+// Peer connection
+const peer = new SimplePeer({
+  initiator: false,
+  trickle: false});
+const name = "#"+(Math.random()*(2**32)>>>0).toString(16);
+post("offer",{name}).then(data => peer.signal(data));
+peer.on('error', err => console.log('error', err))
+peer.on('signal', data => post("answer", {name,data}));
+peer.on('connect', () => {});
+peer.on('data', data => console.log(""+data));
+window.send = msg => peer.send(msg);
+
+const Register = __webpack_require__(84);
+
+class GameList extends Component {
+  constructor(props) {
+    super(props);
+    this.game_count = 0;
+    this.game_list = [];
+  }
+  render() {
+    // Game List
+    var game_elems = [];
+    for (var i = 0; i < this.game_list.length; ++i) {
+      game_elems.push(h("div", {}, [
+        game_list[i].id,
+        " | ",
+        game_list[i].name, 
+      ]));
+    }
+
+    return h("div", {
+      style: {
+        "display": "flex",
+        "flex-flow": "column nowrap",
+        "justify-content": "flex-start",
+        "align-items": "center",
+      }
+    }, [
+      game_elems,
+    ]);
+  }
+};
+
+class Chat extends Component {
+  constructor(props) {
+    super(props);
+    this.msgs = [];
+    peer.on("data", (data) => {
+      this.msgs.push(""+data);
+      this.forceUpdate();
+    });
+  }
+  render() {
+    var msgs = [];
+    for (var i = 0; i < this.msgs.length; ++i) {
+      msgs.push(h("div", {}, this.msgs[i]));
+    };
+    var chat = h("div", {
+      id: "chat_msgs",
+      style: {
+        "font-size": "10px",
+        "width": "100%",
+        "height": "calc(100% - 24px)",
+        "padding": "4px",
+        "flex-grow": "1",
+        "display": "flex",
+        "overflow-x": "hidden",
+        "overflow-y": "scroll",
+        "flex-flow": "column",
+        "justify-content": "flex-start",
+        "align-items": "flex-start",
+      }
+    }, [msgs]);
+
+    var input = h("input", {
+      id: "chat_input",
+      onkeydown: (e) => {
+        var value = e.target.value;
+        if (e.key === "Enter") {
+          peer.send(value);
+          setTimeout(() => {
+            var el0 = document.getElementById("chat_input");
+            var el1 = document.getElementById("chat_msgs");
+            el0.value = "";
+            el1.scrollTop = el1.scrollHeight;
+          }, 5);
+        }
+        this.forceUpdate();
+      },
+      style: {
+        "width": "calc(100% - 10px)",
+        "outline": "none",
+        "padding": "4px",
+        "height": "24px",
+        "margin": "5px",
+        "border-radius": "4px",
+        "border": "0px solid gray",
+        "background": "#F2F2F2",
+      },
+    });
+
+    return h("div", {
+      style: {
+        "position": "fixed",
+        "right": "0px",
+        "top": "24px",
+        "width": "160px",
+        "height": "calc(100% - 24px)",
+        "border-left": "1px solid rgba(0,0,0,0.1)",
+        "display": "flex",
+        "flex-flow": "column nowrap",
+        "justify-content": "flex-end",
+        "background": "rgba(255,255,255,0.3)",
+        "align-items": "center",
+      }
+    }, [
+      chat,
+      input
+    ]);
+  };
+};
 
 class Main extends Component {
   constructor(props) {
@@ -8454,8 +8575,9 @@ class Main extends Component {
             this.forceUpdate();
             post("name_of", {addr: this.wlet.address})
               .then((res) => {
-                if (res.ctor === "ok") {
+                if (res.ctr === "ok") {
                   this.name = res.name;
+                  peer.send("+"+this.name); // TODO: sign
                   this.forceUpdate();
                 }
               });
@@ -8478,9 +8600,8 @@ class Main extends Component {
       ]);
     };
 
-    return h("div", {
+    var top_menu = h("div", {
       style: {
-        "position": "absolute",
         "background": "#4070D0",
         "height": "24px",
         "display": "flex",
@@ -8499,6 +8620,19 @@ class Main extends Component {
     }, [
       title,
       login,
+    ])
+
+    return h("div", {
+      style: {
+        "position": "fixed",
+        "width": "100%",
+        "height": "100%",
+        "font-family": "monaco, monospace",
+      },
+    }, [
+      top_menu,
+      h(Chat),
+      h(GameList),
     ])
   }
 };
@@ -8564,17 +8698,6 @@ window.onload = () => {
 
   }, 1000 / 24);
 };
-
-const name = "x" + Math.floor(Math.random()*65536);
-console.log("I'm " + name);
-const SimplePeer = __webpack_require__(66);
-const peer = new SimplePeer({initiator:false,trickle:false});
-post("offer",{name}).then(data => peer.signal(data));
-peer.on('error', err => console.log('error', err))
-peer.on('signal', data => post("answer", {name,data}));
-peer.on('connect', () => {});
-peer.on('data', data => console.log(""+data));
-window.say = msg => peer.send(msg);
 
 
 /***/ }),
@@ -10435,242 +10558,11 @@ function getResponse (opt, resp) {
 /* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const {Component, render} = __webpack_require__(0);
-const h = __webpack_require__(8).h;
-const ethers = __webpack_require__(11);
-const request = __webpack_require__(12);
-const post = (func, body) => {
-  return request("/"+func, {method:"POST",body,json:true});
-};
-
-class Register extends Component {
-  constructor(props) {
-    super(props)
-    this.phase = "enter_name";
-    this.input = "";
-    this.ondone = props.ondone;
-    this.wlet = ethers.Wallet.createRandom();
-    this.name = "";
-  }
-
-  render() {
-    
-    const modal = (body) => {
-      return h("div", {
-        style: {
-          "position": "fixed",
-          "width": "100%",
-          "height": "100%",
-          "display": "flex",
-          "flex-flow": "column nowrap",
-          "justify-content": "center",
-          "align-items": "center",
-          "font-family": "monaco, monospace",
-          "background": "#4070D0",
-          "color": "white",
-        }
-      }, body);
-    };
-
-    const title = (body) => {
-      return h("div", {
-        style: {
-          "margin": "4px"
-        }
-      }, [body]);
-    };
-
-    const button = (body, onClick) => {
-      return h("div", {
-        onClick,
-        style: {
-          "margin": "4px",
-          "width": "128px",
-          "cursor": "pointer",
-          "border": "1px solid #204090",
-          "padding": "3px",
-          "text-align": "center",
-          "background": "rgba(255,255,255,0.25)"
-        }}, [
-          body
-        ]);
-    };
-
-    const input = (field, next) => {
-      return h("input", {
-        style: {
-          "border": "1px solid #204090",
-          "outline": "none",
-          "height": "24px",
-          "font-size": "16px",
-          "padding": "2px",
-        },
-        autoFocus: 1,
-        onkeyup: (e) => {
-          this[field] = e.target.value;
-          if (e.key === "Enter") {
-            this.phase = next;
-            this.forceUpdate();
-          };
-        }});
-    };
-
-    const ask = (question, infield, buttons) => {
-      var children = [title(question)];
-      if (infield) {
-        children.push(input(infield, buttons[0][1]));
-      };
-      for (let i = 0; i < buttons.length; ++i) {
-        children.push(button(buttons[i][0], () => {
-          this.phase = buttons[i][1];
-          this.forceUpdate();
-        }));
-      };
-      return modal(children);
-    };
-
-    switch (this.phase) {
-      case "enter_name":
-        return ask("Escolha um nick:", "name", [
-          ["Pronto", "got_name"]]);
-      case "got_name":
-        if (!/^[a-zA-Z0-9_]{1,32}$/.test(this.name)) {
-          return ask([
-            h("div",{},"Nome inválido."),
-            h("div",{},"Use letras, números e underscore.")],
-            null,
-            [["Ok.", "enter_name"]]);
-        }
-        var body = h("div", {}, [
-          h("div", {}, "Seja bem-vindo, " + this.name + "!"),
-          h("div", {}, [
-            h("span", {}, "Criamos uma "),
-            h("span", {
-              style: {"font-weight": "bold"}
-            }, "*chave-privada Ethereum*"),
-            h("span", {}, " pra você.")]),
-          h("div", {},
-            "Use-a para logar, jogar e guardar suas moedas."),
-          h("div", {},
-            "Essa chave NÃO é enviada pra gente. Se perder,"),
-          h("div", {},
-            "não tem volta. Poderia anotá-la seguramente?"),
-        ]);
-        return ask(body, null, [
-          ["Posso sim!", "here_is_your_key"],
-          ["Não posso.", "come_back_when_you_can"]]);
-      case "come_back_when_you_can":
-        return ask("Então volte quando puder.", null,
-          [["Ok.", "failure"]]);
-      case "here_is_your_key":
-        var body = h("div", {}, [
-          h("div", {}, "Sua chave é:"),
-          h("div", {}, ""),
-          h("div", {
-            style: {
-              "background": "rgba(0,0,0,0.2)",
-              "width": "420px",
-              "overflow-y": "scroll",
-            },
-          }, this.wlet.privateKey),
-          h("div", {}, ""),
-          h("div", {}, "Guardou em lugar seguro?")
-        ]);
-        return ask(body, null, [
-          ["Sim!", "will_you_lose_your_key"],
-          ["Não.", "no_account_for_you"]
-        ]);
-      case "no_account_for_you":
-        return ask(
-          "Então sem conta pra você.",
-          null,
-          [["Ok.", "failure"]]);
-      case "will_you_lose_your_key":
-        return ask(
-          "Você pretende perder sua chave?",
-          null,
-          [ ["Sim!", "no_account_for_you"],
-            ["Não.", "will_you_not_not_lose_your_key"]]);
-      case "will_you_not_not_lose_your_key":
-        return ask(
-          "Você não pretende não perder sua chave?",
-          null,
-          [ ["Sim!", "type_your_key"],
-            ["Não.", "type_your_key"]]);
-      case "type_your_key":
-        return ask(
-          "Prove que guardou a chave. Digite-a:",
-          "key",
-          [["Pronto.", "check_key"]]);
-      case "check_key":
-        if (this.key !== this.wlet.privateKey) {
-          return ask(
-            "Tá errado. Pq mentir? Vai jogar LoL.",
-            null,
-            [ ["Blz.", "failure"],
-              ["Nãããão!!!", "type_your_key"]]);
-        } else {
-          post("register", {
-            name: this.name,
-            addr: this.wlet.address,
-          }).then((res) => {
-            switch (res.ctor) {
-              case "err": 
-                this.phase = "error";
-                this.error = res.error;
-                break;
-              case "ok":
-                this.phase = "done";
-                break;
-            }
-            this.forceUpdate();
-          }).catch((err) => {
-            this.phase = "error";
-            this.error = "Deu ruim no server. Desculpa :(";
-            this.forceUpdate();
-          });
-          return ask("Registrando. Aguarde...", null, []);
-        }
-      case "error":
-        return ask(this.error, null, [
-          ["Tentar outro.", "enter_name"],
-          ["Ah vsf.", "failure"],
-        ]);
-          
-      case "done":
-        return ask([
-          h("div", {},
-            "Nice nice! Confio plenamente que você não"),
-          h("div", {},
-            "vai perder a sua chave. Bons jogos, GLHF!")
-          ],
-          null,
-          [
-            ["GLHF <3", "success"],
-            ["Foda-se", "success"],
-          ]);
-      case "success":
-        this.ondone({name:this.name, wlet:this.wlet});
-        return h("div");
-      case "failure":
-        this.ondone({name:null, wlet:null});
-        return h("div");
-    }
-  }
-};
-
-module.exports = Register;
-
-
-/***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {var debug = __webpack_require__(70)('simple-peer')
-var getBrowserRTC = __webpack_require__(73)
-var randombytes = __webpack_require__(74)
-var stream = __webpack_require__(75)
-var queueMicrotask = __webpack_require__(84) // TODO: remove when Node 10 is not supported
+/* WEBPACK VAR INJECTION */(function(Buffer) {var debug = __webpack_require__(69)('simple-peer')
+var getBrowserRTC = __webpack_require__(72)
+var randombytes = __webpack_require__(73)
+var stream = __webpack_require__(74)
+var queueMicrotask = __webpack_require__(83) // TODO: remove when Node 10 is not supported
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024
 var ICECOMPLETE_TIMEOUT = 5 * 1000
@@ -11673,7 +11565,7 @@ module.exports = Peer
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5).Buffer))
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11832,7 +11724,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -11922,7 +11814,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -11933,7 +11825,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/* eslint-env browser */
@@ -12185,7 +12077,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(71)(exports);
+module.exports = __webpack_require__(70)(exports);
 
 const {formatters} = module.exports;
 
@@ -12204,7 +12096,7 @@ formatters.j = function (v) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -12220,7 +12112,7 @@ function setup(env) {
 	createDebug.disable = disable;
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(72);
+	createDebug.humanize = __webpack_require__(71);
 
 	Object.keys(env).forEach(key => {
 		createDebug[key] = env[key];
@@ -12476,7 +12368,7 @@ module.exports = setup;
 
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, exports) {
 
 /**
@@ -12644,7 +12536,7 @@ function plural(ms, msAbs, n, name) {
 
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -12665,7 +12557,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12723,7 +12615,7 @@ function randomBytes (size, cb) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1), __webpack_require__(2)))
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(15);
@@ -12732,19 +12624,19 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(20);
 exports.Duplex = __webpack_require__(4);
 exports.Transform = __webpack_require__(22);
-exports.PassThrough = __webpack_require__(82);
+exports.PassThrough = __webpack_require__(81);
 exports.finished = __webpack_require__(7);
-exports.pipeline = __webpack_require__(83);
+exports.pipeline = __webpack_require__(82);
 
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12759,7 +12651,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var _require = __webpack_require__(5),
     Buffer = _require.Buffer;
 
-var _require2 = __webpack_require__(78),
+var _require2 = __webpack_require__(77),
     inspect = _require2.inspect;
 
 var custom = inspect && inspect.custom || 'inspect';
@@ -12941,13 +12833,13 @@ function () {
 }();
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -13021,7 +12913,7 @@ function config (name) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(1)))
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13235,7 +13127,7 @@ module.exports = createReadableStreamAsyncIterator;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = function () {
@@ -13244,7 +13136,7 @@ module.exports = function () {
 
 
 /***/ }),
-/* 82 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13289,7 +13181,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 83 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13392,7 +13284,7 @@ function pipeline() {
 module.exports = pipeline;
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports) {
 
 let promise
@@ -13403,6 +13295,237 @@ module.exports = typeof queueMicrotask === 'function'
   : cb => (promise || (promise = Promise.resolve()))
     .then(cb)
     .catch(err => setTimeout(() => { throw err }, 0))
+
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const {Component, render} = __webpack_require__(0);
+const h = __webpack_require__(8).h;
+const ethers = __webpack_require__(11);
+const request = __webpack_require__(12);
+const post = (func, body) => {
+  return request("/"+func, {method:"POST",body,json:true});
+};
+
+class Register extends Component {
+  constructor(props) {
+    super(props)
+    this.phase = "enter_name";
+    this.input = "";
+    this.ondone = props.ondone;
+    this.wlet = ethers.Wallet.createRandom();
+    this.name = "";
+  }
+
+  render() {
+    
+    const modal = (body) => {
+      return h("div", {
+        style: {
+          "position": "fixed",
+          "width": "100%",
+          "height": "100%",
+          "display": "flex",
+          "flex-flow": "column nowrap",
+          "justify-content": "center",
+          "align-items": "center",
+          "font-family": "monaco, monospace",
+          "background": "#4070D0",
+          "color": "white",
+        }
+      }, body);
+    };
+
+    const title = (body) => {
+      return h("div", {
+        style: {
+          "margin": "4px"
+        }
+      }, [body]);
+    };
+
+    const button = (body, onClick) => {
+      return h("div", {
+        onClick,
+        style: {
+          "margin": "4px",
+          "width": "128px",
+          "cursor": "pointer",
+          "border": "1px solid #204090",
+          "padding": "3px",
+          "text-align": "center",
+          "background": "rgba(255,255,255,0.25)"
+        }}, [
+          body
+        ]);
+    };
+
+    const input = (field, next) => {
+      return h("input", {
+        style: {
+          "border": "1px solid #204090",
+          "outline": "none",
+          "height": "24px",
+          "font-size": "16px",
+          "padding": "2px",
+        },
+        autoFocus: 1,
+        onkeyup: (e) => {
+          this[field] = e.target.value;
+          if (e.key === "Enter") {
+            this.phase = next;
+            this.forceUpdate();
+          };
+        }});
+    };
+
+    const ask = (question, infield, buttons) => {
+      var children = [title(question)];
+      if (infield) {
+        children.push(input(infield, buttons[0][1]));
+      };
+      for (let i = 0; i < buttons.length; ++i) {
+        children.push(button(buttons[i][0], () => {
+          this.phase = buttons[i][1];
+          this.forceUpdate();
+        }));
+      };
+      return modal(children);
+    };
+
+    switch (this.phase) {
+      case "enter_name":
+        return ask("Escolha um nick:", "name", [
+          ["Pronto", "got_name"]]);
+      case "got_name":
+        if (!/^[a-zA-Z0-9_]{1,32}$/.test(this.name)) {
+          return ask([
+            h("div",{},"Nome inválido."),
+            h("div",{},"Use letras, números e underscore.")],
+            null,
+            [["Ok.", "enter_name"]]);
+        }
+        var body = h("div", {}, [
+          h("div", {}, "Seja bem-vindo, " + this.name + "!"),
+          h("div", {}, [
+            h("span", {}, "Criamos uma "),
+            h("span", {
+              style: {"font-weight": "bold"}
+            }, "*chave-privada Ethereum*"),
+            h("span", {}, " pra você.")]),
+          h("div", {},
+            "Use-a para logar, jogar e guardar suas moedas."),
+          h("div", {},
+            "Essa chave NÃO é enviada pra gente. Se perder,"),
+          h("div", {},
+            "não tem volta. Poderia anotá-la seguramente?"),
+        ]);
+        return ask(body, null, [
+          ["Posso sim!", "here_is_your_key"],
+          ["Não posso.", "come_back_when_you_can"]]);
+      case "come_back_when_you_can":
+        return ask("Então volte quando puder.", null,
+          [["Ok.", "failure"]]);
+      case "here_is_your_key":
+        var body = h("div", {}, [
+          h("div", {}, "Sua chave é:"),
+          h("div", {}, ""),
+          h("div", {
+            style: {
+              "background": "rgba(0,0,0,0.2)",
+              "width": "420px",
+              "overflow-y": "scroll",
+            },
+          }, this.wlet.privateKey),
+          h("div", {}, ""),
+          h("div", {}, "Guardou em lugar seguro?")
+        ]);
+        return ask(body, null, [
+          ["Sim!", "will_you_lose_your_key"],
+          ["Não.", "no_account_for_you"]
+        ]);
+      case "no_account_for_you":
+        return ask(
+          "Então sem conta pra você.",
+          null,
+          [["Ok.", "failure"]]);
+      case "will_you_lose_your_key":
+        return ask(
+          "Você pretende perder sua chave?",
+          null,
+          [ ["Sim!", "no_account_for_you"],
+            ["Não.", "will_you_not_not_lose_your_key"]]);
+      case "will_you_not_not_lose_your_key":
+        return ask(
+          "Você não pretende não perder sua chave?",
+          null,
+          [ ["Sim!", "type_your_key"],
+            ["Não.", "type_your_key"]]);
+      case "type_your_key":
+        return ask(
+          "Prove que guardou a chave. Digite-a:",
+          "key",
+          [["Pronto.", "check_key"]]);
+      case "check_key":
+        if (this.key !== this.wlet.privateKey) {
+          return ask(
+            "Tá errado. Pq mentir? Vai jogar LoL.",
+            null,
+            [ ["Blz.", "failure"],
+              ["Nãããão!!!", "type_your_key"]]);
+        } else {
+          post("register", {
+            name: this.name,
+            addr: this.wlet.address,
+          }).then((res) => {
+            switch (res.ctr) {
+              case "err": 
+                this.phase = "error";
+                this.error = res.err;
+                break;
+              case "ok":
+                this.phase = "done";
+                break;
+            }
+            this.forceUpdate();
+          }).catch((err) => {
+            this.phase = "error";
+            this.error = "Deu ruim no server. Desculpa :(";
+            this.forceUpdate();
+          });
+          return ask("Registrando. Aguarde...", null, []);
+        }
+      case "error":
+        return ask(this.error, null, [
+          ["Tentar outro.", "enter_name"],
+          ["Ah vsf.", "failure"],
+        ]);
+          
+      case "done":
+        return ask([
+          h("div", {},
+            "Nice nice! Confio plenamente que você não"),
+          h("div", {},
+            "vai perder a sua chave. Bons jogos, GLHF!")
+          ],
+          null,
+          [
+            ["GLHF <3", "success"],
+            ["Foda-se", "success"],
+          ]);
+      case "success":
+        this.ondone({name:this.name, wlet:this.wlet});
+        return h("div");
+      case "failure":
+        this.ondone({name:null, wlet:null});
+        return h("div");
+    }
+  }
+};
+
+module.exports = Register;
 
 
 /***/ })
