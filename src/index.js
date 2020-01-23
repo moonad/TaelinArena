@@ -7,10 +7,11 @@ const TA = require("./TaelinArena.js");
 const extra = require("./extra.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
-const Register = require("./register.js");
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
+
+const Register = require("./register.js");
 
 class Main extends Component {
   constructor(props) {
@@ -64,8 +65,16 @@ class Main extends Component {
         button("Logar", () => {
           var pvt = prompt("Digite sua chave privada:");
           if (pvt && pvt.length===66 || pvt.length===64) {
-            window.account = new ethers.Wallet(pvt);
-
+            this.wlet = new ethers.Wallet(pvt);
+            this.name = "anonymous";
+            this.forceUpdate();
+            post("name_of", {addr: this.wlet.address})
+              .then((res) => {
+                if (res.ctor === "ok") {
+                  this.name = res.name;
+                  this.forceUpdate();
+                }
+              });
           } else {
             alert("Tá errado isso ae. Você não guardou né?");
           }

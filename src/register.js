@@ -13,7 +13,7 @@ class Register extends Component {
     this.input = "";
     this.ondone = props.ondone;
     this.wlet = ethers.Wallet.createRandom();
-    this.name = null;
+    this.name = "";
   }
 
   render() {
@@ -97,6 +97,13 @@ class Register extends Component {
         return ask("Escolha um nick:", "name", [
           ["Pronto", "got_name"]]);
       case "got_name":
+        if (!/^[a-zA-Z0-9_]{1,32}$/.test(this.name)) {
+          return ask([
+            h("div",{},"Nome inválido."),
+            h("div",{},"Use letras, números e underscore.")],
+            null,
+            [["Ok.", "enter_name"]]);
+        }
         var body = h("div", {}, [
           h("div", {}, "Seja bem-vindo, " + this.name + "!"),
           h("div", {}, [
@@ -161,12 +168,11 @@ class Register extends Component {
       case "check_key":
         if (this.key !== this.wlet.privateKey) {
           return ask(
-            "Tá errado mana. Pq mentir? Vai jogar LoL.",
+            "Tá errado. Pq mentir? Vai jogar LoL.",
             null,
             [ ["Blz.", "failure"],
               ["Nãããão!!!", "type_your_key"]]);
         } else {
-          console.log("to aqui");
           post("register", {
             name: this.name,
             addr: this.wlet.address,

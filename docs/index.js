@@ -8391,10 +8391,11 @@ const TA = __webpack_require__(25);
 const extra = __webpack_require__(10);
 const ethers = __webpack_require__(11);
 const request = __webpack_require__(12);
-const Register = __webpack_require__(65);
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
+
+const Register = __webpack_require__(65);
 
 class Main extends Component {
   constructor(props) {
@@ -8448,8 +8449,16 @@ class Main extends Component {
         button("Logar", () => {
           var pvt = prompt("Digite sua chave privada:");
           if (pvt && pvt.length===66 || pvt.length===64) {
-            window.account = new ethers.Wallet(pvt);
-
+            this.wlet = new ethers.Wallet(pvt);
+            this.name = "anonymous";
+            this.forceUpdate();
+            post("name_of", {addr: this.wlet.address})
+              .then((res) => {
+                if (res.ctor === "ok") {
+                  this.name = res.name;
+                  this.forceUpdate();
+                }
+              });
           } else {
             alert("Tá errado isso ae. Você não guardou né?");
           }
@@ -10441,7 +10450,7 @@ class Register extends Component {
     this.input = "";
     this.ondone = props.ondone;
     this.wlet = ethers.Wallet.createRandom();
-    this.name = null;
+    this.name = "";
   }
 
   render() {
@@ -10525,6 +10534,13 @@ class Register extends Component {
         return ask("Escolha um nick:", "name", [
           ["Pronto", "got_name"]]);
       case "got_name":
+        if (!/^[a-zA-Z0-9_]{1,32}$/.test(this.name)) {
+          return ask([
+            h("div",{},"Nome inválido."),
+            h("div",{},"Use letras, números e underscore.")],
+            null,
+            [["Ok.", "enter_name"]]);
+        }
         var body = h("div", {}, [
           h("div", {}, "Seja bem-vindo, " + this.name + "!"),
           h("div", {}, [
@@ -10589,17 +10605,15 @@ class Register extends Component {
       case "check_key":
         if (this.key !== this.wlet.privateKey) {
           return ask(
-            "Tá errado mana. Pq mentir? Vai jogar LoL.",
+            "Tá errado. Pq mentir? Vai jogar LoL.",
             null,
             [ ["Blz.", "failure"],
               ["Nãããão!!!", "type_your_key"]]);
         } else {
-          console.log("to aqui");
           post("register", {
             name: this.name,
             addr: this.wlet.address,
           }).then((res) => {
-            console.log(res);
             switch (res.ctor) {
               case "err": 
                 this.phase = "error";

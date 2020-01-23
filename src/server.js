@@ -48,7 +48,7 @@ app.post("/register", async (req, res) => {
   var name = req.body.name;
   var addr = req.body.addr;
 
-  if (!/^[a-zA-Z0-9_]{1,64}$/.test(name)) {
+  if (!/^[a-zA-Z0-9_]{1,32}$/.test(name)) {
     return res.send(JSON.stringify({
       ctor: "err",
       error: "Invalid name.",
@@ -77,19 +77,22 @@ app.post("/register", async (req, res) => {
   res.send(JSON.stringify({ctor: "ok"}));
 });
 
-// 
+// Gets the name of an address
 app.post("/name_of", async (req, res) => {
-  var name = await get(req.addr);
+  var name = await get("name_of."+req.body.addr);
+  console.log(req.body);
+  console.log("name_of", req.body.addr, name);
   if (!name) {
     res.send(JSON.stringify({
       ctor: "err",
       error: "Account not found.",
     }));
+  } else {
+    res.send(JSON.stringify({
+      ctor: "ok",
+      name: name
+    }));
   }
-  res.send(JSON.stringify({
-    ctor: "ok",
-    name: name
-  }));
 });
 
 // Sets up a new Peer connection
