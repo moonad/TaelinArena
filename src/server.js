@@ -2,8 +2,10 @@ var express = require("express");
 var app = express();
 var Peer = require("simple-peer");
 var wrtc = require("wrtc");
+var cors = require("cors");
 
 var peers = {};
+app.use(cors());
 app.use(express.json());
 app.use(express.static("docs"));
 app.post("/offer", (req, res) => {
