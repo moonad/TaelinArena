@@ -96,3 +96,47 @@ window.onload = () => {
 
   }, 1000 / 24);
 };
+
+const Peer = require("peerjs").peerjs.Peer;
+
+console.log("- J: init peerjs");
+console.log("- K: connect to peer");
+console.log("- L: send a message");
+
+var peer = null;
+var name = null;
+var conns = [];
+const on_data = (name) => (data) => {
+  console.log("[" + name + "] " + data);
+};
+const on_open = (name) => () => {
+  console.log("- Connected to '" + name + "'.");
+};
+const register = (conn_name, conn) => {
+  console.log("- New connection from '" + conn_name + "'.");
+  conn.on("data", on_data(conn_name));
+  conn.on("open", on_open(conn_name));
+  conns.push(conn);
+};
+window.onkeypress = (e) => {
+  switch (e.key) {
+    case "j":
+      name = prompt("name?");
+      console.log("PeerJS started as '" + name + "'.");
+      peer = new Peer(name); 
+      peer.on('connection', (conn) => {
+        register(conn.peer, conn);
+      });
+      break;
+    case "k":
+      var conn_name = prompt("Connect to:");
+      var conn = peer.connect(conn_name);
+      register(conn_name, conn);
+      break;
+    case "l":
+      var msg = prompt("Message:");
+      conns.forEach(conn => conn.send(msg));
+      on_data(name)(msg);
+      break;
+  }
+};

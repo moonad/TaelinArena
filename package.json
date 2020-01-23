@@ -29,6 +29,11 @@
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
-    "formality-lang": "^0.1.233"
+    "express": "^4.17.1",
+    "formality-lang": "^0.1.233",
+    "navigator": "^1.0.1",
+    "peerjs": "^1.2.0",
+    "window": "^4.2.6",
+    "wrtc": "^0.4.3"
   }
 }

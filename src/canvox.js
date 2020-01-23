@@ -355,13 +355,13 @@ module.exports = function canvox(opts = {}) {
     gl.compileShader(fragShader);
 
     var compiled = gl.getShaderParameter(vertShader, gl.COMPILE_STATUS);
-    console.log('Shader compiled successfully: ' + compiled);
+    //console.log('Shader compiled successfully: ' + compiled);
     var compilationLog = gl.getShaderInfoLog(vertShader);
-    console.log('Shader compiler log: ' + compilationLog);
+    //console.log('Shader compiler log: ' + compilationLog);
     var compiled = gl.getShaderParameter(fragShader, gl.COMPILE_STATUS);
-    console.log('Shader compiled successfully: ' + compiled);
+    //console.log('Shader compiled successfully: ' + compiled);
     var compilationLog = gl.getShaderInfoLog(fragShader);
-    console.log('Shader compiler log: ' + compilationLog);
+    //console.log('Shader compiler log: ' + compilationLog);
 
     var shader = gl.createProgram();
     gl.attachShader(shader, vertShader);
