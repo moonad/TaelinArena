@@ -97,46 +97,17 @@ window.onload = () => {
   }, 1000 / 24);
 };
 
-const Peer = require("peerjs").peerjs.Peer;
-
-console.log("- J: init peerjs");
-console.log("- K: connect to peer");
-console.log("- L: send a message");
-
-var peer = null;
-var name = null;
-var conns = [];
-const on_data = (name) => (data) => {
-  console.log("[" + name + "] " + data);
+const request = require("xhr-request-promise");
+const post = (func, body) => {
+  return request("/"+func, {method:"POST",body,json:true});
 };
-const on_open = (name) => () => {
-  console.log("- Connected to '" + name + "'.");
-};
-const register = (conn_name, conn) => {
-  console.log("- New connection from '" + conn_name + "'.");
-  conn.on("data", on_data(conn_name));
-  conn.on("open", on_open(conn_name));
-  conns.push(conn);
-};
-window.onkeypress = (e) => {
-  switch (e.key) {
-    case "j":
-      name = prompt("name?");
-      console.log("PeerJS started as '" + name + "'.");
-      peer = new Peer(name); 
-      peer.on('connection', (conn) => {
-        register(conn.peer, conn);
-      });
-      break;
-    case "k":
-      var conn_name = prompt("Connect to:");
-      var conn = peer.connect(conn_name);
-      register(conn_name, conn);
-      break;
-    case "l":
-      var msg = prompt("Message:");
-      conns.forEach(conn => conn.send(msg));
-      on_data(name)(msg);
-      break;
-  }
-};
+const name = "x" + Math.floor(Math.random()*65536);
+console.log("I'm " + name);
+const SimplePeer = require("simple-peer");
+const peer = new SimplePeer({initiator:false,trickle:false});
+post("offer",{name}).then(data => peer.signal(data));
+peer.on('error', err => console.log('error', err))
+peer.on('signal', data => post("answer", {name,data}));
+peer.on('connect', () => {});
+peer.on('data', data => console.log(""+data));
+window.say = msg => peer.send(msg);
