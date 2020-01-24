@@ -8391,6 +8391,7 @@ const extra = __webpack_require__(10);
 const ethers = __webpack_require__(11);
 const request = __webpack_require__(12);
 const SimplePeer = __webpack_require__(65);
+const FPS = 36;
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -8404,51 +8405,110 @@ post("offer",{name}).then(data => peer.signal(data));
 peer.on('error', err => console.log('error', err))
 peer.on('signal', data => post("answer", {name,data}));
 peer.on('connect', () => {});
-peer.on('data', data => console.log(""+data));
-window.send = msg => peer.send(msg);
+//peer.on('data', data => console.log(""+data));
 
+// Send an chat message
+window.say = msg => {
+  if (msg[0] === "/") {
+    var args = msg.slice(1).split(" ");
+    switch (args[0]) {
+      case "new":
+      case "new_game":
+        //console.log("creating a new game");
+        var name = args[1];
+        var lft = args[2].split(",");
+        var rgt = args[3].split(",");
+        var teams = {lft, rgt};
+        //console.log(name, teams);
+        post("new_game", {name, teams}).then((res) => {
+          if (res.ctr === "ok") {
+            alert("Game created!");
+          } else {
+            alert("Error: " + res.err);
+          }
+        });
+      break;
+    }
+  } else {
+    peer.send(msg);
+  }
+};
+
+// Account registration
 const Register = __webpack_require__(84);
 
+// List of games
 class GameList extends Component {
   constructor(props) {
     super(props);
-    this.game_count = 0;
-    this.game_list = [];
   }
   render() {
-    // Game List
-    var game_elems = [];
-    for (var i = 0; i < this.game_list.length; ++i) {
-      game_elems.push(h("div", {}, [
-        game_list[i].id,
-        " | ",
-        game_list[i].name, 
-      ]));
+    var game_list = this.props.game_list;
+    var col = (body, onclick) => {
+      return h("td", {
+        style: {
+          "padding": "4px",
+          "cursor": onclick ? "pointer" : null,
+          "text-decoration": onclick ? "underline" : null,
+        },
+        onclick,
+      }, body);
+    };
+    var rows = [];
+    rows.push(h("tr", {
+      style: {
+        "font-weight": "bold",
+        "border-bottom": "1px dotted rgba(0,0,0,0.1)",
+        "background": "rgba(0,0,0,0.03)",
+      }
+    }, [col("Jogo"), col("Equipe L"), col("Equipe R")]));
+    for (let i = game_list.length - 1; i >= 0; --i) {
+      let game = game_list[i];
+      let row = [];
+      if (game) {
+        var id = ("00000000"+game.id.toString(16)).slice(-8);
+        var nm = game.name;
+        row.push(col(nm, () => this.props.join(game.id)));
+        row.push(col(game.teams.lft.join(", ")));
+        row.push(col(game.teams.rgt.join(", ")));
+      } else {
+        row.push(h("td", {colspan:3}, "?"));
+      }
+      rows.push(h("tr", {}, row));
     }
+    var table = h("table", {
+      style: {
+        "width": "100%",
+        "font-size": "12px",
+        "border-collapse": "collapse",
+      }
+    }, rows);
 
     return h("div", {
       style: {
+        "position": "fixed",
+        "top": "24px",
+        "left": "0px",
+        "width": "calc(100% - 160px)",
+        "height": "calc(100% - 24px)",
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-start",
         "align-items": "center",
+        "overflow-y": "scroll",
+        "background": "rgba(255,255,255,0.2)",
       }
-    }, [
-      game_elems,
-    ]);
+    }, [table]);
   }
 };
 
+// Chat
 class Chat extends Component {
   constructor(props) {
     super(props);
-    this.msgs = [];
-    peer.on("data", (data) => {
-      this.msgs.push(""+data);
-      this.forceUpdate();
-    });
   }
   render() {
+    this.msgs = this.props.msgs;
     var msgs = [];
     for (var i = 0; i < this.msgs.length; ++i) {
       msgs.push(h("div", {}, this.msgs[i]));
@@ -8475,7 +8535,7 @@ class Chat extends Component {
       onkeydown: (e) => {
         var value = e.target.value;
         if (e.key === "Enter") {
-          peer.send(value);
+          say(value);
           setTimeout(() => {
             var el0 = document.getElementById("chat_input");
             var el1 = document.getElementById("chat_msgs");
@@ -8496,7 +8556,6 @@ class Chat extends Component {
         "background": "#F2F2F2",
       },
     });
-
     return h("div", {
       style: {
         "position": "fixed",
@@ -8508,7 +8567,7 @@ class Chat extends Component {
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        "background": "rgba(255,255,255,0.3)",
+        "background": "rgba(255,255,255,0.2)",
         "align-items": "center",
       }
     }, [
@@ -8518,14 +8577,164 @@ class Chat extends Component {
   };
 };
 
+// Main HUD
 class Main extends Component {
   constructor(props) {
     super(props)
     this.modal = null;
     this.name = null;
     this.wlet = null;
+    this.game_id = null;
+    this.game_turns = null;
+    this.game_state = null;
+    this.game_list = [];
+    this.chat_msgs = [];
+    this.key = {};
+    this.pad = null;
+    this.canvox = canvox();
+  }
+  emit_keys() {
+    var key_d = this.key.d||0;
+    var key_a = this.key.a||0;
+    var key_w = this.key.w||0;
+    var key_s = this.key.s||0;
+    var pad_x = (key_d||0) - (key_a||0);
+    var pad_y = (key_w||0) - (key_s||0);
+    var pad = {x:pad_x, y:pad_y};
+    if (this.game_id
+      && (!this.pad
+      || pad.x !== this.pad.x
+      || pad.y !== this.pad.y)) {
+      this.pad = pad;
+      var px = Math.floor((pad.x+1)/2*14).toString(16);
+      var py = Math.floor((pad.y+1)/2*14).toString(16);
+      var act = "0" + px + py;
+      //console.log("emit act ", act);
+      peer.send("$" + act);
+    }
+  };
+  make_cam(cam) {
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    var T = Date.now()/1000;
+    var ang = Math.PI * 1/4;
+    var cos = Math.cos(ang);
+    var sin = Math.sin(ang);
+    var front = {x:0, y:cos, z:-sin};
+    var right = {x:1, y:0, z:0};
+    var down = {x:0, y:-sin, z:-cos};
+    var pos = {x:0,y:-2048*cos,z:2048*sin};
+    return {
+      pos   : pos, // center pos
+      right : right, // right direction
+      down  : down, // down direction
+      front : front, // front direction
+      size  : {x:W*0.5, y:H*0.5}, // world size
+      port  : {x:W, y:H}, // browser size
+      res   : 1.0, // rays_per_pixel = res^2
+    };
   }
   componentDidMount() {
+    // Appends canvox to body
+    document.body.appendChild(this.canvox);
+    this.render_loop = setInterval(() => {
+      if (this.game_id) {
+        //console.log(this.game_state);
+        TA.render_game(this.game_state, this.canvox);
+      }
+    }, 1000/FPS);
+
+    // Game inputs
+    document.body.onkeyup = (e) => {
+      this.key[e.key] = 0;
+      this.emit_keys();
+    };
+    document.body.onkeypress = (e) => {
+      this.key[e.key] = 1;
+      this.emit_keys();
+    };
+
+    // Pools list of game
+    const pool_game_list = () => {
+      post("get_game_count", {}).then((res) => {
+        var count = this.game_list.length;
+        for (let id = count; id < res.count; ++id) {
+          post("get_game", {id}).then((res) => {
+            if (res.ctr === "ok") {
+              this.game_list[id] = res.game;
+              this.forceUpdate();
+            }
+          });
+        }
+      });
+    };
+    this.game_pooler = setInterval(pool_game_list, 2000);
+    pool_game_list();
+
+    // Adjusts the turn to be streamed to me 
+    this.turn_asker = setInterval(() => {
+      if (this.game_id) {
+        console.log(
+          "Ask turn="+this.game_turns.length
+          +" game="+this.game_id);
+        var turn = this.game_turns.length.toString(16);
+        var turn = ("00000000"+turn).slice(-8);
+        var game = this.game_id.toString(16);
+        var game = ("00000000"+game).slice(-8);
+        peer.send("?"+turn+game);
+      }
+    }, 1000);
+
+    // Deals with incoming UDP data
+    peer.on("data", (data) => {
+      var str = ""+data;
+      switch (str[0]) {
+        case "$":
+          var game = parseInt(str.slice(1,9), 16);
+          var from = parseInt(str.slice(9,17), 16);
+          var last = this.game_turns.length;
+          var new_turns = TA.parse_turns(str.slice(17));
+          if (from <= last) {
+            for (var i = last-from; i<new_turns.length; ++i) {
+              this.game_turns[i+from] = new_turns[i];
+              for (var j = 0; j < new_turns[i].length; ++j) {
+                let a = new_turns[i][j];
+                switch (a.action) {
+                  case "dpad":
+                    let x = a.params.dir.x;
+                    let y = a.params.dir.y;
+                    let d = v3 => v3(x)(y)(0);
+                    var e = TA.game_dpad(a.player)(d);
+                  break;
+                }
+                var g = this.game_state;
+                var g = TA.exec_game_action(e)(g);
+                this.game_state = g;
+              }
+              var gs = this.game_state;
+              this.game_state = TA.exec_game_turn(gs);
+            }
+          }
+        break;
+        default:
+          this.chat_msgs.push(str);
+        break;
+      }
+      this.forceUpdate();
+    });
+  }
+  componentWillUnmount() {
+    clearInterval(this.game_pooler);
+    clearInterval(this.render_loop);
+    clearInterval(this.turn_asker);
+  }
+  componentDidUpdate() {
+  }
+  join(game_id) {
+    this.game_id = game_id;
+    this.game_turns = [];
+    this.game_state = TA.new_game;
+    this.forceUpdate();
   }
   render() {
     if (this.modal) {
@@ -8541,14 +8750,25 @@ class Main extends Component {
       }, content);
     };
 
-    var title = h("div", {
+    var top_lft = h("div", {
       style: {
-        "font-size": "16px"
+        "font-size": "16px",
+        "cursor": "pointer",
       },
-    }, "Taelin::Arena");
+      onClick: () => {
+        this.game_id = null;
+        this.forceUpdate();
+      }
+    }, "Taelin::Arena (alpha-0.0.0)");
 
-    if (this.name) {
-      var login = h("div", {
+    if (this.game_id) {
+      var top_rgt = h("div", {
+        style: {
+          "font-size": "12px"
+        }
+      }, "turn="+this.game_turns.length);
+    } else if (this.name) {
+      var top_rgt = h("div", {
         onClick: () => {
           if (confirm("Clique OK para deslogar.")) {
             this.wlet = null;
@@ -8562,7 +8782,7 @@ class Main extends Component {
         },
       }, [this.name]);
     } else {
-      var login = h("div", {
+      var top_rgt = h("div", {
         style: {
           "font-size": "12px"
         },
@@ -8577,7 +8797,7 @@ class Main extends Component {
               .then((res) => {
                 if (res.ctr === "ok") {
                   this.name = res.name;
-                  peer.send("+"+this.name); // TODO: sign
+                  say("+"+this.name); // TODO: sign
                   this.forceUpdate();
                 }
               });
@@ -8602,7 +8822,7 @@ class Main extends Component {
 
     var top_menu = h("div", {
       style: {
-        "background": "#4070D0",
+        "background": this.game_id ? null : "#4070D0",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -8613,13 +8833,11 @@ class Main extends Component {
         "font-family": "monaco, monospace",
         "padding": "0px 4px",
         "font-weight": "bold",
-        "color": "white",
+        "color": this.game_id ? "black" : "white",
       },
-      onClick: () => {
-      }
     }, [
-      title,
-      login,
+      top_lft,
+      top_rgt,
     ])
 
     return h("div", {
@@ -8631,8 +8849,15 @@ class Main extends Component {
       },
     }, [
       top_menu,
-      h(Chat),
-      h(GameList),
+      this.game_id
+        ? null
+        : h(Chat, {msgs: this.chat_msgs}),
+      this.game_id
+        ? null
+        : h(GameList, {
+          game_list: this.game_list,
+          join: (game) => this.join(game)
+        }),
     ])
   }
 };
@@ -8640,64 +8865,11 @@ class Main extends Component {
 window.onload = () => {
   // Renders site using Inferno
   render(h(Main), document.getElementById("main"));
-
-  // Creates canvas and inserts on page
-  var canvas = canvox();
-  document.body.appendChild(canvas);
-
-  // Keys that are pressed
-  var key = {};
-  var refresh_game_pad = () => {
-    var key_d = key.d||0;
-    var key_a = key.a||0;
-    var key_w = key.w||0;
-    var key_s = key.s||0;
-    var event = t => {
-      var id = 0;
-      var dir = t => {
-        var x = (key_d||0) - (key_a||0);
-        var y = (key_w||0) - (key_s||0);
-        var z = 0;
-        return t(x)(y)(0);
-      }
-      return t(id)(dir);
-    };
-    game = TA.input_game(event)(game);
-  };
-  document.body.onkeyup = (e) => {
-    key[e.key] = 0;
-    refresh_game_pad();
-  };
-  document.body.onkeypress = (e) => {
-    key[e.key] = 1;
-    refresh_game_pad();
-  };
-
-  // FPS metering
-  var last_fps_print = extra.now();
-  var fps_count = 0;
-
-  // Initial state of the game
-  var game = TA.demo_game;
-
-  // Main loop of the game
-  setInterval(function main_loop() {
-    // Updates the FPS counter
-    ++fps_count;
-    if (extra.now() > last_fps_print + 1) {
-      document.title = "FPS " + fps_count;
-      fps_count = 0;
-      last_fps_print = extra.now();
-    };
-
-    // Renders game to canvas
-    TA.render_game(game, canvas);
-
-    // Updates game state
-    game = TA.tick_game(game);
-
-  }, 1000 / 24);
 };
+
+setTimeout(() => {
+  peer.send("+SrPx");
+}, 2000);
 
 
 /***/ }),
@@ -8768,7 +8940,7 @@ module.exports = function canvox(opts = {}) {
     var context = canvas.getContext("2d");
     canvas.draw = ({voxels, cam}) => {
       // Camera and viewport
-      var cam = setup_cam(opts.cam);
+      var cam = setup_cam(cam);
 
       // Canvas setup
       canvas.width = cam.size.x * cam.res;
@@ -9102,7 +9274,7 @@ module.exports = function canvox(opts = {}) {
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0); 
     gl.enableVertexAttribArray(coord);
       
-    canvas.draw = function({voxels,cam}) {
+    canvas.draw = function({voxels, cam}) {
       var cam = setup_cam(cam);
 
       // Canvas setup
@@ -9244,9 +9416,83 @@ function render_game(game, canvox) {
   canvox.draw({voxels});
 };
 
+// Turns ::=
+//   | 0: End
+//   | 1: Next(Turn, Turns)
+// Turn ::=
+//   | 0: End
+//   | 1: Player0(Action, Turn)
+//   | 2: Player1(Action, Turn)
+//   | ... up to 15 ...
+// Action ::=
+//   | 0: dpad(x: 4bit, y: 4bit) 
+//   | 1: mlft(x: 12bit, y: 12bit)
+//   | 2: mmid(x: 12bit, y:12bit)
+//   | 3: mrgt(x: 12bit, y:12bit)
+//   | 4: key0
+//   | 5: key1
+//   | 6: key2
+//   | 7: key3
+
+function parse_turns(code) {
+  var turns = [];
+  var idx = 0;
+  while (idx < code.length) {
+    if (code[idx] === "0") {
+      break;
+    } else {
+      idx += 1;
+      var turn = [];
+      while (idx < code.length) {
+        if (code[idx] === "0") {
+          idx += 1;
+          break;
+        } else {
+          var player = parseInt(code[idx],16) - 1;
+          var action = parseInt(code[idx+1],16);
+          if (action === 0) {
+            var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
+            var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
+            turn.push({
+              player,
+              action: "dpad",
+              params: {dir: {x: dir_x, y: dir_y}}
+            });
+            idx += 4;
+          } else if (action >= 1 && action <= 3) {
+            var pos_x_a = parseInt(code[idx+2],16);
+            var pos_x_b = parseInt(code[idx+3],16);
+            var pos_x_c = parseInt(code[idx+4],16);
+            var pos_y_a = parseInt(code[idx+5],16);
+            var pos_y_b = parseInt(code[idx+6],16);
+            var pos_y_c = parseInt(code[idx+7],16);
+            var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
+            var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+            turn.push({
+              player,
+              action: ["mlft","mmid","mrgt"][action-1],
+              params: {pos: {x: pos_x, y: pos_y}}
+            });
+            idx += 8;
+          } else {
+            turn.push({
+              player,
+              action: "key" + (action - 4)
+            });
+            idx += 2;
+          };
+        }
+      };
+      turns.push(turn);
+    }
+  };
+  return turns;
+};
+
 module.exports = {
   ...TA,
   render_game,
+  parse_turns,
 };
 
 
@@ -9302,13 +9548,20 @@ module.exports = (function(){
   var _TaelinArena$belanna = _TaelinArena$game_object(3)(80)(_Geometry$v3(0)(64)(0))(0)(_Geometry$v3(-1)(0)(0))(_Geometry$v3(0)(0)(0))(_TaelinArena$circbox(12))(_TaelinArena$sprite(3));
   var _List$HQNc$cons = (_0=>(_1=>(_2=>(_3=>_3(_0)(_1)))));
   var _List$HQNc$nil = (_0=>(_1=>_0));
-  var _TaelinArena$demo_game = _TaelinArena$game(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$cons(_TaelinArena$neelix)(_List$HQNc$cons(_TaelinArena$belanna)(_List$HQNc$nil)))));
-  var _TaelinArena$GameEvent = undefined;
-  var _TaelinArena$game_move = (_0=>(_1=>(_2=>_2(_0)(_1))));
+  var _TaelinArena$new_game = _TaelinArena$game(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$cons(_TaelinArena$neelix)(_List$HQNc$cons(_TaelinArena$belanna)(_List$HQNc$nil)))));
+  var _TaelinArena$GameAction = undefined;
+  var _TaelinArena$game_dpad = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_2(_0)(_1)))))))))));
+  var _TaelinArena$game_mlft = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_3(_0)(_1)))))))))));
+  var _TaelinArena$game_mmid = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_4(_0)(_1)))))))))));
+  var _TaelinArena$game_mrgt = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_5(_0)(_1)))))))))));
+  var _TaelinArena$game_key0 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_4))))))));
+  var _TaelinArena$game_key1 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_5))))))));
+  var _TaelinArena$game_key2 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_6))))))));
+  var _TaelinArena$game_key3 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>_7))))))));
   var _Extra$map_list = (_2=>(_3=>_3(_List$HQNc$nil)((_4=>(_5=>_List$HQNc$cons(_2(_4))(_Extra$map_list(_2)(_5)))))));
   var _TaelinArena$map_game_objects = (_0=>(_1=>_TaelinArena$game(_Extra$map_list(_0)(_TaelinArena$get_game_map(_1)))));
   var _Geometry$len_v3 = (_13=>_13((_14=>(_15=>(_16=>((((0+(_14*_14))+(_15*_15))+(_16*_16))**0.5))))));
-  var _TaelinArena$input_game = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$map_game_objects((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>((_2===_5? 1 : 0)?_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>4)))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)):_4))))))))))))(_1))))));
+  var _TaelinArena$exec_game_action = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$map_game_objects((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>((_2===_5? 1 : 0)?_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>4)))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)):_4))))))))))))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))(_1)(_1)(_1)(_1)));
   var _Geometry$sqrdist_v3 = (_22=>(_23=>_22((_24=>(_25=>(_26=>_23((_27=>(_28=>(_29=>(((0+((_24-_27)**2))+((_25-_28)**2))+((_26-_29)**2))))))))))));
   var _Geometry$dist_v3 = (_20=>(_21=>(_Geometry$sqrdist_v3(_20)(_21)**0.5)));
   var _Geometry$add_v3 = (_21=>(_22=>_21((_23=>(_24=>(_25=>_22((_26=>(_27=>(_28=>_Geometry$v3((_23+_26))((_24+_27))((_25+_28))))))))))));
@@ -9317,7 +9570,7 @@ module.exports = (function(){
   var _Geometry$sub_v3 = (_21=>(_22=>_21((_23=>(_24=>(_25=>_22((_26=>(_27=>(_28=>_Geometry$v3((_23-_26))((_24-_27))((_25-_28))))))))))));
   var _TaelinArena$interact_with = (_0=>(_1=>_0((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_1((_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>_8((_18=>_16((_19=>(((_Geometry$dist_v3(_4)(_12)>_19)&(_Geometry$dist_v3(_4)(_12)<(_18+_19)))?_TaelinArena$mut_object_pos((_20=>_Geometry$add_v3(_4)(_Geometry$scale_v3(((_18+_19)-_Geometry$dist_v3(_4)(_12)))(_Geometry$norm_v3(_Geometry$sub_v3(_4)(_12))))))(_0):_0)))((_19=>_0))))((_18=>_0))))))))))))))))))))));
   var _Extra$fold_list = (_11=>(_12=>(_13=>_13(_11)((_14=>(_15=>_12(_14)(_Extra$fold_list(_11)(_12)(_15))))))));
-  var _TaelinArena$tick_game = (_0=>_0((_1=>_TaelinArena$game(_Extra$map_list((_2=>_2((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_Extra$fold_list(_TaelinArena$game_object(_3)(_4)(_Geometry$add_v3(_5)(_Geometry$scale_v3(_6)(_7)))(_6)(_7)(_8)(_9)(_10))((_11=>(_12=>_TaelinArena$interact_with(_12)(_11))))(_1))))))))))))(_1)))));
+  var _TaelinArena$exec_game_turn = (_0=>_0((_1=>_TaelinArena$game(_Extra$map_list((_2=>_2((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_Extra$fold_list(_TaelinArena$game_object(_3)(_4)(_Geometry$add_v3(_5)(_Geometry$scale_v3(_6)(_7)))(_6)(_7)(_8)(_9)(_10))((_11=>(_12=>_TaelinArena$interact_with(_12)(_11))))(_1))))))))))))(_1)))));
   return {
     'Hitbox':_TaelinArena$Hitbox,
     'circbox':_TaelinArena$circbox,
@@ -9359,13 +9612,20 @@ module.exports = (function(){
     'stanci':_TaelinArena$stanci,
     'neelix':_TaelinArena$neelix,
     'belanna':_TaelinArena$belanna,
-    'demo_game':_TaelinArena$demo_game,
-    'GameEvent':_TaelinArena$GameEvent,
-    'game_move':_TaelinArena$game_move,
+    'new_game':_TaelinArena$new_game,
+    'GameAction':_TaelinArena$GameAction,
+    'game_dpad':_TaelinArena$game_dpad,
+    'game_mlft':_TaelinArena$game_mlft,
+    'game_mmid':_TaelinArena$game_mmid,
+    'game_mrgt':_TaelinArena$game_mrgt,
+    'game_key0':_TaelinArena$game_key0,
+    'game_key1':_TaelinArena$game_key1,
+    'game_key2':_TaelinArena$game_key2,
+    'game_key3':_TaelinArena$game_key3,
     'map_game_objects':_TaelinArena$map_game_objects,
-    'input_game':_TaelinArena$input_game,
+    'exec_game_action':_TaelinArena$exec_game_action,
     'interact_with':_TaelinArena$interact_with,
-    'tick_game':_TaelinArena$tick_game
+    'exec_game_turn':_TaelinArena$exec_game_turn
   };
 })()
 

@@ -62,7 +62,7 @@ module.exports = function canvox(opts = {}) {
     var context = canvas.getContext("2d");
     canvas.draw = ({voxels, cam}) => {
       // Camera and viewport
-      var cam = setup_cam(opts.cam);
+      var cam = setup_cam(cam);
 
       // Canvas setup
       canvas.width = cam.size.x * cam.res;
@@ -396,7 +396,7 @@ module.exports = function canvox(opts = {}) {
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0); 
     gl.enableVertexAttribArray(coord);
       
-    canvas.draw = function({voxels,cam}) {
+    canvas.draw = function({voxels, cam}) {
       var cam = setup_cam(cam);
 
       // Canvas setup

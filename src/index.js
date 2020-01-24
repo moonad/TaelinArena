@@ -7,6 +7,7 @@ const extra = require("./extra.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
 const SimplePeer = require("simple-peer");
+const FPS = 36;
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -20,51 +21,110 @@ post("offer",{name}).then(data => peer.signal(data));
 peer.on('error', err => console.log('error', err))
 peer.on('signal', data => post("answer", {name,data}));
 peer.on('connect', () => {});
-peer.on('data', data => console.log(""+data));
-window.send = msg => peer.send(msg);
+//peer.on('data', data => console.log(""+data));
 
+// Send an chat message
+window.say = msg => {
+  if (msg[0] === "/") {
+    var args = msg.slice(1).split(" ");
+    switch (args[0]) {
+      case "new":
+      case "new_game":
+        //console.log("creating a new game");
+        var name = args[1];
+        var lft = args[2].split(",");
+        var rgt = args[3].split(",");
+        var teams = {lft, rgt};
+        //console.log(name, teams);
+        post("new_game", {name, teams}).then((res) => {
+          if (res.ctr === "ok") {
+            alert("Game created!");
+          } else {
+            alert("Error: " + res.err);
+          }
+        });
+      break;
+    }
+  } else {
+    peer.send(msg);
+  }
+};
+
+// Account registration
 const Register = require("./register.js");
 
+// List of games
 class GameList extends Component {
   constructor(props) {
     super(props);
-    this.game_count = 0;
-    this.game_list = [];
   }
   render() {
-    // Game List
-    var game_elems = [];
-    for (var i = 0; i < this.game_list.length; ++i) {
-      game_elems.push(h("div", {}, [
-        game_list[i].id,
-        " | ",
-        game_list[i].name, 
-      ]));
+    var game_list = this.props.game_list;
+    var col = (body, onclick) => {
+      return h("td", {
+        style: {
+          "padding": "4px",
+          "cursor": onclick ? "pointer" : null,
+          "text-decoration": onclick ? "underline" : null,
+        },
+        onclick,
+      }, body);
+    };
+    var rows = [];
+    rows.push(h("tr", {
+      style: {
+        "font-weight": "bold",
+        "border-bottom": "1px dotted rgba(0,0,0,0.1)",
+        "background": "rgba(0,0,0,0.03)",
+      }
+    }, [col("Jogo"), col("Equipe L"), col("Equipe R")]));
+    for (let i = game_list.length - 1; i >= 0; --i) {
+      let game = game_list[i];
+      let row = [];
+      if (game) {
+        var id = ("00000000"+game.id.toString(16)).slice(-8);
+        var nm = game.name;
+        row.push(col(nm, () => this.props.join(game.id)));
+        row.push(col(game.teams.lft.join(", ")));
+        row.push(col(game.teams.rgt.join(", ")));
+      } else {
+        row.push(h("td", {colspan:3}, "?"));
+      }
+      rows.push(h("tr", {}, row));
     }
+    var table = h("table", {
+      style: {
+        "width": "100%",
+        "font-size": "12px",
+        "border-collapse": "collapse",
+      }
+    }, rows);
 
     return h("div", {
       style: {
+        "position": "fixed",
+        "top": "24px",
+        "left": "0px",
+        "width": "calc(100% - 160px)",
+        "height": "calc(100% - 24px)",
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-start",
         "align-items": "center",
+        "overflow-y": "scroll",
+        "background": "rgba(255,255,255,0.2)",
       }
-    }, [
-      game_elems,
-    ]);
+    }, [table]);
   }
 };
 
+// Chat
 class Chat extends Component {
   constructor(props) {
     super(props);
-    this.msgs = [];
-    peer.on("data", (data) => {
-      this.msgs.push(""+data);
-      this.forceUpdate();
-    });
   }
   render() {
+    this.msgs = this.props.msgs;
     var msgs = [];
     for (var i = 0; i < this.msgs.length; ++i) {
       msgs.push(h("div", {}, this.msgs[i]));
@@ -91,7 +151,7 @@ class Chat extends Component {
       onkeydown: (e) => {
         var value = e.target.value;
         if (e.key === "Enter") {
-          peer.send(value);
+          say(value);
           setTimeout(() => {
             var el0 = document.getElementById("chat_input");
             var el1 = document.getElementById("chat_msgs");
@@ -112,7 +172,6 @@ class Chat extends Component {
         "background": "#F2F2F2",
       },
     });
-
     return h("div", {
       style: {
         "position": "fixed",
@@ -124,7 +183,7 @@ class Chat extends Component {
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        "background": "rgba(255,255,255,0.3)",
+        "background": "rgba(255,255,255,0.2)",
         "align-items": "center",
       }
     }, [
@@ -134,14 +193,164 @@ class Chat extends Component {
   };
 };
 
+// Main HUD
 class Main extends Component {
   constructor(props) {
     super(props)
     this.modal = null;
     this.name = null;
     this.wlet = null;
+    this.game_id = null;
+    this.game_turns = null;
+    this.game_state = null;
+    this.game_list = [];
+    this.chat_msgs = [];
+    this.key = {};
+    this.pad = null;
+    this.canvox = canvox();
+  }
+  emit_keys() {
+    var key_d = this.key.d||0;
+    var key_a = this.key.a||0;
+    var key_w = this.key.w||0;
+    var key_s = this.key.s||0;
+    var pad_x = (key_d||0) - (key_a||0);
+    var pad_y = (key_w||0) - (key_s||0);
+    var pad = {x:pad_x, y:pad_y};
+    if (this.game_id
+      && (!this.pad
+      || pad.x !== this.pad.x
+      || pad.y !== this.pad.y)) {
+      this.pad = pad;
+      var px = Math.floor((pad.x+1)/2*14).toString(16);
+      var py = Math.floor((pad.y+1)/2*14).toString(16);
+      var act = "0" + px + py;
+      //console.log("emit act ", act);
+      peer.send("$" + act);
+    }
+  };
+  make_cam(cam) {
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    var T = Date.now()/1000;
+    var ang = Math.PI * 1/4;
+    var cos = Math.cos(ang);
+    var sin = Math.sin(ang);
+    var front = {x:0, y:cos, z:-sin};
+    var right = {x:1, y:0, z:0};
+    var down = {x:0, y:-sin, z:-cos};
+    var pos = {x:0,y:-2048*cos,z:2048*sin};
+    return {
+      pos   : pos, // center pos
+      right : right, // right direction
+      down  : down, // down direction
+      front : front, // front direction
+      size  : {x:W*0.5, y:H*0.5}, // world size
+      port  : {x:W, y:H}, // browser size
+      res   : 1.0, // rays_per_pixel = res^2
+    };
   }
   componentDidMount() {
+    // Appends canvox to body
+    document.body.appendChild(this.canvox);
+    this.render_loop = setInterval(() => {
+      if (this.game_id) {
+        //console.log(this.game_state);
+        TA.render_game(this.game_state, this.canvox);
+      }
+    }, 1000/FPS);
+
+    // Game inputs
+    document.body.onkeyup = (e) => {
+      this.key[e.key] = 0;
+      this.emit_keys();
+    };
+    document.body.onkeypress = (e) => {
+      this.key[e.key] = 1;
+      this.emit_keys();
+    };
+
+    // Pools list of game
+    const pool_game_list = () => {
+      post("get_game_count", {}).then((res) => {
+        var count = this.game_list.length;
+        for (let id = count; id < res.count; ++id) {
+          post("get_game", {id}).then((res) => {
+            if (res.ctr === "ok") {
+              this.game_list[id] = res.game;
+              this.forceUpdate();
+            }
+          });
+        }
+      });
+    };
+    this.game_pooler = setInterval(pool_game_list, 2000);
+    pool_game_list();
+
+    // Adjusts the turn to be streamed to me 
+    this.turn_asker = setInterval(() => {
+      if (this.game_id) {
+        console.log(
+          "Ask turn="+this.game_turns.length
+          +" game="+this.game_id);
+        var turn = this.game_turns.length.toString(16);
+        var turn = ("00000000"+turn).slice(-8);
+        var game = this.game_id.toString(16);
+        var game = ("00000000"+game).slice(-8);
+        peer.send("?"+turn+game);
+      }
+    }, 1000);
+
+    // Deals with incoming UDP data
+    peer.on("data", (data) => {
+      var str = ""+data;
+      switch (str[0]) {
+        case "$":
+          var game = parseInt(str.slice(1,9), 16);
+          var from = parseInt(str.slice(9,17), 16);
+          var last = this.game_turns.length;
+          var new_turns = TA.parse_turns(str.slice(17));
+          if (from <= last) {
+            for (var i = last-from; i<new_turns.length; ++i) {
+              this.game_turns[i+from] = new_turns[i];
+              for (var j = 0; j < new_turns[i].length; ++j) {
+                let a = new_turns[i][j];
+                switch (a.action) {
+                  case "dpad":
+                    let x = a.params.dir.x;
+                    let y = a.params.dir.y;
+                    let d = v3 => v3(x)(y)(0);
+                    var e = TA.game_dpad(a.player)(d);
+                  break;
+                }
+                var g = this.game_state;
+                var g = TA.exec_game_action(e)(g);
+                this.game_state = g;
+              }
+              var gs = this.game_state;
+              this.game_state = TA.exec_game_turn(gs);
+            }
+          }
+        break;
+        default:
+          this.chat_msgs.push(str);
+        break;
+      }
+      this.forceUpdate();
+    });
+  }
+  componentWillUnmount() {
+    clearInterval(this.game_pooler);
+    clearInterval(this.render_loop);
+    clearInterval(this.turn_asker);
+  }
+  componentDidUpdate() {
+  }
+  join(game_id) {
+    this.game_id = game_id;
+    this.game_turns = [];
+    this.game_state = TA.new_game;
+    this.forceUpdate();
   }
   render() {
     if (this.modal) {
@@ -157,14 +366,25 @@ class Main extends Component {
       }, content);
     };
 
-    var title = h("div", {
+    var top_lft = h("div", {
       style: {
-        "font-size": "16px"
+        "font-size": "16px",
+        "cursor": "pointer",
       },
-    }, "Taelin::Arena");
+      onClick: () => {
+        this.game_id = null;
+        this.forceUpdate();
+      }
+    }, "Taelin::Arena (alpha-0.0.0)");
 
-    if (this.name) {
-      var login = h("div", {
+    if (this.game_id) {
+      var top_rgt = h("div", {
+        style: {
+          "font-size": "12px"
+        }
+      }, "turn="+this.game_turns.length);
+    } else if (this.name) {
+      var top_rgt = h("div", {
         onClick: () => {
           if (confirm("Clique OK para deslogar.")) {
             this.wlet = null;
@@ -178,7 +398,7 @@ class Main extends Component {
         },
       }, [this.name]);
     } else {
-      var login = h("div", {
+      var top_rgt = h("div", {
         style: {
           "font-size": "12px"
         },
@@ -193,7 +413,7 @@ class Main extends Component {
               .then((res) => {
                 if (res.ctr === "ok") {
                   this.name = res.name;
-                  peer.send("+"+this.name); // TODO: sign
+                  say("+"+this.name); // TODO: sign
                   this.forceUpdate();
                 }
               });
@@ -218,7 +438,7 @@ class Main extends Component {
 
     var top_menu = h("div", {
       style: {
-        "background": "#4070D0",
+        "background": this.game_id ? null : "#4070D0",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -229,13 +449,11 @@ class Main extends Component {
         "font-family": "monaco, monospace",
         "padding": "0px 4px",
         "font-weight": "bold",
-        "color": "white",
+        "color": this.game_id ? "black" : "white",
       },
-      onClick: () => {
-      }
     }, [
-      title,
-      login,
+      top_lft,
+      top_rgt,
     ])
 
     return h("div", {
@@ -247,8 +465,15 @@ class Main extends Component {
       },
     }, [
       top_menu,
-      h(Chat),
-      h(GameList),
+      this.game_id
+        ? null
+        : h(Chat, {msgs: this.chat_msgs}),
+      this.game_id
+        ? null
+        : h(GameList, {
+          game_list: this.game_list,
+          join: (game) => this.join(game)
+        }),
     ])
   }
 };
@@ -256,61 +481,8 @@ class Main extends Component {
 window.onload = () => {
   // Renders site using Inferno
   render(h(Main), document.getElementById("main"));
-
-  // Creates canvas and inserts on page
-  var canvas = canvox();
-  document.body.appendChild(canvas);
-
-  // Keys that are pressed
-  var key = {};
-  var refresh_game_pad = () => {
-    var key_d = key.d||0;
-    var key_a = key.a||0;
-    var key_w = key.w||0;
-    var key_s = key.s||0;
-    var event = t => {
-      var id = 0;
-      var dir = t => {
-        var x = (key_d||0) - (key_a||0);
-        var y = (key_w||0) - (key_s||0);
-        var z = 0;
-        return t(x)(y)(0);
-      }
-      return t(id)(dir);
-    };
-    game = TA.input_game(event)(game);
-  };
-  document.body.onkeyup = (e) => {
-    key[e.key] = 0;
-    refresh_game_pad();
-  };
-  document.body.onkeypress = (e) => {
-    key[e.key] = 1;
-    refresh_game_pad();
-  };
-
-  // FPS metering
-  var last_fps_print = extra.now();
-  var fps_count = 0;
-
-  // Initial state of the game
-  var game = TA.demo_game;
-
-  // Main loop of the game
-  setInterval(function main_loop() {
-    // Updates the FPS counter
-    ++fps_count;
-    if (extra.now() > last_fps_print + 1) {
-      document.title = "FPS " + fps_count;
-      fps_count = 0;
-      last_fps_print = extra.now();
-    };
-
-    // Renders game to canvas
-    TA.render_game(game, canvas);
-
-    // Updates game state
-    game = TA.tick_game(game);
-
-  }, 1000 / 24);
 };
+
+setTimeout(() => {
+  peer.send("+SrPx");
+}, 2000);

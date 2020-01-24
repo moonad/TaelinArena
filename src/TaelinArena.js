@@ -80,7 +80,81 @@ function render_game(game, canvox) {
   canvox.draw({voxels});
 };
 
+// Turns ::=
+//   | 0: End
+//   | 1: Next(Turn, Turns)
+// Turn ::=
+//   | 0: End
+//   | 1: Player0(Action, Turn)
+//   | 2: Player1(Action, Turn)
+//   | ... up to 15 ...
+// Action ::=
+//   | 0: dpad(x: 4bit, y: 4bit) 
+//   | 1: mlft(x: 12bit, y: 12bit)
+//   | 2: mmid(x: 12bit, y:12bit)
+//   | 3: mrgt(x: 12bit, y:12bit)
+//   | 4: key0
+//   | 5: key1
+//   | 6: key2
+//   | 7: key3
+
+function parse_turns(code) {
+  var turns = [];
+  var idx = 0;
+  while (idx < code.length) {
+    if (code[idx] === "0") {
+      break;
+    } else {
+      idx += 1;
+      var turn = [];
+      while (idx < code.length) {
+        if (code[idx] === "0") {
+          idx += 1;
+          break;
+        } else {
+          var player = parseInt(code[idx],16) - 1;
+          var action = parseInt(code[idx+1],16);
+          if (action === 0) {
+            var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
+            var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
+            turn.push({
+              player,
+              action: "dpad",
+              params: {dir: {x: dir_x, y: dir_y}}
+            });
+            idx += 4;
+          } else if (action >= 1 && action <= 3) {
+            var pos_x_a = parseInt(code[idx+2],16);
+            var pos_x_b = parseInt(code[idx+3],16);
+            var pos_x_c = parseInt(code[idx+4],16);
+            var pos_y_a = parseInt(code[idx+5],16);
+            var pos_y_b = parseInt(code[idx+6],16);
+            var pos_y_c = parseInt(code[idx+7],16);
+            var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
+            var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+            turn.push({
+              player,
+              action: ["mlft","mmid","mrgt"][action-1],
+              params: {pos: {x: pos_x, y: pos_y}}
+            });
+            idx += 8;
+          } else {
+            turn.push({
+              player,
+              action: "key" + (action - 4)
+            });
+            idx += 2;
+          };
+        }
+      };
+      turns.push(turn);
+    }
+  };
+  return turns;
+};
+
 module.exports = {
   ...TA,
   render_game,
+  parse_turns,
 };

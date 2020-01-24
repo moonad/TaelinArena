@@ -7,99 +7,132 @@ var cors = require("cors");
 var fs = require("fs").promises;
 var path = require("path");
 var ethers = require("ethers");
+var FPS = 24;
+var MAX_TURNS = FPS * 60 * 1;
 
-// Global state
-var peers = {};
-var games = {};
+// Simple fs database
+var get_str = async (key) => {
+  try {
+    var file_path = path.join("db", key).toLowerCase();
+    return await fs.readFile(file_path, "utf8");
+  } catch (e) {
+    return null;
+  }
+};
+var set_str = async (key, str) => {
+  try {
+    var file_path = path.join("db",key).toLowerCase();
+    await fs.writeFile(file_path, str);
+    return true;
+  } catch (e) {
+    return null;
+  }
+};
+var push_str = async (key, str) => {
+  try {
+    var file_path = path.join("db",key).toLowerCase();
+    await fs.appendFile(file_path, str);
+  } catch (e) {
+    return null;
+  }
+};
+var get = async (key) => {
+  return JSON.parse(await get_str(key));
+};
+var set = async (key, val) => {
+  return set_str(key, JSON.stringify(val));
+};
 
-//start: time
-//teams: {
-  //a: [nam0, nam1, nam2, nam3, nam4],
-  //b: [nam5, nam6, nam7, nam8, nam9],
-//},
-//prose: [
-  //"
-//]
+// Creates a new game
+function create_new_game(game) {
+  var id = games.length;
+  games[id] = {...game, id};
+  turns[id] = [];
 
-// Turns ::=
-//   | 0: End
-//   | 1: Next(Turn, Turns)
-// Turn ::=
-//   | 0: End
-//   | 1: Player1(Action, Turn)
-//   | 2: Player2(Action, Turn)
-//   | ... up to 15 ...
-// Action ::=
-//   | 0: Direction(x: 4bit, y: 4bit) 
-//   | 1: LeftClick(x: 12bit, y: 12bit)
-//   | 2: MiddleClick(x: 12bit, y:12bit)
-//   | 3: RightClick(x: 12bit, y:12bit)
-//   | 4: Key0
-//   | 5: Key1
-//   | 6: Key2
-//   | 7: Key3
+  // TODO: persist efficiently
+  set("games", games);
+  set_str("games.turns."+id, "");
+};
 
-function parse_turns(code) {
-  var turns = [];
-  var idx = 0;
-  while (idx < code.length) {
-    if (code[idx] === "0") {
-      break;
+// Completes a turn on given game_id
+function add_new_turn(gid) {
+  var turn_count = turns[gid].length;
+  if (turn_count < MAX_TURNS) {
+    // If there are no turns, add the first turn
+    if (turn_count === 0) {
+      turns[gid].push("");
+    // Else, end the last turn and add a new one
     } else {
-      idx += 1;
-      var turn = [];
-      while (idx < code.length) {
-        if (code[idx] === "0") {
-          idx += 1;
-          break;
-        } else {
-          var player = parseInt(code[idx],16);
-          var action = parseInt(code[idx+1],16);
-          if (action === 0) {
-            var dir_x = parseInt(code[idx+2],16);
-            var dir_y = parseInt(code[idx+3],16);
-            turn.push({
-              player,
-              action: "dpad",
-              params: {dir: {x: dir_x, y: dir_y}}
-            });
-            idx += 4;
-          } else if (action >= 1 && action <= 3) {
-            var pos_x_a = parseInt(code[idx+2],16);
-            var pos_x_b = parseInt(code[idx+3],16);
-            var pos_x_c = parseInt(code[idx+4],16);
-            var pos_y_a = parseInt(code[idx+5],16);
-            var pos_y_b = parseInt(code[idx+6],16);
-            var pos_y_c = parseInt(code[idx+7],16);
-            var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
-            var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
-            turn.push({
-              player,
-              action: ["mlft","mmid","mrgt"][action-1],
-              params: {pos: {x: pos_x, y: pos_y}}
-            });
-            idx += 8;
-          } else {
-            turn.push({
-              player,
-              action: "key" + (action - 4)
-            });
-            idx += 2;
-          };
-        }
-      };
-      turns.push(turn);
+      turns[gid][turn_count-1] += "0"; // 'nil'
+      turns[gid].push(""); // new one
+      push_str("games.turns."+gid,turns[gid][turn_count-1]+"\n");
     }
-  };
-  return turns;
+  }
 };
 
-var str = "";
-for (var i = 0; i < 100000; ++i) {
-  str += "120784455220110020";
+// Adds a action to given game_id
+function perform_action(gid, player_name, action) {
+  console.log(player_name+" acting on "+gid);
+  var player_id = get_player_id(player_name, games[gid]);
+  var turn_count = turns[gid].length;
+  if ( turn_count > 0
+    && turn_count < MAX_TURNS
+    && player_id !== null
+    && is_valid_action(action)) {
+    console.log(
+      ("- game="+gid
+      +", turn="+turn_count
+      +", acti="+action));
+    // Creates the turn constructor: (PLAYER_ID+1)|ACTION
+    var turn_ctor = (player_id+1).toString(16);
+    var turn_ctor = turn_ctor + action;
+    turns[gid][turn_count-1] += turn_ctor;
+  }
 };
-str += "0";
 
+// Gets the player id on given game
+function get_player_id(name, game) {
+  for (var i = 0; i < game.teams.lft.length; ++i) {
+    if (game.teams.lft[i] === name) {
+      return i;
+    }
+  }
+  for (var j = 0; j < game.teams.rgt.length; ++j) {
+    if (game.teams.rgt[j] === name) {
+      return i + j;
+    }
+  }
+  return null;
+};
+
+// Validates a team object
+function is_valid_teams(teams) {
+  if (typeof teams !== "object") {
+    return false;
+  }
+  if (Object.keys(teams).length !== 2) {
+    return false;
+  }
+  for (var side of ["lft", "rgt"]) {
+    if (!(teams[side] instanceof Array)) {
+      return false;
+    }
+    if (teams[side].length > 5) {
+      return false;
+    }
+    for (var i = 0; i < teams[side].length; ++i) {
+      if (typeof teams[side][i] !== "string") { 
+        return false;
+      }
+      if (!is_valid_name(teams[side][i])) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Validates an action code string
 function is_valid_action(code) {
   var ctr = Number(code[0]);
   if (ctr === 0 && code.length === 3) {
@@ -114,35 +147,18 @@ function is_valid_action(code) {
   return false;
 };
 
+// Validates a name string
 var is_valid_name = (name) => {
   return typeof name === "string"
     && /^[a-zA-Z0-9_]{1,32}$/.test(name);
 };
 
+// Validates an Ethereum address string
 var is_valid_address = (addr) => {
   try {
     return ethers.utils.getAddress(addr) === addr;
   } catch (e) {
     return false;
-  }
-};
-
-// Simple fs database
-var get = async (key) => {
-  try {
-    var file_path = path.join("db", key).toLowerCase();
-    return JSON.parse(await fs.readFile(file_path, "utf8"));
-  } catch (e) {
-    return null;
-  }
-};
-var set = async (key, val) => {
-  try {
-    var file_path = path.join("db",key).toLowerCase();
-    fs.writeFile(file_path, JSON.stringify(val));
-    return true;
-  } catch (e) {
-    return null;
   }
 };
 
@@ -205,61 +221,25 @@ app.post("/name_of", async (req, res) => {
 app.post("/new_game", async (req, res) => {
   // Validates game name
   var name = req.body.name;
-  if (!/^[a-zA-Z0-9_]{1,64}$/.test(name)) {
+  if (!is_valid_name(name)) {
     return res.send(JSON.parse({
       ctr: "err",
       err: "Invalid game name.",
     }));
   }
 
-  // Validates teams format
+  // Validates team format
   var teams = req.body.teams; 
-  function is_valid_teams(teams) {
-    if (typeof teams !== "object") {
-      return false;
-    }
-    if (Object.keys(teams).length !== 2) {
-      return false;
-    }
-    for (var side of ["lft", "rgt"]) {
-      if (!(teams[side] instanceof Array)) {
-        return false;
-      }
-      if (teams[side].length > 5) {
-        return false;
-      }
-      for (var i = 0; i < teams[side].length; ++i) {
-        if (typeof teams[side][i] !== "string") { 
-          return false;
-        }
-        if (!is_valid_name(terms[side][i])) {
-          return false;
-        }
-      }
-    }
-  }
   if (!is_valid_teams(teams)) {
-    return res.send(JSON.parse({
+    return res.send(JSON.stringify({
       ctr: "err",
       err: "Invalid teams.",
     }));
   }
 
-  // Game timestamp
+  // Creates new game and sends success answer
   var init = Date.now();
-
-  // Game id
-  var id = (await get("game_count") || 0) + 1;
-
-  // Game actions
-  var turns = turns;
-
-  // Game info
-  var game = {id,name,teams,init,turns}
-
-  games[id] = game;
-  await set("game_"+id, game);
-
+  create_new_game({name,teams,init});
   res.send(JSON.stringify({ctr:"ok"}));
 });
 
@@ -267,20 +247,20 @@ app.post("/new_game", async (req, res) => {
 app.post("/get_game_count", async (req, res) => {
   res.send(JSON.stringify({
     ctr: "ok",
-    count: (await get("game_count")) || 0,
+    count: games.length,
   }));
 });
 
 // Gets a game
 app.post("/get_game", async (req, res) => {
-  var game = await get("game_"+req.body.id);
+  var game = games[req.body.id];
   if (game) {
-    res.send(JSON.stringify({
+    return res.send(JSON.stringify({
       ctr: "ok",
       game
     }));
   } else {
-    res.send(JSON.stringify({
+    return res.send(JSON.stringify({
       ctr: "err",
       err: "Game not found"
     }));
@@ -291,36 +271,86 @@ app.post("/get_game", async (req, res) => {
 app.post("/offer", (req, res) => {
   var name = req.body.name;
   var peer = new Peer({initiator: true, wrtc, tricke: true});
+  var game = 0;
+  var turn = 0;
   peers[req.body.name] = peer;
+
+  // Continuously sends `game_id,from_turn,[action]` to peer
+  var turn_feed = setInterval(() => {
+    if (game > 0) {
+      var count = turns[game].length;
+
+      // Gather 5 turns around the one demanded by peer
+      var from = Math.min(Math.max((turn||0)-5, 0),count-1); 
+      var to = Math.min((turn||0)+5, count-1);
+
+      // Creates message with game_id, from_turn and actions
+      var msg = "";
+      msg += ("00000000"+game.toString(16)).slice(-8); 
+      msg += ("00000000"+from.toString(16)).slice(-8);
+      for (var i = from; i < to; ++i) {
+        msg += "1"+turns[game][i];
+      }
+      msg += "0";
+
+      // Updates the turn demanded by peer
+      turn = Math.min(turn + 3, turns[game].length);
+
+      // Sends the turn to peer
+      try {
+        peer.send("$" + msg);
+      } catch (e) {
+        console.log(e);
+      };
+    }
+  }, 1000/FPS);
+
   peer.on("signal", data => {
     if (data.type === "offer") {
       res.send(JSON.stringify(data))
     }
   })
+
   peer.on("connect", () => {})
+
+  // Deals with messages sent by peer
   peer.on("data", (data) => {
     var str = "" + data;
     switch (str[0]) {
-      // TODO: require signature
+
+      // Set the player's name. TODO: demand signature.
       case "+":
         delete peers[name];
         name = str.slice(1);
         peers[name] = peer;
         break;
+
+      // Informs player's last downloaded turn.
+      case "?":
+        turn = parseInt(str.slice(1,9), 16);
+        game = parseInt(str.slice(9,17), 16);
+        console.log(name+" wants turn="+turn+" game="+game);
+        break;
+
+      // In-game action.
+      case "$":
+        perform_action(game, name, str.slice(1));
+        break;
+
+      // Normal chat message.
       default:
         for (var peer_name in peers) {
           peers[peer_name].send(name+": "+str);
         }
         break;
+
     }
-    //}
-    //var msg = "["+name+"] "+data;
-      //peers[peer_name].send(msg);
-    //}
-    //console.log(msg);
   });
   peer.on("error", (err) => {});
-  peer.on("close", () => { delete peers[name]; });
+  peer.on("close", () => {
+    delete peers[name];
+    clearInterval(turn_feed);
+  });
 });
 
 // Finishes setting up a new Peer connection
@@ -329,6 +359,24 @@ app.post("/answer", (req, res) => {
   res.send('"ok"');
 });
 
+// Starts serving files and API on port 80
 app.listen(80);
+
+// Initializes the global state
+var peers = {};
+var games = await get("games") || [];
+var turns = [];
+for (var gid = 0; gid < games.length; ++gid) {
+  var turn_file = (await get_str("games.turns."+gid)) || "";
+  turns[gid] = turn_file.split("\n");
+  turns[gid].pop();
+}
+
+// Main loop: passes time on all active games
+setInterval(() => {
+  for (var gid = 1; gid < games.length; ++gid) {
+    add_new_turn(gid);
+  }
+}, 1000 / FPS);
 
 })();

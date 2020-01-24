@@ -221,14 +221,21 @@ belanna : GameObject
   let spr = sprite(3)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
-demo_game : Game
+new_game : Game
   let map = [srpx, stanci, neelix, belanna]
   game(map)
 
 // GAME INPUT
 
-T GameEvent
-| game_move(id: ObjectId, dir: V3)
+T GameAction
+| game_dpad(id: ObjectId, dir: V3)
+| game_mlft(id: ObjectId, pos: V3)
+| game_mmid(id: ObjectId, pos: V3)
+| game_mrgt(id: ObjectId, pos: V3)
+| game_key0
+| game_key1
+| game_key2
+| game_key3
 
 // Modifies every object in the game
 map_game_objects(
@@ -237,23 +244,23 @@ map_game_objects(
 ) : Game
   game(map_list(__ fn, get_game_map(gm)))
 
-// Apply an event to the game state
-input_game(event: GameEvent, gm: Game) : Game
-  case event
-  | game_move =>
+// Apply an action to the game state
+exec_game_action(action: GameAction, gm: Game) : Game
+  case action
+  | game_dpad =>
     let fn = (obj) =>
       case obj | game_object =>
-      // If this is this event's target object
-      if event.id .==. obj.id then
+      // If this is this action's target object
+      if action.id .==. obj.id then
         // Change its direction if analog isn't centered
         let dir_fn =
-          if len_v3(event.dir) .==. 0 then
+          if len_v3(action.dir) .==. 0 then
             (old_dir) => old_dir
           else
-            (old_dir) => event.dir
+            (old_dir) => action.dir
         // Set its speed if analog isn't centered
         let spd_fn =
-          if len_v3(event.dir) .==. 0 then
+          if len_v3(action.dir) .==. 0 then
             (old_spd) => 0
           else
             (old_spd) => 4
@@ -264,6 +271,13 @@ input_game(event: GameEvent, gm: Game) : Game
       else
         obj
     map_game_objects(fn, gm)
+  | game_mlft => gm
+  | game_mmid => gm
+  | game_mrgt => gm
+  | game_key0 => gm
+  | game_key1 => gm
+  | game_key2 => gm
+  | game_key3 => gm
 
 // Tick-wise interaction of `a` with `b`
 interact_with(this:GameObject, that:GameObject): GameObject
@@ -288,7 +302,7 @@ interact_with(this:GameObject, that:GameObject): GameObject
     this
 
 // Game's main loop
-tick_game(gm: Game) : Game
+exec_game_turn(gm: Game) : Game
   case gm | game =>
   let tick = (obj) =>
     case obj | game_object =>
