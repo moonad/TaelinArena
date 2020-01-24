@@ -1,4 +1,4 @@
-const spritestack = require("./spritestack.js");
+const spritestack = require("./spritestack/spritestack.js");
 
 const load_model = name => {
   var model_json = require("./models/"+name+".json");

@@ -11,7 +11,7 @@ class Register extends Component {
     super(props)
     this.phase = "enter_name";
     this.input = "";
-    this.ondone = props.ondone;
+    this.on_done = props.on_done;
     this.wlet = ethers.Wallet.createRandom();
     this.name = "";
   }
@@ -213,10 +213,10 @@ class Register extends Component {
             ["Foda-se", "success"],
           ]);
       case "success":
-        this.ondone({name:this.name, wlet:this.wlet});
+        this.on_done({name:this.name, wlet:this.wlet});
         return h("div");
       case "failure":
-        this.ondone({name:null, wlet:null});
+        this.on_done({name:null, wlet:null});
         return h("div");
     }
   }

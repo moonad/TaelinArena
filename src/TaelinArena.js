@@ -1,10 +1,14 @@
-const TA = require("./TaelinArena.fm");
-const extra = require("./extra.js");
+const TA = require("./game/TaelinArena.fm");
 const {models} = require("./models.js");
+
+const now = (() => {
+  var init_time = Date.now()/1000;
+  return () => Date.now()/1000 - init_time;
+})();
 
 function render_game(game, canvox) {
   // Gets the current time
-  var T = extra.now();
+  var T = now();
 
   // Gets the main hero position
   var hero_pos = TA.get_position_by_id(0, game);
