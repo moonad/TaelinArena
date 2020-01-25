@@ -1,6 +1,46 @@
+// Converts a MagicaVoxel .vox to a TaelinArena .json
+
+var vox = require("vox.js");
+var parser = new vox.Parser();
+var fs = require("fs");
+
+// Uint8Array -> Promise(JSON)
+function vox_to_json(vox) {
+  //var vox = fs.readFileSync(vox_file);
+  var u8 = new Uint8Array(vox);
+  var byt = b => ("00"+b.toString(16)).slice(-2);
+  return new Promise((resolve,reject) => {
+    parser.parseUint8Array(u8, (err,data) => {
+      var voxels = "";
+      for (var i = 0; i < data.voxels.length; ++i) {
+        var vpos = data.voxels[i];
+        var k = data.palette[vpos.colorIndex];
+        var x = Math.floor(vpos.x - data.size.x * 0.5)+128;
+        var y = Math.floor(vpos.y - data.size.y * 0.5)+128;
+        var z = Math.floor(vpos.z)+128;
+        var r = k.r;
+        var g = k.g;
+        var b = k.b;
+        voxels += byt(x);
+        voxels += byt(y);
+        voxels += byt(z);
+        voxels += byt(r);
+        voxels += byt(g);
+        voxels += byt(b);
+      };
+      resolve(voxels);
+      //fs.writeFileSync(json_file,
+        //JSON.stringify(voxels,null,2));
+    });
+  });
+};
+
+// TODO: deprecated, update to new format
 // Receives a SpriteStack model, returns an array of voxels
 // in the format [[{x:x0,y:y0,z:z0},col], ...].
-function model_to_voxels(model) {
+function ss_to_json(model) {
+  throw "This function requires update.";
+
   var voxels = [];
 
   var col = (model.palette[1]) | 0xFF;
@@ -62,4 +102,8 @@ function model_to_voxels(model) {
   return voxels;
 };
 
-module.exports = {model_to_voxels};
+
+module.exports = {
+  vox_to_json,
+  ss_to_json,
+};

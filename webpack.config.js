@@ -10,6 +10,10 @@ module.exports = {
         test: /\.fm$/, 
         loader: 'formality-loader',  
         options: { typeCheckMode: 'all' }
+      },
+      {
+        test: /\.vox$/i,
+        use: 'arraybuffer-loader',
       }
     ]
   },

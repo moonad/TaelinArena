@@ -1,3 +1,5 @@
+const DEBUG_LOCAL = true;
+
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const canvox = require("./../canvox/canvox.js");
@@ -30,6 +32,15 @@ class Main extends Component {
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
+    if (DEBUG_LOCAL) {
+      this.game_id = -1;
+      this.game_turns = [];
+      this.game_state = TA.new_game;
+      setInterval(() => {
+        var gs = this.game_state;
+        this.game_state = TA.exec_game_turn(gs);
+      }, 1000 / 24);
+    }
   }
   emit_keys() {
     var key_d = this.key.d||0;
@@ -47,8 +58,12 @@ class Main extends Component {
       var px = Math.floor((pad.x+1)/2*14).toString(16);
       var py = Math.floor((pad.y+1)/2*14).toString(16);
       var act = "0" + px + py;
-      //console.log("emit act ", act);
-      this.peer.send("$" + act);
+      if (DEBUG_LOCAL) {
+        var action = TA.parse_turns("11"+act+"0")[0][0];
+        this.exec_action(action);
+      } else {
+        this.peer.send("$"+act);
+      }
     }
   };
   make_cam(cam) {
@@ -96,6 +111,19 @@ class Main extends Component {
     } else {
       this.peer.send(msg);
     }
+  }
+  exec_action(a) {
+    switch (a.action) {
+      case "dpad":
+        let x = a.params.dir.x;
+        let y = a.params.dir.y;
+        let d = v3 => v3(x)(y)(0);
+        var e = TA.game_dpad(a.player)(d);
+      break;
+    }
+    var g = this.game_state;
+    var g = TA.exec_game_action(e)(g);
+    this.game_state = g;
   }
   componentDidMount() {
     // Peer connection
@@ -153,7 +181,7 @@ class Main extends Component {
 
     // Adjusts the turn to be streamed to me 
     this.turn_asker = setInterval(() => {
-      if (this.game_id) {
+      if (this.game_id && !this.DEBUG_LOCAL) {
         console.log(
           "Ask turn="+this.game_turns.length
           +" game="+this.game_id);
@@ -178,18 +206,7 @@ class Main extends Component {
             for (var i = last-from; i<new_turns.length; ++i) {
               this.game_turns[i+from] = new_turns[i];
               for (var j = 0; j < new_turns[i].length; ++j) {
-                let a = new_turns[i][j];
-                switch (a.action) {
-                  case "dpad":
-                    let x = a.params.dir.x;
-                    let y = a.params.dir.y;
-                    let d = v3 => v3(x)(y)(0);
-                    var e = TA.game_dpad(a.player)(d);
-                  break;
-                }
-                var g = this.game_state;
-                var g = TA.exec_game_action(e)(g);
-                this.game_state = g;
+                this.exec_action(new_turns[i][j]);
               }
               var gs = this.game_state;
               this.game_state = TA.exec_game_turn(gs);

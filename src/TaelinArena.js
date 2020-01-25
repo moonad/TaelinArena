@@ -1,5 +1,5 @@
 const TA = require("./game/TaelinArena.fm");
-const {models} = require("./models.js");
+const {models} = require("./models/models.js");
 
 const now = (() => {
   var init_time = Date.now()/1000;
@@ -36,29 +36,7 @@ function render_game(game, canvox) {
     // Gets the object model and current frame
     var anim_id = spr(anim_id => anim_id);
     var model = models[anim_id||0];
-    var feet = model.pivot.z;
-    var frames = model.frames.length;
-    var frame = model.frames[Math.floor((T*10) % frames)];
-
-    // Renders each voxel of the frame
-    for (var i = 0; i < frame.length; ++i) {
-      var [{x,y,z},col] = frame[i];
-      var cx = pos_x;
-      var cy = pos_y;
-      var cz = pos_z;
-      var px = cx + x;
-      var py = cy + y;
-      var pz = cz + z;
-      var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-      var pa = Math.atan2(py-cy,px-cx);
-      var px = cx + pl * Math.cos(pa + ang) + 0.5;
-      var py = cy + pl * Math.sin(pa + ang) + 0.5;
-      var pz = cz + z;
-      var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
-      var col = col | 0x000000FF;
-      voxels[voxels.length] = pos;
-      voxels[voxels.length] = col;
-    }
+    var frame = model[Math.floor((T*24)%model.length)];
 
     // Renders hitbox (for debugging)
     let case_circbox = (rad) => {
@@ -67,8 +45,11 @@ function render_game(game, canvox) {
           if (i*i+j*j < rad*rad) {
             var px = pos_x + i;
             var py = pos_y + j;
-            var pz = -64;
-            var pos = (px+512)<<20 | (py+512)<<10 | (pz+512);
+            var pz = 0;
+            var pos
+              = (px+512)<<20
+              | (py+512)<<10
+              | (pz+512);
             var col = 0xE0E0FFFF;
             voxels[voxels.length] = pos;
             voxels[voxels.length] = col;
@@ -79,6 +60,27 @@ function render_game(game, canvox) {
     let case_polybox = (pts) => {
     };
     box(case_circbox)(case_polybox);
+
+    // Renders each voxel of the frame
+    for (var i = 0; i < frame.length; ++i) {
+      var [pos,col] = frame[i];
+      var {x,y,z} = pos;
+      var {r,g,b} = col;
+      var cx = pos_x;
+      var cy = pos_y;
+      var cz = pos_z;
+      var px = cx + x;
+      var py = cy + y;
+      var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+      var pa = Math.atan2(py-cy,px-cx);
+      var px = cx + pl * Math.cos(pa + ang) + 0.5;
+      var py = cy + pl * Math.sin(pa + ang) + 0.5;
+      var pz = cz + z;
+      var pos = (px+512)<<20|(py+512)<<10|(pz+512);
+      var col = (r<<24)|(g<<16)|(b<<8)|0xFF;
+      voxels[voxels.length] = pos;
+      voxels[voxels.length] = col;
+    }
   })(game);
 
   canvox.draw({voxels});

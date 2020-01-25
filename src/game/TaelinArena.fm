@@ -183,7 +183,7 @@ srpx : GameObject
   let spd = 0
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(12)
+  let box = circbox(8)
   let spr = sprite(0)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
@@ -194,7 +194,7 @@ stanci : GameObject
   let spd = 0
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(10)
+  let box = circbox(8)
   let spr = sprite(1)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
@@ -217,7 +217,7 @@ belanna : GameObject
   let spd = 0
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(12)
+  let box = circbox(8)
   let spr = sprite(3)
   game_object(id, hp, pos, spd, dir, vel, box, spr)
 
