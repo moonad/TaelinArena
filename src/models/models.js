@@ -1,3 +1,4 @@
+const TA = require("./../game/TaelinArena.fm");
 const CRONI_IDLE   = 0;
 const LYN_IDLE     = 1;
 const FANTASY_IDLE = 2;
@@ -30,37 +31,27 @@ const load = (name) => {
   return parse_voxel_data(voxel_data);
 };
 
-const models = {
-  [CRONI_IDLE]: [
-    load("simplao/idle1"),
-    load("simplao/idle2"),
-    load("simplao/idle3"),
-    load("simplao/idle4"),
-  ],
-  [LYN_IDLE]: [
-    load("simplao/atk1"),
-    load("simplao/atk2"),
-    load("simplao/atk3"),
-    load("simplao/atk4"),
-  ],
-  [FANTASY_IDLE]: [
-    load("simplao/move1"),
-    load("simplao/move2"),
-    load("simplao/move3"),
-    load("simplao/move4"),
-    load("simplao/move5"),
-    load("simplao/move6"),
-  ],
-  [ARCHER_IDLE]: [
-    load("simplao/poder1"),
-    load("simplao/poder2"),
-    load("simplao/poder3"),
-    load("simplao/poder4"),
-    load("simplao/poder5"),
-    load("simplao/poder6"),
-    load("simplao/poder7"),
-  ],
-};
+const models = [
+  "simplao/idle1",
+  "simplao/idle2",
+  "simplao/idle3",
+  "simplao/idle4",
+  "simplao/atk1",
+  "simplao/atk2",
+  "simplao/atk3",
+  "simplao/atk4",
+  "simplao/move1",
+  "simplao/move2",
+  "simplao/move3",
+  "simplao/move4",
+  "simplao/poder1",
+  "simplao/poder2",
+  "simplao/poder3",
+  "simplao/poder4",
+  "simplao/poder5",
+  "simplao/poder6",
+  "simplao/poder7",
+].map(load);
 
 module.exports = {
   CRONI_IDLE,

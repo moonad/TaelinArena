@@ -25,18 +25,13 @@ function render_game(game, canvox) {
     var dir = TA.get_object_dir(object);
     var vel = TA.get_object_vel(object);
     var box = TA.get_object_box(object);
-    var spr = TA.get_object_spr(object);
+    var ani = TA.get_object_ani(object);
     var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
     var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
 
     // Computes the object facing angle
     var ang = Math.atan2(dir_y, dir_x);
     var ang = ang + Math.PI*0.5;
-
-    // Gets the object model and current frame
-    var anim_id = spr(anim_id => anim_id);
-    var model = models[anim_id||0];
-    var frame = model[Math.floor((T*24)%model.length)];
 
     // Renders hitbox (for debugging)
     let case_circbox = (rad) => {
@@ -61,9 +56,11 @@ function render_game(game, canvox) {
     };
     box(case_circbox)(case_polybox);
 
-    // Renders each voxel of the frame
-    for (var i = 0; i < frame.length; ++i) {
-      var [pos,col] = frame[i];
+    // Renders each voxel of the model
+    var model_id = TA.get_object_model_id(object);
+    var model = models[model_id];
+    for (var i = 0; i < model.length; ++i) {
+      var [pos,col] = model[i];
       var {x,y,z} = pos;
       var {r,g,b} = col;
       var cx = pos_x;

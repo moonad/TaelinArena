@@ -50,6 +50,7 @@ class Main extends Component {
     var pad_x = (key_d||0) - (key_a||0);
     var pad_y = (key_w||0) - (key_s||0);
     var pad = {x:pad_x, y:pad_y};
+    var act = null;
     if (this.game_id
       && (!this.pad
       || pad.x !== this.pad.x
@@ -58,6 +59,11 @@ class Main extends Component {
       var px = Math.floor((pad.x+1)/2*14).toString(16);
       var py = Math.floor((pad.y+1)/2*14).toString(16);
       var act = "0" + px + py;
+    }
+    if (this.game_id && this.key.j) {
+      var act = "4";
+    }
+    if (act) {
       if (DEBUG_LOCAL) {
         var action = TA.parse_turns("11"+act+"0")[0][0];
         this.exec_action(action);
@@ -65,7 +71,24 @@ class Main extends Component {
         this.peer.send("$"+act);
       }
     }
-  };
+  }
+  exec_action(a) {
+    let e = null;
+    switch (a.action) {
+      case "dpad":
+        let x = a.params.dir.x;
+        let y = a.params.dir.y;
+        let d = v3 => v3(x)(y)(0);
+        e = TA.game_dpad(a.player)(d);
+      break;
+      case "key0":
+        e = TA.game_key0(a.player);
+      break;
+    }
+    var g = this.game_state;
+    var g = TA.exec_game_action(e)(g);
+    this.game_state = g;
+  }
   make_cam(cam) {
     var W = window.innerWidth;
     var H = window.innerHeight;
@@ -111,19 +134,6 @@ class Main extends Component {
     } else {
       this.peer.send(msg);
     }
-  }
-  exec_action(a) {
-    switch (a.action) {
-      case "dpad":
-        let x = a.params.dir.x;
-        let y = a.params.dir.y;
-        let d = v3 => v3(x)(y)(0);
-        var e = TA.game_dpad(a.player)(d);
-      break;
-    }
-    var g = this.game_state;
-    var g = TA.exec_game_action(e)(g);
-    this.game_state = g;
   }
   componentDidMount() {
     // Peer connection
@@ -181,7 +191,7 @@ class Main extends Component {
 
     // Adjusts the turn to be streamed to me 
     this.turn_asker = setInterval(() => {
-      if (this.game_id && !this.DEBUG_LOCAL) {
+      if (this.game_id && !DEBUG_LOCAL) {
         console.log(
           "Ask turn="+this.game_turns.length
           +" game="+this.game_id);

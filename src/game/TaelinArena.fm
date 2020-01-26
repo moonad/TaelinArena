@@ -13,8 +13,13 @@ T Hitbox
 ObjectId : Type
   Number
 
-T Sprite
-| sprite(id: Number)
+ModelId : Type
+  Number
+
+T Anim
+| anim(
+  id  : Number,
+  tik : Number)
 
 T GameObject
 | game_object(
@@ -25,7 +30,7 @@ T GameObject
   dir : V3,
   vel : V3,
   box : Hitbox,
-  spr : Sprite)
+  ani : Anim)
 
 // Changes the object's fields
 mut_object_fields(
@@ -36,7 +41,7 @@ mut_object_fields(
   dir: V3 -> V3,
   vel: V3 -> V3,
   box: Hitbox -> Hitbox,
-  spr: Sprite -> Sprite,
+  ani: Anim -> Anim,
   obj: GameObject
 ) : GameObject
   case obj | game_object =>
@@ -47,8 +52,8 @@ mut_object_fields(
   let dir = dir(obj.dir)
   let vel = vel(obj.vel)
   let box = box(obj.box)
-  let spr = spr(obj.spr)
-  game_object(id,hp,pos,spd,dir,vel,box,spr)
+  let ani = ani(obj.ani)
+  game_object(id,hp,pos,spd,dir,vel,box,ani)
 
 // Object accessors / mutters
 
@@ -80,9 +85,9 @@ get_object_box(obj: GameObject)
   case obj | game_object =>
   obj.box
 
-get_object_spr(obj: GameObject)
+get_object_ani(obj: GameObject)
   case obj | game_object =>
-  obj.spr
+  obj.ani
 
 mut_object_id(fn: ObjectId -> ObjectId , obj: GameObject)
   mut_object_fields(
@@ -126,7 +131,7 @@ mut_object_box(fn: Hitbox -> Hitbox, obj: GameObject)
     id(_), id(_), fn, id(_),
     obj)
 
-mut_object_spr(fn: Sprite -> Sprite, obj: GameObject)
+mut_object_ani(fn: Anim -> Anim, obj: GameObject)
   mut_object_fields(
     id(_), id(_), id(_), id(_),
     id(_), id(_), id(_), fn,
@@ -184,8 +189,8 @@ srpx : GameObject
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
-  let spr = sprite(0)
-  game_object(id, hp, pos, spd, dir, vel, box, spr)
+  let ani = anim(0, 0)
+  game_object(id, hp, pos, spd, dir, vel, box, ani)
 
 stanci : GameObject
   let id = 1
@@ -195,8 +200,8 @@ stanci : GameObject
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
-  let spr = sprite(1)
-  game_object(id, hp, pos, spd, dir, vel, box, spr)
+  let ani = anim(0, 0)
+  game_object(id, hp, pos, spd, dir, vel, box, ani)
 
 neelix : GameObject
   let id = 2
@@ -207,8 +212,8 @@ neelix : GameObject
   let vel = v3(0, 0, 0)
   let box = v3(6,6,6)
   let box = circbox(8)
-  let spr = sprite(2)
-  game_object(id, hp, pos, spd, dir, vel, box, spr)
+  let ani = anim(0, 0)
+  game_object(id, hp, pos, spd, dir, vel, box, ani)
 
 belanna : GameObject
   let id = 3
@@ -218,8 +223,8 @@ belanna : GameObject
   let dir = v3(-1, 0, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
-  let spr = sprite(3)
-  game_object(id, hp, pos, spd, dir, vel, box, spr)
+  let ani = anim(0, 0)
+  game_object(id, hp, pos, spd, dir, vel, box, ani)
 
 new_game : Game
   let map = [srpx, stanci, neelix, belanna]
@@ -232,10 +237,10 @@ T GameAction
 | game_mlft(id: ObjectId, pos: V3)
 | game_mmid(id: ObjectId, pos: V3)
 | game_mrgt(id: ObjectId, pos: V3)
-| game_key0
-| game_key1
-| game_key2
-| game_key3
+| game_key0(id: ObjectId)
+| game_key1(id: ObjectId)
+| game_key2(id: ObjectId)
+| game_key3(id: ObjectId)
 
 // Modifies every object in the game
 map_game_objects(
@@ -244,37 +249,51 @@ map_game_objects(
 ) : Game
   game(map_list(__ fn, get_game_map(gm)))
 
+// Modifies the object with given id
+// TODO: Optimize
+modify_object_by_id(
+  id: ObjectId,
+  fn: GameObject -> GameObject,
+  gm: Game
+) : Game
+  let fn2 = (obj) =>
+    case obj | game_object =>
+    if obj.id .==. id then
+      fn(obj)
+    else
+      obj
+  game(map_list(GameObject; _ fn2, get_game_map(gm)))
+
 // Apply an action to the game state
 exec_game_action(action: GameAction, gm: Game) : Game
   case action
   | game_dpad =>
     let fn = (obj) =>
       case obj | game_object =>
-      // If this is this action's target object
-      if action.id .==. obj.id then
-        // Change its direction if analog isn't centered
-        let dir_fn =
-          if len_v3(action.dir) .==. 0 then
-            (old_dir) => old_dir
-          else
-            (old_dir) => action.dir
-        // Set its speed if analog isn't centered
-        let spd_fn =
-          if len_v3(action.dir) .==. 0 then
-            (old_spd) => 0
-          else
-            (old_spd) => 4
-        // Modify the object with the logic above
-        let obj = mut_object_dir(dir_fn, obj)
-        let obj = mut_object_spd(spd_fn, obj)
-        obj
-      else
-        obj
-    map_game_objects(fn, gm)
+      // Change its direction if analog isn't centered
+      let dir_fn =
+        if len_v3(action.dir) .==. 0 then
+          (old_dir) => old_dir
+        else
+          (old_dir) => action.dir
+      // Set its speed if analog isn't centered
+      let spd_fn =
+        if len_v3(action.dir) .==. 0 then
+          (old_spd) => 0
+        else
+          (old_spd) => 4
+      // Modify the object using the logic above
+      let obj = mut_object_dir(dir_fn, obj)
+      let obj = mut_object_spd(spd_fn, obj)
+      obj
+    modify_object_by_id(action.id, fn, gm)
   | game_mlft => gm
   | game_mmid => gm
   | game_mrgt => gm
-  | game_key0 => gm
+  | game_key0 =>
+    let fn = (obj) =>
+      mut_object_pos(mut_x((x) => x .+. 10), obj)
+    modify_object_by_id(action.id, fn, gm)
   | game_key1 => gm
   | game_key2 => gm
   | game_key3 => gm
@@ -312,12 +331,41 @@ exec_game_turn(gm: Game) : Game
     let new_dir = obj.dir
     let new_vel = obj.vel
     let new_box = obj.box
-    let new_spr = obj.spr
+    let new_ani =
+      case obj.ani
+      | anim => anim(obj.ani.id, obj.ani.tik .+. 1)
     let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
     let trg_pos = v3(0,64,0)
     let new_obj = game_object(
       new_id, new_hp, new_pos, new_spd,
-      new_dir, new_vel, new_box, new_spr)
+      new_dir, new_vel, new_box, new_ani)
     let int_fun = (that, this) => interact_with(this, that)
     fold_list(GameObject; _ new_obj, int_fun, gm.map)
   game(map_list(GameObject; _ tick, gm.map))
+
+// ...
+get_object_model_id(obj: GameObject) : Number 
+  case obj | game_object =>
+  case obj.ani | anim =>
+  ((obj.ani.tik ./. 3) .>>>. 0) .%. 4
+
+
+SIMPLAO_IDLE1 0
+SIMPLAO_IDLE2 1
+SIMPLAO_IDLE3 2
+SIMPLAO_IDLE4 3
+SIMPLAO_ATK1 4
+SIMPLAO_ATK2 5
+SIMPLAO_ATK3 6
+SIMPLAO_ATK4 7
+SIMPLAO_MOVE1 8
+SIMPLAO_MOVE2 9
+SIMPLAO_MOVE3 10
+SIMPLAO_MOVE4 11
+SIMPLAO_PODER1 12
+SIMPLAO_PODER2 13
+SIMPLAO_PODER3 14
+SIMPLAO_PODER4 15
+SIMPLAO_PODER5 16
+SIMPLAO_PODER6 17
+SIMPLAO_PODER7 18
