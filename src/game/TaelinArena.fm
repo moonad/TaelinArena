@@ -188,7 +188,7 @@ srpx : GameObject
   let spd = 0
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(8)
+  let box = circbox(10)
   let ani = anim(0, 0)
   game_object(id, hp, pos, spd, dir, vel, box, ani)
 
@@ -222,7 +222,7 @@ belanna : GameObject
   let spd = 0
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
-  let box = circbox(8)
+  let box = circbox(14)
   let ani = anim(0, 0)
   game_object(id, hp, pos, spd, dir, vel, box, ani)
 
@@ -281,7 +281,11 @@ exec_game_action(action: GameAction, gm: Game) : Game
         if len_v3(action.dir) .==. 0 then
           (old_spd) => 0
         else
-          (old_spd) => 6
+          (old_spd) =>
+            if obj.id .==. 3 then
+              3
+            else
+              6
       // Modify the object using the logic above
       let obj = mut_object_dir(dir_fn, obj)
       let obj = mut_object_spd(spd_fn, obj)
@@ -336,16 +340,12 @@ exec_game_turn(gm: Game) : Game
       | anim =>
         let id  = obj.ani.id
         let tik = obj.ani.tik
-        let new_id = 
-          if (id .==. 1) .&. (tik .==. 5) then
-            0
-          else
-            id
-        let new_tik =
-          if (id .==. 1) .&. (tik .==. 5) then
-            0
-          else
-            tik .+. 1
+        let res =
+          let a = (id .==. 1) .&. (tik .==. 15)
+          let b = (id .==. 3) .&. (tik .==. 18)
+          a .|. b
+        let new_id = if res then 0 else id
+        let new_tik = if res then 0 else tik .+. 1
         anim(new_id, new_tik)
     let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
     let trg_pos = v3(0,64,0)
@@ -356,7 +356,7 @@ exec_game_turn(gm: Game) : Game
     fold_list(GameObject; _ new_obj, int_fun, gm.map)
   game(map_list(GameObject; _ tick, gm.map))
 
-// ...
+// TODO: very hard coded, comment, improve, etc.
 get_object_model_id(obj: GameObject) : Number 
   case obj | game_object =>
   case obj.ani | anim =>
@@ -370,6 +370,16 @@ get_object_model_id(obj: GameObject) : Number
     // attack
     else
       MIN_ATTACKA_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 6
+  else if obj.id .==. 3 then
+    // idle/walk
+    if obj.ani.id .==. 0 then
+      if (obj.spd .<. 0.1) then
+        ZOIN_IDLE_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 5
+      else
+        ZOIN_WALK_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 6
+    // attack
+    else
+      ZOIN_ATTACKA_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 7
   else
     SIMPLAO_IDLE1 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 4
 
@@ -406,3 +416,22 @@ MIN_ATTACKA_2 29
 MIN_ATTACKA_3 30
 MIN_ATTACKA_4 31
 MIN_ATTACKA_5 32
+ZOIN_IDLE_0 33
+ZOIN_IDLE_1 34
+ZOIN_IDLE_2 35
+ZOIN_IDLE_3 36
+ZOIN_IDLE_4 37
+ZOIN_ATTACKA_0 38
+ZOIN_ATTACKA_1 39
+ZOIN_ATTACKA_2 40
+ZOIN_ATTACKA_3 41
+ZOIN_ATTACKA_4 42
+ZOIN_ATTACKA_5 43
+ZOIN_ATTACKA_6 44
+ZOIN_WALK_0 45
+ZOIN_WALK_1 46
+ZOIN_WALK_2 47
+ZOIN_WALK_3 48
+ZOIN_WALK_4 49
+ZOIN_WALK_5 50
+ZOIN_WALK_6 51

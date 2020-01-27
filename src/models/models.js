@@ -65,6 +65,26 @@ const models = [
   "min/attackA_3",
   "min/attackA_4",
   "min/attackA_5",
+  "zoin/idle_0",
+  "zoin/idle_1",
+  "zoin/idle_2",
+  "zoin/idle_3",
+  "zoin/idle_4",
+  "zoin/attackA_0",
+  "zoin/attackA_1",
+  "zoin/attackA_2",
+  "zoin/attackA_3",
+  "zoin/attackA_4",
+  "zoin/attackA_5",
+  "zoin/attackA_6",
+  "zoin/walk_0",
+  "zoin/walk_1",
+  "zoin/walk_2",
+  "zoin/walk_3",
+  "zoin/walk_4",
+  "zoin/walk_5",
+  "zoin/walk_6",
+
 ].map(load);
 
 module.exports = {
