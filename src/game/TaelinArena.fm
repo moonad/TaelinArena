@@ -197,7 +197,7 @@ stanci : GameObject
   let hp = 90
   let pos = v3(64, 0, 0)
   let spd = 0
-  let dir = v3(-1, 0, 0)
+  let dir = v3(1, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
   let ani = anim(0, 0)
@@ -208,7 +208,7 @@ neelix : GameObject
   let hp = 700
   let pos = v3(-64, 0, 0)
   let spd = 0
-  let dir = v3(-1, 0, 0)
+  let dir = v3(-1, -1, 0)
   let vel = v3(0, 0, 0)
   let box = v3(6,6,6)
   let box = circbox(8)
@@ -220,7 +220,7 @@ belanna : GameObject
   let hp = 80
   let pos = v3(0, 64, 0)
   let spd = 0
-  let dir = v3(-1, 0, 0)
+  let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
   let ani = anim(0, 0)
@@ -281,7 +281,7 @@ exec_game_action(action: GameAction, gm: Game) : Game
         if len_v3(action.dir) .==. 0 then
           (old_spd) => 0
         else
-          (old_spd) => 4
+          (old_spd) => 6
       // Modify the object using the logic above
       let obj = mut_object_dir(dir_fn, obj)
       let obj = mut_object_spd(spd_fn, obj)
@@ -292,7 +292,7 @@ exec_game_action(action: GameAction, gm: Game) : Game
   | game_mrgt => gm
   | game_key0 =>
     let fn = (obj) =>
-      mut_object_pos(mut_x((x) => x .+. 10), obj)
+      mut_object_ani((a) => anim(1, 0), obj)
     modify_object_by_id(action.id, fn, gm)
   | game_key1 => gm
   | game_key2 => gm
@@ -333,7 +333,20 @@ exec_game_turn(gm: Game) : Game
     let new_box = obj.box
     let new_ani =
       case obj.ani
-      | anim => anim(obj.ani.id, obj.ani.tik .+. 1)
+      | anim =>
+        let id  = obj.ani.id
+        let tik = obj.ani.tik
+        let new_id = 
+          if (id .==. 1) .&. (tik .==. 5) then
+            0
+          else
+            id
+        let new_tik =
+          if (id .==. 1) .&. (tik .==. 5) then
+            0
+          else
+            tik .+. 1
+        anim(new_id, new_tik)
     let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
     let trg_pos = v3(0,64,0)
     let new_obj = game_object(
@@ -347,8 +360,18 @@ exec_game_turn(gm: Game) : Game
 get_object_model_id(obj: GameObject) : Number 
   case obj | game_object =>
   case obj.ani | anim =>
-  ((obj.ani.tik ./. 3) .>>>. 0) .%. 4
-
+  if obj.id .==. 0 then
+    // idle/walk
+    if obj.ani.id .==. 0 then
+      if (obj.spd .<. 0.1) then
+        MIN_IDLE_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 3
+      else
+        MIN_RUN_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 5
+    // attack
+    else
+      MIN_ATTACKA_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 6
+  else
+    SIMPLAO_IDLE1 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 4
 
 SIMPLAO_IDLE1 0
 SIMPLAO_IDLE2 1
@@ -369,3 +392,17 @@ SIMPLAO_PODER4 15
 SIMPLAO_PODER5 16
 SIMPLAO_PODER6 17
 SIMPLAO_PODER7 18
+MIN_IDLE_0 19
+MIN_IDLE_1 20
+MIN_IDLE_2 21
+MIN_RUN_0 22
+MIN_RUN_1 23
+MIN_RUN_2 24
+MIN_RUN_3 25
+MIN_RUN_4 26
+MIN_ATTACKA_0 27
+MIN_ATTACKA_1 28
+MIN_ATTACKA_2 29
+MIN_ATTACKA_3 30
+MIN_ATTACKA_4 31
+MIN_ATTACKA_5 32

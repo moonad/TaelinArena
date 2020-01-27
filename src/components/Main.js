@@ -1,4 +1,4 @@
-const DEBUG_LOCAL = true;
+const DEBUG_LOCAL = false;
 
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
@@ -32,6 +32,7 @@ class Main extends Component {
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
+    this.login();
     if (DEBUG_LOCAL) {
       this.game_id = -1;
       this.game_turns = [];
@@ -56,11 +57,14 @@ class Main extends Component {
       || pad.x !== this.pad.x
       || pad.y !== this.pad.y)) {
       this.pad = pad;
-      var px = Math.floor((pad.x+1)/2*14).toString(16);
-      var py = Math.floor((pad.y+1)/2*14).toString(16);
+      var pl = Math.sqrt(pad.x*pad.x + pad.y*pad.y);
+      var px = pad.x / (pl || 1);
+      var py = pad.y / (pl || 1);
+      var px = Math.floor((px+1)/2*14).toString(16);
+      var py = Math.floor((py+1)/2*14).toString(16);
       var act = "0" + px + py;
     }
-    if (this.game_id && this.key.j) {
+    if (this.game_id && this.key[" "]) {
       var act = "4";
     }
     if (act) {
@@ -68,7 +72,7 @@ class Main extends Component {
         var action = TA.parse_turns("11"+act+"0")[0][0];
         this.exec_action(action);
       } else {
-        this.peer.send("$"+act);
+        this.say("$"+act);
       }
     }
   }
@@ -132,7 +136,11 @@ class Main extends Component {
         break;
       }
     } else {
-      this.peer.send(msg);
+      try {
+        this.peer.send(msg);
+      } catch (e) {
+        console.log("peer.send error:", e);
+      }
     }
   }
   componentDidMount() {
@@ -145,13 +153,6 @@ class Main extends Component {
     this.peer.on('error', err => console.log('error', err))
     this.peer.on('signal', data => post("answer", {name,data}));
     this.peer.on('connect', () => {});
-    //peer.on('data', data => console.log(""+data));
-
-    // Set nick to SrPx (for debugging)
-    setTimeout(() => {
-      this.peer.send("+SrPx");
-    }, 2000);
-
 
     // Appends canvox to body
     document.body.appendChild(this.canvox);
@@ -199,7 +200,7 @@ class Main extends Component {
         var turn = ("00000000"+turn).slice(-8);
         var game = this.game_id.toString(16);
         var game = ("00000000"+game).slice(-8);
-        this.peer.send("?"+turn+game);
+        this.say("?"+turn+game);
       }
     }, 1000);
 
@@ -243,6 +244,43 @@ class Main extends Component {
     this.game_state = TA.new_game;
     this.forceUpdate();
   }
+  login(pvt) {
+    if (!pvt) {
+      var key = "taelin_arena_private_key";
+      pvt = localStorage.getItem(key);
+    }
+    if (pvt && (pvt.length === 66 || pvt.length === 64)) {
+      localStorage.setItem("taelin_arena_private_key", pvt);
+      this.wlet = new ethers.Wallet(pvt);
+      this.name = "logging...";
+      this.forceUpdate();
+      post("name_of", {addr: this.wlet.address})
+        .then((res) => {
+          if (res.ctr === "ok") {
+            this.name = res.name;
+            // TODO: proper signatures
+            for (let t = 125; t <= 4000; t *= 2) {
+              setTimeout(() => this.say("+"+this.name), t);
+            }
+            this.forceUpdate();
+          }
+        });
+    }
+  }
+  logout() {
+    var key = "taelin_arena_private_key";
+    localStorage.setItem(key, "");
+    this.wlet = null;
+    this.name = null;
+    this.forceUpdate();
+  }
+  //try_login() {
+    //var key = "taelin_arena_private_key";
+    //var pvt = localStorage.setItem(key);
+    //if (pvt && pvt.length === 66 || pvt.length === 64) {
+      //this.login(pvt);
+    //}
+  //}
   render() {
     if (this.modal) {
       return this.modal;
@@ -278,9 +316,7 @@ class Main extends Component {
       var top_rgt = h("div", {
         onClick: () => {
           if (confirm("Clique OK para deslogar.")) {
-            this.wlet = null;
-            this.name = null;
-            this.forceUpdate();
+            this.logout();
           }
         },
         style: {
@@ -296,18 +332,8 @@ class Main extends Component {
       }, [
         button("Logar", () => {
           var pvt = prompt("Digite sua chave privada:");
-          if (pvt && pvt.length===66 || pvt.length===64) {
-            this.wlet = new ethers.Wallet(pvt);
-            this.name = "anonymous";
-            this.forceUpdate();
-            post("name_of", {addr: this.wlet.address})
-              .then((res) => {
-                if (res.ctr === "ok") {
-                  this.name = res.name;
-                  this.say("+"+this.name); // TODO: sign
-                  this.forceUpdate();
-                }
-              });
+          if (pvt && (pvt.length===66 || pvt.length===64)) {
+            this.login(pvt);
           } else {
             alert("Tá errado isso ae. Você não guardou né?");
           }
@@ -316,10 +342,9 @@ class Main extends Component {
         button("Registrar", () => {
           this.modal = h(Register, {
             on_done: ({name,wlet}) => {
-              this.wlet = wlet;
-              this.name = name;
               this.modal = null;
-              this.forceUpdate();
+              this.login(wlet.privateKey);
+              //this.forceUpdate();
             }
           });
           this.forceUpdate();

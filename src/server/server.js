@@ -8,7 +8,7 @@ var fs = require("fs").promises;
 var path = require("path");
 var ethers = require("ethers");
 var FPS = 24;
-var MAX_TURNS = FPS * 60 * 1;
+var MAX_TURNS = FPS * 60 * 10;
 
 // Simple fs database
 var get_str = async (key) => {
@@ -99,7 +99,7 @@ function get_player_id(name, game) {
   }
   for (var j = 0; j < game.teams.rgt.length; ++j) {
     if (game.teams.rgt[j] === name) {
-      return i + j;
+      return game.teams.lft.length + j;
     }
   }
   return null;

@@ -51,6 +51,20 @@ const models = [
   "simplao/poder5",
   "simplao/poder6",
   "simplao/poder7",
+  "min/idle_0",
+  "min/idle_1",
+  "min/idle_2",
+  "min/run_0",
+  "min/run_1",
+  "min/run_2",
+  "min/run_3",
+  "min/run_4",
+  "min/attackA_0",
+  "min/attackA_1",
+  "min/attackA_2",
+  "min/attackA_3",
+  "min/attackA_4",
+  "min/attackA_5",
 ].map(load);
 
 module.exports = {
