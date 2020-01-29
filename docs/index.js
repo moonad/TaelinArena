@@ -8796,16 +8796,16 @@ class Main extends Component {
 
         // Moves camera with mouse
         var cam_dir = {x:0, y:0};
-        if (this.mouse.x <= 0) {
+        if (this.mouse.x <= 16) {
           cam_dir.x = -6;
-        } else if (this.mouse.x >= window.innerWidth - 1) {
+        } else if (this.mouse.x >= window.innerWidth-16) {
           cam_dir.x = 6;
         } else {
           cam_dir.x = 0;
         }
-        if (this.mouse.y <= 0) {
+        if (this.mouse.y <= 16) {
           cam_dir.y = 6;
-        } else if (this.mouse.y >= window.innerHeight - 1) {
+        } else if (this.mouse.y >= window.innerHeight-16) {
           cam_dir.y = -6;
         } else {
           cam_dir.y = 0;
@@ -8876,9 +8876,18 @@ class Main extends Component {
     };
     window.onmouseout = (e) => {
       this.set_mouse_pos(e.clientX, e.clientY);
+      this.mouse_out_timeout = setTimeout(() => {
+        this.set_mouse_pos({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2});
+      }, 250);
     };
     window.onmousein = (e) => {
       this.set_mouse_pos(e.clientX, e.clientY);
+      if (this.mouse_out_timeout) {
+        clearTimeout(this.mouse_out_timeout);
+        this.mouse_out_timeout = null;
+      }
     };
 
     // Pools list of game
