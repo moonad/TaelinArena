@@ -7,7 +7,7 @@ const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
 const SimplePeer = require("simple-peer");
-const FPS = 36;
+const FPS = 60;
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -29,7 +29,9 @@ class Main extends Component {
     this.game_list = [];
     this.chat_msgs = [];
     this.keyboard = {};
-    this.mouse = {x:0,y:0};
+    this.pointer = {x:0,y:0}; // game position
+    this.mouse = {x:0,y:0}; // window position
+    this.cam_pos = {x:0,y:0};
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
@@ -46,8 +48,8 @@ class Main extends Component {
   }
   emit_keys() {
     let keyboard = this.keyboard;
-    let mouse = this.mouse;
-    var action_code = TA.make_action_code(keyboard, mouse);
+    let pointer = this.pointer;
+    var action_code = TA.make_action_code(keyboard,pointer);
     if (action_code && DEBUG_LOCAL) {
       var pa = TA.parse_player_action("1"+action_code)[1];
       var gs = this.game_state;
@@ -76,7 +78,10 @@ class Main extends Component {
     var front = {x:0, y:cos, z:-sin};
     var right = {x:1, y:0, z:0};
     var down = {x:0, y:-sin, z:-cos};
-    var pos = {x:0,y:-2048*cos,z:2048*sin};
+    var pos_x = this.cam_pos.x;
+    var pos_y = this.cam_pos.y - 2048*cos;
+    var pos_z = 2048*sin;
+    var pos = {x:pos_x, y:pos_y, z:pos_z};
     return {
       pos   : pos, // center pos
       ang   : ang,
@@ -87,6 +92,17 @@ class Main extends Component {
       port  : {x:W, y:H}, // browser size
       res   : 1.0, // rays_per_pixel = res^2
     };
+  }
+  set_mouse_pos(client_x, client_y) {
+    this.mouse = {x: client_x, y: client_y};
+    var c = this.make_cam();
+    var u = c.size.x / c.port.x;
+    var v = c.size.y / c.port.y / Math.cos(c.ang);
+    var i = (+this.mouse.x - Math.floor(c.port.x*0.5));
+    var j = (-this.mouse.y + Math.floor(c.port.y*0.5));
+    var x = this.cam_pos.x + i * u;
+    var y = this.cam_pos.y + j * v;
+    this.pointer = {x, y};
   }
   post(msg) {
     if (msg[0] === "/") {
@@ -187,14 +203,44 @@ class Main extends Component {
       //this.emit_keys();
       e.preventDefault();
     };
-    document.body.onmousemove = (e) => {
+    const set_mouse_pos = (client_x, client_y) => {
       var c = this.make_cam();
       var u = c.size.x / c.port.x;
       var v = c.size.y / c.port.y / Math.cos(c.ang);
-      var x = (+e.clientX - Math.floor(c.port.x * 0.5)) * u;
-      var y = (-e.clientY + Math.floor(c.port.y * 0.5)) * v;
-      this.mouse = {x, y};
+      var x = this.cam_pos.x
+            + (+client_x - Math.floor(c.port.x * 0.5)) * u;
+      var y = this.cam_pos.y
+            + (-client_y + Math.floor(c.port.y * 0.5)) * v;
+      this.pointer = {x, y};
     };
+    window.onmousemove = (e) => {
+      this.set_mouse_pos(e.clientX, e.clientY);
+    };
+    window.onmouseout = (e) => {
+      this.set_mouse_pos(e.clientX, e.clientY);
+    };
+    window.onmousein = (e) => {
+      this.set_mouse_pos(e.clientX, e.clientY);
+    };
+    setInterval(() => {
+      var cam_dir = {x:0, y:0};
+      if (this.mouse.x <= 0) {
+        cam_dir.x = -6;
+      } else if (this.mouse.x >= window.innerWidth - 1) {
+        cam_dir.x = 6;
+      } else {
+        cam_dir.x = 0;
+      }
+      if (this.mouse.y <= 0) {
+        cam_dir.y = 6;
+      } else if (this.mouse.y >= window.innerHeight - 1) {
+        cam_dir.y = -6;
+      } else {
+        cam_dir.y = 0;
+      }
+      this.cam_pos.x += cam_dir.x;
+      this.cam_pos.y += cam_dir.y;
+    }, 1000/30);
 
     // Pools list of game
     const pool_game_list = () => {
