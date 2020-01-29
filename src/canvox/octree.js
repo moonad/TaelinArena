@@ -271,15 +271,15 @@ module.exports = {
 };
 
 
-var oct = module.exports;
-var tree = oct.empty();
-for (var k = -8; k < 8; ++k) {
-  for (var j = -8; j < 8; ++j) {
-    for (var i = -8; i < 8; ++i) {
-      oct.insert(i,j,k,0xFF,tree);
-    }
-  }
-}
+//var oct = module.exports;
+//var tree = oct.empty();
+//for (var k = -8; k < 8; ++k) {
+  //for (var j = -8; j < 8; ++j) {
+    //for (var i = -8; i < 8; ++i) {
+      //oct.insert(i,j,k,0xFF,tree);
+    //}
+  //}
+//}
 
 //console.log(oct.march(-1000,0,0,1,0,0,tree));
 //console.log(oct.march(1000,0,0,-1,0,0,tree));

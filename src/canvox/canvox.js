@@ -1,4 +1,4 @@
-const oct = require("./octree.js");
+const oct = require("./octree.js"); 
 
 function build_voxel_octree(voxels) {
   var tree = oct.empty();
@@ -60,7 +60,7 @@ module.exports = function canvox(opts = {}) {
   // CPU MODE
   if (mode === "CPU") {
     var context = canvas.getContext("2d");
-    canvas.draw = ({voxels, cam}) => {
+    canvas.draw = ({voxels, stage, cam}) => {
       // Camera and viewport
       var cam = setup_cam(cam);
 
@@ -70,10 +70,14 @@ module.exports = function canvox(opts = {}) {
       canvas.style.width = cam.port.x + "px";
       canvas.style.height = cam.port.y + "px";
       if (!canvas.image_data) {
-        canvas.image_data = context.getImageData(0, 0, canvas.width, canvas.height);
-        canvas.image_buf = new ArrayBuffer(canvas.image_data.data.length);
-        canvas.image_u8 = new Uint8ClampedArray(canvas.image_buf);
-        canvas.image_u32 = new Uint32Array(canvas.image_buf);
+        canvas.image_data = context.getImageData(
+          0, 0, canvas.width, canvas.height);
+        canvas.image_buf = new ArrayBuffer(
+          canvas.image_data.data.length);
+        canvas.image_u8 = new Uint8ClampedArray(
+          canvas.image_buf);
+        canvas.image_u32 = new Uint32Array(
+          canvas.image_buf);
       }
 
       // Builds voxel octree
@@ -102,10 +106,31 @@ module.exports = function canvox(opts = {}) {
           var ray_dir_z = cam.front.z;
 
           // Performs the march
-          var hit = oct.march(
+          var hit1 = oct.march(
             ray_pos_x, ray_pos_y, ray_pos_z,
             ray_dir_x, ray_dir_y, ray_dir_z,
             tree);
+          if (stage) {
+            var hit2 = oct.march(
+              ray_pos_x, ray_pos_y, ray_pos_z,
+              ray_dir_x, ray_dir_y, ray_dir_z,
+              stage);
+            if (hit2.ctr === oct.HIT) {
+              var dist1 = 0;
+              var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
+              var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
+              var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
+              var dist2 = 0;
+              var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
+              var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
+              var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
+              var hit = dist1 < dist2 ? hit1 : hit2;
+            } else {
+              var hit = hit1;
+            }
+          } else {
+            var hit = hit1;
+          }
 
           // Renders to screen
           var j = Math.floor((scr_pos_y+1)/2*(cam.size.y*cam.res));
@@ -140,12 +165,14 @@ module.exports = function canvox(opts = {}) {
 
     var vertex_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,
+      new Float32Array(vertices), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     var index_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(indices), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
     // Vertex shader source code
@@ -176,7 +203,8 @@ module.exports = function canvox(opts = {}) {
       uniform vec3 cam_front;
       uniform vec2 scr_siz;
 
-      uniform sampler2D octree;
+      uniform sampler2D voxels;
+      uniform sampler2D stage;
 
       const float inf = 65536.0;
       const float eps = 0.0009765625;
@@ -200,7 +228,11 @@ module.exports = function canvox(opts = {}) {
         }
       }
 
-      float intersect(vec3 ray_pos, vec3 ray_dir, vec3 box_pos, vec3 box_siz) {
+      float intersect(
+        vec3 ray_pos,
+        vec3 ray_dir,
+        vec3 box_pos,
+        vec3 box_siz) {
         vec3 box_min = box_pos - box_siz * 0.5;
         vec3 box_max = box_pos + box_siz * 0.5;
         float t1 = div(box_min.x - ray_pos.x, ray_dir.x, -inf);
@@ -332,7 +364,16 @@ module.exports = function canvox(opts = {}) {
         //ray_dir = vec3(0.0, 1.0, 0.0);
 
         // Marches towards octree
-        Hit hit = march(ray_pos, ray_dir, octree);
+        Hit hit1 = march(ray_pos, ray_dir, voxels);
+        Hit hit2 = march(ray_pos, ray_dir, stage);
+        float dist1 = distance(hit1.pos, ray_pos);
+        float dist2 = distance(hit2.pos, ray_pos);
+        Hit hit;
+        if (hit2.ctr == HIT && dist1 > dist2) {
+          hit = hit2;
+        } else {
+          hit = hit1;
+        }
 
         // If it hit a voxel, draw it
         if (hit.ctr == HIT) {
@@ -355,13 +396,13 @@ module.exports = function canvox(opts = {}) {
     gl.compileShader(fragShader);
 
     var compiled = gl.getShaderParameter(vertShader, gl.COMPILE_STATUS);
-    //console.log('Shader compiled successfully: ' + compiled);
+    console.log('Shader compiled successfully: ' + compiled);
     var compilationLog = gl.getShaderInfoLog(vertShader);
-    //console.log('Shader compiler log: ' + compilationLog);
+    console.log('Shader compiler log: ' + compilationLog);
     var compiled = gl.getShaderParameter(fragShader, gl.COMPILE_STATUS);
-    //console.log('Shader compiled successfully: ' + compiled);
+    console.log('Shader compiled successfully: ' + compiled);
     var compilationLog = gl.getShaderInfoLog(fragShader);
-    //console.log('Shader compiler log: ' + compilationLog);
+    console.log('Shader compiler log: ' + compilationLog);
 
     var shader = gl.createProgram();
     gl.attachShader(shader, vertShader);
@@ -369,21 +410,36 @@ module.exports = function canvox(opts = {}) {
     gl.linkProgram(shader);
     gl.useProgram(shader);
 
-    // ======= Input texture =======
+    // ======= Voxels texture =======
 
-    var texture = gl.createTexture();
+    var voxels_texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 2048, 2048, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindTexture(gl.TEXTURE_2D, voxels_texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+      2048, 2048, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.uniform1i(gl.getUniformLocation(shader, "octree"), texture);
+    gl.uniform1i(gl.getUniformLocation(shader, "voxels"), 0);
 
-    // ======= Octree data buffer =======
+    // ======= Stage texture =======
+
+    var stage_texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, stage_texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+      2048, 2048, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.uniform1i(gl.getUniformLocation(shader, "stage"), 1);
+
+    // ======= data buffer =======
     
-    var octree_buffer = new Uint32Array(2048*2048);
+    var transfer_buffer_u32 = new Uint32Array(2048*2048);
+    var transfer_buffer_u8 = new Uint8Array(transfer_buffer_u32.buffer);
 
     // ======= Associating shaders to buffer objects =======
 
@@ -396,7 +452,7 @@ module.exports = function canvox(opts = {}) {
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0); 
     gl.enableVertexAttribArray(coord);
       
-    canvas.draw = function({voxels, cam}) {
+    canvas.draw = function({voxels, stage, cam}) {
       var cam = setup_cam(cam);
 
       // Canvas setup
@@ -408,20 +464,26 @@ module.exports = function canvox(opts = {}) {
       canvas.style.width = cam.port.x + "px";
       canvas.style.height = cam.port.y + "px";
 
-      // Builds voxel octree
+      // Builds voxels octree and uploads to GPU
       var tree = build_voxel_octree(voxels);
-
-      // Copies data to octree buffer
       for (var i = 0; i < tree.length; ++i) {
-        octree_buffer[i] = tree[i] >>> 0;
+        transfer_buffer_u32[i] = tree[i] >>> 0;
       }
+      var size = [2048, Math.ceil(tree.length/2048)];
+      gl.activeTexture(gl.TEXTURE0);
+      gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,...size,
+        gl.RGBA, gl.UNSIGNED_BYTE, transfer_buffer_u8);
 
-      // Uploads octree to GPU
-      var buff = new Uint8Array(octree_buffer.buffer);
-      var size = [2048, 2048];
-      gl.texSubImage2D(
-        gl.TEXTURE_2D, 0, 0,0, ...size,
-        gl.RGBA, gl.UNSIGNED_BYTE, buff);
+      // Uploads stage octree to GPU
+      if (stage && !canvox.__uploaded_stage__) {
+        for (var i = 0; i < stage.length; ++i) {
+          transfer_buffer_u32[i] = stage[i] >>> 0;
+        }
+        gl.activeTexture(gl.TEXTURE1);
+        gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,2048,2048,
+          gl.RGBA, gl.UNSIGNED_BYTE, transfer_buffer_u8);
+        canvox.__uploaded_stage__ = true;
+      }
 
       // Uploads camera to GPU
       gl.uniform3fv(

@@ -130,10 +130,22 @@ class Main extends Component {
 
     // Appends canvox to body
     document.body.appendChild(this.canvox);
+    this.fps_last = Date.now();
+    this.fps_tick = 0; 
     this.render_loop = setInterval(() => {
       if (this.game_id) {
+        ++this.fps_tick;
+        if (Date.now() > this.fps_last + 1000) {
+          console.log("fps:", this.fps_tick);
+          this.fps_tick = 0;
+          this.fps_last = Date.now();
+        }
         //console.log(this.game_state);
-        TA.render_game(this.game_state, this.canvox);
+        TA.render_game({
+          game: this.game_state,
+          canvox: this.canvox,
+          cam: this.make_cam()
+        });
       }
     }, 1000/FPS);
 
@@ -397,7 +409,7 @@ class Main extends Component {
       this.game_id
         ? null
         : h(Chat, {
-          on_say: msg => this.say(msg),
+          on_say: msg => this.post(msg),
           msgs: this.chat_msgs,
         }),
       this.game_id

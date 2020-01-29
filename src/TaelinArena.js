@@ -1,4 +1,5 @@
 const TA = require("./game/TaelinArena.fm");
+const oct = require("./canvox/octree.js");
 const {models} = require("./models/models.js");
 
 const now = (() => {
@@ -6,8 +7,19 @@ const now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
+var stage = oct.empty();
+for (var y = -512; y < 512; ++y) {
+  for (var x = -512; x < 512; ++x) {
+    if (((x+2048) / 32) % 2 < 1) {
+      oct.insert(x,y,-32,0xFF2F9C63,stage);
+    } else {
+      oct.insert(x,y,-32,0xFF4FAC63,stage);
+    }
+  }
+}
+
 // Renders the game state to screen using the canvox library
-function render_game(game, canvox) {
+function render_game({game, canvox, cam}) {
   // Gets the current time
   var T = now();
 
@@ -81,7 +93,7 @@ function render_game(game, canvox) {
     }
   })(game);
 
-  canvox.draw({voxels});
+  canvox.draw({voxels, stage, cam});
 };
 
 // Turns ::=
