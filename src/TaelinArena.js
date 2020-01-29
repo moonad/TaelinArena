@@ -121,8 +121,8 @@ function parse_player_action(code, idx=0) {
     var pos_y_a = parseInt(code[idx+5],16);
     var pos_y_b = parseInt(code[idx+6],16);
     var pos_y_c = parseInt(code[idx+7],16);
-    var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
-    var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+    var pos_x = ((pos_x_a<<8)|(pos_x_b<<4)|pos_x_c)-2048;
+    var pos_y = ((pos_y_a<<8)|(pos_y_b<<4)|pos_y_c)-2048;
     return [idx+8, {
       player,
       action: "KEY"+"012345"[action-1],
@@ -206,8 +206,8 @@ function make_action_code(keyboard, mouse) {
   if (key0 || key1 || key2 || key3 || key4 || key5) {
     var mx = mouse.x;
     var my = mouse.y;
-    var mx = Math.max(Math.min(mx, 2048), 0);
-    var my = Math.max(Math.min(my, 2048), 0);
+    var mx = Math.max(Math.min(mx+2048, 4096), 0);
+    var my = Math.max(Math.min(my+2048, 4096), 0);
     var mx = ("000"+Math.floor(mx).toString(16)).slice(-3);
     var my = ("000"+Math.floor(my).toString(16)).slice(-3);
     var ct = key0 ? "1"

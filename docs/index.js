@@ -4931,7 +4931,7 @@ module.exports = (function(){
   var _TaelinArena$map_game_objects = (_0=>(_1=>_TaelinArena$game(_Extra$map_list(_0)(_TaelinArena$get_game_map(_1)))));
   var _TaelinArena$modify_object_by_id = (_0=>(_1=>(_2=>_TaelinArena$game(_Extra$map_list((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>((_4===_0? 1 : 0)?_1(_3):_3))))))))))))(_TaelinArena$get_game_map(_2))))));
   var _Geometry$len_v3 = (_13=>_13((_14=>(_15=>(_16=>((((0+(_14*_14))+(_15*_15))+(_16*_16))**0.5))))));
-  var _TaelinArena$exec_game_action = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>((_5===3? 1 : 0)?3:6))))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)))))))))))))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_TaelinArena$mut_object_ani((_5=>_TaelinArena$anim(1)(0)))(_4)))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))));
+  var _TaelinArena$exec_game_action = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>((_5===3? 1 : 0)?3:6))))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)))))))))))))(_1))))((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)(_TaelinArena$mut_object_pos((_4=>_3)))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_TaelinArena$mut_object_ani((_5=>_TaelinArena$anim(1)(0)))(_4)))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))));
   var _Geometry$sqrdist_v3 = (_22=>(_23=>_22((_24=>(_25=>(_26=>_23((_27=>(_28=>(_29=>(((0+((_24-_27)**2))+((_25-_28)**2))+((_26-_29)**2))))))))))));
   var _Geometry$dist_v3 = (_20=>(_21=>(_Geometry$sqrdist_v3(_20)(_21)**0.5)));
   var _Geometry$add_v3 = (_21=>(_22=>_21((_23=>(_24=>(_25=>_22((_26=>(_27=>(_28=>_Geometry$v3((_23+_26))((_24+_27))((_25+_28))))))))))));
@@ -8346,6 +8346,7 @@ class Main extends Component {
     var pos = {x:0,y:-2048*cos,z:2048*sin};
     return {
       pos   : pos, // center pos
+      ang   : ang,
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
@@ -8427,21 +8428,27 @@ class Main extends Component {
         this.emit_keys();
       }
     };
-    document.body.onclick = (e) => {
-      if (e.which === 2 || e.button === 4) {
-        this.keyboard["middle"] = [1,1];
-      } else {
-        this.keyboard["left"] = [1,1];
+    document.body.onmousedown = (e) => {
+      switch (e.which) {
+        case 1: this.keyboard["left"] = [1,1]; break;
+        case 2: this.keyboard["middle"] = [1,1]; break;
+        case 3: this.keyboard["right"] = [1,1]; break;
       }
       this.emit_keys();
     };
     document.body.oncontextmenu = (e) => {
-      this.keyboard["right"] = [1,1];
-      this.emit_keys();
+      //console.log("?????");
+      //this.keyboard["right"] = [1,1];
+      //this.emit_keys();
       e.preventDefault();
     };
     document.body.onmousemove = (e) => {
-      this.mouse = {x: e.clientX, y: e.clientY};
+      var c = this.make_cam();
+      var u = c.size.x / c.port.x;
+      var v = c.size.y / c.port.y / Math.cos(c.ang);
+      var x = (+e.clientX - Math.floor(c.port.x * 0.5)) * u;
+      var y = (-e.clientY + Math.floor(c.port.y * 0.5)) * v;
+      this.mouse = {x, y};
     };
 
     // Pools list of game
@@ -9619,8 +9626,8 @@ function parse_player_action(code, idx=0) {
     var pos_y_a = parseInt(code[idx+5],16);
     var pos_y_b = parseInt(code[idx+6],16);
     var pos_y_c = parseInt(code[idx+7],16);
-    var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
-    var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+    var pos_x = ((pos_x_a<<8)|(pos_x_b<<4)|pos_x_c)-2048;
+    var pos_y = ((pos_y_a<<8)|(pos_y_b<<4)|pos_y_c)-2048;
     return [idx+8, {
       player,
       action: "KEY"+"012345"[action-1],
@@ -9704,8 +9711,8 @@ function make_action_code(keyboard, mouse) {
   if (key0 || key1 || key2 || key3 || key4 || key5) {
     var mx = mouse.x;
     var my = mouse.y;
-    var mx = Math.max(Math.min(mx, 2048), 0);
-    var my = Math.max(Math.min(my, 2048), 0);
+    var mx = Math.max(Math.min(mx+2048, 4096), 0);
+    var my = Math.max(Math.min(my+2048, 4096), 0);
     var mx = ("000"+Math.floor(mx).toString(16)).slice(-3);
     var my = ("000"+Math.floor(my).toString(16)).slice(-3);
     var ct = key0 ? "1"

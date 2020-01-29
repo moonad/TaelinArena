@@ -79,6 +79,7 @@ class Main extends Component {
     var pos = {x:0,y:-2048*cos,z:2048*sin};
     return {
       pos   : pos, // center pos
+      ang   : ang,
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
@@ -160,21 +161,27 @@ class Main extends Component {
         this.emit_keys();
       }
     };
-    document.body.onclick = (e) => {
-      if (e.which === 2 || e.button === 4) {
-        this.keyboard["middle"] = [1,1];
-      } else {
-        this.keyboard["left"] = [1,1];
+    document.body.onmousedown = (e) => {
+      switch (e.which) {
+        case 1: this.keyboard["left"] = [1,1]; break;
+        case 2: this.keyboard["middle"] = [1,1]; break;
+        case 3: this.keyboard["right"] = [1,1]; break;
       }
       this.emit_keys();
     };
     document.body.oncontextmenu = (e) => {
-      this.keyboard["right"] = [1,1];
-      this.emit_keys();
+      //console.log("?????");
+      //this.keyboard["right"] = [1,1];
+      //this.emit_keys();
       e.preventDefault();
     };
     document.body.onmousemove = (e) => {
-      this.mouse = {x: e.clientX, y: e.clientY};
+      var c = this.make_cam();
+      var u = c.size.x / c.port.x;
+      var v = c.size.y / c.port.y / Math.cos(c.ang);
+      var x = (+e.clientX - Math.floor(c.port.x * 0.5)) * u;
+      var y = (-e.clientY + Math.floor(c.port.y * 0.5)) * v;
+      this.mouse = {x, y};
     };
 
     // Pools list of game

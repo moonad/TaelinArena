@@ -291,7 +291,9 @@ exec_game_action(action: GameAction, gm: Game) : Game
       let obj = mut_object_spd(spd_fn, obj)
       obj
     modify_object_by_id(action.id, fn, gm)
-  | game_key0 => gm
+  | game_key0 =>
+    let fn = mut_object_pos((a) => action.pos)
+    modify_object_by_id(action.id, fn, gm)
   | game_key1 => gm
   | game_key2 => gm
   | game_key3 =>
