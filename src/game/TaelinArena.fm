@@ -233,14 +233,14 @@ new_game : Game
 // GAME INPUT
 
 T GameAction
-| game_dpad(id: ObjectId, dir: V3)
-| game_mlft(id: ObjectId, pos: V3)
-| game_mmid(id: ObjectId, pos: V3)
-| game_mrgt(id: ObjectId, pos: V3)
-| game_key0(id: ObjectId)
-| game_key1(id: ObjectId)
-| game_key2(id: ObjectId)
-| game_key3(id: ObjectId)
+| game_sdir(id: ObjectId, dir: V3) // stick direction
+| game_key0(id: ObjectId, pos: V3) // left down
+| game_key1(id: ObjectId, pos: V3) // middle down
+| game_key2(id: ObjectId, pos: V3) // right down
+| game_key3(id: ObjectId, pos: V3) // space down
+| game_key4(id: ObjectId, pos: V3) // extra down
+| game_key5(id: ObjectId, pos: V3) // shift down
+| game_text(id: ObjectId, txt: String) // chat message
 
 // Modifies every object in the game
 map_game_objects(
@@ -267,7 +267,7 @@ modify_object_by_id(
 // Apply an action to the game state
 exec_game_action(action: GameAction, gm: Game) : Game
   case action
-  | game_dpad =>
+  | game_sdir =>
     let fn = (obj) =>
       case obj | game_object =>
       // Change its direction if analog isn't centered
@@ -291,16 +291,16 @@ exec_game_action(action: GameAction, gm: Game) : Game
       let obj = mut_object_spd(spd_fn, obj)
       obj
     modify_object_by_id(action.id, fn, gm)
-  | game_mlft => gm
-  | game_mmid => gm
-  | game_mrgt => gm
-  | game_key0 =>
+  | game_key0 => gm
+  | game_key1 => gm
+  | game_key2 => gm
+  | game_key3 =>
     let fn = (obj) =>
       mut_object_ani((a) => anim(1, 0), obj)
     modify_object_by_id(action.id, fn, gm)
-  | game_key1 => gm
-  | game_key2 => gm
-  | game_key3 => gm
+  | game_key4 => gm
+  | game_key5 => gm
+  | game_text => gm
 
 // Tick-wise interaction of `a` with `b`
 interact_with(this:GameObject, that:GameObject): GameObject

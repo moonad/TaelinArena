@@ -4919,19 +4919,19 @@ module.exports = (function(){
   var _List$HQNc$nil = (_0=>(_1=>_0));
   var _TaelinArena$new_game = _TaelinArena$game(_List$HQNc$cons(_TaelinArena$srpx)(_List$HQNc$cons(_TaelinArena$stanci)(_List$HQNc$cons(_TaelinArena$neelix)(_List$HQNc$cons(_TaelinArena$belanna)(_List$HQNc$nil)))));
   var _TaelinArena$GameAction = undefined;
-  var _TaelinArena$game_dpad = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_2(_0)(_1)))))))))));
-  var _TaelinArena$game_mlft = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_3(_0)(_1)))))))))));
-  var _TaelinArena$game_mmid = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_4(_0)(_1)))))))))));
-  var _TaelinArena$game_mrgt = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_5(_0)(_1)))))))))));
-  var _TaelinArena$game_key0 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_5(_0))))))))));
-  var _TaelinArena$game_key1 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_6(_0))))))))));
-  var _TaelinArena$game_key2 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_7(_0))))))))));
-  var _TaelinArena$game_key3 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>_8(_0))))))))));
+  var _TaelinArena$game_sdir = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_2(_0)(_1)))))))))));
+  var _TaelinArena$game_key0 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_3(_0)(_1)))))))))));
+  var _TaelinArena$game_key1 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_4(_0)(_1)))))))))));
+  var _TaelinArena$game_key2 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_5(_0)(_1)))))))))));
+  var _TaelinArena$game_key3 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_6(_0)(_1)))))))))));
+  var _TaelinArena$game_key4 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_7(_0)(_1)))))))))));
+  var _TaelinArena$game_key5 = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_8(_0)(_1)))))))))));
+  var _TaelinArena$game_text = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_9(_0)(_1)))))))))));
   var _Extra$map_list = (_2=>(_3=>_3(_List$HQNc$nil)((_4=>(_5=>_List$HQNc$cons(_2(_4))(_Extra$map_list(_2)(_5)))))));
   var _TaelinArena$map_game_objects = (_0=>(_1=>_TaelinArena$game(_Extra$map_list(_0)(_TaelinArena$get_game_map(_1)))));
   var _TaelinArena$modify_object_by_id = (_0=>(_1=>(_2=>_TaelinArena$game(_Extra$map_list((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>((_4===_0? 1 : 0)?_1(_3):_3))))))))))))(_TaelinArena$get_game_map(_2))))));
   var _Geometry$len_v3 = (_13=>_13((_14=>(_15=>(_16=>((((0+(_14*_14))+(_15*_15))+(_16*_16))**0.5))))));
-  var _TaelinArena$exec_game_action = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>((_5===3? 1 : 0)?3:6))))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)))))))))))))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>_TaelinArena$modify_object_by_id(_2)((_3=>_TaelinArena$mut_object_ani((_4=>_TaelinArena$anim(1)(0)))(_3)))(_1)))((_2=>_1))((_2=>_1))((_2=>_1))));
+  var _TaelinArena$exec_game_action = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena$mut_object_spd(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>0):(_13=>((_5===3? 1 : 0)?3:6))))(_TaelinArena$mut_object_dir(((_Geometry$len_v3(_3)===0? 1 : 0)?(_13=>_13):(_13=>_3)))(_4)))))))))))))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_TaelinArena$modify_object_by_id(_2)((_4=>_TaelinArena$mut_object_ani((_5=>_TaelinArena$anim(1)(0)))(_4)))(_1))))((_2=>(_3=>_1)))((_2=>(_3=>_1)))((_2=>(_3=>_1)))));
   var _Geometry$sqrdist_v3 = (_22=>(_23=>_22((_24=>(_25=>(_26=>_23((_27=>(_28=>(_29=>(((0+((_24-_27)**2))+((_25-_28)**2))+((_26-_29)**2))))))))))));
   var _Geometry$dist_v3 = (_20=>(_21=>(_Geometry$sqrdist_v3(_20)(_21)**0.5)));
   var _Geometry$add_v3 = (_21=>(_22=>_21((_23=>(_24=>(_25=>_22((_26=>(_27=>(_28=>_Geometry$v3((_23+_26))((_24+_27))((_25+_28))))))))))));
@@ -5038,14 +5038,14 @@ module.exports = (function(){
     'belanna':_TaelinArena$belanna,
     'new_game':_TaelinArena$new_game,
     'GameAction':_TaelinArena$GameAction,
-    'game_dpad':_TaelinArena$game_dpad,
-    'game_mlft':_TaelinArena$game_mlft,
-    'game_mmid':_TaelinArena$game_mmid,
-    'game_mrgt':_TaelinArena$game_mrgt,
+    'game_sdir':_TaelinArena$game_sdir,
     'game_key0':_TaelinArena$game_key0,
     'game_key1':_TaelinArena$game_key1,
     'game_key2':_TaelinArena$game_key2,
     'game_key3':_TaelinArena$game_key3,
+    'game_key4':_TaelinArena$game_key4,
+    'game_key5':_TaelinArena$game_key5,
+    'game_text':_TaelinArena$game_text,
     'map_game_objects':_TaelinArena$map_game_objects,
     'modify_object_by_id':_TaelinArena$modify_object_by_id,
     'exec_game_action':_TaelinArena$exec_game_action,
@@ -8265,7 +8265,7 @@ window.onload = () => {
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const DEBUG_LOCAL = false;
+const DEBUG_LOCAL = true;
 
 const {Component, render} = __webpack_require__(0);
 const h = __webpack_require__(5).h;
@@ -8295,7 +8295,8 @@ class Main extends Component {
     this.game_state = null;
     this.game_list = [];
     this.chat_msgs = [];
-    this.key = {};
+    this.keyboard = {};
+    this.mouse = {x:0,y:0};
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
@@ -8311,54 +8312,26 @@ class Main extends Component {
     }
   }
   emit_keys() {
-    var key_d = this.key.d||0;
-    var key_a = this.key.a||0;
-    var key_w = this.key.w||0;
-    var key_s = this.key.s||0;
-    var pad_x = (key_d||0) - (key_a||0);
-    var pad_y = (key_w||0) - (key_s||0);
-    var pad = {x:pad_x, y:pad_y};
-    var act = null;
-    if (this.game_id
-      && (!this.pad
-      || pad.x !== this.pad.x
-      || pad.y !== this.pad.y)) {
-      this.pad = pad;
-      var pl = Math.sqrt(pad.x*pad.x + pad.y*pad.y);
-      var px = pad.x / (pl || 1);
-      var py = pad.y / (pl || 1);
-      var px = Math.floor((px+1)/2*14).toString(16);
-      var py = Math.floor((py+1)/2*14).toString(16);
-      var act = "0" + px + py;
-    }
-    if (this.game_id && this.key[" "]) {
-      var act = "4";
-    }
-    if (act) {
-      if (DEBUG_LOCAL) {
-        var action = TA.parse_turns("11"+act+"0")[0][0];
-        this.exec_action(action);
-      } else {
-        this.say("$"+act);
+    let keyboard = this.keyboard;
+    let mouse = this.mouse;
+    var action_code = TA.make_action_code(keyboard, mouse);
+    if (action_code && DEBUG_LOCAL) {
+      var pa = TA.parse_player_action("1"+action_code)[1];
+      var gs = this.game_state;
+      this.game_state = TA.exec_player_action(pa, gs);
+    } else if (action_code) {
+      var is_same_code = this.last_code === action_code;
+      var is_sdir_code = action_code[0] === "0";
+      // Prevents repeatedly sending the same SDIR event
+      if (!(is_sdir_code && is_same_code)) {
+        this.post("$"+action_code);
       }
+      this.last_code = action_code;
     }
-  }
-  exec_action(a) {
-    let e = null;
-    switch (a.action) {
-      case "dpad":
-        let x = a.params.dir.x;
-        let y = a.params.dir.y;
-        let d = v3 => v3(x)(y)(0);
-        e = TA.game_dpad(a.player)(d);
-      break;
-      case "key0":
-        e = TA.game_key0(a.player);
-      break;
+    // Sets 'changed' flag to false
+    for (var key in this.keyboard) {
+      this.keyboard[key][0] = 0;
     }
-    var g = this.game_state;
-    var g = TA.exec_game_action(e)(g);
-    this.game_state = g;
   }
   make_cam(cam) {
     var W = window.innerWidth;
@@ -8381,7 +8354,7 @@ class Main extends Component {
       res   : 1.0, // rays_per_pixel = res^2
     };
   }
-  say(msg) {
+  post(msg) {
     if (msg[0] === "/") {
       var args = msg.slice(1).split(" ");
       switch (args[0]) {
@@ -8431,13 +8404,44 @@ class Main extends Component {
     }, 1000/FPS);
 
     // Game inputs
+    const key_name = {
+      "w": "w",
+      "a": "a",
+      "s": "s",
+      "d": "d",
+      "e": "extra",
+      " ": "space",
+      "shift": "shift",
+    };
     document.body.onkeyup = (e) => {
-      this.key[e.key] = 0;
+      var name = key_name[e.key.toLowerCase()];
+      if (name) {
+        this.keyboard[name] = [1,0];
+        this.emit_keys();
+      }
+    };
+    document.body.onkeydown = (e) => {
+      var name = key_name[e.key.toLowerCase()];
+      if (name) {
+        this.keyboard[name] = [1,1];
+        this.emit_keys();
+      }
+    };
+    document.body.onclick = (e) => {
+      if (e.which === 2 || e.button === 4) {
+        this.keyboard["middle"] = [1,1];
+      } else {
+        this.keyboard["left"] = [1,1];
+      }
       this.emit_keys();
     };
-    document.body.onkeypress = (e) => {
-      this.key[e.key] = 1;
+    document.body.oncontextmenu = (e) => {
+      this.keyboard["right"] = [1,1];
       this.emit_keys();
+      e.preventDefault();
+    };
+    document.body.onmousemove = (e) => {
+      this.mouse = {x: e.clientX, y: e.clientY};
     };
 
     // Pools list of game
@@ -8467,7 +8471,7 @@ class Main extends Component {
         var turn = ("00000000"+turn).slice(-8);
         var game = this.game_id.toString(16);
         var game = ("00000000"+game).slice(-8);
-        this.say("?"+turn+game);
+        this.post("?"+turn+game);
       }
     }, 1000);
 
@@ -8479,12 +8483,14 @@ class Main extends Component {
           var game = parseInt(str.slice(1,9), 16);
           var from = parseInt(str.slice(9,17), 16);
           var last = this.game_turns.length;
-          var new_turns = TA.parse_turns(str.slice(17));
+          var new_turns = TA.parse_turns(str.slice(17))[1];
           if (from <= last) {
             for (var i = last-from; i<new_turns.length; ++i) {
               this.game_turns[i+from] = new_turns[i];
               for (var j = 0; j < new_turns[i].length; ++j) {
-                this.exec_action(new_turns[i][j]);
+                let a = new_turns[i][j];
+                let g = this.game_state;
+                this.game_state = TA.exec_player_action(a,g);
               }
               var gs = this.game_state;
               this.game_state = TA.exec_game_turn(gs);
@@ -8527,7 +8533,7 @@ class Main extends Component {
             this.name = res.name;
             // TODO: proper signatures
             for (let t = 125; t <= 4000; t *= 2) {
-              setTimeout(() => this.say("+"+this.name), t);
+              setTimeout(() => this.post("+"+this.name), t);
             }
             this.forceUpdate();
           }
@@ -9498,6 +9504,7 @@ const now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
+// Renders the game state to screen using the canvox library
 function render_game(game, canvox) {
   // Gets the current time
   var T = now();
@@ -9584,74 +9591,172 @@ function render_game(game, canvox) {
 //   | 2: Player1(Action, Turn)
 //   | ... up to 15 ...
 // Action ::=
-//   | 0: dpad(x: 4bit, y: 4bit) 
-//   | 1: mlft(x: 12bit, y: 12bit)
-//   | 2: mmid(x: 12bit, y:12bit)
-//   | 3: mrgt(x: 12bit, y:12bit)
-//   | 4: key0
-//   | 5: key1
-//   | 6: key2
-//   | 7: key3
+//   | 0: stick(x: 4bit, y: 4bit) 
+//   | 1: left(x: 12bit, y: 12bit)
+//   | 2: middle(x: 12bit, y:12bit)
+//   | 3: right(x: 12bit, y:12bit)
+//   | 4: space(x: 12bit, y:12bit)
+//   | 5: shift(x: 12bit, y:12bit)
+//   | 6: extra(x: 12bit, y:12bit)
+//   | 7: text(...TODO...)
 
-function parse_turns(code) {
+// Parses a player action code into an object
+function parse_player_action(code, idx=0) {
+  var player = parseInt(code[idx],16) - 1;
+  var action = parseInt(code[idx+1],16);
+  if (action === 0) {
+    var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
+    var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
+    return [idx+4, {
+      player,
+      action: "SDIR",
+      params: {dir: {x: dir_x, y: dir_y}}
+    }];
+  } else if (action >= 1 && action <= 6) {
+    var pos_x_a = parseInt(code[idx+2],16);
+    var pos_x_b = parseInt(code[idx+3],16);
+    var pos_x_c = parseInt(code[idx+4],16);
+    var pos_y_a = parseInt(code[idx+5],16);
+    var pos_y_b = parseInt(code[idx+6],16);
+    var pos_y_c = parseInt(code[idx+7],16);
+    var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
+    var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+    return [idx+8, {
+      player,
+      action: "KEY"+"012345"[action-1],
+      params: {pos: {x: pos_x, y: pos_y}}
+    }];
+  } else {
+    return [idx+2, {
+      player,
+      action: "TEXT",
+      string: ""
+    }];
+  };
+}
+
+// Parses a player turn code into an array of player actions
+function parse_turn(code, idx=0) {
+  var turn = [];
+  while (idx < code.length) {
+    if (code[idx] === "0") {
+      idx += 1;
+      break;
+    } else {
+      var [idx,plr_act] = parse_player_action(code,idx);
+      turn.push(plr_act);
+    }
+  };
+  return [idx, turn];
+};
+
+// Parses a list of player turns
+function parse_turns(code, idx=0) {
   var turns = [];
-  var idx = 0;
   while (idx < code.length) {
     if (code[idx] === "0") {
       break;
     } else {
       idx += 1;
-      var turn = [];
-      while (idx < code.length) {
-        if (code[idx] === "0") {
-          idx += 1;
-          break;
-        } else {
-          var player = parseInt(code[idx],16) - 1;
-          var action = parseInt(code[idx+1],16);
-          if (action === 0) {
-            var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
-            var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
-            turn.push({
-              player,
-              action: "dpad",
-              params: {dir: {x: dir_x, y: dir_y}}
-            });
-            idx += 4;
-          } else if (action >= 1 && action <= 3) {
-            var pos_x_a = parseInt(code[idx+2],16);
-            var pos_x_b = parseInt(code[idx+3],16);
-            var pos_x_c = parseInt(code[idx+4],16);
-            var pos_y_a = parseInt(code[idx+5],16);
-            var pos_y_b = parseInt(code[idx+6],16);
-            var pos_y_c = parseInt(code[idx+7],16);
-            var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
-            var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
-            turn.push({
-              player,
-              action: ["mlft","mmid","mrgt"][action-1],
-              params: {pos: {x: pos_x, y: pos_y}}
-            });
-            idx += 8;
-          } else {
-            turn.push({
-              player,
-              action: "key" + (action - 4)
-            });
-            idx += 2;
-          };
-        }
-      };
+      var [idx, turn] = parse_turn(code, idx);
       turns.push(turn);
     }
   };
-  return turns;
+  return [idx, turns];
 };
+
+// Makes a player action code from keyboard/mouse states
+function make_action_code(keyboard, mouse) {
+  function changed(name) {
+    return keyboard[name] ? keyboard[name][0] : 0;
+  };
+  function state(name) {
+    return keyboard[name] ? keyboard[name][1] : 0;
+  };
+  function pressed(name) {
+    return changed(name) && state(name) ? 1 : 0;
+  };
+
+  // WASD events take precedence
+  let keyW = changed("w");
+  let keyA = changed("a");
+  let keyS = changed("s");
+  let keyD = changed("d");
+  if (keyW || keyA || keyS || keyD) {
+    var pad_x = state("d") - state("a");
+    var pad_y = state("w") - state("s");
+    var pad = {x: pad_x, y: pad_y};
+    var pl = Math.sqrt(pad.x**2 + pad.y**2) || 1;
+    var px = pad.x / pl;
+    var py = pad.y / pl;
+    var px = Math.floor((px+1)/2*14).toString(16);
+    var py = Math.floor((py+1)/2*14).toString(16);
+    return "0" + px + py;
+  }
+
+  // Otherwise, check for action keys
+  var key0 = pressed("left");
+  var key1 = pressed("middle");
+  var key2 = pressed("right");
+  var key3 = pressed("space");
+  var key4 = pressed("shift");
+  var key5 = pressed("extra");
+  if (key0 || key1 || key2 || key3 || key4 || key5) {
+    var mx = mouse.x;
+    var my = mouse.y;
+    var mx = Math.max(Math.min(mx, 2048), 0);
+    var my = Math.max(Math.min(my, 2048), 0);
+    var mx = ("000"+Math.floor(mx).toString(16)).slice(-3);
+    var my = ("000"+Math.floor(my).toString(16)).slice(-3);
+    var ct = key0 ? "1"
+           : key1 ? "2"
+           : key2 ? "3"
+           : key3 ? "4"
+           : key4 ? "5"
+           : key5 ? "6"
+           : null;
+    return ct + mx + my;
+  }
+
+  return null;
+}
+
+// Executes a player action inside Formality
+function exec_player_action(act, game) {
+  let ga = null;
+  if (act.action === "SDIR") {
+    let x = act.params.dir.x;
+    let y = act.params.dir.y;
+    let d = v3 => v3(x)(y)(0);
+    ga = TA.game_sdir(act.player)(d);
+  } else if (act.action === "TEXT") {
+    throw "TODO";
+  } else {
+    var x = act.params.pos.x;
+    var y = act.params.pos.y;
+    let p = v3 => v3(x)(y)(0);
+    var f = null;
+    switch (act.action) {
+      case "KEY0": f = TA.game_key0; break;
+      case "KEY1": f = TA.game_key1; break;
+      case "KEY2": f = TA.game_key2; break;
+      case "KEY3": f = TA.game_key3; break;
+      case "KEY4": f = TA.game_key4; break;
+      case "KEY5": f = TA.game_key5; break;
+    }
+    ga = f(act.player)(p);
+  }
+  return TA.exec_game_action(ga)(game);
+}
 
 module.exports = {
   ...TA,
   render_game,
+  parse_turn,
   parse_turns,
+  parse_player_action,
+  exec_player_action,
+  make_action_code,
 };
 
 

@@ -1,4 +1,4 @@
-const DEBUG_LOCAL = false;
+const DEBUG_LOCAL = true;
 
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
@@ -28,7 +28,8 @@ class Main extends Component {
     this.game_state = null;
     this.game_list = [];
     this.chat_msgs = [];
-    this.key = {};
+    this.keyboard = {};
+    this.mouse = {x:0,y:0};
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
@@ -44,54 +45,26 @@ class Main extends Component {
     }
   }
   emit_keys() {
-    var key_d = this.key.d||0;
-    var key_a = this.key.a||0;
-    var key_w = this.key.w||0;
-    var key_s = this.key.s||0;
-    var pad_x = (key_d||0) - (key_a||0);
-    var pad_y = (key_w||0) - (key_s||0);
-    var pad = {x:pad_x, y:pad_y};
-    var act = null;
-    if (this.game_id
-      && (!this.pad
-      || pad.x !== this.pad.x
-      || pad.y !== this.pad.y)) {
-      this.pad = pad;
-      var pl = Math.sqrt(pad.x*pad.x + pad.y*pad.y);
-      var px = pad.x / (pl || 1);
-      var py = pad.y / (pl || 1);
-      var px = Math.floor((px+1)/2*14).toString(16);
-      var py = Math.floor((py+1)/2*14).toString(16);
-      var act = "0" + px + py;
-    }
-    if (this.game_id && this.key[" "]) {
-      var act = "4";
-    }
-    if (act) {
-      if (DEBUG_LOCAL) {
-        var action = TA.parse_turns("11"+act+"0")[0][0];
-        this.exec_action(action);
-      } else {
-        this.say("$"+act);
+    let keyboard = this.keyboard;
+    let mouse = this.mouse;
+    var action_code = TA.make_action_code(keyboard, mouse);
+    if (action_code && DEBUG_LOCAL) {
+      var pa = TA.parse_player_action("1"+action_code)[1];
+      var gs = this.game_state;
+      this.game_state = TA.exec_player_action(pa, gs);
+    } else if (action_code) {
+      var is_same_code = this.last_code === action_code;
+      var is_sdir_code = action_code[0] === "0";
+      // Prevents repeatedly sending the same SDIR event
+      if (!(is_sdir_code && is_same_code)) {
+        this.post("$"+action_code);
       }
+      this.last_code = action_code;
     }
-  }
-  exec_action(a) {
-    let e = null;
-    switch (a.action) {
-      case "dpad":
-        let x = a.params.dir.x;
-        let y = a.params.dir.y;
-        let d = v3 => v3(x)(y)(0);
-        e = TA.game_dpad(a.player)(d);
-      break;
-      case "key0":
-        e = TA.game_key0(a.player);
-      break;
+    // Sets 'changed' flag to false
+    for (var key in this.keyboard) {
+      this.keyboard[key][0] = 0;
     }
-    var g = this.game_state;
-    var g = TA.exec_game_action(e)(g);
-    this.game_state = g;
   }
   make_cam(cam) {
     var W = window.innerWidth;
@@ -114,7 +87,7 @@ class Main extends Component {
       res   : 1.0, // rays_per_pixel = res^2
     };
   }
-  say(msg) {
+  post(msg) {
     if (msg[0] === "/") {
       var args = msg.slice(1).split(" ");
       switch (args[0]) {
@@ -164,13 +137,44 @@ class Main extends Component {
     }, 1000/FPS);
 
     // Game inputs
+    const key_name = {
+      "w": "w",
+      "a": "a",
+      "s": "s",
+      "d": "d",
+      "e": "extra",
+      " ": "space",
+      "shift": "shift",
+    };
     document.body.onkeyup = (e) => {
-      this.key[e.key] = 0;
+      var name = key_name[e.key.toLowerCase()];
+      if (name) {
+        this.keyboard[name] = [1,0];
+        this.emit_keys();
+      }
+    };
+    document.body.onkeydown = (e) => {
+      var name = key_name[e.key.toLowerCase()];
+      if (name) {
+        this.keyboard[name] = [1,1];
+        this.emit_keys();
+      }
+    };
+    document.body.onclick = (e) => {
+      if (e.which === 2 || e.button === 4) {
+        this.keyboard["middle"] = [1,1];
+      } else {
+        this.keyboard["left"] = [1,1];
+      }
       this.emit_keys();
     };
-    document.body.onkeypress = (e) => {
-      this.key[e.key] = 1;
+    document.body.oncontextmenu = (e) => {
+      this.keyboard["right"] = [1,1];
       this.emit_keys();
+      e.preventDefault();
+    };
+    document.body.onmousemove = (e) => {
+      this.mouse = {x: e.clientX, y: e.clientY};
     };
 
     // Pools list of game
@@ -200,7 +204,7 @@ class Main extends Component {
         var turn = ("00000000"+turn).slice(-8);
         var game = this.game_id.toString(16);
         var game = ("00000000"+game).slice(-8);
-        this.say("?"+turn+game);
+        this.post("?"+turn+game);
       }
     }, 1000);
 
@@ -212,12 +216,14 @@ class Main extends Component {
           var game = parseInt(str.slice(1,9), 16);
           var from = parseInt(str.slice(9,17), 16);
           var last = this.game_turns.length;
-          var new_turns = TA.parse_turns(str.slice(17));
+          var new_turns = TA.parse_turns(str.slice(17))[1];
           if (from <= last) {
             for (var i = last-from; i<new_turns.length; ++i) {
               this.game_turns[i+from] = new_turns[i];
               for (var j = 0; j < new_turns[i].length; ++j) {
-                this.exec_action(new_turns[i][j]);
+                let a = new_turns[i][j];
+                let g = this.game_state;
+                this.game_state = TA.exec_player_action(a,g);
               }
               var gs = this.game_state;
               this.game_state = TA.exec_game_turn(gs);
@@ -260,7 +266,7 @@ class Main extends Component {
             this.name = res.name;
             // TODO: proper signatures
             for (let t = 125; t <= 4000; t *= 2) {
-              setTimeout(() => this.say("+"+this.name), t);
+              setTimeout(() => this.post("+"+this.name), t);
             }
             this.forceUpdate();
           }

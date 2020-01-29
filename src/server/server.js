@@ -318,26 +318,26 @@ app.post("/offer", (req, res) => {
     var str = "" + data;
     switch (str[0]) {
 
-      // Set the player's name. TODO: demand signature.
+      // Player wants to set its name. TODO: signatures.
       case "+":
         delete peers[name];
         name = str.slice(1);
         peers[name] = peer;
         break;
 
-      // Informs player's last downloaded turn.
+      // Player is informing its last downloaded turn.
       case "?":
         turn = parseInt(str.slice(1,9), 16);
         game = parseInt(str.slice(9,17), 16);
         console.log(name+" wants turn="+turn+" game="+game);
         break;
 
-      // In-game action.
+      // Player wants to perform an in-game action.
       case "$":
         perform_action(game, name, str.slice(1));
         break;
 
-      // Normal chat message.
+      // Player sent a normal chat message.
       default:
         for (var peer_name in peers) {
           peers[peer_name].send(name+": "+str);

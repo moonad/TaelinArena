@@ -6,6 +6,7 @@ const now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
+// Renders the game state to screen using the canvox library
 function render_game(game, canvox) {
   // Gets the current time
   var T = now();
@@ -92,72 +93,170 @@ function render_game(game, canvox) {
 //   | 2: Player1(Action, Turn)
 //   | ... up to 15 ...
 // Action ::=
-//   | 0: dpad(x: 4bit, y: 4bit) 
-//   | 1: mlft(x: 12bit, y: 12bit)
-//   | 2: mmid(x: 12bit, y:12bit)
-//   | 3: mrgt(x: 12bit, y:12bit)
-//   | 4: key0
-//   | 5: key1
-//   | 6: key2
-//   | 7: key3
+//   | 0: stick(x: 4bit, y: 4bit) 
+//   | 1: left(x: 12bit, y: 12bit)
+//   | 2: middle(x: 12bit, y:12bit)
+//   | 3: right(x: 12bit, y:12bit)
+//   | 4: space(x: 12bit, y:12bit)
+//   | 5: shift(x: 12bit, y:12bit)
+//   | 6: extra(x: 12bit, y:12bit)
+//   | 7: text(...TODO...)
 
-function parse_turns(code) {
+// Parses a player action code into an object
+function parse_player_action(code, idx=0) {
+  var player = parseInt(code[idx],16) - 1;
+  var action = parseInt(code[idx+1],16);
+  if (action === 0) {
+    var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
+    var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
+    return [idx+4, {
+      player,
+      action: "SDIR",
+      params: {dir: {x: dir_x, y: dir_y}}
+    }];
+  } else if (action >= 1 && action <= 6) {
+    var pos_x_a = parseInt(code[idx+2],16);
+    var pos_x_b = parseInt(code[idx+3],16);
+    var pos_x_c = parseInt(code[idx+4],16);
+    var pos_y_a = parseInt(code[idx+5],16);
+    var pos_y_b = parseInt(code[idx+6],16);
+    var pos_y_c = parseInt(code[idx+7],16);
+    var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
+    var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
+    return [idx+8, {
+      player,
+      action: "KEY"+"012345"[action-1],
+      params: {pos: {x: pos_x, y: pos_y}}
+    }];
+  } else {
+    return [idx+2, {
+      player,
+      action: "TEXT",
+      string: ""
+    }];
+  };
+}
+
+// Parses a player turn code into an array of player actions
+function parse_turn(code, idx=0) {
+  var turn = [];
+  while (idx < code.length) {
+    if (code[idx] === "0") {
+      idx += 1;
+      break;
+    } else {
+      var [idx,plr_act] = parse_player_action(code,idx);
+      turn.push(plr_act);
+    }
+  };
+  return [idx, turn];
+};
+
+// Parses a list of player turns
+function parse_turns(code, idx=0) {
   var turns = [];
-  var idx = 0;
   while (idx < code.length) {
     if (code[idx] === "0") {
       break;
     } else {
       idx += 1;
-      var turn = [];
-      while (idx < code.length) {
-        if (code[idx] === "0") {
-          idx += 1;
-          break;
-        } else {
-          var player = parseInt(code[idx],16) - 1;
-          var action = parseInt(code[idx+1],16);
-          if (action === 0) {
-            var dir_x = (parseInt(code[idx+2],16)/14)*2-1;
-            var dir_y = (parseInt(code[idx+3],16)/14)*2-1;
-            turn.push({
-              player,
-              action: "dpad",
-              params: {dir: {x: dir_x, y: dir_y}}
-            });
-            idx += 4;
-          } else if (action >= 1 && action <= 3) {
-            var pos_x_a = parseInt(code[idx+2],16);
-            var pos_x_b = parseInt(code[idx+3],16);
-            var pos_x_c = parseInt(code[idx+4],16);
-            var pos_y_a = parseInt(code[idx+5],16);
-            var pos_y_b = parseInt(code[idx+6],16);
-            var pos_y_c = parseInt(code[idx+7],16);
-            var pos_x = (pos_x_a<<8) | (pos_x_b<<4) | pos_x_c;
-            var pos_y = (pos_y_a<<8) | (pos_y_b<<4) | pos_y_c;
-            turn.push({
-              player,
-              action: ["mlft","mmid","mrgt"][action-1],
-              params: {pos: {x: pos_x, y: pos_y}}
-            });
-            idx += 8;
-          } else {
-            turn.push({
-              player,
-              action: "key" + (action - 4)
-            });
-            idx += 2;
-          };
-        }
-      };
+      var [idx, turn] = parse_turn(code, idx);
       turns.push(turn);
     }
   };
-  return turns;
+  return [idx, turns];
 };
+
+// Makes a player action code from keyboard/mouse states
+function make_action_code(keyboard, mouse) {
+  function changed(name) {
+    return keyboard[name] ? keyboard[name][0] : 0;
+  };
+  function state(name) {
+    return keyboard[name] ? keyboard[name][1] : 0;
+  };
+  function pressed(name) {
+    return changed(name) && state(name) ? 1 : 0;
+  };
+
+  // WASD events take precedence
+  let keyW = changed("w");
+  let keyA = changed("a");
+  let keyS = changed("s");
+  let keyD = changed("d");
+  if (keyW || keyA || keyS || keyD) {
+    var pad_x = state("d") - state("a");
+    var pad_y = state("w") - state("s");
+    var pad = {x: pad_x, y: pad_y};
+    var pl = Math.sqrt(pad.x**2 + pad.y**2) || 1;
+    var px = pad.x / pl;
+    var py = pad.y / pl;
+    var px = Math.floor((px+1)/2*14).toString(16);
+    var py = Math.floor((py+1)/2*14).toString(16);
+    return "0" + px + py;
+  }
+
+  // Otherwise, check for action keys
+  var key0 = pressed("left");
+  var key1 = pressed("middle");
+  var key2 = pressed("right");
+  var key3 = pressed("space");
+  var key4 = pressed("shift");
+  var key5 = pressed("extra");
+  if (key0 || key1 || key2 || key3 || key4 || key5) {
+    var mx = mouse.x;
+    var my = mouse.y;
+    var mx = Math.max(Math.min(mx, 2048), 0);
+    var my = Math.max(Math.min(my, 2048), 0);
+    var mx = ("000"+Math.floor(mx).toString(16)).slice(-3);
+    var my = ("000"+Math.floor(my).toString(16)).slice(-3);
+    var ct = key0 ? "1"
+           : key1 ? "2"
+           : key2 ? "3"
+           : key3 ? "4"
+           : key4 ? "5"
+           : key5 ? "6"
+           : null;
+    return ct + mx + my;
+  }
+
+  return null;
+}
+
+// Executes a player action inside Formality
+function exec_player_action(act, game) {
+  let ga = null;
+  if (act.action === "SDIR") {
+    let x = act.params.dir.x;
+    let y = act.params.dir.y;
+    let d = v3 => v3(x)(y)(0);
+    ga = TA.game_sdir(act.player)(d);
+  } else if (act.action === "TEXT") {
+    throw "TODO";
+  } else {
+    var x = act.params.pos.x;
+    var y = act.params.pos.y;
+    let p = v3 => v3(x)(y)(0);
+    var f = null;
+    switch (act.action) {
+      case "KEY0": f = TA.game_key0; break;
+      case "KEY1": f = TA.game_key1; break;
+      case "KEY2": f = TA.game_key2; break;
+      case "KEY3": f = TA.game_key3; break;
+      case "KEY4": f = TA.game_key4; break;
+      case "KEY5": f = TA.game_key5; break;
+    }
+    ga = f(act.player)(p);
+  }
+  return TA.exec_game_action(ga)(game);
+}
 
 module.exports = {
   ...TA,
   render_game,
+  parse_turn,
   parse_turns,
+  parse_player_action,
+  exec_player_action,
+  make_action_code,
 };
