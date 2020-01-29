@@ -378,6 +378,15 @@ module.exports = function canvox(opts = {}) {
         // If it hit a voxel, draw it
         if (hit.ctr == HIT) {
           vec4 col = uint_to_vec4(hit.val);
+
+          vec3 sun_dir = vec3(1.0,-1.0,1.0);
+          Hit sky = march(hit.pos, sun_dir, voxels);
+          if (sky.ctr == HIT) {
+            col.r *= 0.7;
+            col.g *= 0.7;
+            col.b *= 0.7;
+          }
+
           outColor = vec4(vec3(col),1.0);
           //outColor = vec4(1.0,0.5,0.5,1.0);
         //} else if (hit.ctr == MIS) {

@@ -11,9 +11,9 @@ var stage = oct.empty();
 for (var y = -512; y < 512; ++y) {
   for (var x = -512; x < 512; ++x) {
     if (((x+2048) / 32) % 2 < 1) {
-      oct.insert(x,y,-32,0xFF2F9C63,stage);
+      oct.insert(x,y,0,0xFF8fd9ad,stage);
     } else {
-      oct.insert(x,y,-32,0xFF4FAC63,stage);
+      oct.insert(x,y,0,0xFF85c9a0,stage);
     }
   }
 }
@@ -67,7 +67,7 @@ function render_game({game, canvox, cam}) {
     };
     let case_polybox = (pts) => {
     };
-    box(case_circbox)(case_polybox);
+    //box(case_circbox)(case_polybox);
 
     // Renders each voxel of the model
     var model_id = TA.get_object_model_id(object);

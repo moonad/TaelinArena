@@ -1,4 +1,9 @@
-const DEBUG_LOCAL = true;
+const PARAM = window.location.search;
+const DEBUG_ON = PARAM.indexOf("debug") !== -1;
+const DEBUG_ID
+  = PARAM.indexOf("zoio") !== -1 ? 3
+  : PARAM.indexOf("simplao") !== -1 ? 1
+  : 0;
 
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
@@ -7,7 +12,6 @@ const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
 const SimplePeer = require("simple-peer");
-const FPS = 60;
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -20,6 +24,8 @@ const Chat = require("./Chat.js");
 class Main extends Component {
   constructor(props) {
     super(props)
+    let w = window.innerWidth;
+    let h = window.innerHeight;
     this.modal = null;
     this.name = null;
     this.wlet = null;
@@ -30,13 +36,13 @@ class Main extends Component {
     this.chat_msgs = [];
     this.keyboard = {};
     this.pointer = {x:0,y:0}; // game position
-    this.mouse = {x:0,y:0}; // window position
+    this.mouse = {x:w/2,y:h/2}; // window position
     this.cam_pos = {x:0,y:0};
     this.pad = null;
     this.canvox = canvox();
     this.peer = null;
     this.login();
-    if (DEBUG_LOCAL) {
+    if (DEBUG_ON) {
       this.game_id = -1;
       this.game_turns = [];
       this.game_state = TA.new_game;
@@ -50,8 +56,9 @@ class Main extends Component {
     let keyboard = this.keyboard;
     let pointer = this.pointer;
     var action_code = TA.make_action_code(keyboard,pointer);
-    if (action_code && DEBUG_LOCAL) {
-      var pa = TA.parse_player_action("1"+action_code)[1];
+    if (action_code && DEBUG_ON) {
+      var ac = String((DEBUG_ID||0)+1) + action_code;
+      var pa = TA.parse_player_action(ac)[1];
       var gs = this.game_state;
       this.game_state = TA.exec_player_action(pa, gs);
     } else if (action_code) {
@@ -148,22 +155,45 @@ class Main extends Component {
     document.body.appendChild(this.canvox);
     this.fps_last = Date.now();
     this.fps_tick = 0; 
-    this.render_loop = setInterval(() => {
+    window.requestAnimationFrame(function render() {
       if (this.game_id) {
+
+        // Measures FPS
         ++this.fps_tick;
         if (Date.now() > this.fps_last + 1000) {
           console.log("fps:", this.fps_tick);
           this.fps_tick = 0;
           this.fps_last = Date.now();
         }
-        //console.log(this.game_state);
+
+        // Moves camera with mouse
+        var cam_dir = {x:0, y:0};
+        if (this.mouse.x <= 0) {
+          cam_dir.x = -6;
+        } else if (this.mouse.x >= window.innerWidth - 1) {
+          cam_dir.x = 6;
+        } else {
+          cam_dir.x = 0;
+        }
+        if (this.mouse.y <= 0) {
+          cam_dir.y = 6;
+        } else if (this.mouse.y >= window.innerHeight - 1) {
+          cam_dir.y = -6;
+        } else {
+          cam_dir.y = 0;
+        }
+        this.cam_pos.x += cam_dir.x;
+        this.cam_pos.y += cam_dir.y;
+
+        // Renders the game
         TA.render_game({
           game: this.game_state,
           canvox: this.canvox,
           cam: this.make_cam()
         });
       }
-    }, 1000/FPS);
+      window.requestAnimationFrame(render.bind(this));
+    }.bind(this));
 
     // Game inputs
     const key_name = {
@@ -222,25 +252,6 @@ class Main extends Component {
     window.onmousein = (e) => {
       this.set_mouse_pos(e.clientX, e.clientY);
     };
-    setInterval(() => {
-      var cam_dir = {x:0, y:0};
-      if (this.mouse.x <= 0) {
-        cam_dir.x = -6;
-      } else if (this.mouse.x >= window.innerWidth - 1) {
-        cam_dir.x = 6;
-      } else {
-        cam_dir.x = 0;
-      }
-      if (this.mouse.y <= 0) {
-        cam_dir.y = 6;
-      } else if (this.mouse.y >= window.innerHeight - 1) {
-        cam_dir.y = -6;
-      } else {
-        cam_dir.y = 0;
-      }
-      this.cam_pos.x += cam_dir.x;
-      this.cam_pos.y += cam_dir.y;
-    }, 1000/30);
 
     // Pools list of game
     const pool_game_list = () => {
@@ -261,7 +272,7 @@ class Main extends Component {
 
     // Adjusts the turn to be streamed to me 
     this.turn_asker = setInterval(() => {
-      if (this.game_id && !DEBUG_LOCAL) {
+      if (this.game_id && !DEBUG_ON) {
         console.log(
           "Ask turn="+this.game_turns.length
           +" game="+this.game_id);
