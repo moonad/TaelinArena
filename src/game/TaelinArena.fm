@@ -31,110 +31,6 @@ T GameObject
   box : Hitbox,
   ani : Anim)
 
-// Changes the object's fields
-mut_object_fields(
-  id: ObjectId -> ObjectId,
-  hp: Number -> Number,
-  pos: V3 -> V3,
-  spd: Number -> Number,
-  dir: V3 -> V3,
-  vel: V3 -> V3,
-  box: Hitbox -> Hitbox,
-  ani: Anim -> Anim,
-  obj: GameObject
-) : GameObject
-  case obj |game_object
-  let id  = id(obj.id)
-  let hp  = hp(obj.hp)
-  let pos = pos(obj.pos)
-  let spd = spd(obj.spd)
-  let dir = dir(obj.dir)
-  let vel = vel(obj.vel)
-  let box = box(obj.box)
-  let ani = ani(obj.ani)
-  game_object(id,hp,pos,spd,dir,vel,box,ani)
-
-// Object accessors / mutters
-
-get_object_id(obj: GameObject)
-  case obj |game_object
-  obj.id
-
-get_object_hp(obj: GameObject)
-  case obj |game_object
-  obj.hp
-
-get_object_pos(obj: GameObject)
-  case obj |game_object
-  obj.pos
-
-get_object_spd(obj: GameObject)
-  case obj |game_object
-  obj.spd
-
-get_object_dir(obj: GameObject)
-  case obj |game_object
-  obj.dir
-
-get_object_vel(obj: GameObject)
-  case obj |game_object
-  obj.vel
-
-get_object_box(obj: GameObject)
-  case obj |game_object
-  obj.box
-
-get_object_ani(obj: GameObject)
-  case obj |game_object
-  obj.ani
-
-mut_object_id(fn: ObjectId -> ObjectId , obj: GameObject)
-  mut_object_fields(
-    fn, id(_), id(_), id(_),
-    id(_), id(_), id(_), id(_),
-    obj)
-
-mut_object_hp(fn: Number -> Number, obj: GameObject)
-  mut_object_fields(
-    id(_), fn, id(_), id(_),
-    id(_), id(_), id(_), id(_),
-    obj)
-
-mut_object_pos(fn: V3 -> V3, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), fn, id(_),
-    id(_), id(_), id(_), id(_),
-    obj)
-
-mut_object_spd(fn: Number -> Number, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), id(_), fn,
-    id(_), id(_), id(_), id(_),
-    obj)
-
-mut_object_dir(fn: V3 -> V3, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), id(_), id(_),
-    fn, id(_), id(_), id(_),
-    obj)
-
-mut_object_vel(fn: V3 -> V3, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), id(_), id(_),
-    id(_), fn, id(_), id(_),
-    obj)
-
-mut_object_box(fn: Hitbox -> Hitbox, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), id(_), id(_),
-    id(_), id(_), fn, id(_),
-    obj)
-
-mut_object_ani(fn: Anim -> Anim, obj: GameObject)
-  mut_object_fields(
-    id(_), id(_), id(_), id(_),
-    id(_), id(_), id(_), fn,
-    obj)
 
 // :: GAME MAP ::
 
@@ -273,32 +169,33 @@ exec_game_action(action: GameAction, gm: Game) : Game
       // Change its direction if analog isn't centered
       let dir_fn =
         if len_v3(action.dir) === 0 then
-          (old_dir) => old_dir
+          (old_dir: V3) => old_dir
         else
-          (old_dir) => action.dir
+          (old_dir: V3) => action.dir
       // Set its speed if analog isn't centered
       let spd_fn =
         if len_v3(action.dir) === 0 then
-          (old_spd) => 0
+          (old_spd: Number) => 0
         else
-          (old_spd) =>
+          (old_spd: Number) =>
             if obj.id === 3 then
               3
             else
               6
       // Modify the object using the logic above
-      let obj = mut_object_dir(dir_fn, obj)
-      let obj = mut_object_spd(spd_fn, obj)
+      let obj = obj <= game_object(dir = dir_fn(dir))
+      let obj = obj <= game_object(spd = spd_fn(spd))
       obj
     modify_object_by_id(action.id, fn, gm)
   | game_key0 =>
-    let fn = mut_object_pos((a) => action.pos)
+    let fn = (obj) =>
+      obj <= game_object(pos = action.pos)
     modify_object_by_id(action.id, fn, gm)
   | game_key1 => gm
   | game_key2 => gm
   | game_key3 =>
     let fn = (obj) =>
-      mut_object_ani((a) => anim(1, 0), obj)
+      obj <= game_object(ani = anim(1,0))
     modify_object_by_id(action.id, fn, gm)
   | game_key4 => gm
   | game_key5 => gm
@@ -317,7 +214,7 @@ interact_with(this:GameObject, that:GameObject): GameObject
         let out_dir = norm_v3(sub_v3(this.pos, that.pos))
         let out_vec = scale_v3(rad - dst, out_dir)
         let new_pos = add_v3(this.pos, out_vec)
-        mut_object_pos((old) => new_pos, this)
+        this <= game_object(pos = new_pos)
       else
         this
     | polybox =>
@@ -357,34 +254,44 @@ exec_game_turn(gm: Game) : Game
     fold(GameObject; _ new_obj, int_fun, gm.map)
   game(map(GameObject; _ tick, gm.map))
 
-//// TODO: very hard coded, comment, improve, etc.
-get_object_model_id(obj: GameObject) : Number 
+T RenderInfo
+| render_info(
+  mid: Number,
+  pos: V3,
+  dir: V3)
+
+// TODO: very hard coded, comment, improve, etc.
+get_render_info(obj: GameObject) : RenderInfo 
   case obj |game_object
-  case obj.ani |anim
-  if obj.id === 0 then
-    // idle/walk
-    if obj.ani.id === 0 then
-      if (obj.spd < 0.1) then
-        MIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 3
+    let mid =
+      case obj.ani |anim
+      if obj.id === 0 then
+        // idle/walk
+        if obj.ani.id === 0 then
+          if (obj.spd < 0.1) then
+            MIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 3
+          else
+            MIN_RUN_0 + ((obj.ani.tik \ 3) >>> 0) % 5
+        // attack
+        else
+          MIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 6
+      else if obj.id === 3 then
+        // idle/walk
+        if obj.ani.id === 0 then
+          if (obj.spd < 0.1) then
+            ZOIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 5
+          else
+            ZOIN_WALK_0 + ((obj.ani.tik \ 3) >>> 0) % 6
+        // attack
+        else
+          ZOIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 7
+      else if obj.id === 2 then
+        MIKEGATOR_SPINTAIL_0 + ((obj.ani.tik \ 3) >>> 0) % 8
       else
-        MIN_RUN_0 + ((obj.ani.tik \ 3) >>> 0) % 5
-    // attack
-    else
-      MIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 6
-  else if obj.id === 3 then
-    // idle/walk
-    if obj.ani.id === 0 then
-      if (obj.spd < 0.1) then
-        ZOIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 5
-      else
-        ZOIN_WALK_0 + ((obj.ani.tik \ 3) >>> 0) % 6
-    // attack
-    else
-      ZOIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 7
-  else if obj.id === 2 then
-    MIKEGATOR_SPINTAIL_0 + ((obj.ani.tik \ 3) >>> 0) % 8
-  else
-    KENKO_ULTK_0 + ((obj.ani.tik \ 3) >>> 0) % 26
+        KENKO_ULTK_0 + ((obj.ani.tik \ 3) >>> 0) % 26
+    let pos = obj.pos 
+    let dir = obj.dir
+    render_info(mid, pos, dir)
 
 SIMPLAO_IDLE1 0
 SIMPLAO_IDLE2 1

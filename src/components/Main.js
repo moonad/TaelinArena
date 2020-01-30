@@ -168,25 +168,6 @@ class Main extends Component {
           this.fps_last = Date.now();
         }
 
-        // Moves camera with mouse
-        var cam_dir = {x:0, y:0};
-        if (this.mouse.x <= 16) {
-          cam_dir.x = -6;
-        } else if (this.mouse.x >= window.innerWidth-16) {
-          cam_dir.x = 6;
-        } else {
-          cam_dir.x = 0;
-        }
-        if (this.mouse.y <= 16) {
-          cam_dir.y = 6;
-        } else if (this.mouse.y >= window.innerHeight-16) {
-          cam_dir.y = -6;
-        } else {
-          cam_dir.y = 0;
-        }
-        this.cam_pos.x += cam_dir.x;
-        this.cam_pos.y += cam_dir.y;
-
         // Renders the game
         TA.render_game({
           game: this.game_state,
@@ -199,14 +180,21 @@ class Main extends Component {
 
     // Game inputs
     const key_name = {
-      "w": "w",
-      "a": "a",
-      "s": "s",
-      "d": "d",
-      "e": "extra",
-      " ": "space",
-      "shift": "shift",
+      "w"          : "w",
+      "a"          : "a",
+      "s"          : "s",
+      "d"          : "d",
+      "e"          : "extra",
+      " "          : "space",
+      "shift"      : "shift",
+      "arrowleft"  : "arrowleft",
+      "arrowright" : "arrowright",
+      "arrowup"    : "arrowup",
+      "arrowdown"  : "arrowdown",
     };
+    for (var key in key_name) {
+      this.keyboard[key_name[key]] = [0,0];
+    }
     document.body.onkeyup = (e) => {
       var name = key_name[e.key.toLowerCase()];
       if (name) {
@@ -249,12 +237,10 @@ class Main extends Component {
       this.set_mouse_pos(e.clientX, e.clientY);
     };
     window.onmouseout = (e) => {
-      this.set_mouse_pos(e.clientX, e.clientY);
-      this.mouse_out_timeout = setTimeout(() => {
-        this.set_mouse_pos({
-          x: window.innerWidth / 2,
-          y: window.innerHeight / 2});
-      }, 250);
+      this.set_mouse_pos({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      });
     };
     window.onmousein = (e) => {
       this.set_mouse_pos(e.clientX, e.clientY);
@@ -263,6 +249,30 @@ class Main extends Component {
         this.mouse_out_timeout = null;
       }
     };
+    // Moves camera with mouse
+    setInterval(() => {
+      var cam_dir = {x:0, y:0};
+      if (this.mouse.x <= 16) {
+        cam_dir.x = -4;
+      } else if (this.mouse.x >= window.innerWidth-16) {
+        cam_dir.x = 4;
+      } else {
+        cam_dir.x = 0;
+      }
+      if (this.mouse.y <= 16) {
+        cam_dir.y = 4;
+      } else if (this.mouse.y >= window.innerHeight-16) {
+        cam_dir.y = -4;
+      } else {
+        cam_dir.y = 0;
+      }
+      if (this.keyboard.arrowleft[1]) cam_dir.x -= 4;
+      if (this.keyboard.arrowright[1]) cam_dir.x += 4;
+      if (this.keyboard.arrowdown[1]) cam_dir.y -= 4;
+      if (this.keyboard.arrowup[1]) cam_dir.y += 4;
+      this.cam_pos.x += cam_dir.x;
+      this.cam_pos.y += cam_dir.y;
+    }, 1000 / 60);
 
     // Pools list of game
     const pool_game_list = () => {

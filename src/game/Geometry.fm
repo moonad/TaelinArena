@@ -19,17 +19,14 @@ get_z(v: V3)
   case v |v3
   v.z
 
-mut_x(fn: Number -> Number, v: V3)
-  case v |v3
-  v3(fn(v.x), v.y, v.z)
+map_x(fn: Number -> Number, v: V3)
+  v <= v3(x = fn(x))
 
-mut_y(fn: Number -> Number, v: V3)
-  case v |v3
-  v3(v.x, fn(v.y), v.z)
+map_y(fn: Number -> Number, v: V3)
+  v <= v3(y = fn(y))
 
-mut_z(fn: Number -> Number, v: V3)
-  case v |v3
-  v3(v.x, v.y, fn(v.z))
+map_z(fn: Number -> Number, v: V3)
+  v <= v3(z = fn(z))
 
 sub_v3(a: V3, b: V3) : V3
   case a |v3

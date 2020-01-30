@@ -30,67 +30,31 @@ function render_game({game, canvox, cam}) {
   var voxels = [];
 
   // Renders each game object
-  TA.map_game_objects(function(object) {
-    // Gets the object fields
-    var id = TA.get_object_id(object);
-    var hp = TA.get_object_hp(object);
-    var pos = TA.get_object_pos(object);
-    var dir = TA.get_object_dir(object);
-    var vel = TA.get_object_vel(object);
-    var box = TA.get_object_box(object);
-    var ani = TA.get_object_ani(object);
-    var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
-    var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
-
-    // Computes the object facing angle
-    var ang = Math.atan2(dir_y, dir_x);
-    var ang = ang + Math.PI*0.5;
-
-    // Renders hitbox (for debugging)
-    let case_circbox = (rad) => {
-      for (var j = -rad; j <= rad; ++j) {
-        for (var i = -rad; i <= rad; ++i) {
-          if (i*i+j*j < rad*rad) {
-            var px = pos_x + i;
-            var py = pos_y + j;
-            var pz = 0;
-            var pos
-              = (px+512)<<20
-              | (py+512)<<10
-              | (pz+512);
-            var col = 0xE0E0FFFF;
-            voxels[voxels.length] = pos;
-            voxels[voxels.length] = col;
-          }
-        }
+  TA.map_game_objects((object) => {
+    TA.get_render_info(object)(mid => pos => dir => {
+      var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
+      var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
+      var ang = Math.atan2(dir_y, dir_x);
+      var ang = ang + Math.PI*0.5;
+      var model = models[mid];
+      for (var i = 0; i < model.length; ++i) {
+        var [{x,y,z},{r,g,b}] = model[i];
+        var cx = pos_x;
+        var cy = pos_y;
+        var cz = pos_z;
+        var px = cx + x;
+        var py = cy + y;
+        var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+        var pa = Math.atan2(py-cy,px-cx);
+        var px = cx + pl * Math.cos(pa + ang) + 0.5;
+        var py = cy + pl * Math.sin(pa + ang) + 0.5;
+        var pz = cz + z;
+        var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+        var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+        voxels[voxels.length] = xyz;
+        voxels[voxels.length] = rgb;
       }
-    };
-    let case_polybox = (pts) => {
-    };
-    //box(case_circbox)(case_polybox);
-
-    // Renders each voxel of the model
-    var model_id = TA.get_object_model_id(object);
-    var model = models[model_id];
-    for (var i = 0; i < model.length; ++i) {
-      var [pos,col] = model[i];
-      var {x,y,z} = pos;
-      var {r,g,b} = col;
-      var cx = pos_x;
-      var cy = pos_y;
-      var cz = pos_z;
-      var px = cx + x;
-      var py = cy + y;
-      var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-      var pa = Math.atan2(py-cy,px-cx);
-      var px = cx + pl * Math.cos(pa + ang) + 0.5;
-      var py = cy + pl * Math.sin(pa + ang) + 0.5;
-      var pz = cz + z;
-      var pos = (px+512)<<20|(py+512)<<10|(pz+512);
-      var col = (r<<24)|(g<<16)|(b<<8)|0xFF;
-      voxels[voxels.length] = pos;
-      voxels[voxels.length] = col;
-    }
+    });
   })(game);
 
   canvox.draw({voxels, stage, cam});
@@ -272,3 +236,27 @@ module.exports = {
   exec_player_action,
   make_action_code,
 };
+
+// Renders hitbox (for debugging)
+//let case_circbox = (rad) => {
+//for (var j = -rad; j <= rad; ++j) {
+  //for (var i = -rad; i <= rad; ++i) {
+    //if (i*i+j*j < rad*rad) {
+      //var px = pos_x + i;
+      //var py = pos_y + j;
+      //var pz = 0;
+      //var pos
+        //= (px+512)<<20
+        //| (py+512)<<10
+        //| (pz+512);
+      //var col = 0xE0E0FFFF;
+      //voxels[voxels.length] = pos;
+      //voxels[voxels.length] = col;
+    //}
+  //}
+//}
+//};
+//let case_polybox = (pts) => {
+//};
+//box(case_circbox)(case_polybox);
+
