@@ -10,10 +10,10 @@ const now = (() => {
 var stage = oct.empty();
 for (var y = -512; y < 512; ++y) {
   for (var x = -512; x < 512; ++x) {
-    if (((x+2048) / 32) % 2 < 1) {
-      oct.insert(x,y,0,0xFF8fd9ad,stage);
-    } else {
+    if (((x+2048) / 32) % 2 < 1) { // || ((y+2048) / 32) % 2 < 1) {
       oct.insert(x,y,0,0xFF85c9a0,stage);
+    } else {
+      oct.insert(x,y,0,0xFF8fd9ad,stage);
     }
   }
 }

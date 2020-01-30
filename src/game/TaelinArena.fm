@@ -43,7 +43,7 @@ mut_object_fields(
   ani: Anim -> Anim,
   obj: GameObject
 ) : GameObject
-  case obj | game_object =>
+  case obj |game_object
   let id  = id(obj.id)
   let hp  = hp(obj.hp)
   let pos = pos(obj.pos)
@@ -57,35 +57,35 @@ mut_object_fields(
 // Object accessors / mutters
 
 get_object_id(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.id
 
 get_object_hp(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.hp
 
 get_object_pos(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.pos
 
 get_object_spd(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.spd
 
 get_object_dir(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.dir
 
 get_object_vel(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.vel
 
 get_object_box(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.box
 
 get_object_ani(obj: GameObject)
-  case obj | game_object =>
+  case obj |game_object
   obj.ani
 
 mut_object_id(fn: ObjectId -> ObjectId , obj: GameObject)
@@ -147,7 +147,7 @@ get_object_from_map(id: ObjectId, gm: GameMap)
   case gm
   | nil  => none(_)
   | cons =>
-    case gm.head | game_object => 
+    case gm.head |game_object
     if gm.head.id === id then
       some(_ gm.head)
     else
@@ -159,19 +159,20 @@ T Game
 | game(map : GameMap)
 
 get_game_map(game: Game) : GameMap
-  case game | game =>
+  case game |game
   game.map
 
 // Gets an object by its id
 get_object_by_id(id: ObjectId, gs: Game) : Maybe(GameObject)
-  case gs | game =>
+  case gs |game
   get_object_from_map(id, gs.map)
 
 // Gets the position of an object by its id
 get_position_by_id(id: ObjectId, gs: Game) : V3
   case get_object_by_id(id, gs) as got
   | none => v3(0,0,0)
-  | some => get_object_pos(got.value)
+  | some => case got.value |game_object
+    got.value.pos
 
 // :: TESTS ::
 
@@ -256,7 +257,7 @@ modify_object_by_id(
   gm: Game
 ) : Game
   let fn2 = (obj) =>
-    case obj | game_object =>
+    case obj |game_object
     if obj.id === id then
       fn(obj)
     else
@@ -268,7 +269,7 @@ exec_game_action(action: GameAction, gm: Game) : Game
   case action
   | game_sdir =>
     let fn = (obj) =>
-      case obj | game_object =>
+      case obj |game_object
       // Change its direction if analog isn't centered
       let dir_fn =
         if len_v3(action.dir) === 0 then
@@ -304,8 +305,8 @@ exec_game_action(action: GameAction, gm: Game) : Game
   | game_text => gm
 
 interact_with(this:GameObject, that:GameObject): GameObject
-  case this | game_object =>
-  case that | game_object =>
+  case this |game_object
+  case that |game_object
   case this.box
   | circbox => 
     case that.box
@@ -326,9 +327,9 @@ interact_with(this:GameObject, that:GameObject): GameObject
 
 // Game's main loop
 exec_game_turn(gm: Game) : Game
-  case gm | game =>
+  case gm |game
   let tick = (obj) =>
-    case obj | game_object =>
+    case obj |game_object
     let new_id  = obj.id
     let new_hp  = obj.hp
     let new_spd = obj.spd
@@ -358,8 +359,8 @@ exec_game_turn(gm: Game) : Game
 
 //// TODO: very hard coded, comment, improve, etc.
 get_object_model_id(obj: GameObject) : Number 
-  case obj | game_object =>
-  case obj.ani | anim =>
+  case obj |game_object
+  case obj.ani |anim
   if obj.id === 0 then
     // idle/walk
     if obj.ani.id === 0 then
@@ -479,6 +480,3 @@ KENKO_ULTK_22 90
 KENKO_ULTK_23 91
 KENKO_ULTK_24 92
 KENKO_ULTK_25 93
-
-
-

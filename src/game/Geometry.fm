@@ -4,51 +4,50 @@ T V3
 | v3(x: Number, y: Number, z: Number) 
 
 map_v3(fn: Number -> Number, v: V3) : V3
-  case v | v3 =>
+  case v |v3 
   v3(fn(v.x), fn(v.y), fn(v.z))
 
-// Vector accessors and mutters
 get_x(v: V3)
-  case v | v3 =>
+  case v |v3
   v.x
 
 get_y(v: V3)
-  case v | v3 =>
+  case v |v3
   v.y
 
 get_z(v: V3)
-  case v | v3 =>
+  case v |v3
   v.z
 
 mut_x(fn: Number -> Number, v: V3)
-  case v | v3 =>
+  case v |v3
   v3(fn(v.x), v.y, v.z)
 
 mut_y(fn: Number -> Number, v: V3)
-  case v | v3 =>
+  case v |v3
   v3(v.x, fn(v.y), v.z)
 
 mut_z(fn: Number -> Number, v: V3)
-  case v | v3 =>
+  case v |v3
   v3(v.x, v.y, fn(v.z))
 
 sub_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
+  case a |v3
+  case b |v3
   v3(a.x - b.x, a.y - b.y, a.z - b.z)
 
 add_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
+  case a |v3
+  case b |v3
   v3(a.x + b.x, a.y + b.y, a.z + b.z)
 
 mul_v3(a: V3, b: V3) : V3
-  case a | v3 =>
-  case b | v3 =>
+  case a |v3
+  case b |v3
   v3(a.x * b.x, a.y * b.y, a.z * b.z)
 
 len_v3(a: V3) : Number
-  case a | v3 =>
+  case a |v3
   let sqr = 0
   let sqr = sqr + (a.x * a.x)
   let sqr = sqr + (a.y * a.y)
@@ -58,7 +57,7 @@ len_v3(a: V3) : Number
     
 norm_v3(a: V3) : V3
   let l = len_v3(a)
-  case a | v3 =>
+  case a |v3
   v3(a.x \ l, a.y \ l, a.z \ l)
 
 scale_v3(x: Number, a: V3)
@@ -66,8 +65,8 @@ scale_v3(x: Number, a: V3)
   | v3 => v3(a.x * x, a.y * x, a.z * x)
 
 dot_v3(a: V3, b: V3) : Number
-  case a | v3 =>
-  case b | v3 =>
+  case a |v3
+  case b |v3
   let d = 0
   let d = d + (a.x * b.x)
   let d = d + (a.y * b.y)
@@ -75,8 +74,8 @@ dot_v3(a: V3, b: V3) : Number
   d
 
 sqrdist_v3(a: V3, b: V3) : Number
-  case a | v3 =>
-  case b | v3 =>
+  case a |v3
+  case b |v3
   let d = 0
   let d = d + ((a.x - b.x) ** 2)
   let d = d + ((a.y - b.y) ** 2)
@@ -104,24 +103,24 @@ T Boundary
 
 // Squared distance between a point and a segment
 point_segment_sqrdist(p: V3, s: Segment) : Number
-  case s | segment =>
-  case s.a as a | v3 =>
-  case s.b as b | v3 => 
-  case p | v3 =>
-    let l = 0
-    let l = l + ((a.x - b.x) ** 2)
-    let l = l + ((a.y - b.y) ** 2)
-    let t = 0
-    let t = t + ((p.x - a.x) * (b.x - a.x))
-    let t = t + ((p.y - a.y) * (b.y - a.y))
-    let t = t \ l
-    let t = max(0, min(1, t))
-    let d = 0
-    let k = (p.x - (a.x + (t * (b.x - a.x)))) ** 2
-    let d = d + k
-    let k = (p.y - (a.y + (t * (b.y - a.y)))) ** 2
-    let d = d + k
-    d
+  case s |segment
+  case s.a as a |v3
+  case s.b as b |v3
+  case p |v3
+  let l = 0
+  let l = l + ((a.x - b.x) ** 2)
+  let l = l + ((a.y - b.y) ** 2)
+  let t = 0
+  let t = t + ((p.x - a.x) * (b.x - a.x))
+  let t = t + ((p.y - a.y) * (b.y - a.y))
+  let t = t \ l
+  let t = max(0, min(1, t))
+  let d = 0
+  let k = (p.x - (a.x + (t * (b.x - a.x)))) ** 2
+  let d = d + k
+  let k = (p.y - (a.y + (t * (b.y - a.y)))) ** 2
+  let d = d + k
+  d
 
 
 // Distance between a point and a segment
@@ -131,11 +130,11 @@ point_segment_dist(p: V3, s: Segment): Number
 // The two intersection points of a circle and a line
 circle_line_intersection(circle: Circle, line: Line)
 : Maybe(Pair(V3,V3))
-  case circle | circle =>
-  case line | line =>
-  case circle.pos | v3 =>
-  case line.pos | v3 =>
-  case line.dir | v3 =>
+  case circle |circle
+  case line |line
+  case circle.pos |v3
+  case line.pos |v3
+  case line.dir |v3
   let cx = circle.pos.x
   let cy = circle.pos.y
   let dx = line.dir.x
@@ -167,8 +166,8 @@ circle_line_intersection(circle: Circle, line: Line)
 
 circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
 : Maybe(Number)
-  case a | circle =>
-  case b | circle =>
+  case a |circle
+  case b |circle
   let r = a.rad
   let c = circle(b.pos, a.rad + b.rad)
   let l = line(a.pos, norm_v3(d))
@@ -176,7 +175,7 @@ circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
   case p
   | none => none(_)
   | some =>
-    case p.value as p | pair =>
+    case p.value as p |pair
     let d0 = sqrdist_v3(a.pos, p.fst)
     let d1 = sqrdist_v3(a.pos, p.snd)
     let hp = if d0 < d1 then p.fst else p.snd
@@ -189,8 +188,8 @@ circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
 
 // Circle-boundary intersection test
 circle_boundary_intersects(c: Circle, b: Boundary): Number
-  case b | boundary =>
-  case c | circle =>
+  case b |boundary
+  case c |circle
   case b.points as l0
   | nil => 0
   | cons => case l0.tail as l1

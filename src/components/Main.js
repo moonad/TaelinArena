@@ -80,6 +80,8 @@ class Main extends Component {
     var H = window.innerHeight;
     var T = Date.now()/1000;
     var ang = Math.PI * 1/4;
+    //var ang = Math.PI * 1/5;
+    //var ang = Math.PI * 1/4 + (Math.sin(T*0.5)-0.5)*Math.PI*0.1;
     var cos = Math.cos(ang);
     var sin = Math.sin(ang);
     var front = {x:0, y:cos, z:-sin};
