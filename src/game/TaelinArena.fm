@@ -1,6 +1,5 @@
-import Base#mbRT
+import Base#0OIj
 import Geometry
-import Extra
 
 // :: COLLISION ::
 
@@ -149,7 +148,7 @@ get_object_from_map(id: ObjectId, gm: GameMap)
   | nil  => none(_)
   | cons =>
     case gm.head | game_object => 
-    if gm.head.id .==. id then
+    if gm.head.id === id then
       some(_ gm.head)
     else
       get_object_from_map(id, gm.tail)
@@ -197,7 +196,7 @@ stanci : GameObject
   let hp = 90
   let pos = v3(64, 0, 0)
   let spd = 0
-  let dir = v3(1, -1, 0)
+  let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
   let ani = anim(0, 0)
@@ -208,7 +207,7 @@ neelix : GameObject
   let hp = 700
   let pos = v3(-64, 0, 0)
   let spd = 0
-  let dir = v3(-1, -1, 0)
+  let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = v3(6,6,6)
   let box = circbox(8)
@@ -247,7 +246,7 @@ map_game_objects(
   fn : GameObject -> GameObject,
   gm : Game
 ) : Game
-  game(map_list(__ fn, get_game_map(gm)))
+  game(map(__ fn, get_game_map(gm)))
 
 // Modifies the object with given id
 // TODO: Optimize
@@ -258,11 +257,11 @@ modify_object_by_id(
 ) : Game
   let fn2 = (obj) =>
     case obj | game_object =>
-    if obj.id .==. id then
+    if obj.id === id then
       fn(obj)
     else
       obj
-  game(map_list(GameObject; _ fn2, get_game_map(gm)))
+  game(map(GameObject; _ fn2, get_game_map(gm)))
 
 // Apply an action to the game state
 exec_game_action(action: GameAction, gm: Game) : Game
@@ -272,17 +271,17 @@ exec_game_action(action: GameAction, gm: Game) : Game
       case obj | game_object =>
       // Change its direction if analog isn't centered
       let dir_fn =
-        if len_v3(action.dir) .==. 0 then
+        if len_v3(action.dir) === 0 then
           (old_dir) => old_dir
         else
           (old_dir) => action.dir
       // Set its speed if analog isn't centered
       let spd_fn =
-        if len_v3(action.dir) .==. 0 then
+        if len_v3(action.dir) === 0 then
           (old_spd) => 0
         else
           (old_spd) =>
-            if obj.id .==. 3 then
+            if obj.id === 3 then
               3
             else
               6
@@ -304,7 +303,6 @@ exec_game_action(action: GameAction, gm: Game) : Game
   | game_key5 => gm
   | game_text => gm
 
-// Tick-wise interaction of `a` with `b`
 interact_with(this:GameObject, that:GameObject): GameObject
   case this | game_object =>
   case that | game_object =>
@@ -313,10 +311,10 @@ interact_with(this:GameObject, that:GameObject): GameObject
     case that.box
     | circbox =>  
       let dst = dist_v3(this.pos, that.pos)
-      let rad = this.box.rad .+. that.box.rad
-      if (dst .>. that.box.rad) .&. (dst .<. rad) then
+      let rad = this.box.rad + that.box.rad
+      if (dst > that.box.rad) && (dst < rad) then
         let out_dir = norm_v3(sub_v3(this.pos, that.pos))
-        let out_vec = scale_v3(rad .-. dst, out_dir)
+        let out_vec = scale_v3(rad - dst, out_dir)
         let new_pos = add_v3(this.pos, out_vec)
         mut_object_pos((old) => new_pos, this)
       else
@@ -343,11 +341,11 @@ exec_game_turn(gm: Game) : Game
         let id  = obj.ani.id
         let tik = obj.ani.tik
         let res =
-          let a = (id .==. 1) .&. (tik .==. 15)
-          let b = (id .==. 3) .&. (tik .==. 18)
-          a .|. b
+          let a = (id === 1) && (tik === 15)
+          let b = (id === 3) && (tik === 18)
+          a || b
         let new_id = if res then 0 else id
-        let new_tik = if res then 0 else tik .+. 1
+        let new_tik = if res then 0 else tik + 1
         anim(new_id, new_tik)
     let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
     let trg_pos = v3(0,64,0)
@@ -355,35 +353,37 @@ exec_game_turn(gm: Game) : Game
       new_id, new_hp, new_pos, new_spd,
       new_dir, new_vel, new_box, new_ani)
     let int_fun = (that, this) => interact_with(this, that)
-    fold_list(GameObject; _ new_obj, int_fun, gm.map)
-  game(map_list(GameObject; _ tick, gm.map))
+    fold(GameObject; _ new_obj, int_fun, gm.map)
+  game(map(GameObject; _ tick, gm.map))
 
-// TODO: very hard coded, comment, improve, etc.
+//// TODO: very hard coded, comment, improve, etc.
 get_object_model_id(obj: GameObject) : Number 
   case obj | game_object =>
   case obj.ani | anim =>
-  if obj.id .==. 0 then
+  if obj.id === 0 then
     // idle/walk
-    if obj.ani.id .==. 0 then
-      if (obj.spd .<. 0.1) then
-        MIN_IDLE_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 3
+    if obj.ani.id === 0 then
+      if (obj.spd < 0.1) then
+        MIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 3
       else
-        MIN_RUN_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 5
+        MIN_RUN_0 + ((obj.ani.tik \ 3) >>> 0) % 5
     // attack
     else
-      MIN_ATTACKA_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 6
-  else if obj.id .==. 3 then
+      MIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 6
+  else if obj.id === 3 then
     // idle/walk
-    if obj.ani.id .==. 0 then
-      if (obj.spd .<. 0.1) then
-        ZOIN_IDLE_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 5
+    if obj.ani.id === 0 then
+      if (obj.spd < 0.1) then
+        ZOIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 5
       else
-        ZOIN_WALK_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 6
+        ZOIN_WALK_0 + ((obj.ani.tik \ 3) >>> 0) % 6
     // attack
     else
-      ZOIN_ATTACKA_0 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 7
+      ZOIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 7
+  else if obj.id === 2 then
+    MIKEGATOR_SPINTAIL_0 + ((obj.ani.tik \ 3) >>> 0) % 8
   else
-    SIMPLAO_IDLE1 .+. ((obj.ani.tik ./. 3) .>>>. 0) .%. 4
+    KENKO_ULTK_0 + ((obj.ani.tik \ 3) >>> 0) % 26
 
 SIMPLAO_IDLE1 0
 SIMPLAO_IDLE2 1
@@ -437,3 +437,48 @@ ZOIN_WALK_3 48
 ZOIN_WALK_4 49
 ZOIN_WALK_5 50
 ZOIN_WALK_6 51
+MIKEGATOR_WALK_0 52
+MIKEGATOR_WALK_1 53
+MIKEGATOR_WALK_2 54
+MIKEGATOR_WALK_3 55
+MIKEGATOR_WALK_4 56
+MIKEGATOR_WALK_5 57
+MIKEGATOR_WALK_6 58
+MIKEGATOR_WALK_7 59
+MIKEGATOR_SPINTAIL_0 60
+MIKEGATOR_SPINTAIL_1 61
+MIKEGATOR_SPINTAIL_2 62
+MIKEGATOR_SPINTAIL_3 63
+MIKEGATOR_SPINTAIL_4 64
+MIKEGATOR_SPINTAIL_5 65
+MIKEGATOR_SPINTAIL_6 66
+MIKEGATOR_SPINTAIL_7 67
+KENKO_ULTK_0 68
+KENKO_ULTK_1 69
+KENKO_ULTK_2 70
+KENKO_ULTK_3 71
+KENKO_ULTK_4 72
+KENKO_ULTK_5 73
+KENKO_ULTK_6 74
+KENKO_ULTK_7 75
+KENKO_ULTK_8 76
+KENKO_ULTK_9 77
+KENKO_ULTK_10 78
+KENKO_ULTK_11 79
+KENKO_ULTK_12 80
+KENKO_ULTK_13 81
+KENKO_ULTK_14 82
+KENKO_ULTK_15 83
+KENKO_ULTK_16 84
+KENKO_ULTK_17 85
+KENKO_ULTK_18 86
+KENKO_ULTK_19 87
+KENKO_ULTK_20 88
+KENKO_ULTK_21 89
+KENKO_ULTK_22 90
+KENKO_ULTK_23 91
+KENKO_ULTK_24 92
+KENKO_ULTK_25 93
+
+
+

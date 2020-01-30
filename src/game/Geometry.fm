@@ -1,5 +1,4 @@
-import Base#mbRT
-import Extra
+import Base#0OIj
 
 T V3
 | v3(x: Number, y: Number, z: Number) 
@@ -36,56 +35,56 @@ mut_z(fn: Number -> Number, v: V3)
 sub_v3(a: V3, b: V3) : V3
   case a | v3 =>
   case b | v3 =>
-  v3(a.x .-. b.x, a.y .-. b.y, a.z .-. b.z)
+  v3(a.x - b.x, a.y - b.y, a.z - b.z)
 
 add_v3(a: V3, b: V3) : V3
   case a | v3 =>
   case b | v3 =>
-  v3(a.x .+. b.x, a.y .+. b.y, a.z .+. b.z)
+  v3(a.x + b.x, a.y + b.y, a.z + b.z)
 
 mul_v3(a: V3, b: V3) : V3
   case a | v3 =>
   case b | v3 =>
-  v3(a.x .*. b.x, a.y .*. b.y, a.z .*. b.z)
+  v3(a.x * b.x, a.y * b.y, a.z * b.z)
 
 len_v3(a: V3) : Number
   case a | v3 =>
   let sqr = 0
-  let sqr = sqr .+. (a.x .*. a.x)
-  let sqr = sqr .+. (a.y .*. a.y)
-  let sqr = sqr .+. (a.z .*. a.z)
-  let sqr = sqr .**. 0.5
+  let sqr = sqr + (a.x * a.x)
+  let sqr = sqr + (a.y * a.y)
+  let sqr = sqr + (a.z * a.z)
+  let sqr = sqr ** 0.5
   sqr
     
 norm_v3(a: V3) : V3
   let l = len_v3(a)
   case a | v3 =>
-  v3(a.x ./. l, a.y ./. l, a.z ./. l)
+  v3(a.x \ l, a.y \ l, a.z \ l)
 
 scale_v3(x: Number, a: V3)
   case a
-  | v3 => v3(a.x .*. x, a.y .*. x, a.z .*. x)
+  | v3 => v3(a.x * x, a.y * x, a.z * x)
 
 dot_v3(a: V3, b: V3) : Number
   case a | v3 =>
   case b | v3 =>
   let d = 0
-  let d = d .+. (a.x .*. b.x)
-  let d = d .+. (a.y .*. b.y)
-  let d = d .+. (a.z .*. b.z)
+  let d = d + (a.x * b.x)
+  let d = d + (a.y * b.y)
+  let d = d + (a.z * b.z)
   d
 
 sqrdist_v3(a: V3, b: V3) : Number
   case a | v3 =>
   case b | v3 =>
   let d = 0
-  let d = d .+. ((a.x .-. b.x) .**. 2)
-  let d = d .+. ((a.y .-. b.y) .**. 2)
-  let d = d .+. ((a.z .-. b.z) .**. 2)
+  let d = d + ((a.x - b.x) ** 2)
+  let d = d + ((a.y - b.y) ** 2)
+  let d = d + ((a.z - b.z) ** 2)
   d
 
 dist_v3(a: V3, b: V3) : Number
-  sqrdist_v3(a, b) .**. 0.5
+  sqrdist_v3(a, b) ** 0.5
 
 // A finite line segment between two points
 T Segment
@@ -110,24 +109,24 @@ point_segment_sqrdist(p: V3, s: Segment) : Number
   case s.b as b | v3 => 
   case p | v3 =>
     let l = 0
-    let l = l .+. ((a.x .-. b.x) .**. 2)
-    let l = l .+. ((a.y .-. b.y) .**. 2)
+    let l = l + ((a.x - b.x) ** 2)
+    let l = l + ((a.y - b.y) ** 2)
     let t = 0
-    let t = t .+. ((p.x .-. a.x) .*. (b.x .-. a.x))
-    let t = t .+. ((p.y .-. a.y) .*. (b.y .-. a.y))
-    let t = t ./. l
+    let t = t + ((p.x - a.x) * (b.x - a.x))
+    let t = t + ((p.y - a.y) * (b.y - a.y))
+    let t = t \ l
     let t = max(0, min(1, t))
     let d = 0
-    let k = (p.x .-. (a.x .+. (t .*. (b.x .-. a.x)))) .**. 2
-    let d = d .+. k
-    let k = (p.y .-. (a.y .+. (t .*. (b.y .-. a.y)))) .**. 2
-    let d = d .+. k
+    let k = (p.x - (a.x + (t * (b.x - a.x)))) ** 2
+    let d = d + k
+    let k = (p.y - (a.y + (t * (b.y - a.y)))) ** 2
+    let d = d + k
     d
 
 
 // Distance between a point and a segment
 point_segment_dist(p: V3, s: Segment): Number
-  point_segment_dist(p, s) .**. 0.5
+  point_segment_dist(p, s) ** 0.5
 
 // The two intersection points of a circle and a line
 circle_line_intersection(circle: Circle, line: Line)
@@ -141,29 +140,29 @@ circle_line_intersection(circle: Circle, line: Line)
   let cy = circle.pos.y
   let dx = line.dir.x
   let dy = line.dir.y
-  let x1 = line.pos.x .-. cx
-  let y1 = line.pos.y .-. cy
-  let x2 = (line.pos.x .+. dx) .-. cx
-  let y2 = (line.pos.y .+. dy) .-. cy
-  let dd = (x1 .*. y2) .-. (x2 .*. y1)
-  let de = (circle.rad .*. circle.rad) .-. (dd .*. dd) 
-  if (de .<. 0) .|. (de .==. 0) then
+  let x1 = line.pos.x - cx
+  let y1 = line.pos.y - cy
+  let x2 = (line.pos.x + dx) - cx
+  let y2 = (line.pos.y + dy) - cy
+  let dd = (x1 * y2) - (x2 * y1)
+  let de = (circle.rad * circle.rad) - (dd * dd) 
+  if (de < 0) || (de === 0) then
     none(_)
   else
-    let sx = if dy .<. 0 then 0 .-. dx else dx
-    let sy = if dy .<. 0 then 0 .-. dy else dy
-    let px = sx .*. (de .**. 0.5)
-    let py = sy .*. (de .**. 0.5)
-    let qx = dd .*. dy
-    let qy = (0 .-. dd) .*. dx
-    let ax = qx .-. px
-    let ay = qy .-. py
-    let bx = qx .+. px
-    let by = qy .+. py
-    let ux = ax .+. cx
-    let uy = ay .+. cy
-    let vx = bx .+. cx
-    let vy = by .+. cy
+    let sx = if dy < 0 then 0 - dx else dx
+    let sy = if dy < 0 then 0 - dy else dy
+    let px = sx * (de ** 0.5)
+    let py = sy * (de ** 0.5)
+    let qx = dd * dy
+    let qy = (0 - dd) * dx
+    let ax = qx - px
+    let ay = qy - py
+    let bx = qx + px
+    let by = qy + py
+    let ux = ax + cx
+    let uy = ay + cy
+    let vx = bx + cx
+    let vy = by + cy
     some(_ pair(__ v3(ux,uy,0), v3(vx,vy,0)))
 
 circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
@@ -171,7 +170,7 @@ circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
   case a | circle =>
   case b | circle =>
   let r = a.rad
-  let c = circle(b.pos, a.rad .+. b.rad)
+  let c = circle(b.pos, a.rad + b.rad)
   let l = line(a.pos, norm_v3(d))
   let p = circle_line_intersection(c, l)
   case p
@@ -180,11 +179,11 @@ circle_to_circle_hit_dist(a: Circle, d: V3, b: Circle)
     case p.value as p | pair =>
     let d0 = sqrdist_v3(a.pos, p.fst)
     let d1 = sqrdist_v3(a.pos, p.snd)
-    let hp = if d0 .<. d1 then p.fst else p.snd
+    let hp = if d0 < d1 then p.fst else p.snd
     let dt = dot_v3(d, sub_v3(hp, a.pos))
     let ds = sqrdist_v3(hp, a.pos)
-    if dt .>. 0 then
-      some(_ ds .**. 0.5)
+    if dt > 0 then
+      some(_ ds ** 0.5)
     else
       none(_)
 
@@ -201,7 +200,7 @@ circle_boundary_intersects(c: Circle, b: Boundary): Number
       let p1 = l1.head
       let sg = segment(p0, p1)
       let cd = point_segment_sqrdist(c.pos, sg)
-      if cd .<. (c.rad .*. c.rad) then
+      if cd < (c.rad * c.rad) then
         1
       else
         let boun = boundary(cons(_ l1.head, l1.tail))
