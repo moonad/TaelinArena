@@ -55,20 +55,20 @@ class Main extends Component {
   emit_keys() {
     let keyboard = this.keyboard;
     let pointer = this.pointer;
-    var action_code = TA.make_action_code(keyboard,pointer);
-    if (action_code && DEBUG_ON) {
-      var ac = String((DEBUG_ID||0)+1) + action_code;
-      var pa = TA.parse_player_action(ac)[1];
+    var input_code = TA.make_input_code(keyboard,pointer);
+    if (input_code && DEBUG_ON) {
+      var ac = String((DEBUG_ID||0)+1) + input_code;
+      var pa = TA.parse_player_input(ac)[1];
       var gs = this.game_state;
-      this.game_state = TA.exec_player_action(pa, gs);
-    } else if (action_code) {
-      var is_same_code = this.last_code === action_code;
-      var is_sdir_code = action_code[0] === "0";
+      this.game_state = TA.exec_player_input(pa, gs);
+    } else if (input_code) {
+      var is_same_code = this.last_code === input_code;
+      var is_sdir_code = input_code[0] === "0";
       // Prevents repeatedly sending the same SDIR event
       if (!(is_sdir_code && is_same_code)) {
-        this.post("$"+action_code);
+        this.post("$"+input_code);
       }
-      this.last_code = action_code;
+      this.last_code = input_code;
     }
     // Sets 'changed' flag to false
     for (var key in this.keyboard) {
@@ -320,7 +320,7 @@ class Main extends Component {
               for (var j = 0; j < new_turns[i].length; ++j) {
                 let a = new_turns[i][j];
                 let g = this.game_state;
-                this.game_state = TA.exec_player_action(a,g);
+                this.game_state = TA.exec_player_input(a,g);
               }
               var gs = this.game_state;
               this.game_state = TA.exec_game_turn(gs);

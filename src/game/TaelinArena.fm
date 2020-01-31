@@ -1,4 +1,4 @@
-import Base#0OIj
+import Base#9y4x
 import Geometry
 
 // :: COLLISION ::
@@ -9,72 +9,52 @@ T Hitbox
 
 // :: GAME OBJECT ::
 
-ObjectId : Type
+ThingId : Type
   Number
 
 ModelId : Type
   Number
 
-T Anim
-| anim(
+T Action
+| action(
   id  : Number,
   tik : Number)
 
-T GameObject
-| game_object(
-  id  : ObjectId,
+T Thing
+| thing(
+  id  : ThingId,
   hp  : Number,
   pos : V3,
   spd : Number,
   dir : V3,
   vel : V3,
   box : Hitbox,
-  ani : Anim)
-
-// :: GAME MAP ::
-
-GameMap : Type
-  List(GameObject)
-
-// Gets the position of an object on the game map
-get_object_from_map(id: ObjectId, gm: GameMap)
-: Maybe(GameObject)
-  case gm |nil none(_) |cons
-  case gm.head |game_object
-  if gm.head.id === id then
-    some(_ gm.head)
-  else
-    get_object_from_map(id, gm.tail)
+  act : Action)
 
 // :: GAME ::
 
 T Game
-| game(map : GameMap)
+| game(stage : List(Thing))
 
-get_game_map(game: Game) : GameMap
-  case game |game
-  game.map
-
-// Gets an object by its id
-get_object_by_id(id: ObjectId, gs: Game) : Maybe(GameObject)
-  case gs |game
-  get_object_from_map(id, gs.map)
+// Gets a thing from game by its id
+get_thing_by_id(id: ThingId, gm: Game) : Maybe(Thing)
+  case gm | game
+  let cond = (t) => case t |thing number_equal(t.id, id)
+  find(Thing; cond, gm.stage)
 
 // Gets the position of an object by its id
-get_position_by_id(id: ObjectId, gs: Game) : V3
-  case get_object_by_id(id, gs) as got
+get_position_by_id(id: ThingId, gs: Game) : V3
+  case get_thing_by_id(id, gs) as found
   |none v3(0,0,0)
-  |some case got.value |game_object
-    got.value.pos
+  |some case found.value |thing found.value.pos
 
-// :: TESTS ::
+enum
+| SRPX
+| STANCI
+| NEELIX
+| BELANNA
 
-SRPX : Number; 0
-STANCI : Number; 1
-NEELIX : Number; 2
-BELANNA : Number; 3
-
-srpx : GameObject
+srpx : Thing
   let id = 0
   let hp = 70
   let pos = v3(0, 0, 0)
@@ -82,10 +62,10 @@ srpx : GameObject
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(10)
-  let ani = anim(0, 0)
-  game_object(id, hp, pos, spd, dir, vel, box, ani)
+  let act = action(0, 0)
+  thing(id, hp, pos, spd, dir, vel, box, act)
 
-stanci : GameObject
+stanci : Thing
   let id = 1
   let hp = 90
   let pos = v3(64, 0, 0)
@@ -93,10 +73,10 @@ stanci : GameObject
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(8)
-  let ani = anim(0, 0)
-  game_object(id, hp, pos, spd, dir, vel, box, ani)
+  let act = action(0, 0)
+  thing(id, hp, pos, spd, dir, vel, box, act)
 
-neelix : GameObject
+neelix : Thing
   let id = 2
   let hp = 700
   let pos = v3(-64, 0, 0)
@@ -105,10 +85,10 @@ neelix : GameObject
   let vel = v3(0, 0, 0)
   let box = v3(6,6,6)
   let box = circbox(8)
-  let ani = anim(0, 0)
-  game_object(id, hp, pos, spd, dir, vel, box, ani)
+  let act = action(0, 0)
+  thing(id, hp, pos, spd, dir, vel, box, act)
 
-belanna : GameObject
+belanna : Thing
   let id = 3
   let hp = 80
   let pos = v3(0, 64, 0)
@@ -116,91 +96,84 @@ belanna : GameObject
   let dir = v3(0, -1, 0)
   let vel = v3(0, 0, 0)
   let box = circbox(14)
-  let ani = anim(0, 0)
-  game_object(id, hp, pos, spd, dir, vel, box, ani)
+  let act = action(0, 0)
+  thing(id, hp, pos, spd, dir, vel, box, act)
 
 new_game : Game
-  let map = [srpx, stanci, neelix, belanna]
-  game(map)
+  let stage = [srpx, stanci, neelix, belanna]
+  game(stage)
 
 // GAME INPUT
 
-T GameAction
-| game_sdir(id: ObjectId, dir: V3) // stick direction
-| game_key0(id: ObjectId, pos: V3) // left down
-| game_key1(id: ObjectId, pos: V3) // middle down
-| game_key2(id: ObjectId, pos: V3) // right down
-| game_key3(id: ObjectId, pos: V3) // space down
-| game_key4(id: ObjectId, pos: V3) // extra down
-| game_key5(id: ObjectId, pos: V3) // shift down
-| game_text(id: ObjectId, txt: String) // chat message
+T Input
+| game_sdir(id: ThingId, dir: V3) // stick direction
+| game_key0(id: ThingId, pos: V3) // left down
+| game_key1(id: ThingId, pos: V3) // middle down
+| game_key2(id: ThingId, pos: V3) // right down
+| game_key3(id: ThingId, pos: V3) // space down
+| game_key4(id: ThingId, pos: V3) // extra down
+| game_key5(id: ThingId, pos: V3) // shift down
+| game_text(id: ThingId, txt: String) // chat message
 
-// Modifies every object in the game
-map_game_objects(
-  fn : GameObject -> GameObject,
-  gm : Game
-) : Game
-  game(map(__ fn, get_game_map(gm)))
+// Modifies every thing in the game
+map_stage(fn: Thing -> Thing, gm: Game) : Game
+  gm <= game(stage = map(__ fn, stage))
 
 // Modifies the object with given id
 // TODO: Optimize
-modify_object_by_id(
-  id: ObjectId,
-  fn: GameObject -> GameObject,
-  gm: Game
-  ) : Game
-  let fn2 = (obj) =>
-    case obj |game_object
-    if obj.id === id then
-      fn(obj)
-    else
-      obj
-  game(map(GameObject; _ fn2, get_game_map(gm)))
+with_thing(tid: ThingId, fn: Thing -> Thing, gm: Game): Game
+  let effect = (thi) =>
+    case thi |thing
+    case number_equal(thi.id, tid) as e
+    with thi : Thing
+    | true  => fn(thi)
+    | false => thi
+  map_stage(effect, gm)
 
-// Apply an action to the game state
-exec_game_action(action: GameAction, gm: Game) : Game
-  case action
+// Apply an input to the game state
+exec_input(input: Input, gm: Game) : Game
+  case input
   | game_sdir =>
-    let fn = (obj) =>
-      case obj |game_object
+    let fn = (thi) =>
+      case thi |thing
       // Change its direction if analog isn't centered
       let dir_fn =
-        if len_v3(action.dir) === 0 then
+        if len_v3(input.dir) === 0 then
           (old_dir: V3) => old_dir
         else
-          (old_dir: V3) => action.dir
+          (old_dir: V3) => input.dir
       // Set its speed if analog isn't centered
       let spd_fn =
-        if len_v3(action.dir) === 0 then
+        if len_v3(input.dir) === 0 then
           (old_spd: Number) => 0
         else
           (old_spd: Number) =>
-            if obj.id === 3 then
+            if thi.id === 3 then
               3
             else
               6
-      // Modify the object using the logic above
-      let obj = obj <= game_object(dir = dir_fn(dir))
-      let obj = obj <= game_object(spd = spd_fn(spd))
-      obj
-    modify_object_by_id(action.id, fn, gm)
+      // Modify the thing using the logic above
+      let thi = thi <= thing(dir = dir_fn(dir))
+      let thi = thi <= thing(spd = spd_fn(spd))
+      thi
+    with_thing(input.id, fn, gm)
   | game_key0 =>
-    let fn = (obj) =>
-      obj <= game_object(pos = action.pos)
-    modify_object_by_id(action.id, fn, gm)
+    let fn = (thi) =>
+      thi <= thing(pos = input.pos)
+    with_thing(input.id, fn, gm)
   | game_key1 => gm
   | game_key2 => gm
   | game_key3 =>
-    let fn = (obj) =>
-      obj <= game_object(ani = anim(1,0))
-    modify_object_by_id(action.id, fn, gm)
+    let fn = (thi) =>
+      thi <= thing(act = action(1,0))
+    with_thing(input.id, fn, gm)
   | game_key4 => gm
   | game_key5 => gm
   | game_text => gm
 
-interact_with(this:GameObject, that:GameObject): GameObject
-  case this |game_object
-  case that |game_object
+interact_with(this:Thing, that:Thing): Thing
+  case this |thing
+  case that |thing
   case this.box
   | circbox => 
     case that.box
@@ -211,7 +184,7 @@ interact_with(this:GameObject, that:GameObject): GameObject
         let out_dir = norm_v3(sub_v3(this.pos, that.pos))
         let out_vec = scale_v3(rad - dst, out_dir)
         let new_pos = add_v3(this.pos, out_vec)
-        this <= game_object(pos = new_pos)
+        this <= thing(pos = new_pos)
       else
         this
     | polybox =>
@@ -223,69 +196,66 @@ interact_with(this:GameObject, that:GameObject): GameObject
 exec_game_turn(gm: Game) : Game
   case gm |game
   let tick = (obj) =>
-    case obj |game_object
+    case obj |thing
     let new_id  = obj.id
     let new_hp  = obj.hp
     let new_spd = obj.spd
     let new_dir = obj.dir
     let new_vel = obj.vel
     let new_box = obj.box
-    let new_ani =
-      case obj.ani
-      | anim =>
-        let id  = obj.ani.id
-        let tik = obj.ani.tik
+    let new_act =
+      case obj.act
+      | action =>
+        let id  = obj.act.id
+        let fra = obj.act.tik
         let res =
-          let a = (id === 1) && (tik === 15)
-          let b = (id === 3) && (tik === 18)
+          let a = (id === 1) && (fra === 15)
+          let b = (id === 3) && (fra === 18)
           a || b
         let new_id = if res then 0 else id
-        let new_tik = if res then 0 else tik + 1
-        anim(new_id, new_tik)
+        let new_fra = if res then 0 else fra + 1
+        action(new_id, new_fra)
     let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
     let trg_pos = v3(0,64,0)
-    let new_obj = game_object(
+    let new_obj = thing(
       new_id, new_hp, new_pos, new_spd,
-      new_dir, new_vel, new_box, new_ani)
+      new_dir, new_vel, new_box, new_act)
     let int_fun = (that, this) => interact_with(this, that)
-    fold(GameObject; _ new_obj, int_fun, gm.map)
-  game(map(GameObject; _ tick, gm.map))
+    fold(Thing; _ new_obj, int_fun, gm.stage)
+  game(map(Thing; _ tick, gm.stage))
 
 T RenderInfo
-| render_info(
-  mid: Number,
-  pos: V3,
-  dir: V3)
+| render_info(mid: Number, pos: V3, dir: V3)
 
 // TODO: very hard coded, comment, improve, etc.
-get_render_info(obj: GameObject) : RenderInfo 
-  case obj |game_object
+get_render_info(obj: Thing) : RenderInfo 
+  case obj |thing
     let mid =
-      case obj.ani |anim
+      case obj.act |action
       if obj.id === 0 then
         // idle/walk
-        if obj.ani.id === 0 then
+        if obj.act.id === 0 then
           if (obj.spd < 0.1) then
-            MIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 3
+            MIN_IDLE_0 + ((obj.act.tik \ 3) >>> 0) % 3
           else
-            MIN_RUN_0 + ((obj.ani.tik \ 3) >>> 0) % 5
+            MIN_RUN_0 + ((obj.act.tik \ 3) >>> 0) % 5
         // attack
         else
-          MIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 6
+          MIN_ATTACKA_0 + ((obj.act.tik \ 3) >>> 0) % 6
       else if obj.id === 3 then
         // idle/walk
-        if obj.ani.id === 0 then
+        if obj.act.id === 0 then
           if (obj.spd < 0.1) then
-            ZOIN_IDLE_0 + ((obj.ani.tik \ 3) >>> 0) % 5
+            ZOIN_IDLE_0 + ((obj.act.tik \ 3) >>> 0) % 5
           else
-            ZOIN_WALK_0 + ((obj.ani.tik \ 3) >>> 0) % 6
+            ZOIN_WALK_0 + ((obj.act.tik \ 3) >>> 0) % 6
         // attack
         else
-          ZOIN_ATTACKA_0 + ((obj.ani.tik \ 3) >>> 0) % 7
+          ZOIN_ATTACKA_0 + ((obj.act.tik \ 3) >>> 0) % 7
       else if obj.id === 2 then
-        MIKEGATOR_SPINTAIL_0 + ((obj.ani.tik \ 3) >>> 0) % 8
+        MIKEGATOR_SPINTAIL_0 + ((obj.act.tik \ 3) >>> 0) % 8
       else
-        KENKO_ULTK_0 + ((obj.ani.tik \ 3) >>> 0) % 26
+        KENKO_ULTK_0 + ((obj.act.tik \ 3) >>> 0) % 26
     let pos = obj.pos 
     let dir = obj.dir
     render_info(mid, pos, dir)

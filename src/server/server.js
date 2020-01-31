@@ -70,22 +70,22 @@ function add_new_turn(gid) {
   }
 };
 
-// Adds a action to given game_id
-function perform_action(gid, player_name, action) {
+// Adds a input to given game_id
+function perform_input(gid, player_name, input) {
   console.log(player_name+" acting on "+gid);
   var player_id = get_player_id(player_name, games[gid]);
   var turn_count = turns[gid].length;
   if ( turn_count > 0
     && turn_count < MAX_TURNS
     && player_id !== null
-    && is_valid_action(action)) {
+    && is_valid_input(input)) {
     console.log(
       ("- game="+gid
       +", turn="+turn_count
-      +", acti="+action));
-    // Creates the turn constructor: (PLAYER_ID+1)|ACTION
+      +", acti="+input));
+    // Creates the turn constructor: (PLAYER_ID+1)|INPUT
     var turn_ctor = (player_id+1).toString(16);
-    var turn_ctor = turn_ctor + action;
+    var turn_ctor = turn_ctor + input;
     turns[gid][turn_count-1] += turn_ctor;
   }
 };
@@ -132,8 +132,8 @@ function is_valid_teams(teams) {
   return true;
 }
 
-// Validates an action code string
-function is_valid_action(code) {
+// Validates an input code string
+function is_valid_input(code) {
   var ctr = Number(code[0]);
   if (ctr === 0 && code.length === 3) {
     return true;
@@ -275,7 +275,7 @@ app.post("/offer", (req, res) => {
   var turn = 0;
   peers[req.body.name] = peer;
 
-  // Continuously sends `game_id,from_turn,[action]` to peer
+  // Continuously sends `game_id,from_turn,[input]` to peer
   var turn_feed = setInterval(() => {
     if (game > 0) {
       var count = turns[game].length;
@@ -284,7 +284,7 @@ app.post("/offer", (req, res) => {
       var from = Math.min(Math.max((turn||0)-5, 0),count-1); 
       var to = Math.min((turn||0)+5, count-1);
 
-      // Creates message with game_id, from_turn and actions
+      // Creates message with game_id, from_turn and inputs
       var msg = "";
       msg += ("00000000"+game.toString(16)).slice(-8); 
       msg += ("00000000"+from.toString(16)).slice(-8);
@@ -332,9 +332,9 @@ app.post("/offer", (req, res) => {
         console.log(name+" wants turn="+turn+" game="+game);
         break;
 
-      // Player wants to perform an in-game action.
+      // Player wants to perform an in-game input.
       case "$":
-        perform_action(game, name, str.slice(1));
+        perform_input(game, name, str.slice(1));
         break;
 
       // Player sent a normal chat message.
