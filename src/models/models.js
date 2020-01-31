@@ -51,6 +51,7 @@ const models = [
   "simplao/poder5",
   "simplao/poder6",
   "simplao/poder7",
+  
   "min/idle_0",
   "min/idle_1",
   "min/idle_2",
@@ -65,6 +66,7 @@ const models = [
   "min/attackA_3",
   "min/attackA_4",
   "min/attackA_5",
+
   "zoin/idle_0",
   "zoin/idle_1",
   "zoin/idle_2",
@@ -84,6 +86,7 @@ const models = [
   "zoin/walk_4",
   "zoin/walk_5",
   "zoin/walk_6",
+
   "mikegator/walk1",
   "mikegator/walk2",
   "mikegator/walk3",
@@ -100,6 +103,7 @@ const models = [
   "mikegator/spintail6",
   "mikegator/spintail7",
   "mikegator/spintail8",
+
   "kenko/UltK_0",
   "kenko/UltK_1",
   "kenko/UltK_2",
@@ -126,6 +130,26 @@ const models = [
   "kenko/UltK_23",
   "kenko/UltK_24",
   "kenko/UltK_25",
+  "teichi/walk_0",
+
+  "teichi/idle/idle_1",
+  "teichi/idle/idle_2",
+  "teichi/idle/idle_3",
+  "teichi/idle/idle_4",
+  "teichi/idle/idle_5",
+  "teichi/idle/idle_6",
+  "teichi/walk/walk_1",
+  "teichi/walk/walk_2",
+  "teichi/walk/walk_3",
+  "teichi/walk/walk_4",
+  "teichi/walk/walk_5",
+  "teichi/walk/walk_6",
+  "teichi/walk/walk_7",
+  "teichi/walk/walk_8",
+  "teichi/attack-left/var3/attack1_var3_1",
+  "teichi/attack-left/var3/attack1_var3_2",
+  "teichi/attack-left/var3/attack1_var3_3",
+  "teichi/attack-left/var3/attack1_var3_4"
 ].map(load);
 
 module.exports = {
