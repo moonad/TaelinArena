@@ -7,7 +7,7 @@ Taelin Arena is an Multiplayer Online Battle Arena
 (MOBA) developed by [Sunshine
 Cybernetics](http://sunshinecybernetics.com/).
 
-[Video.](https://www.youtube.com/watch?v=Wqe92Vu92go&feature=youtu.be)
+[Test render!](https://www.youtube.com/watch?v=Wqe92Vu92go&feature=youtu.be)
 
 ### Fully modable
 
