@@ -1,0 +1,21 @@
+import TaelinArena.Game
+import TaelinArena.Models
+
+zoin_hero : Hero
+  let stat = stat(80, 2, 12)
+  let inpt = (this, input) => this
+  let tick = (this) => this
+  let draw = (this) =>
+    case this |thing
+    let model =
+      // idle/walk
+      if this.act === 0 then
+        if (this.spd < 0.1) then
+          aniloop(ZOIN_IDLE_0, 5, 6, this.tik)
+        else
+          aniloop(ZOIN_WALK_0, 6, 3, this.tik)
+      // attack
+      else
+        aniloop(ZOIN_ATTACKA_0, 7, 3, this.tik)
+    draw(model, this.pos, this.dir)
+  hero(stat, inpt, tick, draw)

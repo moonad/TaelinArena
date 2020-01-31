@@ -48,7 +48,7 @@ class Main extends Component {
       this.game_state = TA.new_game;
       setInterval(() => {
         var gs = this.game_state;
-        this.game_state = TA.exec_game_turn(gs);
+        this.game_state = TA.exec_turn(gs);
       }, 1000 / 24);
     }
   }
@@ -58,9 +58,9 @@ class Main extends Component {
     var input_code = TA.make_input_code(keyboard,pointer);
     if (input_code && DEBUG_ON) {
       var ac = String((DEBUG_ID||0)+1) + input_code;
-      var pa = TA.parse_player_input(ac)[1];
+      var pa = TA.parse_command(ac)[1];
       var gs = this.game_state;
-      this.game_state = TA.exec_player_input(pa, gs);
+      this.game_state = TA.exec_command(pa, gs);
     } else if (input_code) {
       var is_same_code = this.last_code === input_code;
       var is_sdir_code = input_code[0] === "0";
@@ -320,10 +320,10 @@ class Main extends Component {
               for (var j = 0; j < new_turns[i].length; ++j) {
                 let a = new_turns[i][j];
                 let g = this.game_state;
-                this.game_state = TA.exec_player_input(a,g);
+                this.game_state = TA.exec_command(a,g);
               }
               var gs = this.game_state;
-              this.game_state = TA.exec_game_turn(gs);
+              this.game_state = TA.exec_turn(gs);
             }
           }
         break;

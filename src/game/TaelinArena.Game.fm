@@ -1,0 +1,97 @@
+import Base#9y4x
+import TaelinArena.Geometry
+
+PlayerId : Type
+  Number
+
+HeroId : Type
+  Number
+
+ActionId : Type
+  Number
+
+T Hitbox
+| cbox(rad: Number)
+| pbox(pts: List(V3))
+
+T Stat
+| stat(
+  mhp: Number,
+  spd: Number,
+  rad: Number)
+
+T Hero
+| hero(
+  stat: Stat,
+  inpt: Thing -> Input -> Thing, 
+  tick: Thing -> Thing,
+  draw: Thing -> Draw)
+
+T Thing
+| thing(
+  pid : PlayerId,
+  hid : HeroId,
+  act : ActionId,
+  tik : Number
+  chp : Number,
+  pos : V3,
+  spd : Number,
+  dir : V3,
+  vel : V3,
+  box : Hitbox)
+
+T Game
+| game(stage : List(Thing))
+
+T Input
+| sdir(dir: V3) // stick direction
+| key0(pos: V3) // left down
+| key1(pos: V3) // middle down
+| key2(pos: V3) // right down
+| key3(pos: V3) // space down
+| key4(pos: V3) // extra down
+| key5(pos: V3) // shift down
+| cmsg(txt: String) // chat message
+
+T Command
+| command(pid: PlayerId, inp: Input)
+
+T Draw
+| draw(model: Number, pos: V3, dir: V3)
+
+// Gets a thing from game by its id
+get_thing_by_pid(pid: PlayerId, gm: Game) : Maybe(Thing)
+  case gm | game
+  let cond = (t) =>
+    case t |thing
+    number_equal(t.pid, pid)
+  find(Thing; cond, gm.stage)
+
+// Gets the position of an object by its id
+get_position_by_pid(pid: PlayerId, gs: Game) : V3
+  case get_thing_by_pid(pid, gs) as found
+  | none => v3(0,0,0)
+  | some => case found.value |thing found.value.pos
+
+// Modifies every thing in the game
+map_stage(fn: Thing -> Thing, gm: Game) : Game
+  gm <= game(stage = map(__ fn, stage))
+
+// Modifies the object with given id
+with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
+  let effect = (thi) =>
+    case thi |thing
+    case number_equal(thi.pid, pid) as e
+    with thi : Thing
+    | true  => fn(thi)
+    | false => thi
+  map_stage(effect, gm)
+
+// Interpolates animation frames
+aniloop(
+  from  : Number,
+  count : Number,
+  delay : Number,
+  tick  : Number
+  ) : Number
+  from + (floor(tick \ delay) % count)

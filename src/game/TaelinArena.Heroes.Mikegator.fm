@@ -1,0 +1,12 @@
+import TaelinArena.Game
+import TaelinArena.Models
+
+mikegator_hero : Hero
+  let stat = stat(110, 3, 12)
+  let inpt = (this, input) => this
+  let tick = (this) => this
+  let draw = (this) =>
+    case this |thing
+    let model = aniloop(MIKEGATOR_SPINTAIL_0,8,3,this.tik)
+    draw(model, this.pos, this.dir)
+  hero(stat, inpt, tick, draw)

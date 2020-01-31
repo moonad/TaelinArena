@@ -1,183 +1,61 @@
 import Base#9y4x
-import Geometry
+import TaelinArena.Geometry
+import TaelinArena.Game
+import TaelinArena.Models
+import TaelinArena.Heroes
 
-// :: COLLISION ::
-
-T Hitbox
-| circbox(rad: Number)
-| polybox(pts: List(V3))
-
-// :: GAME OBJECT ::
-
-ThingId : Type
-  Number
-
-ModelId : Type
-  Number
-
-T Action
-| action(
-  id  : Number,
-  tik : Number)
-
-T Thing
-| thing(
-  id  : ThingId,
-  hp  : Number,
-  pos : V3,
-  spd : Number,
-  dir : V3,
-  vel : V3,
-  box : Hitbox,
-  act : Action)
-
-// :: GAME ::
-
-T Game
-| game(stage : List(Thing))
-
-// Gets a thing from game by its id
-get_thing_by_id(id: ThingId, gm: Game) : Maybe(Thing)
-  case gm | game
-  let cond = (t) => case t |thing number_equal(t.id, id)
-  find(Thing; cond, gm.stage)
-
-// Gets the position of an object by its id
-get_position_by_id(id: ThingId, gs: Game) : V3
-  case get_thing_by_id(id, gs) as found
-  |none v3(0,0,0)
-  |some case found.value |thing found.value.pos
-
-enum
-| SRPX
-| STANCI
-| NEELIX
-| BELANNA
-
-srpx : Thing
-  let id = 0
-  let hp = 70
-  let pos = v3(0, 0, 0)
+// Creates a new reseted hero given its HeroId
+new_hero(hid: HeroId) : Thing
+  case get_hero_by_hid(hid) as hero |hero
+  case hero.stat | stat
+  let id  = 0
+  let hid = hid
+  let act = 0
+  let tik = 0
+  let chp = hero.stat.mhp
+  let pos = v3(0,0,0)
   let spd = 0
-  let dir = v3(0, -1, 0)
-  let vel = v3(0, 0, 0)
-  let box = circbox(10)
-  let act = action(0, 0)
-  thing(id, hp, pos, spd, dir, vel, box, act)
+  let dir = v3(0,-1,0)
+  let vel = v3(0,0,0)
+  let box = cbox(hero.stat.rad)
+  thing(id,hid,act,tik,chp,pos,spd,dir,vel,box)
 
-stanci : Thing
-  let id = 1
-  let hp = 90
-  let pos = v3(64, 0, 0)
-  let spd = 0
-  let dir = v3(0, -1, 0)
-  let vel = v3(0, 0, 0)
-  let box = circbox(8)
-  let act = action(0, 0)
-  thing(id, hp, pos, spd, dir, vel, box, act)
-
-neelix : Thing
-  let id = 2
-  let hp = 700
-  let pos = v3(-64, 0, 0)
-  let spd = 0
-  let dir = v3(0, -1, 0)
-  let vel = v3(0, 0, 0)
-  let box = v3(6,6,6)
-  let box = circbox(8)
-  let act = action(0, 0)
-  thing(id, hp, pos, spd, dir, vel, box, act)
-
-belanna : Thing
-  let id = 3
-  let hp = 80
-  let pos = v3(0, 64, 0)
-  let spd = 0
-  let dir = v3(0, -1, 0)
-  let vel = v3(0, 0, 0)
-  let box = circbox(14)
-  let act = action(0, 0)
-  thing(id, hp, pos, spd, dir, vel, box, act)
-
-new_game : Game
-  let stage = [srpx, stanci, neelix, belanna]
-  game(stage)
-
-// GAME INPUT
-
-T Input
-| game_sdir(id: ThingId, dir: V3) // stick direction
-| game_key0(id: ThingId, pos: V3) // left down
-| game_key1(id: ThingId, pos: V3) // middle down
-| game_key2(id: ThingId, pos: V3) // right down
-| game_key3(id: ThingId, pos: V3) // space down
-| game_key4(id: ThingId, pos: V3) // extra down
-| game_key5(id: ThingId, pos: V3) // shift down
-| game_text(id: ThingId, txt: String) // chat message
-
-// Modifies every thing in the game
-map_stage(fn: Thing -> Thing, gm: Game) : Game
-  gm <= game(stage = map(__ fn, stage))
-
-// Modifies the object with given id
-// TODO: Optimize
-with_thing(tid: ThingId, fn: Thing -> Thing, gm: Game): Game
-  let effect = (thi) =>
-    case thi |thing
-    case number_equal(thi.id, tid) as e
+// Apply a player input to the game state
+exec_command(cmd: Command, gm: Game) : Game
+  case cmd |command
+  let fn = (thi: Thing) =>
+    case cmd.inp as inp
     with thi : Thing
-    | true  => fn(thi)
-    | false => thi
-  map_stage(effect, gm)
-
-// Apply an input to the game state
-exec_input(input: Input, gm: Game) : Game
-  case input
-  | game_sdir =>
-    let fn = (thi) =>
+    | sdir =>
       case thi |thing
-      // Change its direction if analog isn't centered
-      let dir_fn =
-        if len_v3(input.dir) === 0 then
-          (old_dir: V3) => old_dir
-        else
-          (old_dir: V3) => input.dir
-      // Set its speed if analog isn't centered
-      let spd_fn =
-        if len_v3(input.dir) === 0 then
-          (old_spd: Number) => 0
-        else
-          (old_spd: Number) =>
-            if thi.id === 3 then
-              3
-            else
-              6
-      // Modify the thing using the logic above
-      let thi = thi <= thing(dir = dir_fn(dir))
-      let thi = thi <= thing(spd = spd_fn(spd))
+      case get_hero_by_hid(thi.hid) as her |hero
+      case her.stat as sta |stat
+      let mov = len_v3(inp.dir) === 0
+      let dfn = (d: V3    ) => if mov then d else inp.dir
+      let sfn = (s: Number) => if mov then 0 else sta.spd
+      let thi = thi <= thing(dir = dfn(dir))
+      let thi = thi <= thing(spd = sfn(spd))
       thi
-    with_thing(input.id, fn, gm)
-  | game_key0 =>
-    let fn = (thi) =>
-      thi <= thing(pos = input.pos)
-    with_thing(input.id, fn, gm)
-  | game_key1 => gm
-  | game_key2 => gm
-  | game_key3 =>
-    let fn = (thi) =>
-      thi <= thing(act = action(1,0))
-    with_thing(input.id, fn, gm)
-  | game_key4 => gm
-  | game_key5 => gm
-  | game_text => gm
+    | key0 => thi <= thing(pos = inp.pos)
+    | key1 => thi
+    | key2 => thi
+    | key3 => thi <= thing(act = 1, tik = 0)
+    | key4 => thi
+    | key5 => thi
+    | cmsg => thi
+  let fn = (thi: Thing) =>
+    case thi |thing
+    case get_hero_by_hid(thi.hid) as hro |hero
+    hro.inpt(fn(thi), cmd.inp)
+  with_thing(cmd.pid, fn, gm)
 
 interact_with(this:Thing, that:Thing): Thing
   case this |thing
   case that |thing
   case this.box
-  | circbox => 
+  | cbox => 
     case that.box
-    | circbox =>  
+    | cbox =>  
       let dst = dist_v3(this.pos, that.pos)
       let rad = this.box.rad + that.box.rad
       if (dst > that.box.rad) && (dst < rad) then
@@ -187,171 +65,43 @@ interact_with(this:Thing, that:Thing): Thing
         this <= thing(pos = new_pos)
       else
         this
-    | polybox =>
+    | pbox =>
       this
-  | polybox =>
+  | pbox =>
     this
 
 // Game's main loop
-exec_game_turn(gm: Game) : Game
-  case gm |game
-  let tick = (obj) =>
-    case obj |thing
-    let new_id  = obj.id
-    let new_hp  = obj.hp
-    let new_spd = obj.spd
-    let new_dir = obj.dir
-    let new_vel = obj.vel
-    let new_box = obj.box
-    let new_act =
-      case obj.act
-      | action =>
-        let id  = obj.act.id
-        let fra = obj.act.tik
-        let res =
-          let a = (id === 1) && (fra === 15)
-          let b = (id === 3) && (fra === 18)
-          a || b
-        let new_id = if res then 0 else id
-        let new_fra = if res then 0 else fra + 1
-        action(new_id, new_fra)
-    let new_pos = add_v3(obj.pos, scale_v3(obj.spd, obj.dir))
-    let trg_pos = v3(0,64,0)
-    let new_obj = thing(
-      new_id, new_hp, new_pos, new_spd,
-      new_dir, new_vel, new_box, new_act)
-    let int_fun = (that, this) => interact_with(this, that)
-    fold(Thing; _ new_obj, int_fun, gm.stage)
-  game(map(Thing; _ tick, gm.stage))
-
-T RenderInfo
-| render_info(mid: Number, pos: V3, dir: V3)
+exec_turn(gm: Game) : Game
+  let tick = (stage: List(Thing), thi: Thing) =>
+    case thi |thing
+    let tp0 = ((thi.act === 1) && (thi.tik === 15))
+    let tp1 = ((thi.act === 3) && (thi.tik === 18))
+    let tp2 = tp0 || tp1
+    let thi = thi <= thing(
+      act = if tp2 then 0 else thi.act,
+      tik = if tp2 then 0 else thi.tik + 1,
+      pos = add_v3(thi.pos, scale_v3(thi.spd, thi.dir)))
+    let interact = (that, this) => interact_with(this, that)
+    fold(Thing; _ thi, interact, stage)
+  gm <= game(stage = map(Thing; _ tick(stage), stage))
 
 // TODO: very hard coded, comment, improve, etc.
-get_render_info(obj: Thing) : RenderInfo 
-  case obj |thing
-    let mid =
-      case obj.act |action
-      if obj.id === 0 then
-        // idle/walk
-        if obj.act.id === 0 then
-          if (obj.spd < 0.1) then
-            MIN_IDLE_0 + ((obj.act.tik \ 3) >>> 0) % 3
-          else
-            MIN_RUN_0 + ((obj.act.tik \ 3) >>> 0) % 5
-        // attack
-        else
-          MIN_ATTACKA_0 + ((obj.act.tik \ 3) >>> 0) % 6
-      else if obj.id === 3 then
-        // idle/walk
-        if obj.act.id === 0 then
-          if (obj.spd < 0.1) then
-            ZOIN_IDLE_0 + ((obj.act.tik \ 3) >>> 0) % 5
-          else
-            ZOIN_WALK_0 + ((obj.act.tik \ 3) >>> 0) % 6
-        // attack
-        else
-          ZOIN_ATTACKA_0 + ((obj.act.tik \ 3) >>> 0) % 7
-      else if obj.id === 2 then
-        MIKEGATOR_SPINTAIL_0 + ((obj.act.tik \ 3) >>> 0) % 8
-      else
-        KENKO_ULTK_0 + ((obj.act.tik \ 3) >>> 0) % 26
-    let pos = obj.pos 
-    let dir = obj.dir
-    render_info(mid, pos, dir)
+draw_thing(thi: Thing) : Draw 
+  case thi |thing
+  case get_hero_by_hid(thi.hid) as hro | hero
+  hro.draw(thi)
 
-enum
-| SIMPLAO_IDLE_1
-| SIMPLAO_IDLE_2
-| SIMPLAO_IDLE_3
-| SIMPLAO_IDLE_4
-| SIMPLAO_ATK_1
-| SIMPLAO_ATK_2
-| SIMPLAO_ATK_3
-| SIMPLAO_ATK_4
-| SIMPLAO_MOVE_1
-| SIMPLAO_MOVE_2
-| SIMPLAO_MOVE_3
-| SIMPLAO_MOVE_4
-| SIMPLAO_PODER_1
-| SIMPLAO_PODER_2
-| SIMPLAO_PODER_3
-| SIMPLAO_PODER_4
-| SIMPLAO_PODER_5
-| SIMPLAO_PODER_6
-| SIMPLAO_PODER_7
-| MIN_IDLE_0
-| MIN_IDLE_1
-| MIN_IDLE_2
-| MIN_RUN_0
-| MIN_RUN_1
-| MIN_RUN_2
-| MIN_RUN_3
-| MIN_RUN_4
-| MIN_ATTACKA_0
-| MIN_ATTACKA_1
-| MIN_ATTACKA_2
-| MIN_ATTACKA_3
-| MIN_ATTACKA_4
-| MIN_ATTACKA_5
-| ZOIN_IDLE_0
-| ZOIN_IDLE_1
-| ZOIN_IDLE_2
-| ZOIN_IDLE_3
-| ZOIN_IDLE_4
-| ZOIN_ATTACKA_0
-| ZOIN_ATTACKA_1
-| ZOIN_ATTACKA_2
-| ZOIN_ATTACKA_3
-| ZOIN_ATTACKA_4
-| ZOIN_ATTACKA_5
-| ZOIN_ATTACKA_6
-| ZOIN_WALK_0
-| ZOIN_WALK_1
-| ZOIN_WALK_2
-| ZOIN_WALK_3
-| ZOIN_WALK_4
-| ZOIN_WALK_5
-| ZOIN_WALK_6
-| MIKEGATOR_WALK_0
-| MIKEGATOR_WALK_1
-| MIKEGATOR_WALK_2
-| MIKEGATOR_WALK_3
-| MIKEGATOR_WALK_4
-| MIKEGATOR_WALK_5
-| MIKEGATOR_WALK_6
-| MIKEGATOR_WALK_7
-| MIKEGATOR_SPINTAIL_0
-| MIKEGATOR_SPINTAIL_1
-| MIKEGATOR_SPINTAIL_2
-| MIKEGATOR_SPINTAIL_3
-| MIKEGATOR_SPINTAIL_4
-| MIKEGATOR_SPINTAIL_5
-| MIKEGATOR_SPINTAIL_6
-| MIKEGATOR_SPINTAIL_7
-| KENKO_ULTK_0
-| KENKO_ULTK_1
-| KENKO_ULTK_2
-| KENKO_ULTK_3
-| KENKO_ULTK_4
-| KENKO_ULTK_5
-| KENKO_ULTK_6
-| KENKO_ULTK_7
-| KENKO_ULTK_8
-| KENKO_ULTK_9
-| KENKO_ULTK_10
-| KENKO_ULTK_11
-| KENKO_ULTK_12
-| KENKO_ULTK_13
-| KENKO_ULTK_14
-| KENKO_ULTK_15
-| KENKO_ULTK_16
-| KENKO_ULTK_17
-| KENKO_ULTK_18
-| KENKO_ULTK_19
-| KENKO_ULTK_20
-| KENKO_ULTK_21
-| KENKO_ULTK_22
-| KENKO_ULTK_23
-| KENKO_ULTK_24
-| KENKO_ULTK_25
+srpx : Thing
+  new_hero(MIN_HERO) <= thing(pid=0, pos=v3(0,0,0))
+
+stanci : Thing
+  new_hero(KENKO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
+
+neelix : Thing
+  new_hero(ZOIN_HERO) <= thing(pid=2, pos=v3(64,0,0))
+
+belanna : Thing
+  new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
+
+new_game : Game
+  game([srpx, stanci, neelix, belanna])

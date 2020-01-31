@@ -24,19 +24,19 @@ function render_game({game, canvox, cam}) {
   var T = now();
 
   // Gets the main hero position
-  var hero_pos = TA.get_position_by_id(0, game);
+  var hero_pos = TA.get_position_by_pid(0, game);
 
   // Creates list of voxels
   var voxels = [];
 
   // Renders each game thing
   TA.map_stage((thing) => {
-    TA.get_render_info(thing)(mid => pos => dir => {
+    TA.draw_thing(thing)(model_id => pos => dir => {
       var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
-      var model = models[mid];
+      var model = models[model_id];
       for (var i = 0; i < model.length; ++i) {
         var [{x,y,z},{r,g,b}] = model[i];
         var cx = pos_x;
@@ -76,10 +76,10 @@ function render_game({game, canvox, cam}) {
 //   | 4: space(x: 12bit, y:12bit)
 //   | 5: shift(x: 12bit, y:12bit)
 //   | 6: extra(x: 12bit, y:12bit)
-//   | 7: text(...TODO...)
+//   | 7: cmsg(...TODO...)
 
 // Parses a player input code into an object
-function parse_player_input(code, idx=0) {
+function parse_command(code, idx=0) {
   var player = parseInt(code[idx],16) - 1;
   var input = parseInt(code[idx+1],16);
   if (input === 0) {
@@ -121,7 +121,7 @@ function parse_turn(code, idx=0) {
       idx += 1;
       break;
     } else {
-      var [idx,plr_inp] = parse_player_input(code,idx);
+      var [idx,plr_inp] = parse_command(code,idx);
       turn.push(plr_inp);
     }
   };
@@ -199,14 +199,14 @@ function make_input_code(keyboard, mouse) {
   return null;
 }
 
-// Executes a player input inside Formality
-function exec_player_input(inp, game) {
-  let ga = null;
+// Executes a command inside Formality
+function exec_command(inp, game) {
+  let cmd = null;
   if (inp.input === "SDIR") {
     let x = inp.params.dir.x;
     let y = inp.params.dir.y;
     let d = v3 => v3(x)(y)(0);
-    ga = TA.game_sdir(inp.player)(d);
+    cmd = TA.command(inp.player)(TA.sdir(d));
   } else if (inp.input === "TEXT") {
     throw "TODO";
   } else {
@@ -215,16 +215,16 @@ function exec_player_input(inp, game) {
     let p = v3 => v3(x)(y)(0);
     var f = null;
     switch (inp.input) {
-      case "KEY0": f = TA.game_key0; break;
-      case "KEY1": f = TA.game_key1; break;
-      case "KEY2": f = TA.game_key2; break;
-      case "KEY3": f = TA.game_key3; break;
-      case "KEY4": f = TA.game_key4; break;
-      case "KEY5": f = TA.game_key5; break;
+      case "KEY0": keyx = TA.key0; break;
+      case "KEY1": keyx = TA.key1; break;
+      case "KEY2": keyx = TA.key2; break;
+      case "KEY3": keyx = TA.key3; break;
+      case "KEY4": keyx = TA.key4; break;
+      case "KEY5": keyx = TA.key5; break;
     }
-    ga = f(inp.player)(p);
+    cmd = TA.command(inp.player)(keyx(p));
   }
-  return TA.exec_input(ga)(game);
+  return TA.exec_command(cmd)(game);
 }
 
 module.exports = {
@@ -232,8 +232,8 @@ module.exports = {
   render_game,
   parse_turn,
   parse_turns,
-  parse_player_input,
-  exec_player_input,
+  parse_command,
+  exec_command,
   make_input_code,
 };
 

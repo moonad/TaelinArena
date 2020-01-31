@@ -1,0 +1,20 @@
+import TaelinArena.Game
+import TaelinArena.Models
+import TaelinArena.Heroes.Kenko
+import TaelinArena.Heroes.Mikegator
+import TaelinArena.Heroes.Min
+import TaelinArena.Heroes.Zoin
+
+enum
+| MIN_HERO
+| ZOIN_HERO
+| KENKO_HERO
+| MIKEGATOR_HERO
+
+get_hero_by_hid(hid: HeroId) : Hero
+  switch hid
+  |MIN_HERO min_hero
+  |ZOIN_HERO zoin_hero
+  |KENKO_HERO kenko_hero
+  |MIKEGATOR_HERO mikegator_hero
+  else min_hero
