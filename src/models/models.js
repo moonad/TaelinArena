@@ -51,7 +51,7 @@ const models = [
   "simplao/poder5",
   "simplao/poder6",
   "simplao/poder7",
-  
+
   "min/idle_0",
   "min/idle_1",
   "min/idle_2",
@@ -130,7 +130,6 @@ const models = [
   "kenko/UltK_23",
   "kenko/UltK_24",
   "kenko/UltK_25",
-  "teichi/walk_0",
 
   "teichi/idle/idle_1",
   "teichi/idle/idle_2",
@@ -149,7 +148,33 @@ const models = [
   "teichi/attack-left/var3/attack1_var3_1",
   "teichi/attack-left/var3/attack1_var3_2",
   "teichi/attack-left/var3/attack1_var3_3",
-  "teichi/attack-left/var3/attack1_var3_4"
+  "teichi/attack-left/var3/attack1_var3_4",
+  "teichi/Ultimate_1",
+  "teichi/Ultimate_2",
+  "teichi/Ultimate_3",
+  "teichi/Ultimate_4",
+  "teichi/Ultimate_5",
+  "teichi/Ultimate_6",
+  "teichi/Ultimate_7",
+  "teichi/Ultimate_8",
+  "teichi/Ultimate_9",
+  "teichi/Ultimate_10",
+  "teichi/Ultimate_11",
+  "teichi/Ultimate_12",
+  "teichi/Ultimate_13",
+  "teichi/Ultimate_14",
+  "teichi/Ultimate_15",
+  "teichi/Ultimate_16",
+  "teichi/Ultimate_17",
+  "teichi/Ultimate_18",
+  "teichi/Ultimate_19",
+  "teichi/Ultimate_20",
+  "teichi/Ultimate_21",
+  "teichi/Ultimate_22",
+  "teichi/Ultimate_23",
+  "teichi/Ultimate_24",
+  "teichi/Ultimate_25",
+  "teichi/Ultimate_26",
 ].map(load);
 
 module.exports = {
