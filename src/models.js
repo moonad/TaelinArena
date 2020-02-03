@@ -1,4 +1,4 @@
-const TA = require("./../game/TaelinArena.fm");
+const TA = require("./game/TaelinArena.fm");
 const CRONI_IDLE   = 0;
 const LYN_IDLE     = 1;
 const FANTASY_IDLE = 2;
