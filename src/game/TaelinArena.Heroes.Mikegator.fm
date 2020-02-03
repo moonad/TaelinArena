@@ -1,12 +1,59 @@
+// This is an initial model of Mikegator. It has all attack
+// animations, but no movement, hitboxes, etc. It also has a
+// lot of "magic constants" spread in separate places. This
+// code will be improved to avoid those.
+
 import TaelinArena.Game
 import TaelinArena.Models
 
 mikegator_hero : Hero
-  let stat = stat(110, 3, 12)
-  let inpt = (this, input) => this
-  let tick = (this) => this
+  let stat = stat(110, 2, 12)
+
+  let inpt = (this, input) =>
+    case input
+    | sdir => this
+    | key0 => this <= thing(act = 1, tik = 0)
+    | key1 => this <= thing(act = 2, tik = 0)
+    | key2 => this <= thing(act = 3, tik = 0)
+    | key3 => this <= thing(act = 4, tik = 0)
+    | key4 => this <= thing(act = 5, tik = 0)
+    | key5 => this <= thing(act = 6, tik = 0)
+    | cmsg => this
+
+  let tick = (this) =>
+    case this |thing
+    let new_act = when
+      | (this.act === 1) && (this.tik === (6*3)) => 0
+      | (this.act === 2) && (this.tik === (9*3)) => 0
+      | (this.act === 3) && (this.tik === (8*3)) => 0
+      | (this.act === 4) && (this.tik === (14*3)) => 0
+      | (this.act === 5) && (this.tik === (7*3)) => 0
+      | (this.act === 6) && (this.tik === (8*3)) => 0
+      else this.act
+    this <= thing(act = new_act)
+
   let draw = (this) =>
     case this |thing
-    let model = aniloop(MIKEGATOR_SPINTAIL_0,8,3,this.tik)
+    let model = switch this.act
+      // Idle / Walk
+      | 0 =>
+        if (this.spd < 0.1) then
+          aniloop(MIKEGATOR_IDLE_000,6, 3, this.tik)
+        else
+          aniloop(MIKEGATOR_WALK_000,8, 3, this.tik)
+      // Left: Quick Punch
+      | 1 => aniloop(MIKEGATOR_ATTACK_000,6, 3, this.tik)
+      // Middle: Earth Bending
+      | 2 => aniloop(MIKEGATOR_EARTHBENDING_000,9, 3, this.tik)
+      // Right: Spin Tail
+      | 3 => aniloop(MIKEGATOR_SPINTAIL_000,8, 3, this.tik)
+      // Space: Supreme Uppercut
+      | 4 => aniloop(MIKEGATOR_SUPREME_UPPERCUT_000,14, 3, this.tik)
+      // Shift: Dash
+      | 5 => aniloop(MIKEGATOR_DASH_000,7, 3, this.tik)
+      // Extra Block
+      | 6 => aniloop(MIKEGATOR_BLOCK_000,1, 3, this.tik)
+      else MIKEGATOR_IDLE_000
     draw(model, this.pos, this.dir)
+
   hero(stat, inpt, tick, draw)

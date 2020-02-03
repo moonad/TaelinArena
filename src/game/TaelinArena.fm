@@ -36,10 +36,10 @@ exec_command(cmd: Command, gm: Game) : Game
       let thi = thi <= thing(dir = dfn(dir))
       let thi = thi <= thing(spd = sfn(spd))
       thi
-    | key0 => thi <= thing(pos = inp.pos)
+    | key0 => thi
     | key1 => thi
     | key2 => thi
-    | key3 => thi <= thing(act = 1, tik = 0)
+    | key3 => thi
     | key4 => thi
     | key5 => thi
     | cmsg => thi
@@ -74,15 +74,14 @@ interact_with(this:Thing, that:Thing): Thing
 exec_turn(gm: Game) : Game
   let tick = (stage: List(Thing), thi: Thing) =>
     case thi |thing
-    let tp0 = ((thi.act === 1) && (thi.tik === 15))
-    let tp1 = ((thi.act === 3) && (thi.tik === 18))
-    let tp2 = tp0 || tp1
-    let thi = thi <= thing(
-      act = if tp2 then 0 else thi.act,
-      tik = if tp2 then 0 else thi.tik + 1,
-      pos = add_v3(thi.pos, scale_v3(thi.spd, thi.dir)))
-    let interact = (that, this) => interact_with(this, that)
-    fold(Thing; _ thi, interact, stage)
+    case get_hero_by_hid(thi.hid) as hro | hero
+    let nps = add_v3(thi.pos, scale_v3(thi.spd, thi.dir))
+    let ntk = thi.tik + 1
+    let itr = (that, this) => interact_with(this, that)
+    let thi = thi <= thing(pos = nps, tik = ntk)
+    let thi = hro.tick(thi)
+    let thi = fold(Thing; _ thi, itr, stage)
+    thi
   gm <= game(stage = map(Thing; _ tick(stage), stage))
 
 // TODO: very hard coded, comment, improve, etc.
