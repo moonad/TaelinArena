@@ -92,13 +92,13 @@ draw_thing(thi: Thing) : Draw
   hro.draw(thi)
 
 srpx : Thing
-  new_hero(MIN_HERO) <= thing(pid=0, pos=v3(0,0,0))
+  new_hero(MIKEGATOR_HERO) <= thing(pid=0, pos=v3(0,0,0))
 
 stanci : Thing
-  new_hero(KENKO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
+  new_hero(MIKEGATOR_HERO) <= thing(pid=1, pos=v3(-64,0,0))
 
 neelix : Thing
-  new_hero(ZOIN_HERO) <= thing(pid=2, pos=v3(64,0,0))
+  new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
 
 belanna : Thing
   new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))

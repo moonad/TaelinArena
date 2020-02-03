@@ -1,6 +1,6 @@
 const TA = require("./game/TaelinArena.fm");
 const oct = require("./canvox/octree.js");
-const {models} = require("./models.js");
+const models = require("./models/models.js");
 
 const now = (() => {
   var init_time = Date.now()/1000;
