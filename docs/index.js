@@ -8949,7 +8949,12 @@ function setup_cam(cam) {
 };
 
 module.exports = function canvox(opts = {}) {
-  const mode = window.mode || opts.mode || "GPU";
+  var mode;
+  if (window.location.search.indexOf("cpu") !== -1) {
+    mode = "CPU";
+  } else {
+    mode = opts.mode || "GPU";
+  }
 
   var canvas = document.createElement("canvas");
   //canvas.style.border = "1px solid gray";
@@ -9008,27 +9013,27 @@ module.exports = function canvox(opts = {}) {
             ray_pos_x, ray_pos_y, ray_pos_z,
             ray_dir_x, ray_dir_y, ray_dir_z,
             tree);
-          if (stage) {
-            var hit2 = oct.march(
-              ray_pos_x, ray_pos_y, ray_pos_z,
-              ray_dir_x, ray_dir_y, ray_dir_z,
-              stage);
-            if (hit2.ctr === oct.HIT) {
-              var dist1 = 0;
-              var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
-              var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
-              var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
-              var dist2 = 0;
-              var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
-              var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
-              var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
-              var hit = dist1 < dist2 ? hit1 : hit2;
-            } else {
-              var hit = hit1;
-            }
-          } else {
+          //if (stage) {
+            //var hit2 = oct.march(
+              //ray_pos_x, ray_pos_y, ray_pos_z,
+              //ray_dir_x, ray_dir_y, ray_dir_z,
+              //stage);
+            //if (hit2.ctr === oct.HIT) {
+              //var dist1 = 0;
+              //var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
+              //var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
+              //var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
+              //var dist2 = 0;
+              //var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
+              //var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
+              //var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
+              //var hit = dist1 < dist2 ? hit1 : hit2;
+            //} else {
+              //var hit = hit1;
+            //}
+          //} else {
             var hit = hit1;
-          }
+          //}
 
           // Renders to screen
           var j = Math.floor((scr_pos_y+1)/2*(cam.size.y*cam.res));
