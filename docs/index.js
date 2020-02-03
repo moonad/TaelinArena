@@ -9013,6 +9013,7 @@ module.exports = function canvox(opts = {}) {
             ray_pos_x, ray_pos_y, ray_pos_z,
             ray_dir_x, ray_dir_y, ray_dir_z,
             tree);
+          // TODO: re-add stage
           //if (stage) {
             //var hit2 = oct.march(
               //ray_pos_x, ray_pos_y, ray_pos_z,
@@ -9225,6 +9226,13 @@ module.exports = function canvox(opts = {}) {
           ray.x += dir.x * eps;
           ray.y += dir.y * eps;
           ray.z += dir.z * eps;
+          // TODO: re-add stage to improve this "fake floor"
+          if (ray.z <= 0.0) {
+            hit.ctr = HIT;
+            hit.pos = ray;
+            hit.val = 0xFFFFFFu & VAL;
+            return hit;
+          }
           uint got = lookup(octree, ray);
           if ((got&CTR) == NOP) {
             uint lv = 10u - (got & VAL);
@@ -9267,16 +9275,19 @@ module.exports = function canvox(opts = {}) {
         //ray_dir = vec3(0.0, 1.0, 0.0);
 
         // Marches towards octree
-        Hit hit1 = march(ray_pos, ray_dir, voxels);
-        Hit hit2 = march(ray_pos, ray_dir, stage);
-        float dist1 = distance(hit1.pos, ray_pos);
-        float dist2 = distance(hit2.pos, ray_pos);
-        Hit hit;
-        if (hit2.ctr == HIT && dist1 > dist2) {
-          hit = hit2;
-        } else {
-          hit = hit1;
-        }
+        //Hit hit1 = march(ray_pos, ray_dir, voxels);
+        //Hit hit2 = march(ray_pos, ray_dir, stage);
+        //float dist1 = distance(hit1.pos, ray_pos);
+        //float dist2 = distance(hit2.pos, ray_pos);
+        //Hit hit;
+        //if (hit2.ctr == HIT && dist1 > dist2) {
+          //hit = hit2;
+        //} else {
+          //hit = hit1;
+        //}
+        
+        // TODO: re-add stage
+        Hit hit = march(ray_pos, ray_dir, voxels);
 
         // If it hit a voxel, draw it
         if (hit.ctr == HIT) {
@@ -9440,15 +9451,15 @@ const now = (() => {
 })();
 
 var stage = oct.empty();
-for (var y = -512; y < 512; ++y) {
-  for (var x = -512; x < 512; ++x) {
-    if (((x+2048) / 32) % 2 < 1) { // || ((y+2048) / 32) % 2 < 1) {
-      oct.insert(x,y,0,0xFF85c9a0,stage);
-    } else {
-      oct.insert(x,y,0,0xFF8fd9ad,stage);
-    }
-  }
-}
+//for (var y = -512; y < 512; ++y) {
+  //for (var x = -512; x < 512; ++x) {
+    //if (((x+2048) / 32) % 2 < 1) { // || ((y+2048) / 32) % 2 < 1) {
+      //oct.insert(x,y,0,0xFF85c9a0,stage);
+    //} else {
+      //oct.insert(x,y,0,0xFF8fd9ad,stage);
+    //}
+  //}
+//}
 
 // Renders the game state to screen using the canvox library
 function render_game({game, canvox, cam}) {
