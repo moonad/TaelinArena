@@ -91,13 +91,18 @@ class Main extends Component {
     var pos_y = this.cam_pos.y - 2048*cos;
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
+    if (W > H) {
+      var size = {x:480, y:H*480/W};
+    } else {
+      var size = {x:W*270/H, y:270};
+    }
     return {
       pos   : pos, // center pos
       ang   : ang,
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
-      size  : {x:W*0.5, y:H*0.5}, // world size
+      size  : size, // world size
       port  : {x:W, y:H}, // browser size
       res   : 1.0, // rays_per_pixel = res^2
     };
