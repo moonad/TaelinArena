@@ -9941,15 +9941,14 @@ module.exports = (function(){
   var _TaelinArena_Game$PlayerId = undefined;
   var _TaelinArena_Game$HeroId = undefined;
   var _TaelinArena_Game$ActionId = undefined;
+  var _TaelinArena_Game$ModelId = undefined;
   var _TaelinArena_Game$Hitbox = undefined;
   var _TaelinArena_Game$cbox = (_0=>(_1=>(_2=>_1(_0))));
   var _TaelinArena_Game$pbox = (_0=>(_1=>(_2=>_2(_0))));
-  var _TaelinArena_Game$Stat = undefined;
-  var _TaelinArena_Game$stat = (_0=>(_1=>(_2=>(_3=>_3(_0)(_1)(_2)))));
   var _TaelinArena_Game$Hero = undefined;
-  var _TaelinArena_Game$hero = (_0=>(_1=>(_2=>(_3=>(_4=>_4(_0)(_1)(_2)(_3))))));
+  var _TaelinArena_Game$hero = (_0=>(_1=>(_2=>_2(_0)(_1))));
   var _TaelinArena_Game$Thing = undefined;
-  var _TaelinArena_Game$thing = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_10(_0)(_1)(_2)(_3)(_4)(_5)(_6)(_7)(_8)(_9))))))))))));
+  var _TaelinArena_Game$thing = (_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_12(_0)(_1)(_2)(_3)(_4)(_5)(_6)(_7)(_8)(_9)(_10)(_11))))))))))))));
   var _TaelinArena_Game$Game = undefined;
   var _TaelinArena_Game$game = (_0=>(_1=>_1(_0)));
   var _TaelinArena_Game$Input = undefined;
@@ -9965,11 +9964,12 @@ module.exports = (function(){
   var _TaelinArena_Game$command = (_0=>(_1=>(_2=>_2(_0)(_1))));
   var _TaelinArena_Game$Draw = undefined;
   var _TaelinArena_Game$draw = (_0=>(_1=>(_2=>(_3=>_3(_0)(_1)(_2)))));
-  var _TaelinArena_Game$get_thing_by_pid = (_0=>(_1=>_1((_2=>_List$jJkT$find((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>_Number$_G7_$number_equal(_4)(_0))))))))))))))(_2)))));
-  var _TaelinArena_Game$get_position_by_pid = (_0=>(_1=>_TaelinArena_Game$get_thing_by_pid(_0)(_1)(_TaelinArena_Geometry$v3(0)(0)(0))((_2=>_2((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_8)))))))))))))));
+  var _TaelinArena_Game$get_thing_by_pid = (_0=>(_1=>_1((_2=>_List$jJkT$find((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>_Number$_G7_$number_equal(_4)(_0))))))))))))))))(_2)))));
+  var _TaelinArena_Game$get_position_by_pid = (_0=>(_1=>_TaelinArena_Game$get_thing_by_pid(_0)(_1)(_TaelinArena_Geometry$v3(0)(0)(0))((_2=>_2((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>_9)))))))))))))))));
   var _TaelinArena_Game$map_stage = (_0=>(_1=>_1((_2=>_TaelinArena_Game$game(_List$jJkT$map(_0)(_2))))));
-  var _TaelinArena_Game$with_thing = (_0=>(_1=>(_2=>_TaelinArena_Game$map_stage((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>_Number$_G7_$number_equal(_4)(_0)((_14=>_1(_14)))((_14=>_14))(_3))))))))))))))(_2))));
-  var _TaelinArena_Game$aniloop = (_0=>(_1=>(_2=>(_3=>(_0+(_Number$_G7_$floor((_3/_2))%_1))))));
+  var _TaelinArena_Game$with_thing = (_0=>(_1=>(_2=>_TaelinArena_Game$map_stage((_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>_Number$_G7_$number_equal(_4)(_0)((_16=>_1(_16)))((_16=>_16))(_3))))))))))))))))(_2))));
+  var _TaelinArena_Game$animate = (_0=>(_1=>(_2=>(_3=>_0((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>_TaelinArena_Game$thing(_4)(_5)((((_3*_1)===_8? 1 : 0)?0:_6))((_2+(_Number$_G7_$floor((_8/_1))%_3)))(_8)(_9)(_10)(_11)(_12)(_13)(_14)(_15))))))))))))))))));
+  var _TaelinArena_Game$dash = (_0=>(_1=>(_2=>(_3=>_0((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>_TaelinArena_Game$thing(_4)(_5)(_6)(_7)(_8)(_9)(_10)(_11)(_12)(_13)((((_8>_2)&(_8<_3))?_TaelinArena_Geometry$scale_v3(_1)(_13):_TaelinArena_Geometry$v3(0)(0)(0)))(_15))))))))))))))))));
   var _TaelinArena_Models$MIKEGATOR_ATTACK_000 = 0;
   var _TaelinArena_Models$MIKEGATOR_ATTACK_001 = 1;
   var _TaelinArena_Models$MIKEGATOR_ATTACK_002 = 2;
@@ -10042,18 +10042,27 @@ module.exports = (function(){
   var _TaelinArena_Models$MIKEGATOR_WALK_005 = 69;
   var _TaelinArena_Models$MIKEGATOR_WALK_006 = 70;
   var _TaelinArena_Models$MIKEGATOR_WALK_007 = 71;
-  var _TaelinArena_Heroes_Mikegator$mikegator_hero = _TaelinArena_Game$hero(_TaelinArena_Game$stat(110)(2)(12))((_0=>(_1=>_1((_2=>_0))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(1)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(2)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(3)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(4)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(5)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0((_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_3)(_4)(6)(0)(_7)(_8)(_9)(_10)(_11)(_12))))))))))))))((_2=>_0)))))((_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_0((_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>(_19=>(_20=>_TaelinArena_Game$thing(_11)(_12)((((_3===1? 1 : 0)&(_4===(6*3)? 1 : 0))?0:(((_3===2? 1 : 0)&(_4===(9*3)? 1 : 0))?0:(((_3===3? 1 : 0)&(_4===(8*3)? 1 : 0))?0:(((_3===4? 1 : 0)&(_4===(14*3)? 1 : 0))?0:(((_3===5? 1 : 0)&(_4===(7*3)? 1 : 0))?0:(((_3===6? 1 : 0)&(_4===(8*3)? 1 : 0))?0:_3)))))))(_14)(_15)(_16)(_17)(_18)(_19)(_20)))))))))))))))))))))))))((_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_TaelinArena_Game$draw(((0===_3? 1 : 0)?((_7<0.1)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_IDLE_000)(6)(3)(_4):_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_WALK_000)(8)(3)(_4)):((1===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_ATTACK_000)(6)(3)(_4):((2===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_EARTHBENDING_000)(9)(3)(_4):((3===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_SPINTAIL_000)(8)(3)(_4):((4===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_SUPREME_UPPERCUT_000)(14)(3)(_4):((5===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_DASH_000)(7)(3)(_4):((6===_3? 1 : 0)?_TaelinArena_Game$aniloop(_TaelinArena_Models$MIKEGATOR_BLOCK_000)(1)(3)(_4):_TaelinArena_Models$MIKEGATOR_IDLE_000))))))))(_6)(_8))))))))))))));
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_IDLE = 0;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_ATTACK = 1;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_EARTHBENDING = 2;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_SPINTAIL = 3;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_SUPREME_UPPERCUT = 4;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_DASH = 5;
+  var _TaelinArena_Heroes_Mikegator$MIKEGATOR_BLOCK = 6;
+  var _TaelinArena_Heroes_Mikegator$mikegator_init = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$thing(_1)(_2)(_3)(_4)(_5)(_6)(_7)(4)(_9)(_10)(_11)(_12)))))))))))))));
+  var _TaelinArena_Heroes_Mikegator$mikegator_tick = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>((_TaelinArena_Heroes_Mikegator$MIKEGATOR_IDLE===_3? 1 : 0)?((_9<0.1)?_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_IDLE_000)(6):_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_WALK_000)(8)):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_ATTACK===_3? 1 : 0)?_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_ATTACK_000)(6):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_EARTHBENDING===_3? 1 : 0)?_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_EARTHBENDING_000)(9):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_SPINTAIL===_3? 1 : 0)?_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_SPINTAIL_000)(8):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_SUPREME_UPPERCUT===_3? 1 : 0)?_TaelinArena_Game$dash(_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_SUPREME_UPPERCUT_000)(14))(8)(18)(21):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_DASH===_3? 1 : 0)?_TaelinArena_Game$dash(_TaelinArena_Game$animate(_0)(2)(_TaelinArena_Models$MIKEGATOR_DASH_000)(7))(4)(0)(12):((_TaelinArena_Heroes_Mikegator$MIKEGATOR_BLOCK===_3? 1 : 0)?_0((_13=>(_14=>(_15=>(_16=>(_17=>(_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>_TaelinArena_Game$thing(_13)(_14)(_15)(_TaelinArena_Models$MIKEGATOR_BLOCK_000)(_17)(_18)(_19)(_20)(_21)(_22)(_23)(_24))))))))))))))((_13=>(_14=>(_15=>(_16=>(_17=>(_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>_TaelinArena_Game$thing(_13)(_14)(((_17>13)?0:_15))(_16)(_17)(_18)(_19)(_20)(_21)(_22)(_23)(_24)))))))))))))):_0)))))))))))))))))))));
+  var _TaelinArena_Heroes_Mikegator$mikegator_hero = _TaelinArena_Game$hero(_TaelinArena_Heroes_Mikegator$mikegator_init)(_TaelinArena_Heroes_Mikegator$mikegator_tick);
   var _TaelinArena_Heroes$MIKEGATOR_HERO = 0;
   var _TaelinArena_Heroes$get_hero_by_hid = (_0=>((_TaelinArena_Heroes$MIKEGATOR_HERO===_0? 1 : 0)?_TaelinArena_Heroes_Mikegator$mikegator_hero:_TaelinArena_Heroes_Mikegator$mikegator_hero));
-  var _TaelinArena$new_hero = (_0=>_TaelinArena_Heroes$get_hero_by_hid(_0)((_1=>(_2=>(_3=>(_4=>_1((_5=>(_6=>(_7=>_TaelinArena_Game$thing(0)(_0)(0)(0)(_5)(_TaelinArena_Geometry$v3(0)(0)(0))(0)(_TaelinArena_Geometry$v3(0)(-1)(0))(_TaelinArena_Geometry$v3(0)(0)(0))(_TaelinArena_Game$cbox(_7))))))))))));
-  var _TaelinArena$exec_command = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena_Game$with_thing(_2)((_4=>_4((_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>_TaelinArena_Heroes$get_hero_by_hid(_6)((_15=>(_16=>(_17=>(_18=>_16((_19=>_3((_20=>(_21=>_21((_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>(_30=>(_31=>_TaelinArena_Heroes$get_hero_by_hid(_23)((_32=>(_33=>(_34=>(_35=>_32((_36=>(_37=>(_38=>_21((_39=>(_40=>(_41=>(_42=>(_43=>(_44=>(_45=>(_46=>(_47=>(_48=>_TaelinArena_Game$thing(_39)(_40)(_41)(_42)(_43)(_44)(_45)((_49=>((_TaelinArena_Geometry$len_v3(_20)===0? 1 : 0)?_49:_20))(_46))(_47)(_48))))))))))))((_39=>(_40=>(_41=>(_42=>(_43=>(_44=>(_45=>(_46=>(_47=>(_48=>_TaelinArena_Game$thing(_39)(_40)(_41)(_42)(_43)(_44)((_49=>((_TaelinArena_Geometry$len_v3(_20)===0? 1 : 0)?0:_37))(_45))(_46)(_47)(_48)))))))))))))))))))))))))))))))))))((_20=>(_21=>_21)))((_20=>(_21=>_21)))((_20=>(_21=>_21)))((_20=>(_21=>_21)))((_20=>(_21=>_21)))((_20=>(_21=>_21)))((_20=>(_21=>_21)))(_19))(_4))(_3)))))))))))))))))))(_1))))));
-  var _TaelinArena$interact_with = (_0=>(_1=>_0((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>_1((_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>(_19=>(_20=>(_21=>_11((_22=>_21((_23=>(((_TaelinArena_Geometry$dist_v3(_7)(_17)>_23)&(_TaelinArena_Geometry$dist_v3(_7)(_17)<(_22+_23)))?_0((_24=>(_25=>(_26=>(_27=>(_28=>(_29=>(_30=>(_31=>(_32=>(_33=>_TaelinArena_Game$thing(_24)(_25)(_26)(_27)(_28)(_TaelinArena_Geometry$add_v3(_7)(_TaelinArena_Geometry$scale_v3(((_22+_23)-_TaelinArena_Geometry$dist_v3(_7)(_17)))(_TaelinArena_Geometry$norm_v3(_TaelinArena_Geometry$sub_v3(_7)(_17)))))(_30)(_31)(_32)(_33)))))))))))):_0)))((_23=>_0))))((_22=>_0))))))))))))))))))))))))));
-  var _TaelinArena$exec_turn = (_0=>_0((_1=>_TaelinArena_Game$game(_List$jJkT$map((_2=>(_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>_TaelinArena_Heroes$get_hero_by_hid(_5)((_14=>(_15=>(_16=>(_17=>_List$jJkT$fold(_16(_3((_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>_TaelinArena_Game$thing(_18)(_19)(_20)((_7+1))(_22)(_TaelinArena_Geometry$add_v3(_9)(_TaelinArena_Geometry$scale_v3(_10)(_11)))(_24)(_25)(_26)(_27))))))))))))))((_18=>(_19=>_TaelinArena$interact_with(_19)(_18))))(_2)))))))))))))))))))(_1))(_1)))));
-  var _TaelinArena$draw_thing = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>_TaelinArena_Heroes$get_hero_by_hid(_2)((_11=>(_12=>(_13=>(_14=>_14(_0))))))))))))))))));
-  var _TaelinArena$srpx = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_TaelinArena_Game$thing(0)(_1)(_2)(_3)(_4)(_TaelinArena_Geometry$v3(0)(0)(0))(_6)(_7)(_8)(_9))))))))))));
-  var _TaelinArena$stanci = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_TaelinArena_Game$thing(1)(_1)(_2)(_3)(_4)(_TaelinArena_Geometry$v3(-64)(0)(0))(_6)(_7)(_8)(_9))))))))))));
-  var _TaelinArena$neelix = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_TaelinArena_Game$thing(2)(_1)(_2)(_3)(_4)(_TaelinArena_Geometry$v3(64)(0)(0))(_6)(_7)(_8)(_9))))))))))));
-  var _TaelinArena$belanna = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>_TaelinArena_Game$thing(3)(_1)(_2)(_3)(_4)(_TaelinArena_Geometry$v3(0)(64)(0))(_6)(_7)(_8)(_9))))))))))));
+  var _TaelinArena$new_hero = (_0=>_TaelinArena_Heroes$get_hero_by_hid(_0)((_1=>(_2=>_1(_TaelinArena_Game$thing(0)(_0)(0)(0)(0)(128)(_TaelinArena_Geometry$v3(0)(0)(0))(8)(0)(_TaelinArena_Geometry$v3(0)(-1)(0))(_TaelinArena_Geometry$v3(0)(0)(0))(_TaelinArena_Game$cbox(12)))))));
+  var _TaelinArena$exec_command = (_0=>(_1=>_0((_2=>(_3=>_TaelinArena_Game$with_thing(_2)((_4=>_3((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Heroes$get_hero_by_hid(_8)((_19=>(_20=>_6((_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>(_30=>(_31=>(_32=>_TaelinArena_Game$thing(_21)(_22)(_23)(_24)(_25)(_26)(_27)(_28)(_29)((_33=>((_TaelinArena_Geometry$len_v3(_5)===0? 1 : 0)?_33:_5))(_30))(_31)(_32))))))))))))))((_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>(_30=>(_31=>(_32=>_TaelinArena_Game$thing(_21)(_22)(_23)(_24)(_25)(_26)(_27)(_28)((_33=>((_TaelinArena_Geometry$len_v3(_5)===0? 1 : 0)?0:_14))(_29))(_30)(_31)(_32)))))))))))))))))))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?1:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?2:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?3:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?4:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?5:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6((_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>(_16=>(_17=>(_18=>_TaelinArena_Game$thing(_7)(_8)(((_9===0? 1 : 0)?6:_9))(_10)(((_9===0? 1 : 0)?0:_11))(_12)(_13)(_14)(_15)(_16)(_17)(_18)))))))))))))))))((_5=>(_6=>_6)))(_4)))(_1))))));
+  var _TaelinArena$interact_with = (_0=>(_1=>_0((_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>_1((_14=>(_15=>(_16=>(_17=>(_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>(_25=>_13((_26=>_25((_27=>(((_TaelinArena_Geometry$dist_v3(_8)(_20)>_27)&(_TaelinArena_Geometry$dist_v3(_8)(_20)<(_26+_27)))?_0((_28=>(_29=>(_30=>(_31=>(_32=>(_33=>(_34=>(_35=>(_36=>(_37=>(_38=>(_39=>_TaelinArena_Game$thing(_28)(_29)(_30)(_31)(_32)(_33)(_TaelinArena_Geometry$add_v3(_8)(_TaelinArena_Geometry$scale_v3(((_26+_27)-_TaelinArena_Geometry$dist_v3(_8)(_20)))(_TaelinArena_Geometry$norm_v3(_TaelinArena_Geometry$sub_v3(_8)(_20)))))(_35)(_36)(_37)(_38)(_39)))))))))))))):_0)))((_27=>_0))))((_26=>_0))))))))))))))))))))))))))))));
+  var _TaelinArena$exec_turn = (_0=>_0((_1=>_TaelinArena_Game$game(_List$jJkT$map((_2=>(_3=>_3((_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>(_13=>(_14=>(_15=>_TaelinArena_Heroes$get_hero_by_hid(_5)((_16=>(_17=>_List$jJkT$fold(_17(_3)((_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>_TaelinArena_Game$thing(_18)(_19)(_20)(_21)(_22)(_23)(_TaelinArena_Geometry$add_v3(_24)(_28))(_25)(_26)(_27)(_28)(_29))))))))))))))((_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>_TaelinArena_Game$thing(_18)(_19)(_20)(_21)(_22)(_23)(_TaelinArena_Geometry$add_v3(_24)(_TaelinArena_Geometry$scale_v3(_26)(_27)))(_25)(_26)(_27)(_28)(_29))))))))))))))((_18=>(_19=>(_20=>(_21=>(_22=>(_23=>(_24=>(_25=>(_26=>(_27=>(_28=>(_29=>_TaelinArena_Game$thing(_18)(_19)(_20)(_21)((_22+1))(_23)(_24)(_25)(_26)(_27)(_28)(_29)))))))))))))))((_18=>(_19=>_TaelinArena$interact_with(_19)(_18))))(_2)))))))))))))))))))(_1))(_1)))));
+  var _TaelinArena$draw_thing = (_0=>_0((_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>(_12=>_TaelinArena_Game$draw(_4)(_7)(_10)))))))))))))));
+  var _TaelinArena$srpx = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>_TaelinArena_Game$thing(0)(_1)(_2)(_3)(_4)(_5)(_TaelinArena_Geometry$v3(0)(0)(0))(_7)(_8)(_9)(_10)(_11))))))))))))));
+  var _TaelinArena$stanci = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>_TaelinArena_Game$thing(1)(_1)(_2)(_3)(_4)(_5)(_TaelinArena_Geometry$v3(-64)(0)(0))(_7)(_8)(_9)(_10)(_11))))))))))))));
+  var _TaelinArena$neelix = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>_TaelinArena_Game$thing(2)(_1)(_2)(_3)(_4)(_5)(_TaelinArena_Geometry$v3(64)(0)(0))(_7)(_8)(_9)(_10)(_11))))))))))))));
+  var _TaelinArena$belanna = _TaelinArena$new_hero(_TaelinArena_Heroes$MIKEGATOR_HERO)((_0=>(_1=>(_2=>(_3=>(_4=>(_5=>(_6=>(_7=>(_8=>(_9=>(_10=>(_11=>_TaelinArena_Game$thing(3)(_1)(_2)(_3)(_4)(_5)(_TaelinArena_Geometry$v3(0)(64)(0))(_7)(_8)(_9)(_10)(_11))))))))))))));
   var _TaelinArena$new_game = _TaelinArena_Game$game(_List$jJkT$cons(_TaelinArena$srpx)(_List$jJkT$cons(_TaelinArena$stanci)(_List$jJkT$cons(_TaelinArena$neelix)(_List$jJkT$cons(_TaelinArena$belanna)(_List$jJkT$nil)))));
   return {
     'Empty':_Empty$qpku$Empty,
@@ -10290,11 +10299,10 @@ module.exports = (function(){
     'PlayerId':_TaelinArena_Game$PlayerId,
     'HeroId':_TaelinArena_Game$HeroId,
     'ActionId':_TaelinArena_Game$ActionId,
+    'ModelId':_TaelinArena_Game$ModelId,
     'Hitbox':_TaelinArena_Game$Hitbox,
     'cbox':_TaelinArena_Game$cbox,
     'pbox':_TaelinArena_Game$pbox,
-    'Stat':_TaelinArena_Game$Stat,
-    'stat':_TaelinArena_Game$stat,
     'Hero':_TaelinArena_Game$Hero,
     'hero':_TaelinArena_Game$hero,
     'Thing':_TaelinArena_Game$Thing,
@@ -10318,7 +10326,8 @@ module.exports = (function(){
     'get_position_by_pid':_TaelinArena_Game$get_position_by_pid,
     'map_stage':_TaelinArena_Game$map_stage,
     'with_thing':_TaelinArena_Game$with_thing,
-    'aniloop':_TaelinArena_Game$aniloop,
+    'animate':_TaelinArena_Game$animate,
+    'dash':_TaelinArena_Game$dash,
     'MIKEGATOR_ATTACK_000':_TaelinArena_Models$MIKEGATOR_ATTACK_000,
     'MIKEGATOR_ATTACK_001':_TaelinArena_Models$MIKEGATOR_ATTACK_001,
     'MIKEGATOR_ATTACK_002':_TaelinArena_Models$MIKEGATOR_ATTACK_002,
@@ -10391,6 +10400,15 @@ module.exports = (function(){
     'MIKEGATOR_WALK_005':_TaelinArena_Models$MIKEGATOR_WALK_005,
     'MIKEGATOR_WALK_006':_TaelinArena_Models$MIKEGATOR_WALK_006,
     'MIKEGATOR_WALK_007':_TaelinArena_Models$MIKEGATOR_WALK_007,
+    'MIKEGATOR_IDLE':_TaelinArena_Heroes_Mikegator$MIKEGATOR_IDLE,
+    'MIKEGATOR_ATTACK':_TaelinArena_Heroes_Mikegator$MIKEGATOR_ATTACK,
+    'MIKEGATOR_EARTHBENDING':_TaelinArena_Heroes_Mikegator$MIKEGATOR_EARTHBENDING,
+    'MIKEGATOR_SPINTAIL':_TaelinArena_Heroes_Mikegator$MIKEGATOR_SPINTAIL,
+    'MIKEGATOR_SUPREME_UPPERCUT':_TaelinArena_Heroes_Mikegator$MIKEGATOR_SUPREME_UPPERCUT,
+    'MIKEGATOR_DASH':_TaelinArena_Heroes_Mikegator$MIKEGATOR_DASH,
+    'MIKEGATOR_BLOCK':_TaelinArena_Heroes_Mikegator$MIKEGATOR_BLOCK,
+    'mikegator_init':_TaelinArena_Heroes_Mikegator$mikegator_init,
+    'mikegator_tick':_TaelinArena_Heroes_Mikegator$mikegator_tick,
     'mikegator_hero':_TaelinArena_Heroes_Mikegator$mikegator_hero,
     'MIKEGATOR_HERO':_TaelinArena_Heroes$MIKEGATOR_HERO,
     'get_hero_by_hid':_TaelinArena_Heroes$get_hero_by_hid,
