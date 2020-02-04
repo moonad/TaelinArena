@@ -8553,7 +8553,7 @@ class Main extends Component {
         // Measures FPS
         ++this.fps_tick;
         if (Date.now() > this.fps_last + 1000) {
-          console.log("fps:", this.fps_tick);
+          document.title = "TaelinArena ("+this.fps_tick+" fps)";
           this.fps_tick = 0;
           this.fps_last = Date.now();
         }
