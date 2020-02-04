@@ -8547,15 +8547,17 @@ class Main extends Component {
     document.body.appendChild(this.canvox);
     this.fps_last = Date.now();
     this.fps_tick = 0; 
+    this.fps_numb = 0;
     window.requestAnimationFrame(function render() {
       if (this.game_id) {
 
         // Measures FPS
         ++this.fps_tick;
         if (Date.now() > this.fps_last + 1000) {
-          document.title = "TaelinArena ("+this.fps_tick+" fps)";
+          this.fps_numb = this.fps_tick;
           this.fps_tick = 0;
           this.fps_last = Date.now();
+          this.forceUpdate();
         }
 
         // Renders the game
@@ -8808,7 +8810,8 @@ class Main extends Component {
         style: {
           "font-size": "12px"
         }
-      }, "turn="+this.game_turns.length);
+      },"fps="+(this.fps_numb||0)+", "+
+        "turn="+this.game_turns.length);
     } else if (this.name) {
       var top_rgt = h("div", {
         onClick: () => {
