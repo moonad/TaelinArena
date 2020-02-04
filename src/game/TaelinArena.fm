@@ -42,21 +42,27 @@ exec_command(cmd: Command, gm: Game) : Game
       let thi = thi <= thing(spd = map_spd(spd))
       thi
     | key0 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 1 else act,
       tik = if act === 0 then 0 else tik)
     | key1 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 2 else act,
       tik = if act === 0 then 0 else tik)
     | key2 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 3 else act,
       tik = if act === 0 then 0 else tik)
     | key3 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 4 else act,
       tik = if act === 0 then 0 else tik)
     | key4 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 5 else act,
       tik = if act === 0 then 0 else tik)
     | key5 => thi <= thing(
+      dir = norm_v3(sub_v3(inp.pos, pos)),
       act = if act === 0 then 6 else act,
       tik = if act === 0 then 0 else tik)
     | cmsg => thi

@@ -62,13 +62,13 @@ class Main extends Component {
       var gs = this.game_state;
       this.game_state = TA.exec_command(pa, gs);
     } else if (input_code) {
-      var is_same_code = this.last_code === input_code;
-      var is_sdir_code = input_code[0] === "0";
+      this.post("$"+input_code);
+      //var is_same_code = this.last_code === input_code;
+      //var is_sdir_code = input_code[0] === "0";
       // Prevents repeatedly sending the same SDIR event
-      if (!(is_sdir_code && is_same_code)) {
-        this.post("$"+input_code);
-      }
-      this.last_code = input_code;
+      //if (!(is_sdir_code && is_same_code)) {
+      //}
+      //this.last_code = input_code;
     }
     // Sets 'changed' flag to false
     for (var key in this.keyboard) {
@@ -215,7 +215,7 @@ class Main extends Component {
     };
     document.body.onkeydown = (e) => {
       var name = key_name[e.key.toLowerCase()];
-      if (name) {
+      if (name && !this.keyboard[name][1]) {
         this.keyboard[name] = [1,1];
         this.emit_keys();
       }
