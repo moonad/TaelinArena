@@ -6,19 +6,23 @@ import TaelinArena.Heroes
 
 // Creates a new reseted hero given its HeroId
 new_hero(hid: HeroId) : Thing
-  case get_hero_by_hid(hid) as hero |hero
-  case hero.stat | stat
+  case get_hero_by_hid(hid) as hro |hero
   let id  = 0
   let hid = hid
   let act = 0
+  let mid = 0
   let tik = 0
-  let chp = hero.stat.mhp
+  let chp = 128
   let pos = v3(0,0,0)
+  let mov = 8
   let spd = 0
   let dir = v3(0,-1,0)
   let vel = v3(0,0,0)
-  let box = cbox(hero.stat.rad)
-  thing(id,hid,act,tik,chp,pos,spd,dir,vel,box)
+  let box = cbox(12)
+  hro.init(thing(id,
+    hid,act,mid,tik,
+    chp,pos,mov,spd,
+    dir,vel,box))
 
 // Apply a player input to the game state
 exec_command(cmd: Command, gm: Game) : Game
@@ -29,24 +33,33 @@ exec_command(cmd: Command, gm: Game) : Game
     | sdir =>
       case thi |thing
       case get_hero_by_hid(thi.hid) as her |hero
-      case her.stat as sta |stat
-      let mov = len_v3(inp.dir) === 0
-      let dfn = (d: V3    ) => if mov then d else inp.dir
-      let sfn = (s: Number) => if mov then 0 else sta.spd
-      let thi = thi <= thing(dir = dfn(dir))
-      let thi = thi <= thing(spd = sfn(spd))
+      let is_idle = len_v3(inp.dir) === 0
+      let map_dir =
+        (d: V3) => if is_idle then d else inp.dir
+      let map_spd =
+        (s: Number) => if is_idle then 0 else thi.mov
+      let thi = thi <= thing(dir = map_dir(dir))
+      let thi = thi <= thing(spd = map_spd(spd))
       thi
-    | key0 => thi
-    | key1 => thi
-    | key2 => thi
-    | key3 => thi
-    | key4 => thi
-    | key5 => thi
+    | key0 => thi <= thing(
+      act = if act === 0 then 1 else act,
+      tik = if act === 0 then 0 else tik)
+    | key1 => thi <= thing(
+      act = if act === 0 then 2 else act,
+      tik = if act === 0 then 0 else tik)
+    | key2 => thi <= thing(
+      act = if act === 0 then 3 else act,
+      tik = if act === 0 then 0 else tik)
+    | key3 => thi <= thing(
+      act = if act === 0 then 4 else act,
+      tik = if act === 0 then 0 else tik)
+    | key4 => thi <= thing(
+      act = if act === 0 then 5 else act,
+      tik = if act === 0 then 0 else tik)
+    | key5 => thi <= thing(
+      act = if act === 0 then 6 else act,
+      tik = if act === 0 then 0 else tik)
     | cmsg => thi
-  let fn = (thi: Thing) =>
-    case thi |thing
-    case get_hero_by_hid(thi.hid) as hro |hero
-    hro.inpt(fn(thi), cmd.inp)
   with_thing(cmd.pid, fn, gm)
 
 interact_with(this:Thing, that:Thing): Thing
@@ -72,23 +85,21 @@ interact_with(this:Thing, that:Thing): Thing
 
 // Game's main loop
 exec_turn(gm: Game) : Game
+  let intr = (that,this) => interact_with(this,that)
   let tick = (stage: List(Thing), thi: Thing) =>
     case thi |thing
     case get_hero_by_hid(thi.hid) as hro | hero
-    let nps = add_v3(thi.pos, scale_v3(thi.spd, thi.dir))
-    let ntk = thi.tik + 1
-    let itr = (that, this) => interact_with(this, that)
-    let thi = thi <= thing(pos = nps, tik = ntk)
     let thi = hro.tick(thi)
-    let thi = fold(Thing; _ thi, itr, stage)
+    let thi = thi<=thing(pos=add_v3(pos,vel))
+    let thi = thi<=thing(pos=add_v3(pos,scale_v3(spd,dir)))
+    let thi = thi<=thing(tik=tik+1)
+    let thi = fold(Thing; _ thi, intr, stage)
     thi
   gm <= game(stage = map(Thing; _ tick(stage), stage))
 
-// TODO: very hard coded, comment, improve, etc.
 draw_thing(thi: Thing) : Draw 
   case thi |thing
-  case get_hero_by_hid(thi.hid) as hro | hero
-  hro.draw(thi)
+  draw(thi.mid, thi.pos, thi.dir)
 
 srpx : Thing
   new_hero(MIKEGATOR_HERO) <= thing(pid=0, pos=v3(0,0,0))

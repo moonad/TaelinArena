@@ -10,31 +10,28 @@ HeroId : Type
 ActionId : Type
   Number
 
+ModelId : Type
+  Number
+
 T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
-T Stat
-| stat(
-  mhp: Number,
-  spd: Number,
-  rad: Number)
-
 T Hero
 | hero(
-  stat: Stat,
-  inpt: Thing -> Input -> Thing, 
-  tick: Thing -> Thing,
-  draw: Thing -> Draw)
+  init: Thing -> Thing,
+  tick: Thing -> Thing)
 
 T Thing
 | thing(
   pid : PlayerId,
   hid : HeroId,
   act : ActionId,
-  tik : Number
+  mid : ModelId,
+  tik : Number,
   chp : Number,
   pos : V3,
+  mov : Number,
   spd : Number,
   dir : V3,
   vel : V3,
@@ -88,10 +85,24 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
   map_stage(effect, gm)
 
 // Interpolates animation frames
-aniloop(
-  from  : Number,
-  count : Number,
+animate(
+  thing : Thing,
   delay : Number,
-  tick  : Number
-  ) : Number
-  from + (floor(tick \ delay) % count)
+  model : Number,
+  count : Number
+  ) : Thing
+  thing <= thing(
+    mid = model + (floor(tik \ delay) % count),
+    act = if (count*delay) === tik then 0 else act)
+
+// Performs a dash between certain frames
+dash(
+  thing : Thing,
+  speed : Number,
+  from  : Number,
+  til   : Number)
+  thing <= thing(vel =
+    if (tik > from) && (tik < til) then 
+      scale_v3(speed, dir)
+    else
+      v3(0,0,0))
