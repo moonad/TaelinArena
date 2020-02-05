@@ -87,6 +87,10 @@ class Main extends Component {
     var front = {x:0, y:cos, z:-sin};
     var right = {x:1, y:0, z:0};
     var down = {x:0, y:-sin, z:-cos};
+    if (DEBUG_ON) {
+      this.cam_pos = TA.get_position_by_pid(0)
+        (this.game_state)(x=>y=>z=>({x,y,z}));
+    }
     var pos_x = this.cam_pos.x;
     var pos_y = this.cam_pos.y - 2048*cos;
     var pos_z = 2048*sin;
