@@ -110,7 +110,12 @@ new_hero(hid: HeroId) : Thing
     wlk,dir,trg,vel,
     box,neo,die)
 
-// Interpolates animation frames
+// Performs an animation, reseting to idle when it ends
+// - self: thing to be animated
+// - delay: how many frames each model lasts
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
 animate(
   self  : Thing,
   delay : Number,
@@ -124,6 +129,10 @@ animate(
     act = if (count*delay) === tik then 0 else act)
 
 // Performs a dash between certain frames
+// - self: thing that will dash
+// - speed: dash speed in voxels/frame
+// - from_tik: number of the tik it will start the dash
+// - til_tik: number of the tik it will stop the dash
 dash(
   self     : Thing,
   speed    : Number,
@@ -136,6 +145,10 @@ dash(
       v3(0,0,0))
 
 // Spawns another thing
+// - self: thing that will create another thing
+// - at_tik: number of the tik when thing will be created
+// - at_pos: position on which thing will be created
+// - thing: thing that will be created
 spawn(
   self   : Thing,
   at_tik : Number,
@@ -144,7 +157,10 @@ spawn(
   let thing = thing <= thing(pid = -1, pos = at_pos)
   self <= thing(neo = if tik === at_tik then [thing] else [])
 
-// Blinks to another position
+// Blinks (teleports) to another position
+// - self: thing that will blink
+// - at_tik: number of the tik on which the blink happens
+// - to_pos: position where the thing will blink to
 blink(
   self   : Thing,
   at_tik : Number,
