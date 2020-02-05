@@ -17,7 +17,7 @@ enum
 | MIKEGATOR_BLOCK
 
 mikegator_init(self: Thing) : Thing
-  self <= thing(mov = 4)
+  self <= thing(mov = 3)
 
 mikegator_tick(self: Thing) : Thing
   let delay = 2
