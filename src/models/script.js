@@ -14,17 +14,26 @@
 
     // Converts all .vox to .json
     await Promise.all(file_names
-      .filter((file_name) => file_name.indexOf("__old__") === -1)
-      .map((file_name) => {
+      .filter((path) => path.indexOf("__old__") === -1)
+      .map((path) => {
         return (async () => {
-          var file = fs.readFileSync(file_name);
-          var json = await conv.vox_to_json(file);
-          var new_file_name = file_name.replace(".vox",".json");
-          fs.writeFileSync(new_file_name, '"'+json+'"');
-          console.log("built " + new_file_name);
-          var model_name = new_file_name
+          var file = fs.readFileSync(path);
+          var pivot_path
+            = path.split("/").slice(0,-1).join("/")
+            + "/pivot.json";
+          if (fs.existsSync(pivot_path)) {
+            var ppath = fs.readFileSync(pivot_path,"utf8");
+            var pivot = JSON.parse(ppath);
+          } else {
+            var pivot = {x:0, y:0, z:0};
+          }
+          var new_path = path.replace(".vox",".json");
+          console.log("build " + new_path);
+          var json = await conv.vox_to_json(file, pivot);
+          fs.writeFileSync(new_path, '"'+json+'"');
+          var model_name = new_path
             .replace(new RegExp(".json","g"), "")
-            .slice(new_file_name.indexOf("models")+7);
+            .slice(new_path.indexOf("models")+7);
           model_names.push(model_name);
           return 1;
         })();
