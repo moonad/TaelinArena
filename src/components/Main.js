@@ -1,10 +1,3 @@
-const PARAM = window.location.search;
-const DEBUG_ON = PARAM.indexOf("debug") !== -1;
-const DEBUG_ID
-  = PARAM.indexOf("zoio") !== -1 ? 3
-  : PARAM.indexOf("simplao") !== -1 ? 1
-  : 0;
-
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const canvox = require("./../canvox/canvox.js");
@@ -19,6 +12,23 @@ const post = (func, body) => {
 const Register = require("./register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
+
+// Global debug options
+var PARAM = window.location.search;
+var DEBUG_ON = PARAM.indexOf("debug") !== -1;
+var HERO_ID = {
+  mikagator: TA.MIKEGATOR_HERO,
+  shao: TA.SHAO_HERO,
+  min: TA.MIN_HERO,
+  zoio: TA.ZOIO_HERO,
+  teichi: TA.TEICHI_HERO,
+};
+var DEBUG_HERO_ID = 0;
+for (var hero_name in HERO_ID) {
+  if (PARAM.indexOf(hero_name) !== -1) {
+    DEBUG_HERO_ID = HERO_ID[hero_name];
+  }
+}
 
 // Main HUD
 class Main extends Component {
@@ -45,7 +55,7 @@ class Main extends Component {
     if (DEBUG_ON) {
       this.game_id = -1;
       this.game_turns = [];
-      this.game_state = TA.new_game;
+      this.game_state = TA.new_game(DEBUG_HERO_ID);
       setInterval(() => {
         var gs = this.game_state;
         this.game_state = TA.exec_turn(gs);
@@ -57,18 +67,18 @@ class Main extends Component {
     let pointer = this.pointer;
     var input_code = TA.make_input_code(keyboard,pointer);
     if (input_code && DEBUG_ON) {
-      var ac = String((DEBUG_ID||0)+1) + input_code;
+      var ac = String(1) + input_code;
       var pa = TA.parse_command(ac)[1];
       var gs = this.game_state;
       this.game_state = TA.exec_command(pa, gs);
     } else if (input_code) {
-      var is_same_code = this.last_code === input_code;
-      var is_sdir_code = input_code[0] === "0";
+      this.post("$"+input_code);
+      //var is_same_code = this.last_code === input_code;
+      //var is_sdir_code = input_code[0] === "0";
       // Prevents repeatedly sending the same SDIR event
-      if (!(is_sdir_code && is_same_code)) {
-        this.post("$"+input_code);
-      }
-      this.last_code = input_code;
+      //if (!(is_sdir_code && is_same_code)) {
+      //}
+      //this.last_code = input_code;
     }
     // Sets 'changed' flag to false
     for (var key in this.keyboard) {
@@ -87,17 +97,26 @@ class Main extends Component {
     var front = {x:0, y:cos, z:-sin};
     var right = {x:1, y:0, z:0};
     var down = {x:0, y:-sin, z:-cos};
+    //if (DEBUG_ON) {
+      //this.cam_pos = TA.get_position_by_pid(0)
+        //(this.game_state)(x=>y=>z=>({x,y,z}));
+    //}
     var pos_x = this.cam_pos.x;
     var pos_y = this.cam_pos.y - 2048*cos;
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
+    if (W > H) {
+      var size = {x:480, y:H*480/W};
+    } else {
+      var size = {x:W*270/H, y:270};
+    }
     return {
       pos   : pos, // center pos
       ang   : ang,
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
-      size  : {x:W*0.5, y:H*0.5}, // world size
+      size  : size, // world size
       port  : {x:W, y:H}, // browser size
       res   : 1.0, // rays_per_pixel = res^2
     };
@@ -157,15 +176,17 @@ class Main extends Component {
     document.body.appendChild(this.canvox);
     this.fps_last = Date.now();
     this.fps_tick = 0; 
+    this.fps_numb = 0;
     window.requestAnimationFrame(function render() {
       if (this.game_id) {
 
         // Measures FPS
         ++this.fps_tick;
         if (Date.now() > this.fps_last + 1000) {
-          console.log("fps:", this.fps_tick);
+          this.fps_numb = this.fps_tick;
           this.fps_tick = 0;
           this.fps_last = Date.now();
+          this.forceUpdate();
         }
 
         // Renders the game
@@ -208,7 +229,7 @@ class Main extends Component {
     };
     document.body.onkeydown = (e) => {
       var name = key_name[e.key.toLowerCase()];
-      if (name) {
+      if (name && !this.keyboard[name][1]) {
         this.keyboard[name] = [1,1];
         this.emit_keys();
       }
@@ -418,7 +439,8 @@ class Main extends Component {
         style: {
           "font-size": "12px"
         }
-      }, "turn="+this.game_turns.length);
+      },"fps="+(this.fps_numb||0)+", "+
+        "turn="+this.game_turns.length);
     } else if (this.name) {
       var top_rgt = h("div", {
         onClick: () => {

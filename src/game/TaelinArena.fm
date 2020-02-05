@@ -4,26 +4,6 @@ import TaelinArena.Game
 import TaelinArena.Models
 import TaelinArena.Heroes
 
-// Creates a new reseted hero given its HeroId
-new_hero(hid: HeroId) : Thing
-  case get_hero_by_hid(hid) as hro |hero
-  let id  = 0
-  let hid = hid
-  let act = 0
-  let mid = 0
-  let tik = 0
-  let chp = 128
-  let pos = v3(0,0,0)
-  let mov = 8
-  let spd = 0
-  let dir = v3(0,-1,0)
-  let vel = v3(0,0,0)
-  let box = cbox(12)
-  hro.init(thing(id,
-    hid,act,mid,tik,
-    chp,pos,mov,spd,
-    dir,vel,box))
-
 // Apply a player input to the game state
 exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
@@ -34,29 +14,33 @@ exec_command(cmd: Command, gm: Game) : Game
       case thi |thing
       case get_hero_by_hid(thi.hid) as her |hero
       let is_idle = len_v3(inp.dir) === 0
-      let map_dir =
-        (d: V3) => if is_idle then d else inp.dir
-      let map_spd =
-        (s: Number) => if is_idle then 0 else thi.mov
+      let map_dir = (d: V3) => if is_idle then d else inp.dir
+      let map_wlk = (s: Bool) => if is_idle then false else true
       let thi = thi <= thing(dir = map_dir(dir))
-      let thi = thi <= thing(spd = map_spd(spd))
+      let thi = thi <= thing(wlk = map_wlk(wlk))
       thi
     | key0 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 1 else act,
       tik = if act === 0 then 0 else tik)
     | key1 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 2 else act,
       tik = if act === 0 then 0 else tik)
     | key2 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 3 else act,
       tik = if act === 0 then 0 else tik)
     | key3 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 4 else act,
       tik = if act === 0 then 0 else tik)
     | key4 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 5 else act,
       tik = if act === 0 then 0 else tik)
     | key5 => thi <= thing(
+      trg = if act === 0 then inp.pos else trg,
       act = if act === 0 then 6 else act,
       tik = if act === 0 then 0 else tik)
     | cmsg => thi
@@ -86,32 +70,42 @@ interact_with(this:Thing, that:Thing): Thing
 // Game's main loop
 exec_turn(gm: Game) : Game
   let intr = (that,this) => interact_with(this,that)
-  let tick = (stage: List(Thing), thi: Thing) =>
+  let tick = (stage: List(Thing), thi: Thing, res: List(Thing)) =>
     case thi |thing
     case get_hero_by_hid(thi.hid) as hro | hero
     let thi = hro.tick(thi)
-    let thi = thi<=thing(pos=add_v3(pos,vel))
-    let thi = thi<=thing(pos=add_v3(pos,scale_v3(spd,dir)))
-    let thi = thi<=thing(tik=tik+1)
+    let thi = thi <= thing(pos = add_v3(pos,vel))
+    let thi = thi <= thing(pos = case wlk
+      | true  => add_v3(pos,scale_v3(mov*bst,dir))
+      | false => pos)
+    let thi = thi <= thing(tik = tik + 1)
     let thi = fold(Thing; _ thi, intr, stage)
-    thi
-  gm <= game(stage = map(Thing; _ tick(stage), stage))
+    case thi |thing
+    let neo_init = (neo_thi) =>
+      case neo_thi | thing
+      case get_hero_by_hid(neo_thi.hid) as neo_hro | hero
+      neo_hro.tick(neo_thi)
+    let neo_list = map(Thing; Thing; neo_init, thi.neo)
+    concat(_ neo_list,
+      case thi.die
+      |true res
+      |false cons(_thi,res))
+  gm <= game(stage = fold(Thing; _ [], tick(stage), stage))
 
 draw_thing(thi: Thing) : Draw 
   case thi |thing
-  draw(thi.mid, thi.pos, thi.dir)
+  let mid = thi.mid
+  let pos = thi.pos
+  let dir =
+    if thi.act === 0 then
+      thi.dir
+    else
+      lookat_v3(thi.pos, thi.trg, thi.dir)
+  draw(mid, pos, dir)
 
-srpx : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=0, pos=v3(0,0,0))
-
-stanci : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=1, pos=v3(-64,0,0))
-
-neelix : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
-
-belanna : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
-
-new_game : Game
-  game([srpx, stanci, neelix, belanna])
+new_game(hero_id: HeroId) : Game
+  let p0 = new_hero(hero_id) <= thing(pid=0, pos=v3(0,0,0))
+  let p1 = new_hero(SHAO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
+  let p2 = new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
+  let p3 = new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
+  game([p0,p1,p2,p3])

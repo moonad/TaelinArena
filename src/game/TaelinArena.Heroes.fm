@@ -1,11 +1,19 @@
 import TaelinArena.Game
+import TaelinArena.HeroIds
 import TaelinArena.Models
 import TaelinArena.Heroes.Mikegator
-
-enum
-| MIKEGATOR_HERO
+import TaelinArena.Heroes.Mikegator.Earth
+import TaelinArena.Heroes.Shao
+import TaelinArena.Heroes.Min
+import TaelinArena.Heroes.Zoio
+import TaelinArena.Heroes.Teichi
 
 get_hero_by_hid(hid: HeroId) : Hero
   switch hid
   |MIKEGATOR_HERO mikegator_hero
+  |MIKEGATOR_EARTH_HERO mikegator_earth_hero
+  |SHAO_HERO shao_hero
+  |MIN_HERO min_hero
+  |ZOIO_HERO zoio_hero
+  |TEICHI_HERO teichi_hero
   else mikegator_hero

@@ -37,6 +37,22 @@ function render_game({game, canvox, cam}) {
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
       var model = models[model_id];
+
+      for (var j = -12; j <= 12; ++j) {
+        for (var i = -12; i <= 12; ++i) {
+          if ( i === -12 || i === 0 || i === 12
+            || j === -12 || j === 0 || j === 12) {
+            var px = pos_x + i;
+            var py = pos_y + j;
+            var pz = 0;
+            var bpos = (px+512)<<20|(py+512)<<10|(pz+512);
+            var bcol = 0xE0E0E0FF;
+            voxels[voxels.length] = bpos;
+            voxels[voxels.length] = bcol;
+          }
+        }
+      }
+
       for (var i = 0; i < model.length; ++i) {
         var [{x,y,z},{r,g,b}] = model[i];
         var cx = pos_x;

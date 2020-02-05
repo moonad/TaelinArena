@@ -4,8 +4,8 @@ var vox = require("vox.js");
 var parser = new vox.Parser();
 var fs = require("fs");
 
-// Uint8Array -> Promise(JSON)
-function vox_to_json(vox) {
+// Uint8Array -> Pos -> Promise(JSON)
+function vox_to_json(vox, pivot) {
   //var vox = fs.readFileSync(vox_file);
   var u8 = new Uint8Array(vox);
   var byt = b => ("00"+b.toString(16)).slice(-2);
@@ -15,9 +15,15 @@ function vox_to_json(vox) {
       for (var i = 0; i < data.voxels.length; ++i) {
         var vpos = data.voxels[i];
         var k = data.palette[vpos.colorIndex];
-        var x = Math.floor(vpos.x - data.size.x * 0.5)+128;
-        var y = Math.floor(vpos.y - data.size.y * 0.5)+128;
-        var z = Math.floor(vpos.z)+128;
+        if (!pivot) {
+          var x = Math.floor(vpos.x-data.size.x*0.5)+128;
+          var y = Math.floor(vpos.y-data.size.y*0.5)+128;
+          var z = Math.floor(vpos.z)+128;
+        } else {
+          var x = Math.floor(vpos.x-pivot.x)+128;
+          var y = Math.floor(vpos.y-pivot.y)+128;
+          var z = Math.floor(vpos.z-pivot.z)+128;
+        }
         var r = k.r;
         var g = k.g;
         var b = k.b;
