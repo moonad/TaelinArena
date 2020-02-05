@@ -1,10 +1,3 @@
-const PARAM = window.location.search;
-const DEBUG_ON = PARAM.indexOf("debug") !== -1;
-const DEBUG_ID
-  = PARAM.indexOf("zoio") !== -1 ? 3
-  : PARAM.indexOf("simplao") !== -1 ? 1
-  : 0;
-
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const canvox = require("./../canvox/canvox.js");
@@ -19,6 +12,23 @@ const post = (func, body) => {
 const Register = require("./register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
+
+// Global debug options
+var PARAM = window.location.search;
+var DEBUG_ON = PARAM.indexOf("debug") !== -1;
+var HERO_ID = {
+  mikagator: TA.MIKEGATOR_HERO,
+  shao: TA.SHAO_HERO,
+  min: TA.MIN_HERO,
+  zoio: TA.ZOIO_HERO,
+  teichi: TA.TEICHI_HERO,
+};
+var DEBUG_HERO_ID = 0;
+for (var hero_name in HERO_ID) {
+  if (PARAM.indexOf(hero_name) !== -1) {
+    DEBUG_HERO_ID = HERO_ID[hero_name];
+  }
+}
 
 // Main HUD
 class Main extends Component {
@@ -45,7 +55,7 @@ class Main extends Component {
     if (DEBUG_ON) {
       this.game_id = -1;
       this.game_turns = [];
-      this.game_state = TA.new_game;
+      this.game_state = TA.new_game(DEBUG_HERO_ID);
       setInterval(() => {
         var gs = this.game_state;
         this.game_state = TA.exec_turn(gs);
@@ -57,7 +67,7 @@ class Main extends Component {
     let pointer = this.pointer;
     var input_code = TA.make_input_code(keyboard,pointer);
     if (input_code && DEBUG_ON) {
-      var ac = String((DEBUG_ID||0)+1) + input_code;
+      var ac = String(1) + input_code;
       var pa = TA.parse_command(ac)[1];
       var gs = this.game_state;
       this.game_state = TA.exec_command(pa, gs);

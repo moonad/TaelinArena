@@ -107,17 +107,9 @@ draw_thing(thi: Thing) : Draw
   case thi |thing
   draw(thi.mid, thi.pos, thi.dir)
 
-srpx : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=0, pos=v3(0,0,0))
-
-stanci : Thing
-  new_hero(SHAO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
-
-neelix : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
-
-belanna : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
-
-new_game : Game
-  game([srpx, stanci, neelix, belanna])
+new_game(hero_id: HeroId) : Game
+  let p0 = new_hero(hero_id) <= thing(pid=0, pos=v3(0,0,0))
+  let p1 = new_hero(SHAO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
+  let p2 = new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
+  let p3 = new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
+  game([p0,p1,p2,p3])
