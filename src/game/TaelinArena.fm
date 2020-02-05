@@ -108,10 +108,10 @@ draw_thing(thi: Thing) : Draw
   draw(thi.mid, thi.pos, thi.dir)
 
 srpx : Thing
-  new_hero(SHAO_HERO) <= thing(pid=0, pos=v3(0,0,0))
+  new_hero(MIKEGATOR_HERO) <= thing(pid=0, pos=v3(0,0,0))
 
 stanci : Thing
-  new_hero(MIKEGATOR_HERO) <= thing(pid=1, pos=v3(-64,0,0))
+  new_hero(SHAO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
 
 neelix : Thing
   new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
