@@ -38,9 +38,6 @@ min_tick(self: Thing) : Thing
   |MIN_DASH
     let self = animate(self, delay, 0, MIN_DASH_000, 3)
     let self = dash(self, 12, 0,3)
-
-    //let self = animate(self, delay, 1, MIKEGATOR_DASH_000, 7)
-    //let self = dash(self, 4, 0,12)
     self
 
   |MIN_TAUNT

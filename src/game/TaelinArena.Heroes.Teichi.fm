@@ -37,9 +37,7 @@ teichi_tick(self: Thing) : Thing
 
   |TEICHI_TELEPORT
     let self = animate(self, delay, 0, TEICHI_TELEPORT_IN_000, 16)
-    let self = self <= thing(
-      pos = if tik === 22 then trg else pos,
-      dir = if tik === 22 then lookat_v3(pos,trg,dir) else dir)
+    let self = blink(self, 22, self.trg)
     self
 
   |TEICHI_TAUNT
