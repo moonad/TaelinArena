@@ -245,7 +245,7 @@ module.exports = [
   parse(require("./../../models/shao/water_tail/010.json")),
   parse(require("./../../models/shao/water_tail/011.json")),
   parse(require("./../../models/shao/water_tail/012.json")),
-  parse(require("./../../models/shao/water_tail/014.json")),
+  parse(require("./../../models/shao/water_tail/013.json")),
   parse(require("./../../models/teichi/base_attack_var_1/000.json")),
   parse(require("./../../models/teichi/base_attack_var_1/001.json")),
   parse(require("./../../models/teichi/base_attack_var_1/002.json")),
