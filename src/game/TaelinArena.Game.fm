@@ -18,9 +18,7 @@ T Hitbox
 | pbox(pts: List(V3))
 
 T Hero
-| hero(
-  init: Thing -> Thing,
-  tick: Thing -> Thing)
+| hero(tick: Thing -> Thing)
 
 T Thing
 | thing(
@@ -32,10 +30,14 @@ T Thing
   chp : Number,
   pos : V3,
   mov : Number,
-  spd : Number,
+  bst : Number,
+  wlk : Bool,
   dir : V3,
+  trg : V3,
   vel : V3,
-  box : Hitbox)
+  box : Hitbox,
+  neo : List(Thing),
+  die : Bool)
 
 T Game
 | game(stage : List(Thing))
@@ -84,14 +86,40 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
     | false => thi
   map_stage(effect, gm)
 
+// Creates a new reseted hero given its HeroId
+new_hero(hid: HeroId) : Thing
+  let id  = 0
+  let hid = hid
+  let act = 0
+  let mid = 0
+  let tik = 0
+  let chp = 128
+  let pos = v3(0,0,0)
+  let mov = 8
+  let bst = 1
+  let wlk = false
+  let dir = v3(0,-1,0)
+  let trg = v3(0,0,0)
+  let vel = v3(0,0,0)
+  let box = cbox(12)
+  let neo = []
+  let die = false
+  thing(id,
+    hid,act,mid,tik,
+    chp,pos,mov,bst,
+    wlk,dir,trg,vel,
+    box,neo,die)
+
 // Interpolates animation frames
 animate(
   thing : Thing,
   delay : Number,
+  boost : Number,
   model : Number,
   count : Number
   ) : Thing
   thing <= thing(
+    bst = if (count*delay) === tik then 1 else boost,
     mid = model + (floor(tik \ delay) % count),
     act = if (count*delay) === tik then 0 else act)
 
@@ -103,6 +131,6 @@ dash(
   til   : Number)
   thing <= thing(vel =
     if (tik > from) && (tik < til) then 
-      scale_v3(speed, dir)
+      scale_v3(speed, lookat_v3(pos, trg, dir))
     else
       v3(0,0,0))

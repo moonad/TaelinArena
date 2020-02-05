@@ -52,6 +52,11 @@ len_v3(a: V3) : Number
   let sqr = sqr ** 0.5
   sqr
     
+eql_v3(a: V3, b: V3) : Number
+  case a |v3
+  case b |v3
+  (a.x === b.x) && (a.y === b.y) && (a.z === b.z)
+
 norm_v3(a: V3) : V3
   let l = len_v3(a)
   case a |v3
@@ -69,6 +74,12 @@ dot_v3(a: V3, b: V3) : Number
   let d = d + (a.y * b.y)
   let d = d + (a.z * b.z)
   d
+
+lookat_v3(a: V3, b: V3, c: V3) : V3
+  if eql_v3(a, b) then
+    c
+  else
+    norm_v3(sub_v3(b, a))
 
 sqrdist_v3(a: V3, b: V3) : Number
   case a |v3

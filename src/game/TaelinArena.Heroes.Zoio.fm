@@ -1,0 +1,50 @@
+import TaelinArena.Game
+import TaelinArena.Geometry
+import TaelinArena.Models
+import TaelinArena.HeroIds
+
+enum
+| ZOIO_IDLE
+| ZOIO_SPINNING_JUMP
+| ZOIO_WELL
+| ZOIO_BIG_EYE_RAY
+| ZOIO_HIPONOTIZING_FIELD
+| ZOIO_DASH
+| ZOIO_BLOCK
+
+zoio_tick(self: Thing) : Thing
+  let delay = 2
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |ZOIO_IDLE
+    case self.wlk
+    | true  => animate(self, delay, 1, ZOIO_WALK_000, 7)
+    | false => animate(self, delay, 1, ZOIO_IDLE_000, 7)
+
+  |ZOIO_SPINNING_JUMP
+    animate(self, delay, 1, ZOIO_SPINNING_JUMP_000, 11)
+
+  // TODO: fix naming
+  |ZOIO_WELL
+    animate(self, delay, 0, ZOIO_ZOIO_WELL_IN_000, 7)
+
+  |ZOIO_BIG_EYE_RAY
+    animate(self, delay, 0, ZOIO_ATTACK_000, 8)
+
+  |ZOIO_HIPONOTIZING_FIELD
+    animate(self, delay, 0, ZOIO_HIPONOTIZING_FIELD_000, 22)
+
+  |ZOIO_DASH
+    let self = animate(self, delay, 1, ZOIO_DASH_000, 8)
+    let self = dash(self, 4, 6,16)
+    self
+
+  |ZOIO_BLOCK
+    animate(self, delay, 0, ZOIO_BLOCK_000, 11)
+
+  else self
+
+zoio_hero : Hero
+  hero(zoio_tick)
