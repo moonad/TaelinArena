@@ -25,7 +25,7 @@
             var ppath = fs.readFileSync(pivot_path,"utf8");
             var pivot = JSON.parse(ppath);
           } else {
-            var pivot = {x:0, y:0, z:0};
+            var pivot = null;
           }
           var new_path = path.replace(".vox",".json");
           console.log("build " + new_path);
