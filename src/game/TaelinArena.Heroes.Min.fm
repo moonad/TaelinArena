@@ -1,0 +1,52 @@
+import TaelinArena.Game
+import TaelinArena.Geometry
+import TaelinArena.Models
+import TaelinArena.HeroIds
+
+enum
+| MIN_IDLE
+| MIN_FLAME_SLASH
+| MIN_FIRE_MARK
+| MIN_MELTING_CUTS
+| MIN_DRAGONS_PERISHMENT
+| MIN_DASH
+| MIN_TAUNT
+
+min_tick(self: Thing) : Thing
+  let delay = 2
+  let self = self <= thing(mov = 6)
+
+  case self |thing switch self.act
+
+  |MIN_IDLE
+    case self.wlk
+    | true  => animate(self, delay, 1, MIN_RUN_000, 6)
+    | false => animate(self, delay*2, 1, MIN_IDLE_000, 3)
+
+  |MIN_FLAME_SLASH
+    animate(self, delay, 0, MIN_FLAME_SLASH_CAST_000, 6)
+
+  |MIN_FIRE_MARK
+    animate(self, delay, 1, MIN_FIRE_MARK_CAST_000, 3)
+
+  |MIN_MELTING_CUTS
+    animate(self, delay, 1, MIN_MELTING_CUTS_000, 9)
+
+  |MIN_DRAGONS_PERISHMENT
+    animate(self, delay, 1, MIN_DRAGONS_PERISHMENT_CAST_000, 1)
+
+  |MIN_DASH
+    let self = animate(self, delay, 0, MIN_DASH_000, 3)
+    let self = dash(self, 12, 0,3)
+
+    //let self = animate(self, delay, 1, MIKEGATOR_DASH_000, 7)
+    //let self = dash(self, 4, 0,12)
+    self
+
+  |MIN_TAUNT
+    animate(self, delay, 1, MIN_TAUNT_000, 5)
+
+  else self
+
+min_hero : Hero
+  hero(min_tick)

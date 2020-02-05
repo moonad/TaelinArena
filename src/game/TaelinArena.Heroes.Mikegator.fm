@@ -1,11 +1,7 @@
-// This is an initial model of Mikegator. It has all attack
-// animations, but no movement, hitboxes, etc. It also has a
-// lot of "magic constants" spread in separate places. This
-// code will be improved to avoid those.
-
 import TaelinArena.Game
 import TaelinArena.Geometry
 import TaelinArena.Models
+import TaelinArena.HeroIds
 
 enum
 | MIKEGATOR_IDLE
@@ -16,36 +12,40 @@ enum
 | MIKEGATOR_DASH
 | MIKEGATOR_BLOCK
 
-mikegator_init(self: Thing) : Thing
-  self <= thing(mov = 3)
-
 mikegator_tick(self: Thing) : Thing
   let delay = 2
-  case self |thing
-  switch self.act
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
 
   |MIKEGATOR_IDLE
-    if self.spd < 0.1 then 
-      animate(self, delay, MIKEGATOR_IDLE_000, 6)
-    else
-      animate(self, delay, MIKEGATOR_WALK_000, 8)
+    case self.wlk
+    | true  => animate(self, delay, 1, MIKEGATOR_WALK_000, 8)
+    | false => animate(self, delay, 1, MIKEGATOR_IDLE_000, 6)
 
   |MIKEGATOR_ATTACK
-    animate(self, delay, MIKEGATOR_ATTACK_000, 6)
+    animate(self, delay, 1, MIKEGATOR_ATTACK_000, 6)
 
   |MIKEGATOR_EARTHBENDING
-    animate(self, delay, MIKEGATOR_EARTHBENDING_000, 9)
+    let self = animate(self, delay, 1, MIKEGATOR_EARTHBENDING_000, 9)
+    let self = self <= thing(neo =
+      let epos = trg
+      if tik === 10 then
+        [new_hero(MIKEGATOR_EARTH_HERO) <= thing(pos=epos, pid=-1)]
+      else
+        [])
+    self
 
   |MIKEGATOR_SPINTAIL
-    animate(self, delay, MIKEGATOR_SPINTAIL_000, 8)
+    animate(self, delay, 0, MIKEGATOR_SPINTAIL_000, 8)
 
   |MIKEGATOR_SUPREME_UPPERCUT
-    let self = animate(self, delay, MIKEGATOR_SUPREME_UPPERCUT_000, 14)
+    let self = animate(self, delay, 0.5, MIKEGATOR_SUPREME_UPPERCUT_000, 14)
     let self = dash(self, 8, 18,21)
     self
 
   |MIKEGATOR_DASH
-    let self = animate(self, delay, MIKEGATOR_DASH_000, 7)
+    let self = animate(self, delay, 1, MIKEGATOR_DASH_000, 7)
     let self = dash(self, 4, 0,12)
     self
 
@@ -57,4 +57,4 @@ mikegator_tick(self: Thing) : Thing
   else self
 
 mikegator_hero : Hero
-  hero(mikegator_init, mikegator_tick)
+  hero(mikegator_tick)
