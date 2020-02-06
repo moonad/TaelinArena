@@ -116,27 +116,27 @@ module.exports = function canvox(opts = {}) {
             ray_dir_x, ray_dir_y, ray_dir_z,
             tree);
           // TODO: re-add stage on CPU mode
-          //if (stage) {
-            //var hit2 = oct.march(
-              //ray_pos_x, ray_pos_y, ray_pos_z,
-              //ray_dir_x, ray_dir_y, ray_dir_z,
-              //stage);
-            //if (hit2.ctr === oct.HIT) {
-              //var dist1 = 0;
-              //var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
-              //var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
-              //var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
-              //var dist2 = 0;
-              //var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
-              //var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
-              //var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
-              //var hit = dist1 < dist2 ? hit1 : hit2;
-            //} else {
-              //var hit = hit1;
-            //}
-          //} else {
+          if (stage) {
+            var hit2 = oct.march(
+              ray_pos_x, ray_pos_y, ray_pos_z,
+              ray_dir_x, ray_dir_y, ray_dir_z,
+              stage);
+            if (hit2.ctr === oct.HIT) {
+              var dist1 = 0;
+              var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
+              var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
+              var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
+              var dist2 = 0;
+              var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
+              var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
+              var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
+              var hit = dist1 < dist2 ? hit1 : hit2;
+            } else {
+              var hit = hit1;
+            }
+          } else {
             var hit = hit1;
-          //}
+          }
 
           // Renders to screen
           var j = Math.floor((scr_pos_y+1)/2*(cam.size.y*cam.res));
@@ -213,7 +213,7 @@ module.exports = function canvox(opts = {}) {
       uniform sampler2D stage;
 
       const float inf = 65536.0;
-      const float eps = 0.0009765625;
+      const float eps = 0.000244140625;
 
       const uint CTR = 0xC0000000u;
       const uint VAL = 0x3FFFFFFFu;

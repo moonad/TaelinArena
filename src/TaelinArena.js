@@ -1,6 +1,7 @@
 const TA = require("./game/TaelinArena.fm");
 const oct = require("./canvox/octree.js");
 const models = require("./models/models.js");
+const parse = require("./models/parser.js");
 
 const now = (() => {
   var init_time = Date.now()/1000;
@@ -10,13 +11,48 @@ const now = (() => {
 var stage = oct.empty();
 for (var y = -512; y < 512; ++y) {
   for (var x = -512; x < 512; ++x) {
-    if (((x+2048) / 32) % 2 < 1) { // || ((y+2048) / 32) % 2 < 1) {
+    var line = 0xFFFFFFFF;
+    var d = x * x + y * y;
+    if ( x >= 508
+      || y >= 508
+      || x < -508
+      || y < -508
+      || x >= -2 && x < 2
+      || x >= -388 && x < -384 && y >= -128 && y <  128
+      || x >=  384 && x <  388 && y >= -128 && y <  128
+      || x >= -512 && x < -384 && y >= -128 && y < -124
+      || x >= -512 && x < -384 && y >=  124 && y <  128
+      || x >=  384 && x <  512 && y >= -128 && y < -124
+      || x >=  384 && x <  512 && y >=  124 && y <  128
+      || d >= 124*124 && d < 128*128) {
+      oct.insert(x,y,0,line,stage);
+    } else if (((x+2048)/32)%2 < 1) { // || ((y+2048)/32)%2<1) {
       oct.insert(x,y,0,0xFF85c9a0,stage);
     } else {
       oct.insert(x,y,0,0xFF8fd9ad,stage);
     }
   }
 }
+
+//function rect(x0,x1,y0,y1,c=0xFFF0F0F0) {
+  //for (var j = y0; j < y1; ++j) {
+    //for (var i = x0; i < x1; ++i) {
+      //oct.insert(i,j,0,c,stage);
+    //}
+  //}
+//};
+//rect(-512,  512,  508,  512); // top
+//rect(-512,  512, -512, -508); // down
+//rect(-512, -508, -256,  256); // left
+//rect( 508,  512, -256,  256); // right
+
+//rect(   0,  128,   62,   66); // red base top
+//rect(   0,  128,  -66,  -62); // red base bot
+//rect( 126,  130,  -66,   66); // red base right
+
+//rect( 896, 1024,   62,   66); // blue base top
+//rect( 896, 1024,  -66,  -62); // blue base bot
+//rect( 894,  898,  -66,   66); // blue base right
 
 // Renders the game state to screen using the canvox library
 function render_game({game, canvox, cam}) {
