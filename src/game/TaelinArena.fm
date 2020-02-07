@@ -103,9 +103,12 @@ draw_thing(thi: Thing) : Draw
       lookat_v3(thi.pos, thi.trg, thi.dir)
   draw(mid, pos, dir)
 
-new_game(hero_id: HeroId) : Game
-  let p0 = new_hero(hero_id) <= thing(pid=0, pos=v3(0,0,0))
-  let p1 = new_hero(SHAO_HERO) <= thing(pid=1, pos=v3(-64,0,0))
-  let p2 = new_hero(MIKEGATOR_HERO) <= thing(pid=2, pos=v3(64,0,0))
-  let p3 = new_hero(MIKEGATOR_HERO) <= thing(pid=3, pos=v3(0,64,0))
-  game([p0,p1,p2,p3])
+new_game(hids: List(HeroId)) : Game
+  let nil = (pid) => []
+  let cons = (hid, heroes, pid) => 
+    let hpid = pid
+    let hpos = v3(pid * 64, 0, 0)
+    let hero = new_hero(hid) <= thing(pid=hpid, pos=hpos)
+    let rest = heroes(pid + 1)
+    cons(_ hero, rest)
+  game(fold(_ Number -> List(Thing); nil, cons, hids, 0))
