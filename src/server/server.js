@@ -7,8 +7,7 @@ var cors = require("cors");
 var fs = require("fs").promises;
 var path = require("path");
 var ethers = require("ethers");
-var FPS = 24;
-var MAX_TURNS = FPS * 60 * 10;
+var TA = require("./../TaelinArena.js");
 
 // Simple fs database
 var get_str = async (key) => {
@@ -57,7 +56,9 @@ function create_new_game(game) {
 // Completes a turn on given game_id
 function add_new_turn(gid) {
   var turn_count = turns[gid].length;
-  if (turn_count < MAX_TURNS) {
+  var game_time = (Date.now() - games[gid].init) / 1000;
+  if ( turn_count <= TA.GAME_DURATION
+    && Date.now() >= games[gid].init) {
     // If there are no turns, add the first turn
     if (turn_count === 0) {
       turns[gid].push("");
@@ -76,7 +77,7 @@ function perform_input(gid, player_name, input) {
   var player_id = get_player_id(player_name, games[gid]);
   var turn_count = turns[gid].length;
   if ( turn_count > 0
-    && turn_count < MAX_TURNS
+    && turn_count <= TA.GAME_DURATION
     && player_id !== null
     && is_valid_input(input)) {
     console.log(
@@ -92,43 +93,19 @@ function perform_input(gid, player_name, input) {
 
 // Gets the player id on given game
 function get_player_id(name, game) {
-  for (var i = 0; i < game.teams.lft.length; ++i) {
-    if (game.teams.lft[i] === name) {
+  var players = game.players.split(",");
+  for (var i = 0; i < players.length; ++i) {
+    if (TA.parse_player(players[i]).name === name) {
+      console.log("(" + name + " is " + i + ")");
       return i;
-    }
-  }
-  for (var j = 0; j < game.teams.rgt.length; ++j) {
-    if (game.teams.rgt[j] === name) {
-      return game.teams.lft.length + j;
     }
   }
   return null;
 };
 
-// Validates a team object
-function is_valid_teams(teams) {
-  if (typeof teams !== "object") {
-    return false;
-  }
-  if (Object.keys(teams).length !== 2) {
-    return false;
-  }
-  for (var side of ["lft", "rgt"]) {
-    if (!(teams[side] instanceof Array)) {
-      return false;
-    }
-    if (teams[side].length > 5) {
-      return false;
-    }
-    for (var i = 0; i < teams[side].length; ++i) {
-      if (typeof teams[side][i] !== "string") { 
-        return false;
-      }
-      if (!is_valid_name(teams[side][i])) {
-        return false;
-      }
-    }
-  }
+// Validates a players object
+function is_valid_players(players) {
+  // TODO
   return true;
 }
 
@@ -229,17 +206,17 @@ app.post("/new_game", async (req, res) => {
   }
 
   // Validates team format
-  var teams = req.body.teams; 
-  if (!is_valid_teams(teams)) {
+  var players = req.body.players; 
+  if (!is_valid_players(players)) {
     return res.send(JSON.stringify({
       ctr: "err",
-      err: "Invalid teams.",
+      err: "Invalid players.",
     }));
   }
 
   // Creates new game and sends success answer
-  var init = Date.now();
-  create_new_game({name,teams,init});
+  var init = Date.now() + 2000;
+  create_new_game({name,players,init});
   res.send(JSON.stringify({ctr:"ok"}));
 });
 
@@ -271,13 +248,22 @@ app.post("/get_game", async (req, res) => {
 app.post("/offer", (req, res) => {
   var name = req.body.name;
   var peer = new Peer({initiator: true, wrtc, tricke: true});
-  var game = 0;
+  var game = TA.NIL_GAME;
   var turn = 0;
-  peers[req.body.name] = peer;
+
+  peer.team = "spec";
+  peer.hero = "MikeGator";
+  peer.do_send = (msg) => {
+    if (peer._pcReady) {
+      try { peer.send(msg); }
+      catch (e) { console.log("send_err:", e); }
+    }
+  };
+  peers[name] = peer;
 
   // Continuously sends `game_id,from_turn,[input]` to peer
   var turn_feed = setInterval(() => {
-    if (game > 0) {
+    if (game !== TA.NIL_GAME) {
       var count = turns[game].length;
 
       // Gather 5 turns around the one demanded by peer
@@ -298,12 +284,33 @@ app.post("/offer", (req, res) => {
 
       // Sends the turn to peer
       try {
-        peer.send("$" + msg);
+        peer.do_send("$" + msg);
       } catch (e) {
         console.log(e);
       };
+
     }
-  }, 1000/FPS);
+  }, 1000 / TA.GAME_FPS);
+
+  // Continuously sends room info if not watching game
+  var room_feed = setInterval(() => {
+    if (game === TA.NIL_GAME) {
+      var players = [];
+      for (var peer_name in peers) {
+        var player = "";
+        switch (peers[peer_name].team) {
+          case "red" : player += "<"; break;
+          case "spec": player += "^"; break;
+          case "blue": player += ">"; break;
+        }
+        player += peer_name;
+        player += "!";
+        player += peers[peer_name].hero;
+        players.push(player);
+      }
+      peer.do_send(players.join(","));
+    }
+  }, 500);
 
   peer.on("signal", data => {
     if (data.type === "offer") {
@@ -311,18 +318,53 @@ app.post("/offer", (req, res) => {
     }
   })
 
-  peer.on("connect", () => {})
+  peer.on("connect", () => {
+    //console.log(">> "+name+" connect <<");
+  })
 
   // Deals with messages sent by peer
   peer.on("data", (data) => {
+    //console.log("recv: "+data);
     var str = "" + data;
     switch (str[0]) {
+
+      // Mod wants to set someone's team to red.
+      case "<":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].team = "red";
+        }
+        break;
+
+      // Mod wants to set someone's team to blue.
+      case ">":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].team = "blue";
+        }
+        break;
+
+      // Mod wants to set someone's team to spec.
+      case "^":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].team = "spec";
+        }
+        break;
 
       // Player wants to set its name. TODO: signatures.
       case "+":
         delete peers[name];
         name = str.slice(1);
         peers[name] = peer;
+        break;
+
+      // Player wants to set its hero.
+      case "!":
+        peer.hero = str.slice(1);
         break;
 
       // Player is informing its last downloaded turn.
@@ -334,22 +376,32 @@ app.post("/offer", (req, res) => {
 
       // Player wants to perform an in-game input.
       case "$":
-        perform_input(game, name, str.slice(1));
+        if (game !== TA.NIL_GAME) {
+          perform_input(game, name, str.slice(1));
+        }
         break;
 
       // Player sent a normal chat message.
       default:
+        //console.log("- is default");
+        //console.log("-", Object.keys(peers));
         for (var peer_name in peers) {
-          peers[peer_name].send(name+": "+str);
+          peers[peer_name].do_send(name+": "+str);
         }
         break;
 
     }
   });
+
   peer.on("error", (err) => {});
+
   peer.on("close", () => {
-    delete peers[name];
+    //console.log(">> "+name+" close <<");
+    if (peers[name] === peer) {
+      delete peers[name];
+    }
     clearInterval(turn_feed);
+    clearInterval(room_feed);
   });
 });
 
@@ -372,11 +424,13 @@ for (var gid = 0; gid < games.length; ++gid) {
   turns[gid].pop();
 }
 
+console.log("Server started.");
+
 // Main loop: passes time on all active games
 setInterval(() => {
-  for (var gid = 1; gid < games.length; ++gid) {
+  for (var gid = 0; gid < games.length; ++gid) {
     add_new_turn(gid);
   }
-}, 1000 / FPS);
+}, 1000 / TA.GAME_FPS);
 
 })();

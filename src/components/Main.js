@@ -11,22 +11,16 @@ const post = (func, body) => {
 
 const Register = require("./register.js");
 const GameList = require("./GameList.js");
+const Room = require("./Room.js");
 const Chat = require("./Chat.js");
 
 // Global debug options
 var PARAM = window.location.search;
-var DEBUG_ON = PARAM.indexOf("debug") !== -1;
-var HERO_ID = {
-  mikagator: TA.MIKEGATOR_HERO,
-  shao: TA.SHAO_HERO,
-  min: TA.MIN_HERO,
-  zoio: TA.ZOIO_HERO,
-  teichi: TA.TEICHI_HERO,
-};
+var DEBUG_MODE = PARAM.indexOf("debug") !== -1;
 var DEBUG_HERO_ID = 0;
-for (var hero_name in HERO_ID) {
+for (var hero_name in TA.hero_id) {
   if (PARAM.indexOf(hero_name) !== -1) {
-    DEBUG_HERO_ID = HERO_ID[hero_name];
+    DEBUG_HERO_ID = TA.hero_id[hero_name];
   }
 }
 
@@ -38,11 +32,11 @@ class Main extends Component {
     let h = window.innerHeight;
     this.modal = null;
     this.name = null;
-    this.wlet = null;
-    this.game_id = null;
+    this.wallet = null;
     this.game_turns = null;
     this.game_state = null;
     this.game_list = [];
+    this.room_players = null;
     this.chat_msgs = [];
     this.keyboard = {};
     this.pointer = {x:0,y:0}; // game position
@@ -52,21 +46,59 @@ class Main extends Component {
     this.canvox = canvox();
     this.peer = null;
     this.login();
-    if (DEBUG_ON) {
-      this.game_id = -1;
+    if (DEBUG_MODE) {
       this.game_turns = [];
-      this.game_state = TA.new_game(DEBUG_HERO_ID);
+      this.game_state = TA.new_game(n=>c=>c(DEBUG_HERO_ID)(n=>c=>n));
       setInterval(() => {
         var gs = this.game_state;
         this.game_state = TA.exec_turn(gs);
-      }, 1000 / 24);
+      }, 1000 / TA.GAME_FPS);
+    }
+  }
+  get_game_id() {
+    if (DEBUG_MODE) {
+      return 0;
+    } else {
+      var game_count = this.game_list.length;
+      if (game_count > 0) {
+        var game = this.game_list[game_count - 1];
+        var game_time = Date.now() - game.init;
+        if (game_time/1000 < TA.GAME_DURATION/TA.GAME_FPS+2) {
+          if (!this.game_state) {
+            var hero_list = game.players
+              .split(",")
+              .map((player) => {
+                console.log("NEW HERO",
+                  player,
+                  TA.parse_player(player).hero, 
+                  TA.hero_id[TA.parse_player(player).hero]);
+                var hero_name = TA.parse_player(player).hero;
+                var hero_name = hero_name.toLowerCase();
+                return TA.hero_id[hero_name];
+              })
+              .reverse()
+              .reduce((a,b)=>n=>c=>c(b)(a), n=>c=>n);
+            this.game_state = TA.new_game(hero_list);
+            this.game_turns = [];
+            this.cam_pos = {x:0, y:0};
+            this.pointer = {x:0, y:0};
+          }
+          return game_count - 1;
+        }
+      }
+      this.game_state = null;
+      this.game_turns = null;
+      return TA.NIL_GAME;
     }
   }
   emit_keys() {
+    if (this.get_game_id() === TA.NIL_GAME) {
+      return;
+    }
     let keyboard = this.keyboard;
     let pointer = this.pointer;
     var input_code = TA.make_input_code(keyboard,pointer);
-    if (input_code && DEBUG_ON) {
+    if (input_code && DEBUG_MODE) {
       var ac = String(1) + input_code;
       var pa = TA.parse_command(ac)[1];
       var gs = this.game_state;
@@ -97,7 +129,7 @@ class Main extends Component {
     var front = {x:0, y:cos, z:-sin};
     var right = {x:1, y:0, z:0};
     var down = {x:0, y:-sin, z:-cos};
-    //if (DEBUG_ON) {
+    //if (DEBUG_MODE) {
       //this.cam_pos = TA.get_position_by_pid(0)
         //(this.game_state)(x=>y=>z=>({x,y,z}));
     //}
@@ -133,44 +165,69 @@ class Main extends Component {
     this.pointer = {x, y};
   }
   post(msg) {
+    console.log("post:", msg);
+    // If starts with '/', this is an offline command
     if (msg[0] === "/") {
       var args = msg.slice(1).split(" ");
       switch (args[0]) {
         case "new":
         case "new_game":
-          //console.log("creating a new game");
-          var name = args[1];
-          var lft = args[2].split(",");
-          var rgt = args[3].split(",");
-          var teams = {lft, rgt};
-          //console.log(name, teams);
-          post("new_game", {name, teams}).then((res) => {
-            if (res.ctr === "ok") {
-              alert("Game created!");
-            } else {
+          if (this.name !== "MaiaVictor") return;
+          if (args.length === 1) {
+            var name = "game_"+((Math.random()*(2**32))>>>0);
+            var players = this.room_players;
+          } else {
+            var name = args[1];
+            var players = args[2];
+          }
+          console.log("posting new_game", name, players)
+          post("new_game", {name, players}).then((res) => {
+            if (res.ctr !== "ok") {
               alert("Error: " + res.err);
             }
           });
         break;
       }
-    } else {
-      try {
-        this.peer.send(msg);
-      } catch (e) {
-        console.log("peer.send error:", e);
+      return;
+    }
+    // If starts with '!', user wants to set its hero, so we
+    // make sure the hero exists
+    if (msg[0] === "!") {
+      var hero_name = msg.slice(1).toLowerCase();
+      if (TA.hero_id[hero_name] === undefined) {
+        alert("Hero '" + hero_name + "' not found.");
+        return;
       }
+      msg = "!" + TA.hero_name[TA.hero_id[hero_name]];
+    }
+    try {
+      this.peer.send(msg);
+    } catch (e) {
+      console.log("peer.send error:", e);
     }
   }
-  componentDidMount() {
+  connect() {
     // Peer connection
-    this.peer = new SimplePeer({
-      initiator: false,
-      trickle: false});
+    console.log("-- peer set");
+    this.peer = new SimplePeer({initiator:false,trickle:false});
     const name = "#"+(Math.random()*(2**32)>>>0).toString(16);
-    post("offer",{name}).then(data => this.peer.signal(data));
+    console.log("-- sending p2p offer");
+    post("offer",{name}).then(data => {
+      console.log("-- got p2p offer answer, signaling");
+      this.peer.signal(data)
+    });
     this.peer.on('error', err => console.log('error', err))
     this.peer.on('signal', data => post("answer", {name,data}));
     this.peer.on('connect', () => {});
+  }
+  componentDidMount() {
+    // Debug
+    //setInterval(() => {
+      //console.log(JSON.stringify(this.game_list, null, 2));
+    //}, 1000);
+
+    // Connect peer
+    this.connect();
 
     // Appends canvox to body
     document.body.appendChild(this.canvox);
@@ -178,8 +235,7 @@ class Main extends Component {
     this.fps_tick = 0; 
     this.fps_numb = 0;
     window.requestAnimationFrame(function render() {
-      if (this.game_id) {
-
+      if (this.get_game_id() !== TA.NIL_GAME) {
         // Measures FPS
         ++this.fps_tick;
         if (Date.now() > this.fps_last + 1000) {
@@ -243,10 +299,7 @@ class Main extends Component {
       this.emit_keys();
     };
     document.body.oncontextmenu = (e) => {
-      //console.log("?????");
-      //this.keyboard["right"] = [1,1];
-      //this.emit_keys();
-      e.preventDefault();
+      //e.preventDefault();
     };
     const set_mouse_pos = (client_x, client_y) => {
       var c = this.make_cam();
@@ -313,48 +366,61 @@ class Main extends Component {
         }
       });
     };
-    this.game_pooler = setInterval(pool_game_list, 2000);
+    this.game_pooler = setInterval(pool_game_list, 1000);
     pool_game_list();
 
     // Adjusts the turn to be streamed to me 
     this.turn_asker = setInterval(() => {
-      if (this.game_id && !DEBUG_ON) {
-        console.log(
-          "Ask turn="+this.game_turns.length
-          +" game="+this.game_id);
-        var turn = this.game_turns.length.toString(16);
+      if (!DEBUG_MODE) {
+        var game_id = this.get_game_id();
+        if (game_id !== TA.NIL_GAME) {
+          var turn = this.game_turns.length.toString(16);
+        } else {
+          var turn = 0;
+        }
         var turn = ("00000000"+turn).slice(-8);
-        var game = this.game_id.toString(16);
+        var game = game_id.toString(16);
         var game = ("00000000"+game).slice(-8);
         this.post("?"+turn+game);
       }
+      //}
     }, 1000);
 
     // Deals with incoming UDP data
     this.peer.on("data", (data) => {
+      console.log("recv: " + data);
       var str = ""+data;
       switch (str[0]) {
+        // Receives room info
+        case "<":
+        case ">":
+        case "^":
+          this.room_players = str;
+          break;
+        // Receives turn info
         case "$":
-          var game = parseInt(str.slice(1,9), 16);
-          var from = parseInt(str.slice(9,17), 16);
-          var last = this.game_turns.length;
-          var new_turns = TA.parse_turns(str.slice(17))[1];
-          if (from <= last) {
-            for (var i = last-from; i<new_turns.length; ++i) {
-              this.game_turns[i+from] = new_turns[i];
-              for (var j = 0; j < new_turns[i].length; ++j) {
-                let a = new_turns[i][j];
-                let g = this.game_state;
-                this.game_state = TA.exec_command(a,g);
+          if (this.game_state && this.game_turns) {
+            var game = parseInt(str.slice(1,9), 16);
+            var from = parseInt(str.slice(9,17), 16);
+            var last = this.game_turns.length;
+            var new_turns = TA.parse_turns(str.slice(17))[1];
+            if (from <= last) {
+              for (var i = last-from; i<new_turns.length; ++i) {
+                this.game_turns[i+from] = new_turns[i];
+                for (var j = 0; j < new_turns[i].length; ++j) {
+                  let a = new_turns[i][j];
+                  let g = this.game_state;
+                  this.game_state = TA.exec_command(a,g);
+                }
+                var gs = this.game_state;
+                this.game_state = TA.exec_turn(gs);
               }
-              var gs = this.game_state;
-              this.game_state = TA.exec_turn(gs);
             }
           }
-        break;
+          break;
         default:
           this.chat_msgs.push(str);
-        break;
+          break;
       }
       this.forceUpdate();
     });
@@ -366,12 +432,6 @@ class Main extends Component {
   }
   componentDidUpdate() {
   }
-  join(game_id) {
-    this.game_id = game_id;
-    this.game_turns = [];
-    this.game_state = TA.new_game;
-    this.forceUpdate();
-  }
   login(pvt) {
     if (!pvt) {
       var key = "taelin_arena_private_key";
@@ -379,10 +439,10 @@ class Main extends Component {
     }
     if (pvt && (pvt.length === 66 || pvt.length === 64)) {
       localStorage.setItem("taelin_arena_private_key", pvt);
-      this.wlet = new ethers.Wallet(pvt);
+      this.wallet = new ethers.Wallet(pvt);
       this.name = "logging...";
       this.forceUpdate();
-      post("name_of", {addr: this.wlet.address})
+      post("name_of", {addr: this.wallet.address})
         .then((res) => {
           if (res.ctr === "ok") {
             this.name = res.name;
@@ -398,7 +458,7 @@ class Main extends Component {
   logout() {
     var key = "taelin_arena_private_key";
     localStorage.setItem(key, "");
-    this.wlet = null;
+    this.wallet = null;
     this.name = null;
     this.forceUpdate();
   }
@@ -413,6 +473,8 @@ class Main extends Component {
     if (this.modal) {
       return this.modal;
     }
+
+    var game_id = this.get_game_id();
 
     const button = (content, onclick) => {
       return h("span", {
@@ -429,12 +491,11 @@ class Main extends Component {
         "cursor": "pointer",
       },
       onClick: () => {
-        this.game_id = null;
         this.forceUpdate();
       }
-    }, "Taelin::Arena (alpha-0.0.0)");
+    }, "Taelin::Arena (test-room)");
 
-    if (this.game_id) {
+    if (game_id !== TA.NIL_GAME) {
       var top_rgt = h("div", {
         style: {
           "font-size": "12px"
@@ -470,9 +531,9 @@ class Main extends Component {
         h("span", {}, " | "),
         button("Registrar", () => {
           this.modal = h(Register, {
-            on_done: ({name,wlet}) => {
+            on_done: ({name,wallet}) => {
               this.modal = null;
-              this.login(wlet.privateKey);
+              this.login(wallet.privateKey);
               //this.forceUpdate();
             }
           });
@@ -483,7 +544,7 @@ class Main extends Component {
 
     var top_menu = h("div", {
       style: {
-        "background": this.game_id ? null : "#4070D0",
+        "background": game_id !== TA.NIL_GAME ? null : "black",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -494,7 +555,7 @@ class Main extends Component {
         "font-family": "monaco, monospace",
         "padding": "0px 4px",
         "font-weight": "bold",
-        "color": this.game_id ? "black" : "white",
+        "color": game_id !== TA.NIL_GAME ? "black" : "white",
       },
     }, [
       top_lft,
@@ -503,6 +564,7 @@ class Main extends Component {
 
     return h("div", {
       style: {
+        "background": game_id !== TA.NIL_GAME ? null : "#192125",
         "position": "fixed",
         "width": "100%",
         "height": "100%",
@@ -510,18 +572,19 @@ class Main extends Component {
       },
     }, [
       top_menu,
-      this.game_id
+      game_id !== TA.NIL_GAME
         ? null
         : h(Chat, {
           on_say: msg => this.post(msg),
           msgs: this.chat_msgs,
         }),
-      this.game_id
+      game_id !== TA.NIL_GAME
         ? null
-        : h(GameList, {
-          game_list: this.game_list,
-          join: (game) => this.join(game)
-        }),
+        : h(Room, {players: this.room_players})
+        //: h(GameList, {
+          //game_list: this.game_list,
+          //join: (game) => this.join(game)
+        //}),
     ])
   }
 };

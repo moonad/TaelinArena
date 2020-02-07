@@ -15,7 +15,7 @@ class Chat extends Component {
     var chat = h("div", {
       id: "chat_msgs",
       style: {
-        "font-size": "10px",
+        "font-size": "12px",
         "width": "100%",
         "height": "calc(100% - 24px)",
         "padding": "4px",
@@ -51,22 +51,25 @@ class Chat extends Component {
         "margin": "5px",
         "border-radius": "4px",
         "border": "0px solid gray",
-        "background": "#F2F2F2",
+        "background": "#101619",
+        "color": "white",
+        //"background": "#F2F2F2",
       },
     });
     return h("div", {
       style: {
         "position": "fixed",
-        "right": "0px",
-        "top": "24px",
-        "width": "160px",
-        "height": "calc(100% - 24px)",
+        "left": "0px",
+        "bottom": "0px",
+        "width": "100%",
+        "height": "160px",
         "border-left": "1px solid rgba(0,0,0,0.1)",
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        "background": "rgba(255,255,255,0.2)",
+        //"background": "#101619",
         "align-items": "center",
+        "color": "white",
       }
     }, [
       chat,

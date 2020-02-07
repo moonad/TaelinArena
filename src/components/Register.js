@@ -12,7 +12,7 @@ class Register extends Component {
     this.phase = "enter_name";
     this.input = "";
     this.on_done = props.on_done;
-    this.wlet = ethers.Wallet.createRandom();
+    this.wallet = ethers.Wallet.createRandom();
     this.name = "";
   }
 
@@ -135,7 +135,7 @@ class Register extends Component {
               "width": "420px",
               "overflow-y": "scroll",
             },
-          }, this.wlet.privateKey),
+          }, this.wallet.privateKey),
           h("div", {}, ""),
           h("div", {}, "Guardou em lugar seguro?")
         ]);
@@ -166,7 +166,7 @@ class Register extends Component {
           "key",
           [["Pronto.", "check_key"]]);
       case "check_key":
-        if (this.key !== this.wlet.privateKey) {
+        if (this.key !== this.wallet.privateKey) {
           return ask(
             "Tá errado. Pq mentir? Vai jogar LoL.",
             null,
@@ -175,7 +175,7 @@ class Register extends Component {
         } else {
           post("register", {
             name: this.name,
-            addr: this.wlet.address,
+            addr: this.wallet.address,
           }).then((res) => {
             switch (res.ctr) {
               case "err": 
@@ -213,10 +213,10 @@ class Register extends Component {
             ["Foda-se", "success"],
           ]);
       case "success":
-        this.on_done({name:this.name, wlet:this.wlet});
+        this.on_done({name:this.name, wallet:this.wallet});
         return h("div");
       case "failure":
-        this.on_done({name:null, wlet:null});
+        this.on_done({name:null, wallet:null});
         return h("div");
     }
   }
