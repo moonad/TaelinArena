@@ -1,58 +1,48 @@
-const TA = require("./game/TaelinArena.fm");
-const oct = require("./canvox/octree.js");
-const models = require("./models/models.js");
-const parse = require("./models/parser.js");
+if (typeof window !== "undefined") {
+  var TA = require("./game/TaelinArena.fm");
+  var oct = require("./canvox/octree.js");
+  var models = require("./models/models.js");
+  var stage = oct.empty();
+  for (var y = -512; y < 512; ++y) {
+    for (var x = -512; x < 512; ++x) {
+      var line = 0xFFFFFFFF;
+      var d = x * x + y * y;
+      if ( x >= 508
+        || y >= 508
+        || x < -508
+        || y < -508
+        || x >= -2 && x < 2
+        || x >= -388 && x < -384 && y >= -128 && y <  128
+        || x >=  384 && x <  388 && y >= -128 && y <  128
+        || x >= -512 && x < -384 && y >= -128 && y < -124
+        || x >= -512 && x < -384 && y >=  124 && y <  128
+        || x >=  384 && x <  512 && y >= -128 && y < -124
+        || x >=  384 && x <  512 && y >=  124 && y <  128
+        || d >= 124*124 && d < 128*128) {
+        oct.insert(x,y,0,line,stage);
+      } else if (((x+2048)/32)%2<1) {
+        oct.insert(x,y,0,0xFF85c9a0,stage);
+      } else {
+        oct.insert(x,y,0,0xFF8fd9ad,stage);
+      }
+    }
+  }
+} else {
+  var TA = {};
+  var oct = null;
+  var models = null;
+  var stage = null;
+}
+
+const GAME_FPS = 24;
+const GAME_DURATION = GAME_FPS * 15;
 
 const now = (() => {
   var init_time = Date.now()/1000;
   return () => Date.now()/1000 - init_time;
 })();
 
-var stage = oct.empty();
-for (var y = -512; y < 512; ++y) {
-  for (var x = -512; x < 512; ++x) {
-    var line = 0xFFFFFFFF;
-    var d = x * x + y * y;
-    if ( x >= 508
-      || y >= 508
-      || x < -508
-      || y < -508
-      || x >= -2 && x < 2
-      || x >= -388 && x < -384 && y >= -128 && y <  128
-      || x >=  384 && x <  388 && y >= -128 && y <  128
-      || x >= -512 && x < -384 && y >= -128 && y < -124
-      || x >= -512 && x < -384 && y >=  124 && y <  128
-      || x >=  384 && x <  512 && y >= -128 && y < -124
-      || x >=  384 && x <  512 && y >=  124 && y <  128
-      || d >= 124*124 && d < 128*128) {
-      oct.insert(x,y,0,line,stage);
-    } else if (((x+2048)/32)%2 < 1) { // || ((y+2048)/32)%2<1) {
-      oct.insert(x,y,0,0xFF85c9a0,stage);
-    } else {
-      oct.insert(x,y,0,0xFF8fd9ad,stage);
-    }
-  }
-}
-
-//function rect(x0,x1,y0,y1,c=0xFFF0F0F0) {
-  //for (var j = y0; j < y1; ++j) {
-    //for (var i = x0; i < x1; ++i) {
-      //oct.insert(i,j,0,c,stage);
-    //}
-  //}
-//};
-//rect(-512,  512,  508,  512); // top
-//rect(-512,  512, -512, -508); // down
-//rect(-512, -508, -256,  256); // left
-//rect( 508,  512, -256,  256); // right
-
-//rect(   0,  128,   62,   66); // red base top
-//rect(   0,  128,  -66,  -62); // red base bot
-//rect( 126,  130,  -66,   66); // red base right
-
-//rect( 896, 1024,   62,   66); // blue base top
-//rect( 896, 1024,  -66,  -62); // blue base bot
-//rect( 894,  898,  -66,   66); // blue base right
+var NIL_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
 function render_game({game, canvox, cam}) {
@@ -163,6 +153,17 @@ function parse_command(code, idx=0) {
       string: ""
     }];
   };
+}
+
+function parse_player(player) {
+  var team;
+  switch(player[0]) {
+    case "<": team = "red"; break;
+    case "^": team = "spec"; break;
+    case ">": team = "blue"; break;
+  }
+  var [name,hero] = player.slice(1).split("!");
+  return {team,name,hero};
 }
 
 // Parses a player turn code into an array of player inputs
@@ -279,36 +280,34 @@ function exec_command(inp, game) {
   return TA.exec_command(cmd)(game);
 }
 
+var hero_id = {
+  mikegator: TA.MIKEGATOR_HERO,
+  shao: TA.SHAO_HERO,
+  min: TA.MIN_HERO,
+  zoio: TA.ZOIO_HERO,
+  teichi: TA.TEICHI_HERO,
+};
+
+var hero_name = {
+  [TA.MIKEGATOR_HERO]: "MikeGator",
+  [TA.SHAO_HERO]: "Shao",
+  [TA.MIN_HERO]: "Min",
+  [TA.ZOIO_HERO]: "Zoio",
+  [TA.TEICHI_HERO]: "Teichi",
+};
+
 module.exports = {
   ...TA,
+  GAME_FPS,
+  GAME_DURATION,
+  NIL_GAME,
+  hero_id,
+  hero_name,
   render_game,
   parse_turn,
   parse_turns,
+  parse_player,
   parse_command,
   exec_command,
   make_input_code,
 };
-
-// Renders hitbox (for debugging)
-//let case_circbox = (rad) => {
-//for (var j = -rad; j <= rad; ++j) {
-  //for (var i = -rad; i <= rad; ++i) {
-    //if (i*i+j*j < rad*rad) {
-      //var px = pos_x + i;
-      //var py = pos_y + j;
-      //var pz = 0;
-      //var pos
-        //= (px+512)<<20
-        //| (py+512)<<10
-        //| (pz+512);
-      //var col = 0xE0E0FFFF;
-      //voxels[voxels.length] = pos;
-      //voxels[voxels.length] = col;
-    //}
-  //}
-//}
-//};
-//let case_polybox = (pts) => {
-//};
-//box(case_circbox)(case_polybox);
-
