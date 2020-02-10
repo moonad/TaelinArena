@@ -7,6 +7,7 @@ function game() {
   self.state = null;
 
   function init(gid, hero_list) {
+    var hero_list = hero_list.map(name => TA.hero_id[name]);
     var hero_list = hero_list.reverse();
     var hero_list = hero_list.reduce((a,b)=>n=>c=>c(b)(a),n=>c=>n);
     self.gid = gid;
