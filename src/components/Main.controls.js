@@ -126,7 +126,7 @@ module.exports = function controls(on_input) {
   };
 
   document.body.oncontextmenu = (e) => {
-    //e.preventDefault();
+    e.preventDefault();
   };
 
   window.onmousemove = (e) => {
