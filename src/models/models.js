@@ -1,7 +1,5 @@
 var parse = require("./parser.js");
 module.exports = [
-  parse(require("./../../models/big_land.json")),
-  parse(require("./../../models/biome.json")),
   parse(require("./../../models/mikegator/attack/000.json")),
   parse(require("./../../models/mikegator/attack/001.json")),
   parse(require("./../../models/mikegator/attack/002.json")),
@@ -236,7 +234,7 @@ module.exports = [
   parse(require("./../../models/shao/balun/012.json")),
   parse(require("./../../models/shao/balun/013.json")),
   parse(require("./../../models/shao/balun/014.json")),
-  parse(require("./../../models/shao/balun/023.json")),
+  parse(require("./../../models/shao/balun/015.json")),
   parse(require("./../../models/shao/dash/000.json")),
   parse(require("./../../models/shao/dash/001.json")),
   parse(require("./../../models/shao/heavy_water/000.json")),
