@@ -35,7 +35,7 @@ if (typeof window !== "undefined") {
 }
 
 const GAME_FPS = 24;
-const GAME_DURATION = GAME_FPS * 15;
+const GAME_DURATION = GAME_FPS * 60;
 
 const now = (() => {
   var init_time = Date.now()/1000;
@@ -197,7 +197,7 @@ function parse_turns(code, idx=0) {
 };
 
 // Makes a player input code from keyboard/mouse states
-function make_input_code(keyboard, mouse) {
+function make_input_netcode(keyboard, mouse) {
   function changed(name) {
     return keyboard[name] ? keyboard[name][0] : 0;
   };
@@ -261,6 +261,8 @@ function exec_command(inp, game) {
     let d = v3 => v3(x)(y)(0);
     cmd = TA.command(inp.player)(TA.sdir(d));
   } else if (inp.input === "TEXT") {
+    console.log(inp);
+    console.log(new Error("aff"));
     throw "TODO";
   } else {
     var x = inp.params.pos.x;
@@ -309,5 +311,5 @@ module.exports = {
   parse_player,
   parse_command,
   exec_command,
-  make_input_code,
+  make_input_netcode,
 };
