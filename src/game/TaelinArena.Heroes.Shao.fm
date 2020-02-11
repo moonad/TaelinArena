@@ -40,8 +40,8 @@ shao_tick(self: Thing) : Thing
   // Space
   // TODO: This skill can't spawn. If 'hurricane' is called on Shao_balun it works.
   |SHAO_HURRICANE
-    let self = animate(self, delay, 1, SHAO_HURRICANE_CAST_000, 3)
-    let self = spawn(self, 3, self.trg, new_hero(SHAO_HURRICANE_HERO))
+    let self = animate(self, 8, 0, SHAO_HURRICANE_CAST_000, 3)
+    let self = spawn(self, 1, self.trg, new_hero(SHAO_HURRICANE_HERO))
     self
    
   |SHAO_DASH
