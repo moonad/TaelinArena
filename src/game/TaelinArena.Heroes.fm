@@ -4,6 +4,8 @@ import TaelinArena.Models
 import TaelinArena.Heroes.Mikegator
 import TaelinArena.Heroes.Mikegator.Earth
 import TaelinArena.Heroes.Shao
+import TaelinArena.Heroes.Shao.Balun
+import TaelinArena.Heroes.Shao.Hurricane
 import TaelinArena.Heroes.Min
 import TaelinArena.Heroes.Zoio
 import TaelinArena.Heroes.Teichi
@@ -13,6 +15,8 @@ get_hero_by_hid(hid: HeroId) : Hero
   |MIKEGATOR_HERO mikegator_hero
   |MIKEGATOR_EARTH_HERO mikegator_earth_hero
   |SHAO_HERO shao_hero
+  |SHAO_BALUN_HERO shao_balun_hero
+  |SHAO_HURRICANE_HERO shao_hurricane_hero
   |MIN_HERO min_hero
   |ZOIO_HERO zoio_hero
   |TEICHI_HERO teichi_hero
