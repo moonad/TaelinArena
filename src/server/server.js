@@ -8,7 +8,7 @@ var fs = require("fs").promises;
 var path = require("path");
 var db = require("./db.js");
 var ethers = require("ethers");
-var TA = require("./../TaelinArena.js");
+var TA = await require("./../TaelinArena.js");
 var GS = require("./game.js");
 
 // API
