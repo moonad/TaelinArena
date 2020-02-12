@@ -1,0 +1,11 @@
+Pose + Idle + Walk = 8hrs
+
+Attack 1 + Attack 2 (Start) = 11hrs
+
+Attack 2
+Attack 3
+
+Ultimate
+
+Hurt 
+
