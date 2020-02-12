@@ -4,13 +4,24 @@ if (typeof window !== "undefined") {
 
   // Loads all models
   var models = require("./models/models.js");
-  var parse_model = require("./models/parser.js");
+  var model_parse = require("./models/parser.js");
+  var model_packs = require("./models/packs.js");
   function get_model(i) {
     // Model wasn't requested
     if (typeof models[i] === "function") {
-      models[i] = models[i]().then(model => {
-        models[i] = parse_model(model.default);
-      });
+      // Loads all models from the same pack
+      for (var pack_name in model_packs) {
+        let pack = model_packs[pack_name];
+        if (i >= pack.from && i < pack.til) {
+          for (let j = pack.from; j < pack.til; ++j) {
+            console.log("load", pack_name, j);
+            models[j] = models[j]().then(model => {
+              console.log("loaded", j);
+              models[j] = model_parse(model.default);
+            });
+          }
+        }
+      };
       return null;
     // Model is loading
     } else if (models.then) {
@@ -98,24 +109,26 @@ function render_game({game, canvox, cam}) {
         }
       }
 
-      var model = get_model(model_id);
-      if (model) {
-        for (var i = 0; i < model.length; ++i) {
-          var [{x,y,z},{r,g,b}] = model[i];
-          var cx = pos_x;
-          var cy = pos_y;
-          var cz = pos_z;
-          var px = cx + x;
-          var py = cy + y;
-          var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-          var pa = Math.atan2(py-cy,px-cx);
-          var px = cx + pl * Math.cos(pa + ang) + 0.5;
-          var py = cy + pl * Math.sin(pa + ang) + 0.5;
-          var pz = cz + z;
-          var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-          var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-          voxels[voxels.length] = xyz;
-          voxels[voxels.length] = rgb;
+      if (model_id !== 0xFFFFFFFF) {
+        var model = get_model(model_id);
+        if (model) {
+          for (var i = 0; i < model.length; ++i) {
+            var [{x,y,z},{r,g,b}] = model[i];
+            var cx = pos_x;
+            var cy = pos_y;
+            var cz = pos_z;
+            var px = cx + x;
+            var py = cy + y;
+            var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+            var pa = Math.atan2(py-cy,px-cx);
+            var px = cx + pl * Math.cos(pa + ang) + 0.5;
+            var py = cy + pl * Math.sin(pa + ang) + 0.5;
+            var pz = cz + z;
+            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+            var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+            voxels[voxels.length] = xyz;
+            voxels[voxels.length] = rgb;
+          }
         }
       }
     });
