@@ -9,7 +9,7 @@ const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
 
-const Register = require("./register.js");
+const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Room = require("./Room.js");
 const Chat = require("./Chat.js");
