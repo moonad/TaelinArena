@@ -44,12 +44,11 @@
       __dirname,
       "/../models/models.js");
     var model_js_text
-      = "var parse = require(\"./parser.js\");\n"
-      + "module.exports = [\n"
+      = "module.exports = [\n"
       + model_names.map(name => {
         var model_key = name.replace(new RegExp("/","g"), "_");
         var file_path = "./../../models/"+name+".json";
-        var file_load = "parse(require(\""+file_path+"\"))";
+        var file_load = "()=>import(\""+file_path+"\")";
         return "  "+file_load+",";
       }).join("\n")
       + "\n];";

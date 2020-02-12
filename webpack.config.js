@@ -22,7 +22,7 @@ module.exports = {
     path: path.resolve(__dirname, 'docs')
   },
   optimization: {
-    minimize: false
+    minimize: true
   },
   performance: {
     hints: false,

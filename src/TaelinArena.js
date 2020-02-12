@@ -1,7 +1,27 @@
 if (typeof window !== "undefined") {
   var TA = require("./game/TaelinArena.fm");
   var oct = require("./canvox/octree.js");
+
+  // Loads all models
   var models = require("./models/models.js");
+  var parse_model = require("./models/parser.js");
+  function get_model(i) {
+    // Model wasn't requested
+    if (typeof models[i] === "function") {
+      models[i] = models[i]().then(model => {
+        models[i] = parse_model(model.default);
+      });
+      return null;
+    // Model is loading
+    } else if (models.then) {
+      return null;
+    // Model is loaded
+    } else {
+      return models[i];
+    }
+  };
+
+  // Builds soccer stage
   var stage = oct.empty();
   for (var y = -512; y < 512; ++y) {
     for (var x = -512; x < 512; ++x) {
@@ -62,7 +82,6 @@ function render_game({game, canvox, cam}) {
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
-      var model = models[model_id];
 
       for (var j = -12; j <= 12; ++j) {
         for (var i = -12; i <= 12; ++i) {
@@ -79,22 +98,25 @@ function render_game({game, canvox, cam}) {
         }
       }
 
-      for (var i = 0; i < model.length; ++i) {
-        var [{x,y,z},{r,g,b}] = model[i];
-        var cx = pos_x;
-        var cy = pos_y;
-        var cz = pos_z;
-        var px = cx + x;
-        var py = cy + y;
-        var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-        var pa = Math.atan2(py-cy,px-cx);
-        var px = cx + pl * Math.cos(pa + ang) + 0.5;
-        var py = cy + pl * Math.sin(pa + ang) + 0.5;
-        var pz = cz + z;
-        var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-        var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-        voxels[voxels.length] = xyz;
-        voxels[voxels.length] = rgb;
+      var model = get_model(model_id);
+      if (model) {
+        for (var i = 0; i < model.length; ++i) {
+          var [{x,y,z},{r,g,b}] = model[i];
+          var cx = pos_x;
+          var cy = pos_y;
+          var cz = pos_z;
+          var px = cx + x;
+          var py = cy + y;
+          var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+          var pa = Math.atan2(py-cy,px-cx);
+          var px = cx + pl * Math.cos(pa + ang) + 0.5;
+          var py = cy + pl * Math.sin(pa + ang) + 0.5;
+          var pz = cz + z;
+          var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+          var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+          voxels[voxels.length] = xyz;
+          voxels[voxels.length] = rgb;
+        }
       }
     });
   })(game);
@@ -240,12 +262,12 @@ function make_input_netcode(keyboard, mouse) {
     var mx = ("000"+Math.floor(mx).toString(16)).slice(-3);
     var my = ("000"+Math.floor(my).toString(16)).slice(-3);
     var ct = key0 ? "1"
-           : key1 ? "2"
-           : key2 ? "3"
-           : key3 ? "4"
-           : key4 ? "5"
-           : key5 ? "6"
-           : null;
+          : key1 ? "2"
+          : key2 ? "3"
+          : key3 ? "4"
+          : key4 ? "5"
+          : key5 ? "6"
+          : null;
     return ct + mx + my;
   }
 
