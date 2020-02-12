@@ -29,7 +29,7 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000
   },
-  devtool: "source-map",
+  //devtool: "source-map",
   resolve: { plugins: [formalityResolver] },
   plugins: [
     new HtmlWebpackPlugin({
