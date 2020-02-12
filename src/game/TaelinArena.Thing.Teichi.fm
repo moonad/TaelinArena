@@ -1,7 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Geometry
-import TaelinArena.Models
-import TaelinArena.HeroIds
 
 enum
 | TEICHI_IDLE
@@ -12,7 +9,7 @@ enum
 | TEICHI_TELEPORT
 | TEICHI_TAUNT
 
-teichi_tick(self: Thing) : Thing
+teichi_fun(self: Thing) : Thing
   let delay = 2
   let self = self <= thing(mov = 4)
 
@@ -44,6 +41,3 @@ teichi_tick(self: Thing) : Thing
     animate(self, delay, 0, TEICHI_TAUNT_RESTING_DOWN_000, 10)
 
   else self
-
-teichi_hero : Hero
-  hero(teichi_tick)

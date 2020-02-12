@@ -1,7 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Geometry
-import TaelinArena.Models
-import TaelinArena.HeroIds
 
 enum
 | MIN_IDLE
@@ -12,7 +9,7 @@ enum
 | MIN_DASH
 | MIN_TAUNT
 
-min_tick(self: Thing) : Thing
+min_fun(self: Thing) : Thing
   let delay = 2
   let self = self <= thing(mov = 6)
 
@@ -44,6 +41,3 @@ min_tick(self: Thing) : Thing
     animate(self, delay, 1, MIN_TAUNT_000, 5)
 
   else self
-
-min_hero : Hero
-  hero(min_tick)

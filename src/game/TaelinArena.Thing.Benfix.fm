@@ -1,7 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Geometry
-import TaelinArena.Models
-import TaelinArena.HeroIds
 
 enum
 | BENFIX_IDLE
@@ -12,7 +9,7 @@ enum
 | BENFIX_DASH
 | BENFIX_TAUNT
 
-benfix_tick(self: Thing) : Thing
+benfix_fun(self: Thing) : Thing
   let delay = 2
   let self = self <= thing(mov = 5)
 
@@ -46,6 +43,3 @@ benfix_tick(self: Thing) : Thing
     animate(self, delay, 0, BENFIX_TAUNT_000, 16)
 
   else self
-
-benfix_hero : Hero
-  hero(benfix_tick)

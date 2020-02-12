@@ -70,7 +70,7 @@
     fs.writeFileSync(packs_js_path, packs_text);
 
     // Updates TaelinArena.Models.fm
-    var model_fm_path = "/../game/TaelinArena.Models.fm";
+    var model_fm_path = "/../game/TaelinArena.ModelIds.fm";
     var model_fm_path = path.join(__dirname, model_fm_path);
     var model_fm_text = "enum\n| " + model_names
       .map(name => name

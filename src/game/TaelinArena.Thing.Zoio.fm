@@ -1,7 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Geometry
-import TaelinArena.Models
-import TaelinArena.HeroIds
 
 enum
 | ZOIO_IDLE
@@ -12,7 +9,7 @@ enum
 | ZOIO_DASH
 | ZOIO_BLOCK
 
-zoio_tick(self: Thing) : Thing
+zoio_fun(self: Thing) : Thing
   let delay = 2
   let self = self <= thing(mov = 2)
 
@@ -45,6 +42,3 @@ zoio_tick(self: Thing) : Thing
     animate(self, delay, 0, ZOIO_BLOCK_000, 11)
 
   else self
-
-zoio_hero : Hero
-  hero(zoio_tick)

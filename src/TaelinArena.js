@@ -318,20 +318,20 @@ function exec_command(inp, game) {
 }
 
 var hero_id = {
-  mikegator: TA.MIKEGATOR_HERO,
-  shao: TA.SHAO_HERO,
-  min: TA.MIN_HERO,
-  zoio: TA.ZOIO_HERO,
-  teichi: TA.TEICHI_HERO,
-  benfix: TA.BENFIX_HERO
+  mikegator: TA.MIKEGATOR_THING,
+  shao: TA.SHAO_THING,
+  min: TA.MIN_THING,
+  zoio: TA.ZOIO_THING,
+  teichi: TA.TEICHI_THING,
+  benfix: TA.BENFIX_THING
 };
 
 var hero_name = {
-  [TA.MIKEGATOR_HERO]: "MikeGator",
-  [TA.SHAO_HERO]: "Shao",
-  [TA.MIN_HERO]: "Min",
-  [TA.ZOIO_HERO]: "Zoio",
-  [TA.TEICHI_HERO]: "Teichi",
+  [TA.MIKEGATOR_THING]: "MikeGator",
+  [TA.SHAO_THING]: "Shao",
+  [TA.MIN_THING]: "Min",
+  [TA.ZOIO_THING]: "Zoio",
+  [TA.TEICHI_THING]: "Teichi",
 };
 
 module.exports = {

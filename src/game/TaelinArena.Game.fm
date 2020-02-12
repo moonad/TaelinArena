@@ -1,43 +1,46 @@
 import Base#9y4x
 import TaelinArena.Geometry
+import TaelinArena.ModelIds
+import TaelinArena.ThingIds
 
 PlayerId : Type
   Number
 
-HeroId : Type
-  Number
-
-ActionId : Type
+ThingId : Type
   Number
 
 ModelId : Type
+  Number
+
+ActionId : Type
   Number
 
 T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
-T Hero
-| hero(tick: Thing -> Thing)
+TxFunction : Type
+  Thing -> Thing
 
 T Thing
 | thing(
-  pid : PlayerId,
-  hid : HeroId,
-  act : ActionId,
-  mid : ModelId,
-  tik : Number,
-  chp : Number,
-  pos : V3,
-  mov : Number,
-  bst : Number,
-  wlk : Bool,
-  dir : V3,
-  trg : V3,
-  vel : V3,
-  box : Hitbox,
-  neo : List(Thing),
-  die : Bool)
+  fun : TxFunction,  // transaction function
+  tid : ThingId,     // id of thing that this is
+  pid : PlayerId,    // number of player controlling this
+  mid : ModelId,     // id of model to be rendered
+  act : ActionId,    // number of action this is performing
+  tik : Number,      // ticks passed since last act change
+  dmg : Number,      // damage taken
+  pos : V3,          // in-game position
+  mov : Number,      // movement speed
+  bst : Number,      // movement speed multiplier
+  wlk : Bool,        // is this walking?
+  dir : V3,          // facing direction
+  trg : V3,          // targeted position
+  vel : V3,          // dash velocity vector
+  box : Hitbox,      // hitbox (space occupied)
+  neo : List(Thing), // child thing to create on next tick
+  die : Bool)        // should this be removed?
 
 T Game
 | game(stage : List(Thing))
@@ -86,14 +89,15 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
     | false => thi
   map_stage(effect, gm)
 
-// Creates a new reseted hero given its HeroId
-new_hero(hid: HeroId) : Thing
-  let id  = 0
-  let hid = hid
-  let act = 0
+// Creates a new reseted hero given its ThingId
+new_thing(fun: TxFunction) : Thing
+  let fun = fun
+  let tid = 0
+  let pid = 0
   let mid = 0xFFFFFFFF
+  let act = 0
   let tik = 0
-  let chp = 128
+  let dmg = 128
   let pos = v3(0,0,0)
   let mov = 8
   let bst = 1
@@ -104,11 +108,10 @@ new_hero(hid: HeroId) : Thing
   let box = cbox(12)
   let neo = []
   let die = false
-  thing(id,
-    hid,act,mid,tik,
-    chp,pos,mov,bst,
-    wlk,dir,trg,vel,
-    box,neo,die)
+  thing(
+    fun,tid,pid,mid,act,tik,dmg,pos,
+    mov,bst,wlk,dir,trg,vel,box,neo,
+    die)
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated

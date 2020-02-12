@@ -1,8 +1,8 @@
 import Base#9y4x
 import TaelinArena.Geometry
 import TaelinArena.Game
-import TaelinArena.Models
-import TaelinArena.Heroes
+import TaelinArena.ModelIds
+import TaelinArena.Thing
 
 // Apply a player input to the game state
 exec_command(cmd: Command, gm: Game) : Game
@@ -12,7 +12,6 @@ exec_command(cmd: Command, gm: Game) : Game
     with thi : Thing
     | sdir =>
       case thi |thing
-      case get_hero_by_hid(thi.hid) as her |hero
       let is_idle = len_v3(inp.dir) === 0
       let map_dir = (d: V3) => if is_idle then d else inp.dir
       let map_wlk = (s: Bool) => if is_idle then false else true
@@ -72,8 +71,7 @@ exec_turn(gm: Game) : Game
   let intr = (that,this) => interact_with(this,that)
   let tick = (stage: List(Thing), thi: Thing, res: List(Thing)) =>
     case thi |thing
-    case get_hero_by_hid(thi.hid) as hro | hero
-    let thi = hro.tick(thi)
+    let thi = thi.fun(thi)
     let thi = thi <= thing(pos = add_v3(pos,vel))
     let thi = thi <= thing(pos = case wlk
       | true  => add_v3(pos,scale_v3(mov*bst,dir))
@@ -83,8 +81,7 @@ exec_turn(gm: Game) : Game
     case thi |thing
     let neo_init = (neo_thi) =>
       case neo_thi | thing
-      case get_hero_by_hid(neo_thi.hid) as neo_hro | hero
-      neo_hro.tick(neo_thi)
+      neo_thi.fun(neo_thi)
     let neo_list = map(Thing; Thing; neo_init, thi.neo)
     concat(_ neo_list,
       case thi.die
@@ -103,12 +100,12 @@ draw_thing(thi: Thing) : Draw
       lookat_v3(thi.pos, thi.trg, thi.dir)
   draw(mid, pos, dir)
 
-new_game(hids: List(HeroId)) : Game
+new_game(tids: List(ThingId)) : Game
   let nil = (pid) => []
-  let cons = (hid, heroes, pid) => 
+  let cons = (tid, heroes, pid) => 
     let hpid = pid
     let hpos = v3(pid * 64, 0, 0)
-    let hero = new_hero(hid) <= thing(pid=hpid, pos=hpos)
+    let hero = init_thing(tid) <= thing(pid=hpid, pos=hpos)
     let rest = heroes(pid + 1)
     cons(_ hero, rest)
-  game(fold(_ Number -> List(Thing); nil, cons, hids, 0))
+  game(fold(_ Number -> List(Thing); nil, cons, tids, 0))

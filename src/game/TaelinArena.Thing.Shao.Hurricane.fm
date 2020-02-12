@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+shao_hurricane_fun(self: Thing) : Thing
+  let self = animate(self, 2, 0, SHAO_HURRICANE_000, 26)
+  let self = self <= thing(die = if tik === 52 then true else false)
+  self

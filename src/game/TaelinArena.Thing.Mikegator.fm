@@ -1,7 +1,5 @@
 import TaelinArena.Game
-import TaelinArena.Geometry
-import TaelinArena.Models
-import TaelinArena.HeroIds
+import TaelinArena.Thing.Mikegator.Earth
 
 enum
 | MIKEGATOR_IDLE
@@ -12,7 +10,7 @@ enum
 | MIKEGATOR_DASH
 | MIKEGATOR_BLOCK
 
-mikegator_tick(self: Thing) : Thing
+mikegator_fun(self: Thing) : Thing
   let delay = 2
   let self = self <= thing(mov = 3)
 
@@ -28,7 +26,8 @@ mikegator_tick(self: Thing) : Thing
 
   |MIKEGATOR_EARTHBENDING
     let self = animate(self, delay, 1, MIKEGATOR_EARTHBENDING_000, 9)
-    let self = spawn(self, 10, self.trg, new_hero(MIKEGATOR_EARTH_HERO))
+    let make = new_thing(mikegator_earth_fun)
+    let self = spawn(self, 10, self.trg, make)
     self
 
   |MIKEGATOR_SPINTAIL
@@ -49,6 +48,3 @@ mikegator_tick(self: Thing) : Thing
     self
 
   else self
-
-mikegator_hero : Hero
-  hero(mikegator_tick)
