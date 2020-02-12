@@ -40,9 +40,8 @@
       }));
 
     // Updates models.js
-    var model_js_path = path.join(
-      __dirname,
-      "/../models/models.js");
+    var model_js_path = "/../models/models.js";
+    var model_js_path = path.join(__dirname, model_js_path);
     var model_js_text
       = "module.exports = [\n"
       + model_names.map(name => {
@@ -55,10 +54,24 @@
     console.log("updated " + model_js_path);
     fs.writeFileSync(model_js_path, model_js_text);
 
+    // Updates packs.js
+    var packs_js_path = "/../models/packs.js";
+    var packs_js_path = path.join(__dirname, packs_js_path);
+    var packs = {};
+    for (var i = 0; i < model_names.length; ++i) {
+      var pack = model_names[i].split("/")[0];
+      if (!packs[pack]) {
+        packs[pack] = {from: i, til: i};
+      }
+      packs[pack].til = i+1;
+    };
+    var packs_text = "module.exports = "+JSON.stringify(packs,null,2);
+    console.log("updated " + packs_js_path);
+    fs.writeFileSync(packs_js_path, packs_text);
+
     // Updates TaelinArena.Models.fm
-    var model_fm_path = path.join(
-      __dirname,
-      "/../game/TaelinArena.Models.fm");
+    var model_fm_path = "/../game/TaelinArena.Models.fm";
+    var model_fm_path = path.join(__dirname, model_fm_path);
     var model_fm_text = "enum\n| " + model_names
       .map(name => name
         .replace(new RegExp("/","g"), "_")

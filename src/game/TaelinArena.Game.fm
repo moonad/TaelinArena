@@ -91,7 +91,7 @@ new_hero(hid: HeroId) : Thing
   let id  = 0
   let hid = hid
   let act = 0
-  let mid = 0
+  let mid = 0xFFFFFFFF
   let tik = 0
   let chp = 128
   let pos = v3(0,0,0)
