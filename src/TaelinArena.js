@@ -324,7 +324,8 @@ var hero_id = {
   zoio: TA.ZOIO_THING,
   teichi: TA.TEICHI_THING,
   benfix: TA.BENFIX_THING,
-  ray: TA.RAY_THING
+  ray: TA.RAY_THING,
+  tupitree: TA.TUPITREE_THING
 };
 
 var hero_name = {

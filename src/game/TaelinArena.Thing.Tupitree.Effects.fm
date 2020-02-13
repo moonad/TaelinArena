@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+tupitree_entangling_fun(self: Thing) : Thing
+  let self = animate(self, 0, TUPITREE_ENTANGLING_FX_000, 11, 22)
+  let self = self <= thing(die = if tik === 22 then true else false)
+  self

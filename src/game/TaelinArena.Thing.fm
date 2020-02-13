@@ -11,6 +11,7 @@ import TaelinArena.Thing.Zoio
 import TaelinArena.Thing.Teichi
 import TaelinArena.Thing.Benfix
 import TaelinArena.Thing.Ray
+import TaelinArena.Thing.Tupitree
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -24,6 +25,7 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |TEICHI_THING teichi_fun
   |BENFIX_THING benfix_fun
   |RAY_THING ray_fun
+  |TUPITREE_THING tupitree_fun
   else mikegator_fun
 
 init_thing(tid: ThingId) : Thing
