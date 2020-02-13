@@ -24,8 +24,8 @@ zoio_fun(self: Thing) : Thing
 
   // TODO: fix naming
   |ZOIO_WELL
-    let self = animate(self, 0, ZOIO_ZOIO_WELL_IN_000, 7, 35)
-    let self = blink(self, 20, self.trg)
+    let self = animate(self, 0, ZOIO_ZOIO_WELL_000, 14, 28)
+    let self = blink(self, 14, self.trg)
     self
 
   |ZOIO_BIG_EYE_RAY
