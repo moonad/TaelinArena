@@ -29,6 +29,6 @@ tophoro_eath_rise_effect_fun(self: Thing) : Thing
 
 // Ground force
 tophoro_ground_force_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 5, 10)
-  let self = self <= thing(die = if tik === 10 then true else false)
+  let self = animate(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 8, 25)
+  let self = self <= thing(die = if tik === 25 then true else false)
   self
