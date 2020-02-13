@@ -3,36 +3,40 @@ module.exports = {
     "from": 0,
     "til": 111
   },
-  "mikegator": {
+  "kenko": {
     "from": 111,
-    "til": 183
+    "til": 284
+  },
+  "mikegator": {
+    "from": 284,
+    "til": 356
   },
   "min": {
-    "from": 183,
-    "til": 250
+    "from": 356,
+    "til": 423
   },
   "ray": {
-    "from": 250,
-    "til": 324
+    "from": 423,
+    "til": 497
   },
   "shao": {
-    "from": 324,
-    "til": 431
+    "from": 497,
+    "til": 604
   },
   "teichi": {
-    "from": 431,
-    "til": 561
+    "from": 604,
+    "til": 734
   },
   "tophoro": {
-    "from": 561,
-    "til": 663
+    "from": 734,
+    "til": 836
   },
   "tupitree": {
-    "from": 663,
-    "til": 811
+    "from": 836,
+    "til": 984
   },
   "zoio": {
-    "from": 811,
-    "til": 910
+    "from": 984,
+    "til": 1083
   }
 }
