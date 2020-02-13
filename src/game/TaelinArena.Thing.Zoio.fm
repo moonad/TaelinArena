@@ -10,35 +10,36 @@ enum
 | ZOIO_BLOCK
 
 zoio_fun(self: Thing) : Thing
-  let delay = 2
   let self = self <= thing(mov = 2)
 
   case self |thing switch self.act
 
   |ZOIO_IDLE
     case self.wlk
-    | true  => animate(self, delay, 1, ZOIO_WALK_000, 7)
-    | false => animate(self, delay, 1, ZOIO_IDLE_000, 7)
+    | true  => animate(self, 1, ZOIO_WALK_000, 7, 14)
+    | false => animate(self, 1, ZOIO_IDLE_000, 7, 14)
 
   |ZOIO_SPINNING_JUMP
-    animate(self, delay, 1, ZOIO_SPINNING_JUMP_000, 11)
+    animate(self, 1, ZOIO_SPINNING_JUMP_000, 11, 22)
 
   // TODO: fix naming
   |ZOIO_WELL
-    animate(self, delay, 0, ZOIO_ZOIO_WELL_IN_000, 7)
+    let self = animate(self, 0, ZOIO_ZOIO_WELL_IN_000, 7, 35)
+    let self = blink(self, 20, self.trg)
+    self
 
   |ZOIO_BIG_EYE_RAY
-    animate(self, delay, 0, ZOIO_ATTACK_000, 8)
+    animate(self, 0, ZOIO_ATTACK_000, 8, 16)
 
   |ZOIO_HIPONOTIZING_FIELD
-    animate(self, delay, 0, ZOIO_HIPONOTIZING_FIELD_000, 22)
+    animate(self, 0, ZOIO_HIPONOTIZING_FIELD_000, 22, 44)
 
   |ZOIO_DASH
-    let self = animate(self, delay, 1, ZOIO_DASH_000, 8)
+    let self = animate(self, 1, ZOIO_DASH_000, 8, 16)
     let self = dash(self, 4, 6,16)
     self
 
   |ZOIO_BLOCK
-    animate(self, delay, 0, ZOIO_BLOCK_000, 11)
+    animate(self, 0, ZOIO_BLOCK_000, 11, 22)
 
   else self
