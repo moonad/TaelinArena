@@ -23,12 +23,16 @@ module.exports = {
     "from": 431,
     "til": 561
   },
-  "tupitree": {
+  "tophoro": {
     "from": 561,
-    "til": 709
+    "til": 663
+  },
+  "tupitree": {
+    "from": 663,
+    "til": 811
   },
   "zoio": {
-    "from": 709,
-    "til": 808
+    "from": 811,
+    "til": 910
   }
 }
