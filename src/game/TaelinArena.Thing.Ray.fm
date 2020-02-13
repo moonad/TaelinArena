@@ -1,0 +1,48 @@
+import TaelinArena.Game
+
+enum
+| RAY_IDLE
+| RAY_SLASH
+| RAY_SELF_BUFF
+| RAY_PIERCING_SWORD
+| RAY_HEAVENS_CALL
+| RAY_DASH
+| RAY_TAUNT
+
+ray_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  case self |thing switch self.act
+
+  |RAY_IDLE
+    case self.wlk
+    | true  => animate(self, 1, RAY_WALK_000, 8, 16)
+    | false => animate(self, 1, RAY_IDLE_000, 9, 18)
+
+  // Left
+  |RAY_SLASH
+    animate(self, 0, RAY_SLASH_000, 6, 6)
+
+  // Middle
+  |RAY_SELF_BUFF
+    animate(self, 0, RAY_SELF_BUFF_000, 10, 20)
+
+  // Right
+  |RAY_PIERCING_SWORD
+    let self = animate(self, 0, RAY_PIERCING_SWORD_000, 8, 14)
+    let self = dash(self, 4, 0, 8)
+    self
+
+  // Space
+  |RAY_HEAVENS_CALL
+    animate(self, 0, RAY_HEAVENS_CALL_000, 17, 28)
+
+  |RAY_DASH
+    let self = animate(self, 0, RAY_DASH_000, 6, 12)
+    let self = dash(self, 4, 0, 12)
+    self
+
+  |RAY_TAUNT
+    animate(self, 0, RAY_TAUNT_000, 9, 20)
+
+  else self

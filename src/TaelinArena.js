@@ -323,7 +323,8 @@ var hero_id = {
   min: TA.MIN_THING,
   zoio: TA.ZOIO_THING,
   teichi: TA.TEICHI_THING,
-  benfix: TA.BENFIX_THING
+  benfix: TA.BENFIX_THING,
+  ray: TA.RAY_THING
 };
 
 var hero_name = {

@@ -43,7 +43,7 @@ mikegator_fun(self: Thing) : Thing
     self
 
   |MIKEGATOR_BLOCK
-    let self = animate(self, 0, MIKEGATOR_BLOCK_000, 1, 10)
+    let self = animate(self, 0, MIKEGATOR_BLOCK_000, 9, 18)
     self
 
   else self

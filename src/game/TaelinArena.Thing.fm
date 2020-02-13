@@ -10,6 +10,7 @@ import TaelinArena.Thing.Min
 import TaelinArena.Thing.Zoio
 import TaelinArena.Thing.Teichi
 import TaelinArena.Thing.Benfix
+import TaelinArena.Thing.Ray
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -22,6 +23,7 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |ZOIO_THING zoio_fun
   |TEICHI_THING teichi_fun
   |BENFIX_THING benfix_fun
+  |RAY_THING ray_fun
   else mikegator_fun
 
 init_thing(tid: ThingId) : Thing
