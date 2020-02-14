@@ -20,7 +20,8 @@ T Hitbox
 | pbox(pts: List(V3))
 
 T Hit
-| hit(dmg: Number, knk: V3)
+| pointed_hit(rad: Number, dmg: Number, vec: V3)
+| outward_hit(rad: Number, dmg: Number, mag: Number)
 
 TxFunction : Type
   Thing -> Thing
@@ -33,7 +34,6 @@ T Thing
   mid : ModelId,     // id of model to be rendered
   act : ActionId,    // number of action this is performing
   tik : Number,      // ticks passed since last act change
-  dmg : Number,      // damage taken
   pos : V3,          // in-game position
   mov : Number,      // movement speed
   bst : Number,      // movement speed multiplier
@@ -42,8 +42,10 @@ T Thing
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
+  dmg : Number,      // damage taken
+  knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
-  hit : Maybe(Hit),  // damage and knockback
+  hit : Maybe(Hit),  // damage and knockback caused by this
   die : Bool)        // should this be removed?
 
 T Game
@@ -101,7 +103,6 @@ new_thing(fun: TxFunction) : Thing
   let mid = 0xFFFFFFFF
   let act = 0
   let tik = 0
-  let dmg = 128
   let pos = v3(0,0,0)
   let mov = 8
   let bst = 1
@@ -110,13 +111,15 @@ new_thing(fun: TxFunction) : Thing
   let trg = v3(0,0,0)
   let vel = v3(0,0,0)
   let box = cbox(12)
+  let dmg = 128
+  let knk = v3(0,0,0)
   let chi = []
   let hit = none(_)
   let die = false
   thing(
-    fun,tid,pid,mid,act,tik,dmg,pos,
-    mov,bst,wlk,dir,trg,vel,box,chi,
-    hit,die)
+    fun,tid,pid,mid,act,tik,pos,mov,
+    bst,wlk,dir,trg,vel,box,dmg,knk,
+    chi,hit,die)
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated
@@ -177,3 +180,23 @@ blink(
   self <= thing(
     pos = if tik === at_tik then to_pos else pos,
     dir = if tik === at_tik then lookat_v3(pos,trg,dir) else dir)
+
+// Creates a hit box that damages and knockbacks
+// - self: thing that owns the hitbox
+// - hitx: Hit object with damage and knockback info
+hit(
+  self   : Thing,
+  at_tik : Number,
+  do_hit : Hit)
+  case self |thing
+  if self.tik === at_tik then
+    self <= thing(hit = some(_ do_hit))
+  else if self.tik === (at_tik + 2) then
+    self <= thing(hit = none(_))
+  else
+    self
+
+// Returns the direction the thing is looking to
+look_dir(self: Thing)
+  case self |thing
+  lookat_v3(self.pos, self.trg, self.dir)

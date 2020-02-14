@@ -30,7 +30,9 @@ tophoro_fun(self: Thing) : Thing
   // Middle
   |TOPHORO_EARTH_WALL
     let self = animate(self, 1, TOPHORO_EARTH_WALL_000, 6, 16)
-    let self = spawn(self, 10, self.trg, new_thing(tophoro_earth_wall_fun))
+    let rock = new_thing(tophoro_earth_wall_fun)
+    let rock = rock <= thing(dir = look_dir(self))
+    let self = spawn(self, 10, self.trg, rock)
     self
 
   // Right

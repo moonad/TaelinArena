@@ -14,9 +14,7 @@ if (typeof window !== "undefined") {
         let pack = model_packs[pack_name];
         if (i >= pack.from && i < pack.til) {
           for (let j = pack.from; j < pack.til; ++j) {
-            console.log("load", pack_name, j);
             models[j] = models[j]().then(model => {
-              console.log("loaded", j);
               models[j] = model_parse(model.default);
             });
           }
