@@ -23,20 +23,24 @@ module.exports = {
     "from": 497,
     "til": 604
   },
-  "teichi": {
+  "sr_madruga": {
     "from": 604,
-    "til": 734
+    "til": 726
+  },
+  "teichi": {
+    "from": 726,
+    "til": 856
   },
   "tophoro": {
-    "from": 734,
-    "til": 836
+    "from": 856,
+    "til": 958
   },
   "tupitree": {
-    "from": 836,
-    "til": 984
+    "from": 958,
+    "til": 1106
   },
   "zoio": {
-    "from": 984,
-    "til": 1083
+    "from": 1106,
+    "til": 1205
   }
 }
