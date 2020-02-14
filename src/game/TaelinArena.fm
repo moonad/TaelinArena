@@ -45,50 +45,87 @@ exec_command(cmd: Command, gm: Game) : Game
     | cmsg => thi
   with_thing(cmd.pid, fn, gm)
 
+// Interaction function between two things
 interact_with(this:Thing, that:Thing): Thing
   case this |thing
   case that |thing
-  case this.box
-  | cbox => 
-    case that.box
-    | cbox =>  
+
+  // When there is a physical collision
+  let this =
+    case this.box |cbox
+    case that.box |cbox
       let dst = dist_v3(this.pos, that.pos)
       let rad = this.box.rad + that.box.rad
-      if (dst > that.box.rad) && (dst < rad) then
+      if (dst > 0) && (dst < rad) then
         let out_dir = norm_v3(sub_v3(this.pos, that.pos))
         let out_vec = scale_v3(rad - dst, out_dir)
         let new_pos = add_v3(this.pos, out_vec)
         this <= thing(pos = new_pos)
       else
         this
-    | pbox =>
-      this
-  | pbox =>
-    this
+    | pbox => this
+    | pbox => this
+
+  this
+
+// Like a fold, but with access to a list of other elements
+interact_list(A; B;
+  i: B,
+  f: A -> List(A) -> B -> B,
+  xs: List(A),
+  ys: List(A) -> List(A)
+  ) : B
+  case xs
+  | nil  => i
+  | cons =>
+    let self = xs.head
+    let tail = xs.tail
+    let ys2  = (x) => ys(cons(_ xs.head, x))
+    let rest = interact_list(A; B; i, f, xs.tail, ys2)
+    f(xs.head, ys(xs.tail), rest)
 
 // Game's main loop
 exec_turn(gm: Game) : Game
+  // Interaction function
   let intr = (that,this) => interact_with(this,that)
-  let tick = (stage: List(Thing), thi: Thing, res: List(Thing)) =>
+
+  // For each thing in the game...
+  let tick = (thi: Thing, stage: List(Thing), res: List(Thing)) =>
     case thi |thing
+
+    // Calls the transaction function
     let thi = thi.fun(thi)
+
+    // Integrates position with dash velocity
     let thi = thi <= thing(pos = add_v3(pos,vel))
+
+    // Integrates position with walk vector
     let thi = thi <= thing(pos = case wlk
       | true  => add_v3(pos,scale_v3(mov*bst,dir))
       | false => pos)
-    let thi = thi <= thing(tik = tik + 1)
+
+    // Calls interaction function with all other things
     let thi = fold(Thing; _ thi, intr, stage)
+
+    // Increments tik counter
+    let thi = thi <= thing(tik = tik + 1)
+
+    // Spawns children
     case thi |thing
-    let neo_init = (neo_thi) =>
-      case neo_thi | thing
-      neo_thi.fun(neo_thi)
-    let neo_list = map(Thing; Thing; neo_init, thi.neo)
-    concat(_ neo_list,
+    let chi_init = (chi) => case chi |thing chi.fun(chi)
+    let chi_list = map(Thing; Thing; chi_init, thi.chi)
+
+    // Adds updated thing and new things to stage
+    concat(_ chi_list,
       case thi.die
       |true res
       |false cons(_thi,res))
-  gm <= game(stage = fold(Thing; _ [], tick(stage), stage))
 
+  // Ticks every thing on stage
+  gm <= game(
+    stage = interact_list(Thing; _ [], tick, stage, (x)=>x))
+
+// Returns the draw object with info to render on screen
 draw_thing(thi: Thing) : Draw 
   case thi |thing
   let mid = thi.mid
@@ -100,6 +137,7 @@ draw_thing(thi: Thing) : Draw
       lookat_v3(thi.pos, thi.trg, thi.dir)
   draw(mid, pos, dir)
 
+// Creates a brand new game
 new_game(tids: List(ThingId)) : Game
   let nil = (pid) => []
   let cons = (tid, heroes, pid) => 

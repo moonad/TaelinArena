@@ -19,6 +19,9 @@ T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
+T Hit
+| hit(dmg: Number, knk: V3)
+
 TxFunction : Type
   Thing -> Thing
 
@@ -39,7 +42,8 @@ T Thing
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
-  neo : List(Thing), // child thing to create on next tick
+  chi : List(Thing), // child thing to create on next tick
+  hit : Maybe(Hit),  // damage and knockback
   die : Bool)        // should this be removed?
 
 T Game
@@ -106,12 +110,13 @@ new_thing(fun: TxFunction) : Thing
   let trg = v3(0,0,0)
   let vel = v3(0,0,0)
   let box = cbox(12)
-  let neo = []
+  let chi = []
+  let hit = none(_)
   let die = false
   thing(
     fun,tid,pid,mid,act,tik,dmg,pos,
-    mov,bst,wlk,dir,trg,vel,box,neo,
-    die)
+    mov,bst,wlk,dir,trg,vel,box,chi,
+    hit,die)
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated
@@ -159,7 +164,7 @@ spawn(
   at_pos : V3,
   thing  : Thing)
   let thing = thing <= thing(pid = -1, pos = at_pos)
-  self <= thing(neo = if tik === at_tik then [thing] else [])
+  self <= thing(chi = if tik === at_tik then [thing] else [])
 
 // Blinks (teleports) to another position
 // - self: thing that will blink

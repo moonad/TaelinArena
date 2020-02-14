@@ -84,7 +84,7 @@ class Main extends Component {
     if (this.game.gid !== gid) {
       var hero_list;
       if (DEBUG_MODE) {
-        hero_list = [DEBUG_HERO];
+        hero_list = [DEBUG_HERO, TA.MIKEGATOR_HERO];
       } else {
         hero_list = this.game_list[gid].players.split(",");
         hero_list = hero_list.map(TA.parse_player);

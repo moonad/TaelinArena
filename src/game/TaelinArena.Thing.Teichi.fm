@@ -21,8 +21,7 @@ teichi_fun(self: Thing) : Thing
 
   // Left
   |TEICHI_BASE_ATTACK
-    animate(self, 1, TEICHI_BASE_ATTACK_VAR_1_000, 4, 10)
-
+    animate(self, 1, TEICHI_BASE_ATTACK_VAR_3_000, 4, 8)
 
   // Middle
   |TEICHI_PEEK_A_BOO
