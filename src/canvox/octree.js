@@ -13,7 +13,6 @@ const max = Math.max;
 const flr = Math.floor;
 const p32 = 2 ** 32;
 const q32 = 1 / p32;
-//const eps = 1 / 65536;
 const eps = 0.00001526;
 
 const CTR = 0xC0000000;

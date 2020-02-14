@@ -1,6 +1,6 @@
 const TA = require("./../TaelinArena.js");
 
-module.exports = function controls(on_input) {
+module.exports = function controls(on_input, render_mode = "GPU") {
   var self = {};
   self.keyboard = {};
   self.pointer = {x:0,y:0};
@@ -64,10 +64,14 @@ module.exports = function controls(on_input) {
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
     // Maximum screen size covers 480x270 in-game pixels
-    if (W > H) {
-      var size = {x:480, y:H*480/W};
+    if (render_mode === "GPU") {
+      if (W > H) {
+        var size = {x:480, y:H*480/W};
+      } else {
+        var size = {x:W*270/H, y:270};
+      }
     } else {
-      var size = {x:W*270/H, y:270};
+      var size = {x:200, y:200*H/W};
     }
     return {
       pos   : pos, // center pos

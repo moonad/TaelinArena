@@ -23,6 +23,11 @@ for (var hero_name in TA.hero_id) {
     DEBUG_HERO = hero_name;
   }
 }
+if (window.location.search.indexOf("cpu") !== -1) {
+  var RENDER_MODE = "CPU";
+} else {
+  var RENDER_MODE = "GPU";
+}
 
 const game = require("./Main.game.js");
 const controls = require("./Main.controls.js");
@@ -38,7 +43,7 @@ class Main extends Component {
     this.room_players = null;
     this.chat_msgs = [];
     this.game = game();
-    this.controls = controls(nc => this.send_inputs(nc));
+    this.controls = controls(nc => this.send_inputs(nc), RENDER_MODE);
     this.canvox = canvox();
     this.peer = null;
     this.login();
