@@ -47,25 +47,43 @@ exec_command(cmd: Command, gm: Game) : Game
 
 // Interaction function between two things
 interact_with(this:Thing, that:Thing): Thing
-  case this |thing
-  case that |thing
-
-  // When there is a physical collision
+  // Physical collisions
   let this =
-    case this.box |cbox
-    case that.box |cbox
-      let dst = dist_v3(this.pos, that.pos)
-      let rad = this.box.rad + that.box.rad
-      if (dst > 0) && (dst < rad) then
-        let out_dir = norm_v3(sub_v3(this.pos, that.pos))
-        let out_vec = scale_v3(rad - dst, out_dir)
-        let new_pos = add_v3(this.pos, out_vec)
-        this <= thing(pos = new_pos)
+    case this |thing
+    case that |thing
+      case this.box |cbox
+      case that.box |cbox
+        let dst = dist_v3(this.pos, that.pos)
+        let rad = this.box.rad + that.box.rad
+        if (dst > 0) && (dst < rad) then
+          let out_dir = norm_v3(sub_v3(this.pos, that.pos))
+          let out_vec = scale_v3(rad - dst, out_dir)
+          let new_pos = add_v3(this.pos, out_vec)
+          this <= thing(pos = new_pos)
+        else
+          this
+      | pbox => this
+      | pbox => this
+
+  // Hit by an attack
+  let this =
+    case this |thing
+    case that |thing
+    case that.hit |none this |some
+    case that.hit.value
+    | pointed_hit => // TODO: implement
+      this
+    | outward_hit =>
+      let dst = sqrdist_v3(that.pos, this.pos)
+      let rad = that.hit.value.rad
+      log(dst)
+      log(rad)
+      if dst < (rad * rad) then
+        let dir = lookat_v3(that.pos, this.pos, v3(1,0,0))
+        let vec = scale_v3(that.hit.value.mag, dir)
+        this <= thing(knk = vec)
       else
         this
-    | pbox => this
-    | pbox => this
-
   this
 
 // Like a fold, but with access to a list of other elements
@@ -103,6 +121,11 @@ exec_turn(gm: Game) : Game
     let thi = thi <= thing(pos = case wlk
       | true  => add_v3(pos,scale_v3(mov*bst,dir))
       | false => pos)
+
+    // Integrates position with knockback
+    let thi = thi <= thing(
+      pos = add_v3(pos, knk),
+      knk = scale_v3(0.80, knk))
 
     // Calls interaction function with all other things
     let thi = fold(Thing; _ thi, intr, stage)
