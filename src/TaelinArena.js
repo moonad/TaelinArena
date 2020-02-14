@@ -326,7 +326,8 @@ var hero_id = {
   benfix: TA.BENFIX_THING,
   ray: TA.RAY_THING,
   tupitree: TA.TUPITREE_THING,
-  tophoro: TA.TOPHORO_THING
+  tophoro: TA.TOPHORO_THING,
+  kenko: TA.KENKO_THING
 };
 
 var hero_name = {
