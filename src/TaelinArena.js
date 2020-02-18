@@ -262,8 +262,8 @@ function make_input_netcode(keyboard, mouse) {
   var key0 = pressed("left");
   var key1 = pressed("middle");
   var key2 = pressed("right");
-  var key3 = pressed("space");
-  var key4 = pressed("shift");
+  var key3 = pressed("shift");
+  var key4 = pressed("space");
   var key5 = pressed("extra");
   if (key0 || key1 || key2 || key3 || key4 || key5) {
     var mx = mouse.x;

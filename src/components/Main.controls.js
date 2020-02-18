@@ -66,12 +66,20 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     // Maximum screen size covers 480x270 in-game pixels
     if (render_mode === "GPU") {
       if (W > H) {
-        var size = {x:480, y:H*480/W};
+        var size = {x:1024, y:H*1024/W};
+        //var size = {x:896, y:H*896/W};
+        //var size = {x:768, y:H*768/W};
+        //var size = {x:680, y:H*680/W};
+        //var size = {x:480, y:H*480/W};
       } else {
-        var size = {x:W*270/H, y:270};
+        var size = {x:W*512/H, y:512};
+        //var size = {x:W*540/H, y:540};
+        //var size = {x:W*432/H, y:432};
+        //var size = {x:W*360/H, y:360};
+        //var size = {x:W*270/H, y:270};
       }
     } else {
-      var size = {x:200, y:200*H/W};
+      var size = {x:256, y:256*H/W};
     }
     return {
       pos   : pos, // center pos
@@ -169,12 +177,12 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     } else {
       cam_dir.y = 0;
     }
-    if (self.keyboard.arrowleft[1]) cam_dir.x -= 4;
-    if (self.keyboard.arrowright[1]) cam_dir.x += 4;
-    if (self.keyboard.arrowdown[1]) cam_dir.y -= 4;
-    if (self.keyboard.arrowup[1]) cam_dir.y += 4;
-    self.cam_pos.x += cam_dir.x;
-    self.cam_pos.y += cam_dir.y;
+    //if (self.keyboard.arrowleft[1]) cam_dir.x -= 4;
+    //if (self.keyboard.arrowright[1]) cam_dir.x += 4;
+    //if (self.keyboard.arrowdown[1]) cam_dir.y -= 4;
+    //if (self.keyboard.arrowup[1]) cam_dir.y += 4;
+    //self.cam_pos.x += cam_dir.x;
+    //self.cam_pos.y += cam_dir.y;
   }, 1000 / 60);
 
   self.center_mouse = center_mouse;

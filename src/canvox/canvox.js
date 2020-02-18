@@ -328,13 +328,13 @@ module.exports = function canvox(opts = {}) {
           ray.x += dir.x * eps;
           ray.y += dir.y * eps;
           ray.z += dir.z * eps;
-          // comment this to test with a fake floor instead
-          //if (ray.z <= 0.0) {
-            //hit.ctr = HIT;
-            //hit.pos = ray;
-            //hit.val = 0xFFFFFFu & VAL;
-            //return hit;
-          //}
+          // Floor at z=0
+          if (ray.z <= 0.0) {
+            hit.ctr = HIT;
+            hit.pos = ray;
+            hit.val = 0xFFFFFFu & VAL;
+            return hit;
+          }
           uint got = lookup(octree, ray);
           if ((got&CTR) == NOP) {
             uint lv = 10u - (got & VAL);
@@ -378,15 +378,16 @@ module.exports = function canvox(opts = {}) {
 
         // Marches towards octree
         Hit hit1 = march(ray_pos, ray_dir, voxels);
-        Hit hit2 = march(ray_pos, ray_dir, stage);
-        float dist1 = distance(hit1.pos, ray_pos);
-        float dist2 = distance(hit2.pos, ray_pos);
-        Hit hit;
-        if (hit2.ctr == HIT && dist1 > dist2) {
-          hit = hit2;
-        } else {
-          hit = hit1;
-        }
+        Hit hit = hit1;
+        //Hit hit2 = march(ray_pos, ray_dir, stage);
+        //float dist1 = distance(hit1.pos, ray_pos);
+        //float dist2 = distance(hit2.pos, ray_pos);
+        //Hit hit;
+        //if (hit2.ctr == HIT && dist1 > dist2) {
+          //hit = hit2;
+        //} else {
+          //hit = hit1;
+        //}
         
         // If it hit a voxel, draw it
         if (hit.ctr == HIT) {

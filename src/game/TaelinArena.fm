@@ -76,8 +76,6 @@ interact_with(this:Thing, that:Thing): Thing
     | outward_hit =>
       let dst = sqrdist_v3(that.pos, this.pos)
       let rad = that.hit.value.rad
-      log(dst)
-      log(rad)
       if dst < (rad * rad) then
         let dir = lookat_v3(that.pos, this.pos, v3(1,0,0))
         let vec = scale_v3(that.hit.value.mag, dir)
