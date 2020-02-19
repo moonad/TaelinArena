@@ -63,23 +63,13 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     var pos_y = self.cam_pos.y - 2048*cos;
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
-    // Maximum screen size covers 480x270 in-game pixels
+    // Maximum screen size covers 1024x512 in-game pixels
     if (render_mode === "GPU") {
-      if (W > H) {
-        var size = {x:1024, y:H*1024/W};
-        //var size = {x:896, y:H*896/W};
-        //var size = {x:768, y:H*768/W};
-        //var size = {x:680, y:H*680/W};
-        //var size = {x:480, y:H*480/W};
-      } else {
-        var size = {x:W*512/H, y:512};
-        //var size = {x:W*540/H, y:540};
-        //var size = {x:W*432/H, y:432};
-        //var size = {x:W*360/H, y:360};
-        //var size = {x:W*270/H, y:270};
-      }
+      var size = {x:1024, y:H*1024/W};
+      var port = {x:W, y:H};
     } else {
-      var size = {x:256, y:256*H/W};
+      var size = {x:256, y:128};
+      var port = {x:W, y:H};
     }
     return {
       pos   : pos, // center pos
@@ -88,7 +78,7 @@ module.exports = function controls(on_input, render_mode = "GPU") {
       down  : down, // down direction
       front : front, // front direction
       size  : size, // world size
-      port  : {x:W, y:H}, // browser size
+      port  : port, // browser size
       res   : 1.0, // rays_per_pixel = res^2
     };
   };

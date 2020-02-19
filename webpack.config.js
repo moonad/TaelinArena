@@ -3,6 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const formalityResolver = require('formality-loader').resolver
 
 module.exports = {
+  mode: 'development',
+  optimization: {
+    minimize: false
+  },
   entry: './src/index.js',
   module: {
     rules: [
@@ -20,9 +24,6 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'docs')
-  },
-  optimization: {
-    minimize: true
   },
   performance: {
     hints: false,

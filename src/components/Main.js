@@ -227,10 +227,11 @@ class Main extends Component {
         this.forceUpdate();
       }
       // Renders the game
+      var cam = this.controls.make_canvox_cam();
       TA.render_game({
         game: this.game.state,
         canvox: this.canvox,
-        cam: this.controls.make_canvox_cam()
+        cam: cam,
       });
     }
     window.requestAnimationFrame(() => this.render_game());
