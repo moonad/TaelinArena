@@ -85,33 +85,35 @@ function render_game({game, canvox, cam}) {
   var voxels = [];
 
   // Renders each game thing
-  TA.map_stage((thing) => {
-    TA.draw_thing(thing)(model_id => pos => dir => {
+  TA.map_stage((thing,k) => {
+    TA.draw_thing(thing)(model_id => pos => dir => dmg => {
       var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
 
-      for (var j = -12; j <= 12; ++j) {
-        for (var i = -12; i <= 12; ++i) {
-          if ( i === -12 || i === 0 || i === 12
-            || j === -12 || j === 0 || j === 12) {
-            var px = pos_x + i;
-            var py = pos_y + j;
-            var pz = 0;
-            var bpos = (px+512)<<20|(py+512)<<10|(pz+512);
-            var bcol = 0xE0E0E0FF;
-            voxels[voxels.length] = bpos;
-            voxels[voxels.length] = bcol;
-          }
-        }
-      }
+      //for (var j = -12; j <= 12; ++j) {
+        //for (var i = -12; i <= 12; ++i) {
+          //if ( i === -12 || i === 0 || i === 12
+            //|| j === -12 || j === 0 || j === 12) {
+            //var px = pos_x + i;
+            //var py = pos_y + j;
+            //var pz = 0;
+            //var bpos = (px+512)<<20|(py+512)<<10|(pz+512);
+            //var bcol = 0xE0E0E0FF;
+            //voxels[voxels.length] = bpos;
+            //voxels[voxels.length] = bcol;
+          //}
+        //}
+      //}
 
+      var max_z = 0;
       if (model_id !== 0xFFFFFFFF) {
         var model = get_model(model_id);
         if (model) {
           for (var i = 0; i < model.length; ++i) {
             var [{x,y,z},{r,g,b}] = model[i];
+            var max_z = Math.max(max_z, z);
             var cx = pos_x;
             var cy = pos_y;
             var cz = pos_z;
@@ -129,6 +131,21 @@ function render_game({game, canvox, cam}) {
           }
         }
       }
+
+      for (var y = 0; y <= 1; ++y) {
+        for (var x = -4; x <= 4; ++x) {
+          var px = pos_x + x;
+          var py = pos_y + y;
+          var pz = max_z + 16;
+          var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+          var r = Math.min(dmg*16, 255);
+          var g = Math.max(Math.min(512-dmg*16,255),0);
+          var rgb = (r<<24)|(g<<16)|0xFF;
+          voxels[voxels.length] = xyz;
+          voxels[voxels.length] = rgb;
+        }
+      }
+
     });
   })(game);
 

@@ -65,7 +65,7 @@ T Command
 | command(pid: PlayerId, inp: Input)
 
 T Draw
-| draw(model: Number, pos: V3, dir: V3)
+| draw(model: Number, pos: V3, dir: V3, dmg: Number)
 
 // Gets a thing from game by its id
 get_thing_by_pid(pid: PlayerId, gm: Game) : Maybe(Thing)
@@ -111,7 +111,7 @@ new_thing(fun: TxFunction) : Thing
   let trg = v3(0,0,0)
   let vel = v3(0,0,0)
   let box = cbox(12)
-  let dmg = 128
+  let dmg = 0
   let knk = v3(0,0,0)
   let chi = []
   let hit = none(_)
