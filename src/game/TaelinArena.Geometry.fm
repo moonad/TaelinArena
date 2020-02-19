@@ -52,6 +52,10 @@ len_v3(a: V3) : Number
   let sqr = sqr ** 0.5
   sqr
     
+rot90_v3(a: V3) : V3
+  case a |v3
+  v3(a.y, 0 - a.x, 0)
+
 eql_v3(a: V3, b: V3) : Number
   case a |v3
   case b |v3

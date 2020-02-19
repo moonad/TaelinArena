@@ -196,6 +196,12 @@ hit(
   else
     self
 
+// Dies at given tick
+die(
+  self   : Thing,
+  at_tik : Number)
+  self <= thing(die = if tik === at_tik then true else false)
+
 // Returns the direction the thing is looking to
 look_dir(self: Thing)
   case self |thing
