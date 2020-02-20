@@ -51,25 +51,25 @@ class Chat extends Component {
         "margin": "5px",
         "border-radius": "4px",
         "border": "0px solid gray",
-        "background": "#101619",
-        "color": "white",
+        "background": "rgb(242,242,242)",
+        //"color": "black",
         //"background": "#F2F2F2",
       },
     });
     return h("div", {
       style: {
-        "position": "fixed",
+        //"position": "fixed",
         "left": "0px",
         "bottom": "0px",
         "width": "100%",
-        "height": "160px",
+        "height": "100%",
         "border-left": "1px solid rgba(0,0,0,0.1)",
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        //"background": "#101619",
+        "background": "white",
         "align-items": "center",
-        "color": "white",
+        //"color": "white",
       }
     }, [
       chat,

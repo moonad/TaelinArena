@@ -3,9 +3,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const formalityResolver = require('formality-loader').resolver
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   optimization: {
-    minimize: false
+    minimize: true
   },
   entry: './src/index.js',
   module: {
@@ -18,7 +18,15 @@ module.exports = {
       {
         test: /\.vox$/i,
         use: 'arraybuffer-loader',
-      }
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
     ]
   },
   output: {

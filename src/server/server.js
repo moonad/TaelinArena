@@ -120,7 +120,7 @@ app.post("/get_game", async (req, res) => {
 app.post("/offer", (req, res) => {
   var name = req.body.name;
   var peer = new Peer({initiator: true, wrtc, tricke: true});
-  var game = TA.NIL_GAME;
+  var game = TA.OFF_GAME;
   var turn = 0;
 
   peer.team = "spec";
@@ -151,7 +151,7 @@ app.post("/offer", (req, res) => {
 
   // Continuously sends room info if not watching game
   var room_feed = setInterval(() => {
-    if (game === TA.NIL_GAME) {
+    if (game === TA.OFF_GAME) {
       var players = [];
       for (var peer_name in peers) {
         var player = "";
@@ -233,7 +233,7 @@ app.post("/offer", (req, res) => {
 
       // Player wants to perform an in-game input.
       case "$":
-        if (game !== TA.NIL_GAME) {
+        if (game !== TA.OFF_GAME) {
           gs.perform_input(game, name, str.slice(1));
         }
         break;

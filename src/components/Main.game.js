@@ -1,19 +1,14 @@
 const TA = require("./../TaelinArena.js");
 
-function game() {
+function Game(gid, hero_list) {
   var self = {};
-  self.gid = null;
-  self.turns = null;
-  self.state = null;
 
-  function init(gid, hero_list) {
-    var hero_list = hero_list.map(name => TA.hero_id[name]);
-    var hero_list = hero_list.reverse();
-    var hero_list = hero_list.reduce((a,b)=>n=>c=>c(b)(a),n=>c=>n);
-    self.gid = gid;
-    self.state = TA.new_game(hero_list);
-    self.turns = [];
-  }
+  var hero_list = hero_list.map(name => TA.hero_id[name.toLowerCase()]);
+  var hero_list = hero_list.reverse();
+  var hero_list = hero_list.reduce((a,b)=>n=>c=>c(b)(a),n=>c=>n);
+  self.gid = gid;
+  self.state = TA.new_game(hero_list);
+  self.turns = [];
 
   function turn() {
     if (self.state) {
@@ -23,12 +18,6 @@ function game() {
 
   function exec(input) {
     self.state = TA.exec_command(input, self.state);
-  }
-
-  function stop() {
-    self.gid = null;
-    self.turns = null;
-    self.state = null;
   }
 
   // Given a string with turn data from the internet, parse
@@ -51,13 +40,11 @@ function game() {
     }
   }
 
-  self.init = init;
   self.exec = exec;
   self.turn = turn;
-  self.stop = stop;
   self.absorb_turn_info = absorb_turn_info;
 
   return self;
 };
 
-module.exports = game;
+module.exports = Game;

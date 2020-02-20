@@ -1,6 +1,6 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
-const canvox = require("./../canvox/canvox.js");
+const Canvox = require("./../canvox/canvox.js");
 const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
@@ -14,23 +14,8 @@ const GameList = require("./GameList.js");
 const Room = require("./Room.js");
 const Chat = require("./Chat.js");
 
-// Global debug options
-var PARAM = window.location.search;
-var DEBUG_MODE = PARAM.indexOf("debug") !== -1;
-var DEBUG_HERO = 0;
-for (var hero_name in TA.hero_id) {
-  if (PARAM.indexOf(hero_name) !== -1) {
-    DEBUG_HERO = hero_name;
-  }
-}
-if (window.location.search.indexOf("cpu") !== -1) {
-  var RENDER_MODE = "CPU";
-} else {
-  var RENDER_MODE = "GPU";
-}
-
-const game = require("./Main.game.js");
-const controls = require("./Main.controls.js");
+const Game = require("./Main.game.js");
+const Controls = require("./Main.controls.js");
 
 // Main HUD
 class Main extends Component {
@@ -42,10 +27,14 @@ class Main extends Component {
     this.game_list = [];
     this.room_players = null;
     this.chat_msgs = [];
-    this.game = game();
-    this.controls = controls(nc => this.send_inputs(nc), RENDER_MODE);
-    this.canvox = canvox();
+    this.game = null;
+    this.controls = Controls(nc => this.send_inputs(nc));
+    this.render_mode = "GPU";
+    this.picked_hero = "Tupitree";
+    this.canvox = null;
     this.peer = null;
+    this.join(TA.OFF_GAME);
+    //this.setup_canvox();
     this.login();
   }
 
@@ -61,6 +50,34 @@ class Main extends Component {
       this.ask_turns();
     }, 1000);
 
+    // Executes turns on offline mode
+    this.offline_mode_turner = setInterval(() => {
+      if (this.game && this.game.gid === TA.OFF_GAME) {
+        this.game.turn();
+      }
+    }, 1000 / TA.GAME_FPS);
+
+    // Automatic game joiner
+    this.game_joiner = setInterval(() => {
+      // Gets the last game
+      var gid = this.game_list.length - 1;
+      var game = this.game_list[gid];
+      if (game) {
+        var game_curr_time = (Date.now() - game.init)/1000;
+        var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
+        // If it is still running, join and return it
+        if (game_curr_time < game_stop_time) {
+          return this.join(gid);
+        // Otherwise, go offline
+        } else {
+          return this.join(TA.OFF_GAME);
+        }
+      // If there is no active game, go offline
+      } else {
+        return this.join(TA.OFF_GAME);
+      }
+    }, 500); 
+    
     // Deals with incoming UDP data
     this.connect();
     this.peer.on("data", (data) => {
@@ -68,7 +85,6 @@ class Main extends Component {
     });
 
     // Appends canvox to body and renders game
-    document.body.appendChild(this.canvox);
     this.fps_last = Date.now();
     this.fps_tick = 0; 
     this.fps_numb = 0;
@@ -79,72 +95,51 @@ class Main extends Component {
     clearInterval(this.game_pooler);
     clearInterval(this.render_loop);
     clearInterval(this.turn_asker);
+    clearInterval(this.offline_mode_turner);
+    clearInterval(this.game_joiner);
   }
 
   componentDidUpdate() {
+    //if (this.canvox) {
+      //var game_screen = document.getElementById("game_screen");
+      //game_screen.appendChild(this.canvox);
+    //}
   }
 
-  // Starts watching game given its gid
-  watch(gid) {
-    if (this.game.gid !== gid) {
+  // Inits the canvox renderer
+  //render_canvox() {
+    //// If the mode changed, create it
+    //var changed_mode = this.render_mode !== this.canvox.render_mode;
+    //if (!this.canvox || changed_mode) {
+      //this.canvox = Canvox(this.render_mode);
+    //}
+    //// Adds it to 
+  //}
+
+  // Joins a game given its gid
+  join(gid) {
+    if (!this.game || this.game.gid !== gid) {
       var hero_list;
-      if (DEBUG_MODE) {
-        hero_list = [DEBUG_HERO, TA.MIKEGATOR_HERO];
+      if (gid === TA.OFF_GAME) {
+        hero_list = [this.picked_hero, "MikeGator"];
       } else {
         hero_list = this.game_list[gid].players.split(",");
         hero_list = hero_list.map(TA.parse_player);
         hero_list = hero_list.map(p => p.hero);
       };
-      this.controls.center_mouse();
-      this.game.init(gid, hero_list);
-      if (DEBUG_MODE) {
-        setInterval(()=>this.game.turn(), 1000/TA.GAME_FPS);
-      }
-    }
-    return gid;
-  }
-
-  // Stops watching any game
-  unwatch() {
-    this.game.stop();
-    return TA.NIL_GAME;
-  }
-
-  // Gets the gid of the game we're currently watching
-  get_watched_gid() {
-    // If on debug mode, return gid=0
-    if (DEBUG_MODE) {
-      return this.watch(0);
-    // Otherwise...
-    } else {
-      // Gets the last game
-      var gid = this.game_list.length - 1;
-      var game = this.game_list[gid];
-      if (game) {
-        var game_curr_time = (Date.now() - game.init)/1000;
-        var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
-        // If it is still running, watch and return it
-        if (game_curr_time < game_stop_time) {
-          return this.watch(gid);
-        // Otherwise, unwatch
-        } else {
-          return this.unwatch();
-        }
-      // If there is no active game, unwatch
-      } else {
-        return this.unwatch();
-      }
+      this.game = Game(gid, hero_list);
     }
   }
 
   // Sends controls to server
   send_inputs(netcode) {
-    // If we're not watching any game, return
-    if (this.get_watched_gid() === TA.NIL_GAME) {
+    // If we're not on any game, return
+    if (!this.game) {
       return;
-    // Otherwise, makes input code and sends to server
-    } else if (DEBUG_MODE) {
+    // If we're on offline mode, exec the command locally
+    } else if (this.game.gid === TA.OFF_GAME) {
       this.game.exec(TA.parse_command("1"+netcode)[1]);
+    // If we're online, send the command to server
     } else {
       this.post("$"+netcode);
     }
@@ -217,7 +212,32 @@ class Main extends Component {
 
   // Renders TaelinArena's screen with canvox
   render_game() {
-    if (this.get_watched_gid() !== TA.NIL_GAME) {
+    // Gets the game screen element
+    var game_screen = document.getElementById("game_screen");
+
+    // If first render or mode changed, restart canvox
+    if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
+      // Init canvox object
+      this.canvox = Canvox({mode: this.render_mode});
+
+      // Inject its canvas on the app
+      if (game_screen) {
+        if (game_screen.firstChild) {
+          game_screen.removeChild(game_screen.firstChild);
+        }
+        game_screen.appendChild(this.canvox);
+      }
+    }
+
+    // Adjusts the game screen height
+    //if (game_screen) {
+      //var canvox_height = this.canvox.style.height.slice(0,-2);
+      //game_screen.style.height = (Number(canvox_height)+2)+"px";
+      //console.log("canvox height: ", canvox_height);
+    //}
+
+    // If we're watching a game, render it on canvox
+    if (this.game) {
       // Measures FPS
       ++this.fps_tick;
       if (Date.now() > this.fps_last + 1000) {
@@ -234,20 +254,17 @@ class Main extends Component {
         cam: cam,
       });
     }
+
+    // Repeat on every screen render
     window.requestAnimationFrame(() => this.render_game());
   }
 
   // Asks missing turns for watched game
   ask_turns() {
-    if (!DEBUG_MODE) {
-      var game_id = this.get_watched_gid();
-      if (game_id !== TA.NIL_GAME) {
-        var turn = this.game.turns.length.toString(16);
-      } else {
-        var turn = 0;
-      }
+    if (this.game && this.game.gid !== TA.OFF_GAME) {
+      var turn = this.game.turns.length.toString(16);
       var turn = ("00000000"+turn).slice(-8);
-      var game = game_id.toString(16);
+      var game = this.game.gid.toString(16);
       var game = ("00000000"+game).slice(-8);
       this.post("?"+turn+game);
     }
@@ -281,7 +298,9 @@ class Main extends Component {
         break;
       // Receives turn info
       case "$":
-        this.game.absorb_turn_info(str);
+        if (this.game) {
+          this.game.absorb_turn_info(str);
+        }
         break;
       default:
         this.chat_msgs.push(str);
@@ -330,17 +349,7 @@ class Main extends Component {
       return this.modal;
     }
 
-    var game_id = this.get_watched_gid();
-
-    const button = (content, onclick) => {
-      return h("span", {
-        style: {
-          cursor: "pointer",
-        },
-        onclick
-      }, content);
-    };
-
+    // Top menu: title
     var top_lft = h("div", {
       style: {
         "font-size": "16px",
@@ -349,16 +358,10 @@ class Main extends Component {
       onClick: () => {
         this.forceUpdate();
       }
-    }, "Taelin::Arena (test-room)");
+    }, "Taelin::Arena ");
 
-    if (game_id !== TA.NIL_GAME) {
-      var top_rgt = h("div", {
-        style: {
-          "font-size": "12px"
-        }
-      },"fps="+(this.fps_numb||0)+", "+
-        "turn="+this.game.turns.length);
-    } else if (this.name) {
+    // Top menu: login
+    if (this.name) {
       var top_rgt = h("div", {
         onClick: () => {
           if (confirm("Clique OK para deslogar.")) {
@@ -371,10 +374,14 @@ class Main extends Component {
         },
       }, [this.name]);
     } else {
+      const button = (content, onclick) => {
+        return h("span", {
+          style: {cursor: "pointer"},
+          onclick
+        }, content);
+      };
       var top_rgt = h("div", {
-        style: {
-          "font-size": "12px"
-        },
+        style: {"font-size": "12px"},
       }, [
         button("Logar", () => {
           var pvt = prompt("Digite sua chave privada:");
@@ -398,9 +405,10 @@ class Main extends Component {
       ]);
     };
 
+    // Top menu
     var top_menu = h("div", {
       style: {
-        "background": game_id !== TA.NIL_GAME ? null : "black",
+        "background": "#F0F0F0",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -411,36 +419,128 @@ class Main extends Component {
         "font-family": "monaco, monospace",
         "padding": "0px 4px",
         "font-weight": "bold",
-        "color": game_id !== TA.NIL_GAME ? "black" : "white",
       },
     }, [
       top_lft,
       top_rgt,
-    ])
+    ]);
 
+    // Game screen
+    if (this.canvox) {
+      var ch = Number(this.canvox.style.height.slice(0,-2));
+    } else {
+      var ch = 386;
+    }
+    var game_screen = h("div", {
+      "id": "game_screen",
+      "style": {
+        "height": (ch + 2) + "px",
+        "border-top": "1px solid #E0E0E0",
+        "border-bottom": "1px solid #E0E0E0",
+        "background": "#FCFCFC",
+      }
+    });
+
+    // Bottom panel: chat box
+    var chat_box = h("div", {
+      "style": {
+        "width": "50%",
+        "height": "100%",
+      }
+    }, [
+      h(Chat, {
+        on_say: msg => this.post(msg),
+        msgs: this.chat_msgs,
+      })
+    ]);
+
+    // Bottom panel: info box
+    var render_mode = h("span", {
+      "onclick": () => {
+        var next_mode = {"GPU":"CPU", "CPU":"GPU"};
+        this.render_mode = next_mode[this.render_mode];
+      },
+      "style": {
+        "text-decoration": "underline",
+        "cursor": "pointer",
+      }
+    }, [
+      this.render_mode
+    ]);
+    var picked_hero = h("span", {
+      "onclick": () => {
+        var heroes = Object.keys(TA.hero_id);
+        var heroes = heroes.map(name => TA.hero_name[TA.hero_id[name]]);
+        var message = "Pick a hero. Options: " + heroes.join(", ");
+        var picked_hero = prompt(message); 
+        if (picked_hero) {
+          var picked_hid = TA.hero_id[picked_hero.toLowerCase()];
+          if (picked_hid !== undefined) {
+            this.picked_hero = TA.hero_name[picked_hid];
+            if (this.game && this.game.gid === TA.OFF_GAME) {
+              this.game = null;
+              this.join(TA.OFF_GAME);
+            }
+          }
+          return;
+        }
+        alert("Invalid hero.");
+      },
+      "style": {
+        "text-decoration": "underline",
+        "cursor": "pointer",
+      }
+    }, [
+      this.picked_hero
+    ]);
+    var current_game = this.game
+      ? (this.game.gid === TA.OFF_GAME
+        ? "offline"
+        : "#" + this.game.gid)
+      : "";
+    var info_box = h("pre", {
+      "style": {
+        "width": "50%",
+        "height": "100%",
+        "padding": "4px",
+        "font-family": "monospace",
+      }
+    }, [
+      h("div", {}, "FPS  : " + (this.fps_numb||0)),
+      h("div", {}, ["Game : ", current_game]),
+      h("div", {}, ["Mode : ", render_mode]),
+      h("div", {}, ["Hero : ", picked_hero]),
+      h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
+    ]);
+
+    // Bottom panel
+    var bottom_panel = h("div", {
+      "style": {
+        "width": "100%",
+        "flex-grow": "1",
+        "display": "flex",
+        "flex-flow": "row nowrap",
+        "justify-content": "center",
+        "align-items": "center",
+      },
+    }, [chat_box, info_box]);
+
+    // Main App
     return h("div", {
       style: {
-        "background": game_id !== TA.NIL_GAME ? null : "#192125",
         "position": "fixed",
+        "display": "flex",
+        "flex-flow": "column nowrap",
+        "justify-content": "flex-start",
+        "align-items": "center",
         "width": "100%",
         "height": "100%",
         "font-family": "monaco, monospace",
       },
     }, [
       top_menu,
-      game_id !== TA.NIL_GAME
-        ? null
-        : h(Chat, {
-          on_say: msg => this.post(msg),
-          msgs: this.chat_msgs,
-        }),
-      game_id !== TA.NIL_GAME
-        ? null
-        : h(Room, {players: this.room_players})
-        //: h(GameList, {
-          //game_list: this.game_list,
-          //join: (game) => this.join(game)
-        //}),
+      game_screen,
+      bottom_panel,
     ])
   }
 };

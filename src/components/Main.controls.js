@@ -1,6 +1,6 @@
 const TA = require("./../TaelinArena.js");
 
-module.exports = function controls(on_input, render_mode = "GPU") {
+module.exports = function Controls(on_input) {
   var self = {};
   self.keyboard = {};
   self.pointer = {x:0,y:0};
@@ -27,10 +27,10 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     self.keyboard[key_name[key]] = [0,0];
   }
 
-  function center_mouse() {
-    self.cam_pos = {x:0, y:0};
-    self.pointer = {x:0, y:0};
-  };
+  //function center_mouse() {
+    //self.cam_pos = {x:0, y:0};
+    //self.pointer = {x:0, y:0};
+  //};
 
   function make_netcode() {
     var code = TA.make_input_netcode(self.keyboard, self.pointer);
@@ -64,16 +64,14 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
     // Maximum screen size covers 1024x512 in-game pixels
-    if (render_mode === "GPU") {
-      var size = {x:1024, y:H*1024/W};
-      var port = {x:W, y:H};
-    } else {
-      var size = {x:256, y:128};
-      var port = {x:W, y:H};
-    }
+    var swid = 896;
+    var shei = 384;
+    let fact = W / swid;
+    var size = {x:swid, y:shei*cos};
+    var port = {x:swid*fact, y:shei*fact*cos};
     return {
       pos   : pos, // center pos
-      ang   : ang,
+      ang   : ang, // camera angle
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
@@ -175,7 +173,7 @@ module.exports = function controls(on_input, render_mode = "GPU") {
     //self.cam_pos.y += cam_dir.y;
   }, 1000 / 60);
 
-  self.center_mouse = center_mouse;
+  //self.center_mouse = center_mouse;
   self.make_netcode = make_netcode;
   self.make_canvox_cam = make_canvox_cam;
   self.set_mouse_pos = set_mouse_pos;

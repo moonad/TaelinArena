@@ -71,7 +71,7 @@ const now = (() => {
   return () => Date.now()/1000 - init_time;
 })();
 
-var NIL_GAME = 0xFFFFFFFF;
+var OFF_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
 function render_game({game, canvox, cam}) {
@@ -107,6 +107,30 @@ function render_game({game, canvox, cam}) {
         //}
       //}
 
+      //// Top red line
+      //for (var x = -512; x <= 512; ++x) {
+        //var px = x;
+        //var py = -255;
+        //var pz = 0;
+        //var rgb = 0xFF4040FF;
+        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+        //voxels[voxels.length] = xyz;
+        //voxels[voxels.length] = rgb;
+      //}
+
+      //// Bot red line
+      //for (var x = -512; x <= 512; ++x) {
+        //var px = x;
+        //var py = 255;
+        //var pz = 0;
+        //var rgb = 0xFF4040FF;
+        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+        //voxels[voxels.length] = xyz;
+        //voxels[voxels.length] = rgb;
+      //}
+
       var max_z = 0;
       if (model_id !== 0xFFFFFFFF) {
         var model = get_model(model_id);
@@ -124,10 +148,14 @@ function render_game({game, canvox, cam}) {
             var px = cx + pl * Math.cos(pa + ang) + 0.5;
             var py = cy + pl * Math.sin(pa + ang) + 0.5;
             var pz = cz + z;
-            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-            var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-            voxels[voxels.length] = xyz;
-            voxels[voxels.length] = rgb;
+            if ( -512 < px && px < 512
+              && -512 < py && py < 512
+              && -512 < pz && pz < 512) {
+              var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+              var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+              voxels[voxels.length] = xyz;
+              voxels[voxels.length] = rgb;
+            }
           }
         }
       }
@@ -137,12 +165,16 @@ function render_game({game, canvox, cam}) {
           var px = pos_x + x;
           var py = pos_y + y;
           var pz = max_z + 16;
-          var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-          var r = Math.min(dmg*16, 255);
-          var g = Math.max(Math.min(512-dmg*16,255),0);
-          var rgb = (r<<24)|(g<<16)|0xFF;
-          voxels[voxels.length] = xyz;
-          voxels[voxels.length] = rgb;
+          if ( -512 < px && px < 512
+            && -512 < py && py < 512
+            && -512 < pz && pz < 512) {
+            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+            var r = Math.min(dmg*16, 255);
+            var g = Math.max(Math.min(512-dmg*16,255),0);
+            var rgb = (r<<24)|(g<<16)|0xFF;
+            voxels[voxels.length] = xyz;
+            voxels[voxels.length] = rgb;
+          }
         }
       }
 
@@ -343,7 +375,7 @@ var hero_id = {
   tupitree: TA.TUPITREE_THING,
   tophoro: TA.TOPHORO_THING,
   kenko: TA.KENKO_THING,
-  sr_madruga: TA.SR_MADRUGA_THING
+  sr_madruga: TA.SR_MADRUGA_THING,
 };
 
 var hero_name = {
@@ -352,13 +384,19 @@ var hero_name = {
   [TA.MIN_THING]: "Min",
   [TA.ZOIO_THING]: "Zoio",
   [TA.TEICHI_THING]: "Teichi",
+  [TA.BENFIX_THING]: "Benfix",
+  [TA.RAY_THING]: "Ray",
+  [TA.TUPITREE_THING]: "Tupitree",
+  [TA.TOPHORO_THING]: "Tophoro",
+  [TA.KENKO_THING]: "Kenko",
+  [TA.SR_MADRUGA_THING]: "Sr_Madruga",
 };
 
 module.exports = {
   ...TA,
   GAME_FPS,
   GAME_DURATION,
-  NIL_GAME,
+  OFF_GAME,
   hero_id,
   hero_name,
   render_game,

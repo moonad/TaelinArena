@@ -116,7 +116,7 @@ async function game_server() {
   };
 
   function make_turn_feed_message(game, turn) {
-    if (game !== TA.NIL_GAME) {
+    if (game !== TA.OFF_GAME) {
       var count = turns[game].length;
 
       // Gather 5 turns around the one demanded by peer
