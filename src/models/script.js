@@ -13,6 +13,8 @@
   glob(files, {}, async (er, file_names) => {
 
     // Converts all .vox to .json
+    var total_removed = 0;
+    var total_length = 0;
     for (let i = 0; i < file_names.length; ++i) {
       var file_path = file_names[i];
       if (file_path.indexOf("__old__") === -1) {
@@ -27,6 +29,8 @@
         var new_path = file_path.replace(".vox",".json");
         var short_path = new_path.slice(new_path.indexOf("models"));
         var {json,removed,length} = await conv.vox_to_json(file, pivot);
+        total_removed += removed;
+        total_length += length;
         console.log("built \x1b[2m"+short_path+"\x1b[0m"
           +", removing \x1b[2m"+removed+"\x1b[0m"
           +" of \x1b[2m"+length+"\x1b[0m voxels"
@@ -38,6 +42,9 @@
         model_names.push(model_name);
       };
     };
+    console.log("removed total of "
+      + "\x1b[2m"+total_removed+"\x1b[0m from "
+      + "\x1b[2m"+total_length+"\x1b[0m voxels!");
 
     // Updates models.js
     var model_js_path = "/../models/models.js";
