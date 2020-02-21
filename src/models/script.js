@@ -13,31 +13,28 @@
   glob(files, {}, async (er, file_names) => {
 
     // Converts all .vox to .json
-    await Promise.all(file_names
-      .filter((path) => path.indexOf("__old__") === -1)
-      .map((path) => {
-        return (async () => {
-          var file = fs.readFileSync(path);
-          var pivot_path
-            = path.split("/").slice(0,-1).join("/")
-            + "/pivot.json";
-          if (fs.existsSync(pivot_path)) {
-            var ppath = fs.readFileSync(pivot_path,"utf8");
-            var pivot = JSON.parse(ppath);
-          } else {
-            var pivot = null;
-          }
-          var new_path = path.replace(".vox",".json");
-          console.log("build " + new_path);
-          var json = await conv.vox_to_json(file, pivot);
-          fs.writeFileSync(new_path, '"'+json+'"');
-          var model_name = new_path
-            .replace(new RegExp(".json","g"), "")
-            .slice(new_path.indexOf("models")+7);
-          model_names.push(model_name);
-          return 1;
-        })();
-      }));
+    
+    for (let i = 0; i < file_names.length; ++i) {
+      var file_path = file_names[i];
+      if (file_path.indexOf("__old__") === -1) {
+        var file = fs.readFileSync(file_path);
+        var pivot_path = file_path.split("/").slice(0,-1).join("/") + "/pivot.json";
+        if (fs.existsSync(pivot_path)) {
+          var ppath = fs.readFileSync(pivot_path,"utf8");
+          var pivot = JSON.parse(ppath);
+        } else {
+          var pivot = null;
+        }
+        var new_path = file_path.replace(".vox",".json");
+        console.log("built " + new_path);
+        var json = await conv.vox_to_json(file, pivot);
+        fs.writeFileSync(new_path, '"'+json+'"');
+        var model_name = new_path
+          .replace(new RegExp(".json","g"), "")
+          .slice(new_path.indexOf("models")+7);
+        model_names.push(model_name);
+      };
+    };
 
     // Updates models.js
     var model_js_path = "/../models/models.js";
