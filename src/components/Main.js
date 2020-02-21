@@ -220,12 +220,14 @@ class Main extends Component {
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
       this.canvox = Canvox({mode: this.render_mode});
-
-      // Inject its canvas on the app
-      if (game_screen) {
-        if (game_screen.firstChild) {
-          game_screen.removeChild(game_screen.firstChild);
-        }
+    }
+    
+    // Inject its canvas on the app
+    if (game_screen) {
+      if (game_screen.firstChild) {
+        game_screen.removeChild(game_screen.firstChild);
+      }
+      if (!game_screen.firstChild) {
         game_screen.appendChild(this.canvox);
       }
     }
@@ -410,8 +412,10 @@ class Main extends Component {
           this.modal = h(Register, {
             on_done: ({name,wallet}) => {
               this.modal = null;
-              this.login(wallet.privateKey);
-              //this.forceUpdate();
+              if (wallet) {
+                this.login(wallet.privateKey);
+              }
+              this.forceUpdate();
             }
           });
           this.forceUpdate();

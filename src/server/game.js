@@ -1,5 +1,6 @@
 const db = require("./db.js");
 const TA = require("./../TaelinArena.js");
+const ethers = require("ethers");
 
 async function game_server() {
   // Loads existing games from disk to memory
