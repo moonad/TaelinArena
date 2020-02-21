@@ -13,7 +13,6 @@
   glob(files, {}, async (er, file_names) => {
 
     // Converts all .vox to .json
-    
     for (let i = 0; i < file_names.length; ++i) {
       var file_path = file_names[i];
       if (file_path.indexOf("__old__") === -1) {
@@ -26,8 +25,12 @@
           var pivot = null;
         }
         var new_path = file_path.replace(".vox",".json");
-        console.log("built " + new_path);
-        var json = await conv.vox_to_json(file, pivot);
+        var short_path = new_path.slice(new_path.indexOf("models"));
+        var {json,removed,length} = await conv.vox_to_json(file, pivot);
+        console.log("built \x1b[2m"+short_path+"\x1b[0m"
+          +", removing \x1b[2m"+removed+"\x1b[0m"
+          +" of \x1b[2m"+length+"\x1b[0m voxels"
+          +" (\x1b[2m"+(removed/length*100).toFixed(2)+"%\x1b[0m)");
         fs.writeFileSync(new_path, '"'+json+'"');
         var model_name = new_path
           .replace(new RegExp(".json","g"), "")

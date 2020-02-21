@@ -4,41 +4,80 @@ var vox = require("vox.js");
 var parser = new vox.Parser();
 var fs = require("fs");
 
+// Used to flag non-empty positions on vox_to_json
+var voxbox = new Uint8Array(256*256*256);
+
 // Uint8Array -> Pos -> Promise(JSON)
-function vox_to_json(vox, pivot) {
+async function vox_to_json(vox, pivot) {
   //var vox = fs.readFileSync(vox_file);
   var u8 = new Uint8Array(vox);
   var byt = b => ("00"+b.toString(16)).slice(-2);
-  return new Promise((resolve,reject) => {
-    parser.parseUint8Array(u8, (err,data) => {
-      var voxels = "";
-      for (var i = 0; i < data.voxels.length; ++i) {
-        var vpos = data.voxels[i];
-        var k = data.palette[vpos.colorIndex];
-        if (!pivot) {
-          var x = Math.floor(vpos.x-data.size.x*0.5)+128;
-          var y = Math.floor(vpos.y-data.size.y*0.5)+128;
-          var z = Math.floor(vpos.z)+128;
-        } else {
-          var x = Math.floor(vpos.x-pivot.x)+128;
-          var y = Math.floor(vpos.y-pivot.y)+128;
-          var z = Math.floor(vpos.z-pivot.z)+128;
-        }
-        var r = k.r;
-        var g = k.g;
-        var b = k.b;
-        voxels += byt(x);
-        voxels += byt(y);
-        voxels += byt(z);
-        voxels += byt(r);
-        voxels += byt(g);
-        voxels += byt(b);
-      };
-      resolve(voxels);
-      //fs.writeFileSync(json_file,
-        //JSON.stringify(voxels,null,2));
+  var data = await new Promise((resolve, reject) => {
+    parser.parseUint8Array(u8, (err, data) => {
+      resolve(data);
     });
   });
+
+  // Builds array with pos, idx and val of each voxel
+  var voxels = [];
+  for (var i = 0; i < data.voxels.length; ++i) {
+    var vpos = data.voxels[i];
+    var k = data.palette[vpos.colorIndex];
+    var r = k.r;
+    var g = k.g;
+    var b = k.b;
+    if (!pivot) {
+      var x = Math.floor(vpos.x-data.size.x*0.5)+128;
+      var y = Math.floor(vpos.y-data.size.y*0.5)+128;
+      var z = Math.floor(vpos.z)+128;
+    } else {
+      var x = Math.floor(vpos.x-pivot.x)+128;
+      var y = Math.floor(vpos.y-pivot.y)+128;
+      var z = Math.floor(vpos.z-pivot.z)+128;
+    }
+    var pos = {x,y,z};
+    var idx = x | (y<<8) | (z<<16);
+    var val = byt(x)+byt(y)+byt(z)+byt(r)+byt(g)+byt(b);
+    voxels.push([pos,idx,val]);
+    voxbox[idx] = 1;
+  };
+
+  // Flags each voxel that is internal for removal
+  var is_internal = {};
+  var removed = 0;
+  finder: for (var i = 0; i < voxels.length; ++i) {
+    var [pos,idx,val] = voxels[i];
+    var x0 = Math.max(pos.x - 1, 0);
+    var x1 = Math.min(pos.x + 1, 255);
+    var y0 = Math.max(pos.y - 1, 0);
+    var y1 = Math.min(pos.y + 1, 255);
+    var z0 = Math.max(pos.z - 1, 0);
+    var z1 = Math.min(pos.z + 1, 255);
+    for (var z = z0; z <= z1; ++z) {
+      for (var y = y0; y <= y1; ++y) {
+        for (var x = x0; x <= x1; ++x) {
+          var idx2 = x | (y<<8) | (z<<16);
+          if (voxbox[idx2] === 0) {
+            continue finder;
+          }
+        }
+      }
+    }
+    is_internal[idx] = true;
+    ++removed;
+  };
+
+  // Builds string with voxel data
+  var str = "";
+  for (var i = 0; i < voxels.length; ++i) {
+    var [pos,idx,val] = voxels[i];
+    if (!is_internal[idx]) {
+      str += val;
+    }
+    voxbox[idx] = 0;
+  }
+
+  return {json: str, removed, length: voxels.length};
 };
 
 // TODO: deprecated, update to new format
