@@ -1,0 +1,52 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Kakashi.Effects
+
+enum
+| KAKASHI_IDLE
+| KAKASHI_PAKKUN_ATTACK
+| KAKASHI_TELEPORT
+| KAKASHI_FIREBALL_CASTING
+| KAKASHI_RAIKIRI
+| KAKASHI_TAUNT
+| KAKASHI_BLOCK
+
+kakashi_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  case self |thing switch self.act
+
+  |KAKASHI_IDLE
+    case self.wlk
+    | true  => animate(self, 1, KAKASHI_RUN_000, 6, 12)
+    | false => animate(self, 1, KAKASHI_IDLE_000, 6, 12)
+
+  // Left 
+  |KAKASHI_PAKKUN_ATTACK
+    animate(self, 0, KAKASHI_PAKKUN_ATTACK_000, 26, 52)
+
+  // Middle
+  |KAKASHI_TELEPORT
+    let self = animate(self, 1, KAKASHI_TELEPORT_000, 14, 28)
+    let self = blink(self, 18, self.trg)
+    self
+
+  // Right
+  |KAKASHI_FIREBALL_CASTING
+    let self = animate(self, 0, KAKASHI_FIREBALL_CASTING_000, 9, 18)
+    let fire = new_thing(kakashi_fire_ball_effect)
+    let fire = fire <= thing(dir = look_dir(self))
+    let self = spawn(self, 10, self.trg, fire)
+    self
+
+  // Space
+  // TODO: after finishing the ultimate, stay in that place
+  |KAKASHI_RAIKIRI
+    animate(self, 1, KAKASHI_RAIKIRI_000, 24, 48)
+
+  | KAKASHI_TAUNT
+    animate(self, 0, KAKASHI_TAUNT_000, 19, 19)
+
+  | KAKASHI_BLOCK
+    animate(self, 1, KAKASHI_BLOCK_000, 15, 30)
+
+  else self

@@ -37,7 +37,10 @@ tupitree_fun(self: Thing) : Thing
 
   // Space
   |TUPITREE_NATURES_REVENGE
-    animate(self, 0, TUPITREE_NATURE_REVENGE_ANIM_000, 28, 56)
+    let self = animate(self, 0, TUPITREE_NATURE_REVENGE_ANIM_000, 28, 28)
+    let root = new_thing(tupitree_natures_revenge_fun)
+    let self = spawn(self, 24, self.pos, root)
+    self
    
   // Q
   |TUPITREE_BLOCK
@@ -47,7 +50,5 @@ tupitree_fun(self: Thing) : Thing
 
   |TUPITREE_TAUNT
     animate(self, 0, TUPITREE_TAUNT_000, 12, 26)
-
-  // Don't have dash
 
   else self
