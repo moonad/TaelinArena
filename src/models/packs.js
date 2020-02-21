@@ -35,48 +35,56 @@ module.exports = {
     "from": 867,
     "til": 972
   },
-  "ppg": {
+  "poste": {
     "from": 972,
-    "til": 1134
+    "til": 973
+  },
+  "ppg": {
+    "from": 973,
+    "til": 1135
   },
   "raichu": {
-    "from": 1134,
-    "til": 1237
+    "from": 1135,
+    "til": 1238
   },
   "ray": {
-    "from": 1237,
-    "til": 1311
+    "from": 1238,
+    "til": 1312
   },
   "shao": {
-    "from": 1311,
-    "til": 1418
+    "from": 1312,
+    "til": 1419
   },
   "sr_madruga": {
-    "from": 1418,
-    "til": 1540
+    "from": 1419,
+    "til": 1541
   },
   "teichi": {
-    "from": 1540,
-    "til": 1670
+    "from": 1541,
+    "til": 1671
   },
   "tophoro": {
-    "from": 1670,
-    "til": 1772
+    "from": 1671,
+    "til": 1773
   },
   "tupitree": {
-    "from": 1772,
-    "til": 1926
+    "from": 1773,
+    "til": 1927
+  },
+  "wall": {
+    "from": 1927,
+    "til": 1928
   },
   "young_link": {
-    "from": 1926,
-    "til": 1955
+    "from": 1928,
+    "til": 1957
   },
   "zagatur": {
-    "from": 1955,
-    "til": 2043
+    "from": 1957,
+    "til": 2045
   },
   "zoio": {
-    "from": 2043,
-    "til": 2142
+    "from": 2045,
+    "til": 2144
   }
 }

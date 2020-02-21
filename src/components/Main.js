@@ -123,7 +123,7 @@ class Main extends Component {
     if (!this.game || this.game.gid !== gid) {
       var hero_list;
       if (gid === TA.OFF_GAME) {
-        hero_list = [this.picked_hero, "MikeGator"];
+        hero_list = [this.picked_hero, "Poste", "MikeGator", "Wall"];
       } else {
         hero_list = this.game_list[gid].players.split(",");
         hero_list = hero_list.map(TA.parse_player);

@@ -173,7 +173,7 @@ new_game(tids: List(ThingId)) : Game
   let nil = (pid) => []
   let cons = (tid, heroes, pid) => 
     let hpid = pid
-    let hpos = v3((pid * 64) - 64, 0, 0)
+    let hpos = v3((pid * 80) - 80, 0, 0)
     let hero = init_thing(tid) <= thing(pid=hpid, pos=hpos)
     let rest = heroes(pid + 1)
     cons(_ hero, rest)

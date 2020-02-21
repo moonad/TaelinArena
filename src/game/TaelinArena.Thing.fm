@@ -19,6 +19,8 @@ import TaelinArena.Thing.Bleskape
 import TaelinArena.Thing.Kakashi 
 import TaelinArena.Thing.Finn 
 import TaelinArena.Thing.Zagatur
+import TaelinArena.Thing.Poste
+import TaelinArena.Thing.Wall
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -40,7 +42,8 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |KAKASHI_THING kakashi_fun
   |FINN_THING finn_fun
   |ZAGATUR_THING zagatur_fun
-
+  |POSTE_THING poste_fun
+  |WALL_THING wall_fun
   else mikegator_fun
 
 init_thing(tid: ThingId) : Thing

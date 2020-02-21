@@ -347,6 +347,8 @@ var hero_id = {
   kakashi: TA.KAKASHI_THING,
   finn: TA.FINN_THING,
   zagatur: TA.ZAGATUR_THING,
+  poste: TA.POSTE_THING,
+  wall: TA.WALL_THING,
 };
 
 var hero_name = {
@@ -365,6 +367,8 @@ var hero_name = {
   [TA.KAKASHI_THING]: "Kakashi",
   [TA.FINN_THING]: "Finn",
   [TA.ZAGATUR_THING]: "Zagatur",
+  [TA.POSTE_THING]: "Poste",
+  [TA.WALL_THING]: "Wall",
 };
 
 module.exports = {
