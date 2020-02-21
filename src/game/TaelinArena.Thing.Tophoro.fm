@@ -52,13 +52,9 @@ tophoro_fun(self: Thing) : Thing
 
   // He doesn't have a taunt neither a dash
   | TOPHORO_TAUNT
-    case self.wlk
-      | true  => animate(self, 1, TOPHORO_WALK_CYCLE_000, 9, 18)
-      | false => animate(self, 1, TOPHORO_IDLE_000, 5, 10)
+    animate(self, 0, TOPHORO_IDLE_000, 5, 10)
 
   | TOPHORO_DASH
-    case self.wlk
-      | true  => animate(self, 1, TOPHORO_WALK_CYCLE_000, 9, 18)
-      | false => animate(self, 1, TOPHORO_IDLE_000, 5, 10)
+    animate(self, 0, TOPHORO_IDLE_000, 5, 10)
 
   else self
