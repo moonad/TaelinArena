@@ -65,18 +65,18 @@ module.exports = {
   },
   "tupitree": {
     "from": 1772,
-    "til": 1920
+    "til": 1926
   },
   "young_link": {
-    "from": 1920,
-    "til": 1949
+    "from": 1926,
+    "til": 1955
   },
   "zagatur": {
-    "from": 1949,
-    "til": 2037
+    "from": 1955,
+    "til": 2043
   },
   "zoio": {
-    "from": 2037,
-    "til": 2136
+    "from": 2043,
+    "til": 2142
   }
 }
