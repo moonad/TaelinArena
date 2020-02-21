@@ -22,11 +22,25 @@ const NIL = 0x00000000;
 const TIP = 0x40000000;
 const OCT = 0x80000000;
 
-function empty() {
-  return [NIL, NIL, NIL, NIL, NIL, NIL, NIL, NIL];
+function empty(max_size, reuse_tree) {
+  var size = 8;
+  var data;
+  if (max_size === undefined && !reuse_tree) {
+    var data = [];
+  } else if (reuse_tree) {
+    var data = reuse_tree.data;
+  } else {
+    var data = new Uint32Array(max_size);
+  }
+  for (var i = 0; i < size; ++i) {
+    data[i] = NIL;
+  }
+  return {size, data};
 };
 
 function insert(px, py, pz, col, oct) {
+  var oct_size = oct.size;
+  var oct_data = oct.data;
   px = (px + 512) >>> 0;
   py = (py + 512) >>> 0;
   pz = (pz + 512) >>> 0;
@@ -37,27 +51,29 @@ function insert(px, py, pz, col, oct) {
       | (((py >>> bit) & 1) << 1)
       | (((pz >>> bit) & 1) << 0);
     if (bit === 0) {
-      oct[idx+slt] = TIP | col;
+      oct_data[idx+slt] = TIP | col;
     } else {
-      var nod = oct[idx+slt];
+      var nod = oct_data[idx+slt];
       var ctr = (nod&CTR)>>>0;
       var val = (nod&VAL)>>>0;
       if (ctr === NIL) {
-        oct[idx+slt] = OCT | oct.length;
-        idx = oct.length;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
-        oct[oct.length] = NIL;
+        oct_data[idx+slt] = OCT | oct_size;
+        idx = oct_size;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
+        oct_data[oct_size++] = NIL;
       } else {
         idx = val;
       }
     }
   }
+  oct.size = oct_size;
+  oct.data = oct_data;
 };
 
 const NOP = 0x00000000;
@@ -67,6 +83,8 @@ const GOT = 0x40000000;
 // the found color. NOP contains the how many levels above
 // the contained color it stopped.
 function lookup(px, py, pz, oct) {
+  var oct_size = oct.size;
+  var oct_data = oct.data;
   px = (px + 512) >>> 0;
   py = (py + 512) >>> 0;
   pz = (pz + 512) >>> 0;
@@ -79,9 +97,9 @@ function lookup(px, py, pz, oct) {
     if (bit === 0) {
       // No need to deconstruct because NIL/TIP have the
       // same constructor labels as NOP/GOT.
-      return oct[idx+slt];
+      return oct_data[idx+slt];
     } else {
-      var nod = oct[idx+slt];
+      var nod = oct_data[idx+slt];
       var ctr = (nod&CTR)>>>0;
       if (ctr !== NIL) {
         idx = (nod&VAL)>>>0;
@@ -94,6 +112,8 @@ function lookup(px, py, pz, oct) {
 
 // Converts an octree to a string
 function show(oct, ptr = OCT, lvl = 0) {
+  var oct_size = oct.size;
+  var oct_data = oct.data;
   var ctr = (ptr & 0xC0000000) >>> 0;
   var val = (ptr & 0x3FFFFFFF) >>> 0;
   var str = "";
@@ -111,7 +131,7 @@ function show(oct, ptr = OCT, lvl = 0) {
     case OCT:
       str += "oct\n";
       for (var i = 0; i < 8; ++i) {
-        str += show(oct, oct[val+i], lvl+1);
+        str += show(oct, oct_data[val+i], lvl+1);
       }
       return str;
   }
@@ -173,7 +193,6 @@ const MIS = 2;
 // value. If it never hits the octree, returns `MIS`. If it
 // hits but passes through, returns `PAS`.
 function march(rx,ry,rz,dx,dy,dz,oct) {
-
   // Enters the octree
   if ( rx >=  512 || ry >=  512 || rz >=  512
     || rx <= -512 || ry <= -512 || rz <= -512) {
@@ -268,87 +287,3 @@ module.exports = {
   PAS,
   show,
 };
-
-
-//var oct = module.exports;
-//var tree = oct.empty();
-//for (var k = -8; k < 8; ++k) {
-  //for (var j = -8; j < 8; ++j) {
-    //for (var i = -8; i < 8; ++i) {
-      //oct.insert(i,j,k,0xFF,tree);
-    //}
-  //}
-//}
-
-//console.log(oct.march(-1000,0,0,1,0,0,tree));
-//console.log(oct.march(1000,0,0,-1,0,0,tree));
-
-//var t = empty();
-//var hit = march(100,-512,0, -1,0,0, t);
-//console.log(hit);
-//for (var z = -16; z < 16; ++z) {
-  //for (var y = -16; y < 16; ++y) {
-    //for (var x = -16; x < 16; ++x) {
-      //insert(x,y,z,1,t);
-    //}
-  //}
-//}
-//var s = 0;
-//for (var i = 0; i < 5000000; ++i) {
-  //s += march(60,0,0, -1,0,0, t).val;
-//};
-//console.log(s);
-//console.log(march(-60,0,0, -1,0,0, t));
-
-//console.log(
-  //intersect(
-    //511.99998474121094,0,0,
-    //-1,0,0,
-    //384,128,128,
-    //256,256,256));
-    
-//console.log(
-  //intersect(
-    //9.9999,0,0,
-    //-1,0,0,
-    //0,0,0,
-    //20,20,20));
-
-//console.log(intersect(
-  //0,0,0,
-  //1,0,0,
-  //0,0,0,
-  //30,64,64));
-
-
-//var t = empty();
-//var L = 10000000;
-//var T = Date.now();
-//for (var i = 0; i < L; ++i) {
-  //var x = i % 1024 - 512;
-  //var y = Math.floor(i / 1024) % 1024 - 512;
-  //var z = Math.floor(i / 1024 / 1024) - 512;
-  //insert(x,y,z,1,t);
-//}
-//console.log((Date.now() - T)+"ms"); T = Date.now();
-//var s = 0;
-//for (var i = 0; i < L; ++i) {
-  //var x = i % 1024 - 512;
-  //var y = Math.floor(i / 1024) % 1024 - 512;
-  //var z = Math.floor(i / 1024 / 1024) - 512;
-  //s += lookup(x,y,z,t)&VAL;
-//}
-//console.log(s);
-//console.log((Date.now() - T)+"ms"); T = Date.now();
-
-//insert(0, 0, 0, 0x1, t);
-//insert(1, 0, 0, 0x2, t);
-//insert(0, 1, 0, 0x3, t);
-//insert(1, 1, 0, 0x4, t);
-//insert(0, 0, 1, 0x5, t);
-//insert(1, 0, 1, 0x6, t);
-//insert(0, 1, 1, 0x7, t);
-//insert(1, 1, 1, 0x8, t);
-//insert(1023, 1023, 1023, 0x9, t);
-//console.log(show(t));
-//console.log(lookup(2,0,0,t));

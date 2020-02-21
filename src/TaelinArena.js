@@ -1,6 +1,5 @@
 if (typeof window !== "undefined") {
   var TA = require("./game/TaelinArena.fm");
-  var oct = require("./canvox/octree.js");
 
   // Loads all models
   var models = require("./models/models.js");
@@ -29,36 +28,9 @@ if (typeof window !== "undefined") {
       return models[i];
     }
   };
-
-  // Builds soccer stage
-  var stage = oct.empty();
-  for (var y = -512; y < 512; ++y) {
-    for (var x = -512; x < 512; ++x) {
-      var line = 0xFFFFFFFF;
-      var d = x * x + y * y;
-      if ( x >= 508
-        || y >= 508
-        || x < -508
-        || y < -508
-        || x >= -2 && x < 2
-        || x >= -388 && x < -384 && y >= -128 && y <  128
-        || x >=  384 && x <  388 && y >= -128 && y <  128
-        || x >= -512 && x < -384 && y >= -128 && y < -124
-        || x >= -512 && x < -384 && y >=  124 && y <  128
-        || x >=  384 && x <  512 && y >= -128 && y < -124
-        || x >=  384 && x <  512 && y >=  124 && y <  128
-        || d >= 124*124 && d < 128*128) {
-        oct.insert(x,y,0,line,stage);
-      } else if (((x+2048)/32)%2<1) {
-        oct.insert(x,y,0,0xFF85c9a0,stage);
-      } else {
-        oct.insert(x,y,0,0xFF8fd9ad,stage);
-      }
-    }
-  }
+  var stage = null;
 } else {
   var TA = {};
-  var oct = null;
   var models = null;
   var stage = null;
 }
@@ -74,15 +46,16 @@ const now = (() => {
 var OFF_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
+var voxels = {size: 65536*2, data: new Uint32Array(65536*2)};
 function render_game({game, canvox, cam}) {
+  var voxels_data = voxels.data;
+  var voxels_size = 0;
+
   // Gets the current time
   var T = now();
 
   // Gets the main hero position
   var hero_pos = TA.get_position_by_pid(0, game);
-
-  // Creates list of voxels
-  var voxels = [];
 
   // Renders each game thing
   TA.map_stage((thing,k) => {
@@ -153,8 +126,8 @@ function render_game({game, canvox, cam}) {
               && -512 < pz && pz < 512) {
               var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
               var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-              voxels[voxels.length] = xyz;
-              voxels[voxels.length] = rgb;
+              voxels_data[voxels_size++] = xyz;
+              voxels_data[voxels_size++] = rgb;
             }
           }
         }
@@ -172,8 +145,8 @@ function render_game({game, canvox, cam}) {
             var r = Math.min(dmg*16, 255);
             var g = Math.max(Math.min(512-dmg*16,255),0);
             var rgb = (r<<24)|(g<<16)|0xFF;
-            voxels[voxels.length] = xyz;
-            voxels[voxels.length] = rgb;
+            voxels_data[voxels_size++] = xyz;
+            voxels_data[voxels_size++] = rgb;
           }
         }
       }
@@ -181,6 +154,8 @@ function render_game({game, canvox, cam}) {
     });
   })(game);
 
+  voxels.data = voxels_data;
+  voxels.size = voxels_size;
   canvox.draw({voxels, stage, cam});
 };
 
