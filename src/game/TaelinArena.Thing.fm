@@ -19,6 +19,8 @@ import TaelinArena.Thing.Bleskape
 import TaelinArena.Thing.Kakashi 
 import TaelinArena.Thing.Finn 
 import TaelinArena.Thing.Zagatur
+import TaelinArena.Thing.PPG
+import TaelinArena.Thing.Luffy
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -40,6 +42,8 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |KAKASHI_THING kakashi_fun
   |FINN_THING finn_fun
   |ZAGATUR_THING zagatur_fun
+  |PPG_THING ppg_fun
+  |LUFFY_THING luffy_fun
 
   else mikegator_fun
 

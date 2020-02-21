@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+ppg_ice_ball_effect(self: Thing) : Thing
+  let self = animate(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
+  let self = self <= thing(die = if tik === 30 then true else false)
+  self
