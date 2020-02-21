@@ -21,6 +21,8 @@ import TaelinArena.Thing.Finn
 import TaelinArena.Thing.Zagatur
 import TaelinArena.Thing.Poste
 import TaelinArena.Thing.Wall
+import TaelinArena.Thing.PPG
+import TaelinArena.Thing.Luffy
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -44,6 +46,8 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |ZAGATUR_THING zagatur_fun
   |POSTE_THING poste_fun
   |WALL_THING wall_fun
+  |PPG_THING ppg_fun
+  |LUFFY_THING luffy_fun
   else mikegator_fun
 
 init_thing(tid: ThingId) : Thing

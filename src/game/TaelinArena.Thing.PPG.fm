@@ -1,0 +1,54 @@
+import TaelinArena.Game
+import TaelinArena.Thing.PPG.Effects
+
+enum
+| PPG_IDLE
+| PPG_COLORFUL_MAGIC
+| PPG_DASH
+| PPG_LASER_BURST
+| PPG_COSMIC_ICE_BALL_CASTING
+| PPG_BLOCK
+| PPG_TAUNT
+
+
+ppg_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  case self |thing switch self.act
+
+  |PPG_IDLE
+    case self.wlk
+    | true  => animate(self, 1, PPG_WALK_000, 3, 6)
+    | false => animate(self, 1, PPG_IDLE_000, 10, 20)
+
+  // Left 
+  |PPG_COLORFUL_MAGIC
+    animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
+
+  // Middle
+  |PPG_DASH
+    let self = animate(self, 1, PPG_DASH_000, 9, 18)
+    let self = dash(self, 4, 0, 18)
+    self
+
+  // Right
+  |PPG_LASER_BURST
+    animate(self, 0, PPG_LASER_BURST_000, 26, 35)
+
+  // Ultimate Q
+  |PPG_COSMIC_ICE_BALL_CASTING
+    let self = animate(self, 0, PPG_COSMIC_ICE_BALL_CAST_000, 23, 50)
+    let ice = new_thing(ppg_ice_ball_effect)
+    let self = spawn(self, 23, self.trg, ice)
+    self
+
+  // Space
+  | PPG_BLOCK
+     animate(self, 0, PPG_BLOCK_000, 18, 18)
+
+  // E
+  | PPG_TAUNT
+    animate(self, 0, PPG_TAUNT_000, 12, 24)
+
+
+  else self

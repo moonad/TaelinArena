@@ -349,6 +349,8 @@ var hero_id = {
   zagatur: TA.ZAGATUR_THING,
   poste: TA.POSTE_THING,
   wall: TA.WALL_THING,
+  ppg: TA.PPG_THING,
+  luffy: TA.LUFFY_THING,
 };
 
 var hero_name = {
@@ -369,6 +371,8 @@ var hero_name = {
   [TA.ZAGATUR_THING]: "Zagatur",
   [TA.POSTE_THING]: "Poste",
   [TA.WALL_THING]: "Wall",
+  [TA.PPG_THING]: "PPG",
+  [TA.LUFFY_THING]: "Luffy",
 };
 
 module.exports = {

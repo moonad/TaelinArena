@@ -1,0 +1,51 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Luffy.Effects
+
+enum
+| LUFFY_IDLE
+| LUFFY_BASIC_ATTACK
+| LUFFY_BAZOOKA
+| LUFFY_GATLING_GUN
+| LUFFY_GIANT_ARM
+| LUFFY_BLOCK
+| LUFFY_TAUNT
+
+
+luffy_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  case self |thing switch self.act
+
+  |LUFFY_IDLE
+    case self.wlk
+    | true  => animate(self, 1, LUFFY_RUN_000, 8, 16)
+    | false => animate(self, 1, LUFFY_IDLE_000, 13, 26)
+
+  // Left
+  |LUFFY_BASIC_ATTACK
+    animate(self, 0, LUFFY_BASIC_ATTACK_1_000, 5, 10)
+
+  // Middle
+  |LUFFY_BAZOOKA
+    animate(self, 0, LUFFY_BAZOOKA_000, 10, 20)
+
+  // Right
+  |LUFFY_GATLING_GUN
+    animate(self, 0, LUFFY_GATLING_GUN_000, 16, 32)
+
+  // Q Ultimate
+  |LUFFY_GIANT_ARM
+    let self = animate(self, 0, LUFFY_GIANT_ARM_000, 23, 46)
+    let arm = new_thing(luffy_giant_arm_effect)
+    let self = spawn(self, 36, self.trg, arm)
+    self
+
+  // Space
+  |LUFFY_BLOCK
+    animate(self, 0, LUFFY_BLOCK_000, 1, 6)
+
+  // E
+  |LUFFY_TAUNT
+    animate(self, 0, LUFFY_TAUNT_000, 13, 26)
+
+  else self
