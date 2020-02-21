@@ -46,7 +46,10 @@ const now = (() => {
 var OFF_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
-var voxels = {size: 65536*2, data: new Uint32Array(65536*2)};
+var voxels = {
+  size: 256*256*256*2,
+  data: new Uint32Array(256*256*256*2)
+};
 function render_game({game, canvox, cam}) {
   var voxels_data = voxels.data;
   var voxels_size = 0;
@@ -54,59 +57,24 @@ function render_game({game, canvox, cam}) {
   // Gets the current time
   var T = now();
 
+  // Lights object
+  var lights = [];
+
   // Gets the main hero position
   var hero_pos = TA.get_position_by_pid(0, game);
 
   // Renders each game thing
   TA.map_stage((thing,k) => {
-    TA.draw_thing(thing)(model_id => pos => dir => dmg => {
+    TA.draw_thing(thing)(mid=>pos=>dir=>lit=>dmg=>{
       var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
 
-      //for (var j = -12; j <= 12; ++j) {
-        //for (var i = -12; i <= 12; ++i) {
-          //if ( i === -12 || i === 0 || i === 12
-            //|| j === -12 || j === 0 || j === 12) {
-            //var px = pos_x + i;
-            //var py = pos_y + j;
-            //var pz = 0;
-            //var bpos = (px+512)<<20|(py+512)<<10|(pz+512);
-            //var bcol = 0xE0E0E0FF;
-            //voxels[voxels.length] = bpos;
-            //voxels[voxels.length] = bcol;
-          //}
-        //}
-      //}
-
-      //// Top red line
-      //for (var x = -512; x <= 512; ++x) {
-        //var px = x;
-        //var py = -255;
-        //var pz = 0;
-        //var rgb = 0xFF4040FF;
-        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-        //voxels[voxels.length] = xyz;
-        //voxels[voxels.length] = rgb;
-      //}
-
-      //// Bot red line
-      //for (var x = -512; x <= 512; ++x) {
-        //var px = x;
-        //var py = 255;
-        //var pz = 0;
-        //var rgb = 0xFF4040FF;
-        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-        //voxels[voxels.length] = xyz;
-        //voxels[voxels.length] = rgb;
-      //}
-
+      // Renders model voxels
       var max_z = 0;
-      if (model_id !== 0xFFFFFFFF) {
-        var model = get_model(model_id);
+      if (mid !== 0xFFFFFFFF) {
+        var model = get_model(mid);
         if (model) {
           for (var i = 0; i < model.length; ++i) {
             var [{x,y,z},{r,g,b}] = model[i];
@@ -133,30 +101,54 @@ function render_game({game, canvox, cam}) {
         }
       }
 
-      for (var y = 0; y <= 1; ++y) {
-        for (var x = -4; x <= 4; ++x) {
-          var px = pos_x + x;
-          var py = pos_y + y;
-          var pz = max_z + 16;
-          if ( -512 < px && px < 512
-            && -512 < py && py < 512
-            && -512 < pz && pz < 512) {
-            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-            var r = Math.min(dmg*16, 255);
-            var g = Math.max(Math.min(512-dmg*16,255),0);
-            var rgb = (r<<24)|(g<<16)|0xFF;
-            voxels_data[voxels_size++] = xyz;
-            voxels_data[voxels_size++] = rgb;
-          }
-        }
-      }
+      // Renders lights
+      (function go(lit) {
+        var case_nil  = null;
+        var case_cons = head => tail => {
+          head(pos => rng => sub => add => {
+            pos(x => y => z => {
+              lights.push({pos:{x,y,z}, rng, sub, add});
+            });
+          });
+          go(tail);
+        };
+        lit(case_nil)(case_cons);
+      })(lit);
+
+      // Renders life bar
+      //for (var y = 0; y <= 1; ++y) {
+        //for (var x = -4; x <= 4; ++x) {
+          //var px = pos_x + x;
+          //var py = pos_y + y;
+          //var pz = max_z + 16;
+          //if ( -512 < px && px < 512
+            //&& -512 < py && py < 512
+            //&& -512 < pz && pz < 512) {
+            //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+            //var r = Math.min(dmg*16, 255);
+            //var g = Math.max(Math.min(512-dmg*16,255),0);
+            //var rgb = (r<<24)|(g<<16)|0xFF;
+            //voxels_data[voxels_size++] = xyz;
+            //voxels_data[voxels_size++] = rgb;
+          //}
+        //}
+      //}
 
     });
   })(game);
 
   voxels.data = voxels_data;
   voxels.size = voxels_size;
-  canvox.draw({voxels, stage, cam});
+
+  //lights.push({
+    //pos: {
+      //x: Math.cos(Date.now()/1000)*64,
+      //y: Math.sin(Date.now()/1000)*64,
+      //z: 64
+    //},
+    //rng: 256});
+
+  canvox.draw({voxels, lights, stage, cam});
 };
 
 // Turns ::=

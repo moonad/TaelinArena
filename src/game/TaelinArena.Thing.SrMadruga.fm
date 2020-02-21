@@ -40,8 +40,22 @@ sr_madruga_fun(self: Thing) : Thing
 
   // Space
   |SR_MADRUGA_EXPLOSIVE_PHOTO
-    let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_000, 10, 20)
-    let self = spawn(self, 15, self.trg, new_thing(sr_madruga_explosive_photo_fun))
+    let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_000, 10, 40)
+    let lpos =
+      case self.pos |v3
+      case look_dir(self) as dir |v3
+      let lx = self.pos.x + (dir.x * 22.0)
+      let ly = self.pos.y + (dir.y * 22.0)
+      let lz = 23.0
+      v3(lx, ly, lz)
+    let lpow = 1 - ((self.tik - 24) \ 16)
+    let lrng = 160.0
+    let lsub = 0.5 * lpow
+    let ladd = 2.0 * lpow
+    let lght = light(lpos,lrng,lsub,ladd)
+    let self = illumine(self, 24, 40, [lght])
+    let self = hit(self, 25, outward_hit(160, 0, 4)) 
+    //let self = spawn(self, 15, self.trg, new_thing(sr_madruga_explosive_photo_fun))
     self
 
   | SR_MADRUGA_DASH

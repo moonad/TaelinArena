@@ -164,8 +164,9 @@ draw_thing(thi: Thing) : Draw
       thi.dir
     else
       lookat_v3(thi.pos, thi.trg, thi.dir)
+  let lit = thi.lit
   let dmg = thi.dmg
-  draw(mid, pos, dir, dmg)
+  draw(mid, pos, dir, lit, dmg)
 
 // Creates a brand new game
 new_game(tids: List(ThingId)) : Game

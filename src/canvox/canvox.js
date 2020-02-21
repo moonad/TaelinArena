@@ -195,11 +195,17 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
       uniform vec3 cam_front;
       uniform vec2 scr_siz;
 
+      uniform int   light_len;
+      uniform vec3  light_pos[32];
+      uniform float light_rng[32];
+      uniform float light_sub[32];
+      uniform float light_add[32];
+
       uniform sampler2D voxels;
       uniform sampler2D stage;
 
       const float inf = 65536.0;
-      const float eps = 0.000244140625;
+      const float eps = 0.001953125;
 
       const uint CTR = 0xC0000000u;
       const uint VAL = 0x3FFFFFFFu;
@@ -292,7 +298,8 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         uint val;
       };
 
-      Hit march(vec3 ray, vec3 dir, sampler2D octree) {
+      Hit march(vec3 ray, vec3 dir, sampler2D octree, float max_dist) {
+        vec3 ini = ray;
         Hit hit;
         // Enters the octree
         if ( ray.x >=  512.0 || ray.y >=  512.0 || ray.z >=  512.0
@@ -314,34 +321,42 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
           ray.x += dir.x * eps;
           ray.y += dir.y * eps;
           ray.z += dir.z * eps;
-          // Floor at z=0
+          // Hits the floor
           if (ray.z <= 0.0) {
             hit.ctr = HIT;
             hit.pos = ray;
             hit.val = 0xFCFCFCu & VAL;
             return hit;
           }
+          // Misses if travelled more than maximum dist
+          if ( max_dist != inf
+            && dot(ray-ini,ray-ini) > max_dist*max_dist) {
+            hit.ctr = PAS;
+            hit.pos = ini + dir * max_dist;
+            return hit;
+          }
+          // Hits a voxel
           uint got = lookup(octree, ray);
-          if ((got&CTR) == NOP) {
-            uint lv = 10u - (got & VAL);
-            float bl = float(1024u >> lv);
-            float bq = 1.0 / float(bl);
-            float bx = (floor((ray.x+512.0)*bq)+0.5)*bl-512.0;
-            float by = (floor((ray.y+512.0)*bq)+0.5)*bl-512.0;
-            float bz = (floor((ray.z+512.0)*bq)+0.5)*bl-512.0;
-            float ht = intersect(ray,dir,vec3(bx,by,bz),vec3(bl));
-            if (ht != inf) {
-              ray.x = ray.x + dir.x * ht;
-              ray.y = ray.y + dir.y * ht;
-              ray.z = ray.z + dir.z * ht;
-            } else {
-              break;
-            }
-          } else {
+          if ((got&CTR) != NOP) {
             hit.ctr = HIT;
             hit.pos = ray;
             hit.val = got & VAL;
             return hit;
+          }
+          // Marches forward
+          uint lv = 10u - (got & VAL);
+          float bl = float(1024u >> lv);
+          float bq = 1.0 / float(bl);
+          float bx = (floor((ray.x+512.0)*bq)+0.5)*bl-512.0;
+          float by = (floor((ray.y+512.0)*bq)+0.5)*bl-512.0;
+          float bz = (floor((ray.z+512.0)*bq)+0.5)*bl-512.0;
+          float ht = intersect(ray,dir,vec3(bx,by,bz),vec3(bl));
+          if (ht != inf) {
+            ray.x = ray.x + dir.x * ht;
+            ray.y = ray.y + dir.y * ht;
+            ray.z = ray.z + dir.z * ht;
+          } else {
+            break;
           }
         }
         // Passed through
@@ -363,9 +378,8 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         //ray_dir = vec3(0.0, 1.0, 0.0);
 
         // Marches towards octree
-        Hit hit1 = march(ray_pos, ray_dir, voxels);
-        Hit hit = hit1;
-        //Hit hit2 = march(ray_pos, ray_dir, stage);
+        Hit hit = march(ray_pos, ray_dir, voxels, inf);
+        //Hit hit2 = march(ray_pos, ray_dir, stage, inf);
         //float dist1 = distance(hit1.pos, ray_pos);
         //float dist2 = distance(hit2.pos, ray_pos);
         //Hit hit;
@@ -379,24 +393,48 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         if (hit.ctr == HIT) {
           vec4 col = uint_to_vec4(hit.val);
 
+          // Applies sunlight
           vec3 sun_dir = vec3(0.0,0.0,1.0);
-          Hit sky = march(hit.pos, sun_dir, voxels);
+          Hit sky = march(hit.pos, sun_dir, voxels, inf);
           if (sky.ctr == HIT) {
             col.r *= 0.85;
             col.g *= 0.85;
             col.b *= 0.85;
           }
 
-          //bool is_floor = hit.pos.z < 0.0;
-          //bool is_white = col.r >= 1.0 && col.g >= 1.0 && col.b >= 1.0;
-          //float alpha   = is_floor ? (is_white ? 0.0 : 0.5) : 1.0;
-          //vec3 color    = is_floor ? vec3(0.0) : vec3(col);
+          // Applies other lights
+          for (int i = 0; i < light_len; ++i) {
+            vec3 lit_pos = light_pos[i];
+            float light_rng = light_rng[i];
+            float light_sub = light_sub[i];
+            float light_add = light_add[i];
+            vec3 lit_dir, ray_pos;
+            if (hit.pos.z > 0.0) {
+              lit_dir = normalize(lit_pos - hit.pos);
+              ray_pos = hit.pos + lit_dir * 1.5;
+            } else {
+              ray_pos = hit.pos + vec3(0.0,0.0,2.0);
+              lit_dir = normalize(lit_pos - ray_pos);
+            }
+            float lit_dst = distance(ray_pos, lit_pos);
+            if (lit_dst < light_rng) {
+              Hit hit = march(ray_pos, lit_dir, voxels, lit_dst);
+              if (hit.ctr == HIT) {
+                lit_dst = inf;
+              }
+            }
+            float pw = 1.0 - min(lit_dst*lit_dst/(light_rng*light_rng),1.0);
+            col.r *= 1.0 - light_sub*(1.0-pw);
+            col.g *= 1.0 - light_sub*(1.0-pw);
+            col.b *= 1.0 - light_sub*(1.0-pw);
+            col.r *= 1.0 + light_add*pw;
+            col.g *= 1.0 + light_add*pw;
+            col.b *= 1.0 + light_add*pw;
+          }
 
           vec3 color  = vec3(col);
           float alpha = 1.0;
-
           outColor = vec4(color, alpha);
-          //outColor = vec4(1.0,0.5,0.5,1.0);
         //} else if (hit.ctr == MIS) {
           //outColor = vec4(0.9,1.0,0.9,1.0);
         //} else if (hit.ctr == PAS) {
@@ -469,7 +507,7 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
     gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0); 
     gl.enableVertexAttribArray(coord);
       
-    canvas.draw = function({voxels, stage, cam}) {
+    canvas.draw = function({voxels, stage, cam, lights}) {
       var cam = setup_cam(cam);
 
       // Canvas setup
@@ -503,6 +541,23 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
           gl.RGBA, gl.UNSIGNED_BYTE, transfer_buffer_u8);
         canvox.__uploaded_stage__ = true;
       }
+
+      // Uploads lights to GPU
+      var light_pos = [];
+      var light_rng = [];
+      var light_sub = [];
+      var light_add = [];
+      for (var i = 0; i < lights.length; ++i) {
+        light_pos.push(lights[i].pos.x, lights[i].pos.y, lights[i].pos.z);
+        light_rng.push(lights[i].rng);
+        light_sub.push(lights[i].sub);
+        light_add.push(lights[i].add);
+      }
+      gl.uniform1i(gl.getUniformLocation(shader, "light_len"), lights.length);
+      gl.uniform3fv(gl.getUniformLocation(shader, "light_pos"), light_pos);
+      gl.uniform1fv(gl.getUniformLocation(shader, "light_rng"), light_rng);
+      gl.uniform1fv(gl.getUniformLocation(shader, "light_sub"), light_sub);
+      gl.uniform1fv(gl.getUniformLocation(shader, "light_add"), light_add);
 
       // Uploads camera to GPU
       gl.uniform3fv(

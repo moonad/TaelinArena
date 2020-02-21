@@ -26,6 +26,9 @@ T Hit
 TxFunction : Type
   Thing -> Thing
 
+T Light
+| light(pos: V3, rng: Number, sub: Number, add: Number)
+
 T Thing
 | thing(
   fun : TxFunction,  // transaction function
@@ -33,6 +36,7 @@ T Thing
   pid : PlayerId,    // number of player controlling this
   mid : ModelId,     // id of model to be rendered
   act : ActionId,    // number of action this is performing
+  lit : List(Light), // list of lights to render
   tik : Number,      // ticks passed since last act change
   pos : V3,          // in-game position
   mov : Number,      // movement speed
@@ -65,7 +69,12 @@ T Command
 | command(pid: PlayerId, inp: Input)
 
 T Draw
-| draw(model: Number, pos: V3, dir: V3, dmg: Number)
+| draw(
+  mid: Number,
+  pos: V3,
+  dir: V3,
+  lit: List(Light),
+  dmg: Number)
 
 // Gets a thing from game by its id
 get_thing_by_pid(pid: PlayerId, gm: Game) : Maybe(Thing)
@@ -102,6 +111,7 @@ new_thing(fun: TxFunction) : Thing
   let pid = 0
   let mid = 0xFFFFFFFF
   let act = 0
+  let lit = nil(_)
   let tik = 0
   let pos = v3(0,0,0)
   let mov = 8
@@ -117,9 +127,9 @@ new_thing(fun: TxFunction) : Thing
   let hit = none(_)
   let die = false
   thing(
-    fun,tid,pid,mid,act,tik,pos,mov,
-    bst,wlk,dir,trg,vel,box,dmg,knk,
-    chi,hit,die)
+    fun,tid,pid,mid,act,lit,tik,pos,
+    mov,bst,wlk,dir,trg,vel,box,dmg,
+    knk,chi,hit,die)
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated
@@ -201,6 +211,17 @@ die(
   self   : Thing,
   at_tik : Number)
   self <= thing(die = if tik === at_tik then true else false)
+
+// Creates lights at given tick
+illumine(
+  self     : Thing,
+  from_tik : Number,
+  to_tik   : Number,
+  lights   : List(Light))
+  self <= thing(lit =
+    if (tik > from_tik) && (tik < to_tik) 
+      then lights
+      else nil(_))
 
 // Returns the direction the thing is looking to
 look_dir(self: Thing)
