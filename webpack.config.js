@@ -5,7 +5,7 @@ const formalityResolver = require('formality-loader').resolver
 module.exports = {
   mode: 'production',
   optimization: {
-    minimize: false
+    minimize: true
   },
   entry: './src/index.js',
   module: {
