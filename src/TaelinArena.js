@@ -354,7 +354,7 @@ var hero_id = {
   bleskape: TA.BLESKAPE_THING,
   kakashi: TA.KAKASHI_THING,
   finn: TA.FINN_THING,
-  zagatur: TA.ZAGATUR
+  zagatur: TA.ZAGATUR_THING,
 };
 
 var hero_name = {
@@ -372,7 +372,7 @@ var hero_name = {
   [TA.BLESKAPE_THING]: "Bleskape",
   [TA.KAKASHI_THING]: "Kakashi",
   [TA.FINN_THING]: "Finn",
-  [TA.ZAGATUR_THING]: "Zagatur"
+  [TA.ZAGATUR_THING]: "Zagatur",
 };
 
 module.exports = {
