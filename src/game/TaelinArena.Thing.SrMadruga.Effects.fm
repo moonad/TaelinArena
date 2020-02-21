@@ -1,0 +1,16 @@
+import TaelinArena.Game
+
+sr_madruga_frying_pan_fun(self: Thing) : Thing
+  let self = animate(self, 0, SR_MADRUGA_FRYING_PAN_CASTING_000, 4, 8)
+  let self = self <= thing(die = if tik === 8 then true else false)
+  self
+
+sr_madruga_shoemaker_glue_fun(self: Thing) : Thing
+  let self = animate(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_CASTING_000, 4, 8)
+  let self = self <= thing(die = if tik === 8 then true else false)
+  self
+
+sr_madruga_explosive_photo_fun(self: Thing) : Thing
+  let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_CASTING_000, 3, 6)
+  let self = self <= thing(die = if tik === 6 then true else false)
+  self

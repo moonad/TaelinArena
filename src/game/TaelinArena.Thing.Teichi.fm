@@ -1,0 +1,46 @@
+import TaelinArena.Game
+
+enum
+| TEICHI_IDLE
+| TEICHI_BASE_ATTACK
+| TEICHI_PEEK_A_BOO
+| TEICHI_SPECTRAL_TWICE
+| TEICHI_PHANTOM_SPLIT
+| TEICHI_TELEPORT
+| TEICHI_TAUNT
+
+teichi_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  case self |thing switch self.act
+
+  |TEICHI_IDLE
+    case self.wlk
+    | true  => animate(self, 1, TEICHI_WALK_000, 8, 16)
+    | false => animate(self, 1, TEICHI_IDLE_000, 6, 12)
+
+  // Left
+  |TEICHI_BASE_ATTACK
+    animate(self, 1, TEICHI_BASE_ATTACK_VAR_3_000, 4, 8)
+
+  // Middle
+  |TEICHI_PEEK_A_BOO
+    animate(self, 1, TEICHI_PEEK_A_BOO_DISSOLVE_000, 12, 24)
+
+  // Right
+  |TEICHI_SPECTRAL_TWICE
+    animate(self, 0, TEICHI_SPECTRAL_TWICE_000, 30, 60)
+
+  // Space
+  |TEICHI_PHANTOM_SPLIT
+    animate(self, 0, TEICHI_PHANTOM_SPLIT_000, 26, 52)
+
+  |TEICHI_TELEPORT
+    let self = animate(self, 0, TEICHI_TELEPORT_IN_000, 16, 32)
+    let self = blink(self, 22, self.trg)
+    self
+
+  |TEICHI_TAUNT
+    animate(self, 0, TEICHI_TAUNT_RESTING_DOWN_000, 10, 20)
+
+  else self

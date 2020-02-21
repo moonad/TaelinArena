@@ -1,0 +1,44 @@
+import TaelinArena.Game
+
+enum
+| BENFIX_IDLE
+| BENFIX_DOUBLE_ATTACK
+| BENFIX_SEISMIC_JUMP
+| BENFIX_STEEL_TORNADO
+| BENFIX_GIGA_DASH
+| BENFIX_DASH
+| BENFIX_TAUNT
+
+benfix_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 5)
+
+  case self |thing switch self.act
+
+  |BENFIX_IDLE
+    case self.wlk
+    | true  => animate(self, 1, BENFIX_WALK_000, 7, 14)
+    | false => animate(self, 1, BENFIX_IDLE_000, 12, 24)
+
+  // Left 
+  |BENFIX_DOUBLE_ATTACK
+    animate(self, 0, BENFIX_TRIPLE_ATTACK_1_000, 14, 28)
+
+  // Middle
+  |BENFIX_SEISMIC_JUMP
+    animate(self, 0, BENFIX_SEISMIC_JUMP_000, 10, 30)
+
+  // Right
+  |BENFIX_STEEL_TORNADO
+    animate(self, 0, BENFIX_STEEL_TORNADO_000, 4, 12)
+
+  // Space
+  |BENFIX_GIGA_DASH
+    animate(self, 1, BENFIX_GIGA_DASH_000, 22, 44)
+    
+  |BENFIX_DASH
+    animate(self, 1, BENFIX_DASH_000, 9, 18)
+
+  |BENFIX_TAUNT
+    animate(self, 0, BENFIX_TAUNT_000, 16, 32)
+
+  else self

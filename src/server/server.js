@@ -8,7 +8,7 @@ var fs = require("fs").promises;
 var path = require("path");
 var db = require("./db.js");
 var ethers = require("ethers");
-var TA = require("./../TaelinArena.js");
+var TA = await require("./../TaelinArena.js");
 var GS = require("./game.js");
 
 // API
@@ -120,11 +120,11 @@ app.post("/get_game", async (req, res) => {
 app.post("/offer", (req, res) => {
   var name = req.body.name;
   var peer = new Peer({initiator: true, wrtc, tricke: true});
-  var game = TA.NIL_GAME;
+  var game = TA.OFF_GAME;
   var turn = 0;
 
   peer.team = "spec";
-  peer.hero = "MikeGator";
+  peer.hero = "Tupitree";
   peer.do_send = (msg) => {
     if (peer._pcReady) {
       try { peer.send(msg); }
@@ -151,23 +151,21 @@ app.post("/offer", (req, res) => {
 
   // Continuously sends room info if not watching game
   var room_feed = setInterval(() => {
-    if (game === TA.NIL_GAME) {
-      var players = [];
-      for (var peer_name in peers) {
-        var player = "";
-        switch (peers[peer_name].team) {
-          case "red" : player += "<"; break;
-          case "spec": player += "^"; break;
-          case "blue": player += ">"; break;
-        }
-        player += peer_name;
-        player += "!";
-        player += peers[peer_name].hero;
-        players.push(player);
+    var players = [];
+    for (var peer_name in peers) {
+      var player = "";
+      switch (peers[peer_name].team) {
+        case "red" : player += "<"; break;
+        case "spec": player += "^"; break;
+        case "blue": player += ">"; break;
       }
-      peer.do_send(players.join(","));
+      player += peer_name;
+      player += "!";
+      player += peers[peer_name].hero;
+      players.push(player);
     }
-  }, 500);
+    peer.do_send(players.join(","));
+  }, 1000);
 
   peer.on("signal", data => {
     if (data.type === "offer") {
@@ -233,7 +231,7 @@ app.post("/offer", (req, res) => {
 
       // Player wants to perform an in-game input.
       case "$":
-        if (game !== TA.NIL_GAME) {
+        if (game !== TA.OFF_GAME) {
           gs.perform_input(game, name, str.slice(1));
         }
         break;

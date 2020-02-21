@@ -1,6 +1,6 @@
 const TA = require("./../TaelinArena.js");
 
-module.exports = function controls(on_input) {
+module.exports = function Controls(on_input) {
   var self = {};
   self.keyboard = {};
   self.pointer = {x:0,y:0};
@@ -27,10 +27,10 @@ module.exports = function controls(on_input) {
     self.keyboard[key_name[key]] = [0,0];
   }
 
-  function center_mouse() {
-    self.cam_pos = {x:0, y:0};
-    self.pointer = {x:0, y:0};
-  };
+  //function center_mouse() {
+    //self.cam_pos = {x:0, y:0};
+    //self.pointer = {x:0, y:0};
+  //};
 
   function make_netcode() {
     var code = TA.make_input_netcode(self.keyboard, self.pointer);
@@ -63,20 +63,20 @@ module.exports = function controls(on_input) {
     var pos_y = self.cam_pos.y - 2048*cos;
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
-    // Maximum screen size covers 480x270 in-game pixels
-    if (W > H) {
-      var size = {x:480, y:H*480/W};
-    } else {
-      var size = {x:W*270/H, y:270};
-    }
+    // Maximum screen size covers 1024x512 in-game pixels
+    var swid = 896;
+    var shei = 384;
+    let fact = W / swid;
+    var size = {x:swid, y:shei*cos};
+    var port = {x:swid*fact, y:shei*fact*cos};
     return {
       pos   : pos, // center pos
-      ang   : ang,
+      ang   : ang, // camera angle
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
       size  : size, // world size
-      port  : {x:W, y:H}, // browser size
+      port  : port, // browser size
       res   : 1.0, // rays_per_pixel = res^2
     };
   };
@@ -165,15 +165,15 @@ module.exports = function controls(on_input) {
     } else {
       cam_dir.y = 0;
     }
-    if (self.keyboard.arrowleft[1]) cam_dir.x -= 4;
-    if (self.keyboard.arrowright[1]) cam_dir.x += 4;
-    if (self.keyboard.arrowdown[1]) cam_dir.y -= 4;
-    if (self.keyboard.arrowup[1]) cam_dir.y += 4;
-    self.cam_pos.x += cam_dir.x;
-    self.cam_pos.y += cam_dir.y;
+    //if (self.keyboard.arrowleft[1]) cam_dir.x -= 4;
+    //if (self.keyboard.arrowright[1]) cam_dir.x += 4;
+    //if (self.keyboard.arrowdown[1]) cam_dir.y -= 4;
+    //if (self.keyboard.arrowup[1]) cam_dir.y += 4;
+    //self.cam_pos.x += cam_dir.x;
+    //self.cam_pos.y += cam_dir.y;
   }, 1000 / 60);
 
-  self.center_mouse = center_mouse;
+  //self.center_mouse = center_mouse;
   self.make_netcode = make_netcode;
   self.make_canvox_cam = make_canvox_cam;
   self.set_mouse_pos = set_mouse_pos;

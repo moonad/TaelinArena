@@ -1,10 +1,13 @@
 const oct = require("./octree.js"); 
 
+var tree = null;
 function build_voxel_octree(voxels) {
-  var tree = oct.empty();
-  for (var i = 0; i < voxels.length / 2; ++i) {
-    var pos = voxels[i*2+0];
-    var col = voxels[i*2+1];
+  tree = oct.empty(256*256*256, tree);
+  var voxels_data = voxels.data;
+  var voxels_size = voxels.size;
+  for (var i = 0; i < voxels_size / 2; ++i) {
+    var pos = voxels_data[i*2+0];
+    var col = voxels_data[i*2+1];
     var vx  = ((pos >>> 20) & 0x3FF) - 512;
     var vy  = ((pos >>> 10) & 0x3FF) - 512;
     var vz  = ((pos >>>  0) & 0x3FF) - 512;
@@ -37,6 +40,7 @@ function setup_cam(cam) {
     var pos = {x:0,y:-2048*cos,z:2048*sin};
     var cam = {
       pos   : pos, // center pos
+      ang   : ang,
       right : right, // right direction
       down  : down, // down direction
       front : front, // front direction
@@ -50,30 +54,27 @@ function setup_cam(cam) {
   return cam;
 };
 
-module.exports = function canvox(opts = {}) {
-  var mode;
-  if (window.location.search.indexOf("cpu") !== -1) {
-    mode = "CPU";
-  } else {
-    mode = opts.mode || "GPU";
-  }
-
+module.exports = function canvox(opts = {mode: "GPU"}) {
   var canvas = document.createElement("canvas");
   //canvas.style.border = "1px solid gray";
   canvas.style["image-rendering"] = "pixelated";
+  canvas.render_mode = opts.mode;
 
   // CPU MODE
-  if (mode === "CPU") {
+  if (opts.mode === "CPU") {
     var context = canvas.getContext("2d");
     canvas.draw = ({voxels, stage, cam}) => {
+      var voxels_data = voxels.data;
+      var voxels_size = voxels.size;
+
       // Camera and viewport
       var cam = setup_cam(cam);
 
       // Canvas setup
       canvas.width = cam.size.x * cam.res;
       canvas.height = cam.size.y * cam.res;
-      canvas.style.width = cam.port.x + "px";
-      canvas.style.height = cam.port.y + "px";
+      canvas.style.width = Math.floor(cam.port.x) + "px";
+      canvas.style.height = Math.floor(cam.port.y) + "px";
       if (!canvas.image_data) {
         canvas.image_data = context.getImageData(
           0, 0, canvas.width, canvas.height);
@@ -83,87 +84,72 @@ module.exports = function canvox(opts = {}) {
           canvas.image_buf);
         canvas.image_u32 = new Uint32Array(
           canvas.image_buf);
+        canvas.depth_buf = new ArrayBuffer(
+          canvas.image_u32.length);
+        canvas.depth_u8 = new Uint8Array(
+          canvas.depth_buf);
+      }
+      var clr = [];
+      var cos = Math.cos(cam.ang);
+
+      // Draws shadows
+      for (var v = 0; v < voxels_size / 2; ++v) {
+        var pos = voxels_data[v*2+0];
+        var vx  = ((pos >>> 20) & 0x3FF) - 512;
+        var vy  = ((pos >>> 10) & 0x3FF) - 512;
+        var vz  = 0;
+        var col = 0xFFD8D8D8;
+        var i   = Math.floor(cam.size.x*0.5 + vx);
+        var j   = Math.floor(cam.size.y*0.5 - vy*cos - vz*cos);
+        var k   = 0;
+        var idx = j * Math.floor(cam.size.x*cam.res) + i;
+        var dpt = canvas.depth_u8[idx];
+        if (k >= dpt) {
+          canvas.image_u32[idx] = col;
+          canvas.depth_u8[idx] = k;
+          clr.push(idx);
+        }
       }
 
-      // Builds voxel octree
-      var tree = build_voxel_octree(voxels);
-
-      // For each pixel on the screen
-      var dx = 2 / (cam.size.x * cam.res);
-      var dy = 2 / (cam.size.y * cam.res);
-      for (var scr_pos_y = -1; scr_pos_y <= 1; scr_pos_y += dy) {
-        for (var scr_pos_x = -1; scr_pos_x < 1; scr_pos_x += dx) {
-
-          // Computes ray position
-          var ray_pos_x = cam.pos.x;
-          var ray_pos_y = cam.pos.y;
-          var ray_pos_z = cam.pos.z;
-          ray_pos_x += cam.right.x*cam.size.x*scr_pos_x*0.5;
-          ray_pos_y += cam.right.y*cam.size.x*scr_pos_x*0.5;
-          ray_pos_z += cam.right.z*cam.size.x*scr_pos_x*0.5;
-          ray_pos_x += cam.down.x *cam.size.y*scr_pos_y*0.5;
-          ray_pos_y += cam.down.y *cam.size.y*scr_pos_y*0.5;
-          ray_pos_z += cam.down.z *cam.size.y*scr_pos_y*0.5;
-
-          // Computes ray direction
-          var ray_dir_x = cam.front.x;
-          var ray_dir_y = cam.front.y;
-          var ray_dir_z = cam.front.z;
-
-          // Performs the march
-          var hit1 = oct.march(
-            ray_pos_x, ray_pos_y, ray_pos_z,
-            ray_dir_x, ray_dir_y, ray_dir_z,
-            tree);
-          // TODO: re-add stage on CPU mode
-          if (stage) {
-            var hit2 = oct.march(
-              ray_pos_x, ray_pos_y, ray_pos_z,
-              ray_dir_x, ray_dir_y, ray_dir_z,
-              stage);
-            if (hit2.ctr === oct.HIT) {
-              var dist1 = 0;
-              var dist1 = dist1+(ray_pos_x-hit1.pos.x)**2;
-              var dist1 = dist1+(ray_pos_y-hit1.pos.y)**2;
-              var dist1 = dist1+(ray_pos_z-hit1.pos.z)**2;
-              var dist2 = 0;
-              var dist2 = dist2+(ray_pos_x-hit2.pos.x)**2;
-              var dist2 = dist2+(ray_pos_y-hit2.pos.y)**2;
-              var dist2 = dist2+(ray_pos_z-hit2.pos.z)**2;
-              var hit = dist1 < dist2 ? hit1 : hit2;
-            } else {
-              var hit = hit1;
-            }
-          } else {
-            var hit = hit1;
-          }
-
-          // Renders to screen
-          var j = Math.floor((scr_pos_y+1)/2*(cam.size.y*cam.res));
-          var i = Math.floor((scr_pos_x+1)/2*(cam.size.x*cam.res));
-          var n = j * Math.floor(cam.size.x*cam.res) + i;
-          switch (hit.ctr) {
-            case oct.HIT:
-              var pos = hit.pos;
-              var col = hit.val & oct.VAL;
-              canvas.image_u32[n] = col | 0xFF000000;
-              break;
-            default:
-              canvas.image_u32[n] = 0;
-              break;
-          }
+      // Draws models
+      for (var v = 0; v < voxels_size / 2; ++v) {
+        var pos = voxels_data[v*2+0];
+        var col = voxels_data[v*2+1];
+        var vx  = ((pos >>> 20) & 0x3FF) - 512;
+        var vy  = ((pos >>> 10) & 0x3FF) - 512;
+        var vz  = ((pos >>>  0) & 0x3FF) - 512;
+        var vr  = (col >>> 24) & 0xFF;
+        var vg  = (col >>> 16) & 0xFF;
+        var vb  = (col >>>  8) & 0xFF;
+        var col = vr | (vg<<8) | (vb<<16) | (0xFF<<24);
+        var i   = Math.floor(cam.size.x*0.5 + vx);
+        var j   = Math.floor(cam.size.y*0.5 - vy*cos - vz*cos);
+        var k   = Math.min(Math.max(Math.floor(vz), 0), 256);
+        var idx = j * Math.floor(cam.size.x*cam.res) + i;
+        var dpt = canvas.depth_u8[idx];
+        if (k >= dpt) {
+          canvas.image_u32[idx] = col;
+          canvas.depth_u8[idx] = k;
+          clr.push(idx);
         }
       }
 
       // Draws buffers to screen
       canvas.image_data.data.set(canvas.image_u8);
       context.putImageData(canvas.image_data, 0, 0);
+
+      // Clears pixels
+      for (var i = 0; i < clr.length; ++i) {
+        var idx = clr[i];
+        canvas.image_u32[idx] = 0;
+        canvas.depth_u8[idx] = 0;
+      }
     };
     return canvas;
   };
 
   // GPU MODE
-  if (mode === "GPU") {
+  if (opts.mode === "GPU") {
     var gl = canvas.getContext('webgl2');
 
     var vertices = [-1,1,0,-1,-1,0,1,-1,0,-1,1,0,1,1,0,1,-1,0,];
@@ -328,13 +314,13 @@ module.exports = function canvox(opts = {}) {
           ray.x += dir.x * eps;
           ray.y += dir.y * eps;
           ray.z += dir.z * eps;
-          // comment this to test with a fake floor instead
-          //if (ray.z <= 0.0) {
-            //hit.ctr = HIT;
-            //hit.pos = ray;
-            //hit.val = 0xFFFFFFu & VAL;
-            //return hit;
-          //}
+          // Floor at z=0
+          if (ray.z <= 0.0) {
+            hit.ctr = HIT;
+            hit.pos = ray;
+            hit.val = 0xFCFCFCu & VAL;
+            return hit;
+          }
           uint got = lookup(octree, ray);
           if ((got&CTR) == NOP) {
             uint lv = 10u - (got & VAL);
@@ -378,29 +364,38 @@ module.exports = function canvox(opts = {}) {
 
         // Marches towards octree
         Hit hit1 = march(ray_pos, ray_dir, voxels);
-        Hit hit2 = march(ray_pos, ray_dir, stage);
-        float dist1 = distance(hit1.pos, ray_pos);
-        float dist2 = distance(hit2.pos, ray_pos);
-        Hit hit;
-        if (hit2.ctr == HIT && dist1 > dist2) {
-          hit = hit2;
-        } else {
-          hit = hit1;
-        }
+        Hit hit = hit1;
+        //Hit hit2 = march(ray_pos, ray_dir, stage);
+        //float dist1 = distance(hit1.pos, ray_pos);
+        //float dist2 = distance(hit2.pos, ray_pos);
+        //Hit hit;
+        //if (hit2.ctr == HIT && dist1 > dist2) {
+          //hit = hit2;
+        //} else {
+          //hit = hit1;
+        //}
         
         // If it hit a voxel, draw it
         if (hit.ctr == HIT) {
           vec4 col = uint_to_vec4(hit.val);
 
-          vec3 sun_dir = vec3(1.0,-1.0,1.0);
+          vec3 sun_dir = vec3(0.0,0.0,1.0);
           Hit sky = march(hit.pos, sun_dir, voxels);
           if (sky.ctr == HIT) {
-            col.r *= 0.7;
-            col.g *= 0.7;
-            col.b *= 0.7;
+            col.r *= 0.85;
+            col.g *= 0.85;
+            col.b *= 0.85;
           }
 
-          outColor = vec4(vec3(col),1.0);
+          //bool is_floor = hit.pos.z < 0.0;
+          //bool is_white = col.r >= 1.0 && col.g >= 1.0 && col.b >= 1.0;
+          //float alpha   = is_floor ? (is_white ? 0.0 : 0.5) : 1.0;
+          //vec3 color    = is_floor ? vec3(0.0) : vec3(col);
+
+          vec3 color  = vec3(col);
+          float alpha = 1.0;
+
+          outColor = vec4(color, alpha);
           //outColor = vec4(1.0,0.5,0.5,1.0);
         //} else if (hit.ctr == MIS) {
           //outColor = vec4(0.9,1.0,0.9,1.0);
@@ -483,15 +478,17 @@ module.exports = function canvox(opts = {}) {
       canvas.height = cam.size.y * cam.res;
       canvas.width -= canvas.width % 2;
       canvas.height -= canvas.height % 2;
-      canvas.style.width = cam.port.x + "px";
-      canvas.style.height = cam.port.y + "px";
+      canvas.style.width = Math.floor(cam.port.x) + "px";
+      canvas.style.height = Math.floor(cam.port.y) + "px";
 
       // Builds voxels octree and uploads to GPU
       var tree = build_voxel_octree(voxels);
-      for (var i = 0; i < tree.length; ++i) {
-        transfer_buffer_u32[i] = tree[i] >>> 0;
+      var tree_size = tree.size;
+      var tree_data = tree.data;
+      for (var i = 0; i < tree_size; ++i) {
+        transfer_buffer_u32[i] = tree_data[i] >>> 0;
       }
-      var size = [2048, Math.ceil(tree.length/2048)];
+      var size = [2048, Math.ceil(tree_size/2048)];
       gl.activeTexture(gl.TEXTURE0);
       gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,...size,
         gl.RGBA, gl.UNSIGNED_BYTE, transfer_buffer_u8);

@@ -1,0 +1,45 @@
+import TaelinArena.Game
+
+enum
+| ZOIO_IDLE
+| ZOIO_SPINNING_JUMP
+| ZOIO_WELL
+| ZOIO_BIG_EYE_RAY
+| ZOIO_HIPONOTIZING_FIELD
+| ZOIO_DASH
+| ZOIO_BLOCK
+
+zoio_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |ZOIO_IDLE
+    case self.wlk
+    | true  => animate(self, 1, ZOIO_WALK_000, 7, 14)
+    | false => animate(self, 1, ZOIO_IDLE_000, 7, 14)
+
+  |ZOIO_SPINNING_JUMP
+    animate(self, 1, ZOIO_SPINNING_JUMP_000, 11, 22)
+
+  // TODO: fix naming
+  |ZOIO_WELL
+    let self = animate(self, 0, ZOIO_ZOIO_WELL_000, 14, 28)
+    let self = blink(self, 14, self.trg)
+    self
+
+  |ZOIO_BIG_EYE_RAY
+    animate(self, 0, ZOIO_ATTACK_000, 8, 16)
+
+  |ZOIO_HIPONOTIZING_FIELD
+    animate(self, 0, ZOIO_HIPONOTIZING_FIELD_000, 22, 44)
+
+  |ZOIO_DASH
+    let self = animate(self, 1, ZOIO_DASH_000, 8, 16)
+    let self = dash(self, 4, 6,16)
+    self
+
+  |ZOIO_BLOCK
+    animate(self, 0, ZOIO_BLOCK_000, 11, 22)
+
+  else self

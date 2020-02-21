@@ -1,0 +1,34 @@
+import TaelinArena.Game
+
+// Higher Ground
+tophoro_higher_ground_init_fun(self: Thing) : Thing
+  let self = animate(self, 0, TOPHORO_HIGHER_GROUND_ROCK_EXPLOSION_000, 4, 8)
+  let self = self <= thing(die = if tik === 8 then true else false)
+  self
+
+tophoro_higher_ground_effect_fun(self: Thing) : Thing
+  let self = animate(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 30)
+  let self = self <= thing(die = if tik === 30 then true else false)
+  self
+
+tophoro_earth_wall_fun(self: Thing) : Thing
+  let self = animate(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 9, 18)
+  let self = self <= thing(die = if tik === 18 then true else false)
+  self
+
+// Earth Rise
+tophoro_eath_rise_rock_formation_fun(self: Thing) : Thing
+  let self = animate(self, 0, TOPHORO_EARTH_RISE_ROCK_FORMATION_000, 1, 4)
+  let self = self <= thing(die = if tik === 4 then true else false)
+  self
+
+tophoro_eath_rise_effect_fun(self: Thing) : Thing
+  let self = animate(self, 0, TOPHORO_EARTH_RISE_ROCK_000, 5, 10)
+  let self = self <= thing(die = if tik === 10 then true else false)
+  self
+
+// Ground force
+tophoro_ground_force_fun(self: Thing) : Thing
+  let self = animate(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 8, 25)
+  let self = self <= thing(die = if tik === 25 then true else false)
+  self

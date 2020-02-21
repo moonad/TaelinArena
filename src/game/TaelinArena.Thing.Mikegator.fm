@@ -1,0 +1,49 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Mikegator.Earth
+
+enum
+| MIKEGATOR_IDLE
+| MIKEGATOR_ATTACK
+| MIKEGATOR_EARTHBENDING
+| MIKEGATOR_SPINTAIL
+| MIKEGATOR_SUPREME_UPPERCUT
+| MIKEGATOR_DASH
+| MIKEGATOR_BLOCK
+
+mikegator_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |MIKEGATOR_IDLE
+    case self.wlk
+    | true  => animate(self, 1, MIKEGATOR_WALK_000, 8, 16)
+    | false => animate(self, 1, MIKEGATOR_IDLE_000, 6, 12)
+
+  |MIKEGATOR_ATTACK
+    animate(self, 1, MIKEGATOR_ATTACK_000, 6, 10)
+
+  |MIKEGATOR_EARTHBENDING
+    let self = animate(self, 1, MIKEGATOR_EARTHBENDING_000, 9, 18)
+    let make = new_thing(mikegator_earth_fun)
+    let self = spawn(self, 10, self.trg, make)
+    self
+
+  |MIKEGATOR_SPINTAIL
+    animate(self, 0, MIKEGATOR_SPINTAIL_000, 8, 16)
+
+  |MIKEGATOR_SUPREME_UPPERCUT
+    let self = animate(self, 0.5, MIKEGATOR_SUPREME_UPPERCUT_000, 14, 28)
+    let self = dash(self, 8, 18, 21)
+    self
+
+  |MIKEGATOR_DASH
+    let self = animate(self, 1, MIKEGATOR_DASH_000, 7, 14)
+    let self = dash(self, 4, 0, 12)
+    self
+
+  |MIKEGATOR_BLOCK
+    let self = animate(self, 0, MIKEGATOR_BLOCK_000, 9, 18)
+    self
+
+  else self

@@ -1,0 +1,50 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Finn.Effects
+
+enum
+| FINN_IDLE
+| FINN_TRIPLE_TAKE
+| FINN_BMO_S_FLASH
+| FINN_BOW
+| FINN_JAKES_FURY
+| FINN_TAUNT
+| FINN_EVADE
+
+finn_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 5)
+
+  case self |thing switch self.act
+
+  |FINN_IDLE
+    case self.wlk
+    | true  => animate(self, 1, FINN_WALK_CYCLE_000, 8, 16)
+    | false => animate(self, 1, FINN_IDLE_000, 5, 10)
+
+  // Left 
+  |FINN_TRIPLE_TAKE
+    animate(self, 1, FINN_TRIPLE_TAKE_000, 17, 34)
+
+  // Middle
+  |FINN_BMO_S_FLASH
+    animate(self, 0, FINN_BMO_S_FLASH_000, 13, 26)
+
+  // Right
+  |FINN_BOW
+    let self = animate(self, 0, FINN_BOW_CAST_ANIMATION_000, 7, 14)
+    let arrow = new_thing(finn_bow_effect)
+    let self = spawn(self, 12, self.trg, arrow)
+    self
+
+  // Space
+  |FINN_JAKES_FURY
+    animate(self, 1, FINN_JAKE_S_FURY_000, 26, 52)
+
+  | FINN_TAUNT
+    animate(self, 0, FINN_TAUNT_000, 17, 34)
+
+  | FINN_EVADE
+    let self = animate(self, 1, FINN_EVADE_000, 6, 12)
+    let self = dash(self, 4, 0, 12)
+    self
+
+  else self

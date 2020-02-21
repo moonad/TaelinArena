@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+shao_balun_fun(self: Thing) : Thing
+  let self = animate(self, 0, SHAO_BALUN_000, 16, 32)
+  let self = self <= thing(die = if tik === 32 then true else false)
+  self

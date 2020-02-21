@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+shao_hurricane_fun(self: Thing) : Thing
+  let self = animate(self, 0, SHAO_HURRICANE_000, 26, 52)
+  let self = die(self, 52)
+  self

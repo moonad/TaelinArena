@@ -1,0 +1,54 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Min.Effects
+
+enum
+| MIN_IDLE
+| MIN_FLAME_SLASH
+| MIN_FIRE_MARK
+| MIN_MELTING_CUTS
+| MIN_DRAGONS_PERISHMENT
+| MIN_DASH
+| MIN_TAUNT
+
+min_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 6)
+
+  case self |thing switch self.act
+
+  |MIN_IDLE
+    case self.wlk
+    | true  => animate(self, 1, MIN_RUN_000, 6, 12)
+    | false => animate(self, 1, MIN_IDLE_000, 3, 12)
+
+  |MIN_FLAME_SLASH
+    animate(self, 0, MIN_FLAME_SLASH_CAST_000, 6, 14)
+
+  // TODO: add fading effect and teleport
+  |MIN_FIRE_MARK
+    let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 12)
+    let make = new_thing(min_fire_mark_effect)
+    let self = spawn(self, 10, self.trg, make)
+    // let make = new_thing(min_fire_mark_effect_fading)
+    // let self = spawn(self, 10, self.trg, make)
+    // let tele = new_thing(min_fire_mark_teleport)
+    // let self = spawn(self, 6, self.trg, tele)
+    self
+
+  |MIN_MELTING_CUTS
+    animate(self, 1, MIN_MELTING_CUTS_000, 9, 20)
+    
+  |MIN_DRAGONS_PERISHMENT
+    let self = animate(self, 1, MIN_DRAGONS_PERISHMENT_CAST_000, 1, 25)
+    let make = new_thing(min_dragons_perishment) 
+    let self = spawn(self, 0, self.pos, make)
+    self
+
+  |MIN_DASH
+    let self = animate(self, 0, MIN_DASH_000, 3, 6)
+    let self = dash(self, 12, 0,3)
+    self
+
+  |MIN_TAUNT
+    animate(self, 1, MIN_TAUNT_000, 5, 12)
+
+  else self
