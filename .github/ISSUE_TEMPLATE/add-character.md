@@ -42,7 +42,8 @@ assignees: ''
 *Describe how you imagine the attack animation and cast.*  
 *You can add sketches, references and later on add gifs you did on MagicaVoxel*
 
-###OPTIONAL
+## OPTIONAL
+
 ## [E] TAUNT
 *Taunt is a funny animation you character will do like laugh, dance aiming to make fun of the enemies*
 
