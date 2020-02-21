@@ -11,7 +11,6 @@ const post = (func, body) => {
 
 const Register = require("./Register.js");
 const GameList = require("./GameList.js");
-const Room = require("./Room.js");
 const Chat = require("./Chat.js");
 
 const Game = require("./Main.game.js");
@@ -28,13 +27,14 @@ class Main extends Component {
     this.room_players = null;
     this.chat_msgs = [];
     this.game = null;
+    this.auto_join = true;
     this.controls = Controls(nc => this.send_inputs(nc));
     this.render_mode = "GPU";
     this.picked_hero = "Tupitree";
     this.canvox = null;
     this.peer = null;
-    this.join(TA.OFF_GAME);
     //this.setup_canvox();
+    this.pick_hero("Tupitree");
     this.login();
   }
 
@@ -59,23 +59,25 @@ class Main extends Component {
 
     // Automatic game joiner
     this.game_joiner = setInterval(() => {
-      // Gets the last game
-      var gid = this.game_list.length - 1;
-      var game = this.game_list[gid];
-      if (game) {
-        var game_curr_time = (Date.now() - game.init)/1000;
-        var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
-        // If it is still running, join and return it
-        if (game_curr_time < game_stop_time) {
-          return this.join(gid);
-        // Otherwise, go offline
+      if (this.auto_join) {
+        // Gets the last game
+        var gid = this.game_list.length - 1;
+        var game = this.game_list[gid];
+        if (game) {
+          var game_curr_time = (Date.now() - game.init)/1000;
+          var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
+          // If it is still running, join and return it
+          if (game_curr_time < game_stop_time) {
+            return this.join(gid);
+          // Otherwise, go offline
+          } else {
+            return this.join(TA.OFF_GAME);
+          }
+        // If there is no active game, go offline
         } else {
           return this.join(TA.OFF_GAME);
         }
-      // If there is no active game, go offline
-      } else {
-        return this.join(TA.OFF_GAME);
-      }
+      };
     }, 500); 
     
     // Deals with incoming UDP data
@@ -159,7 +161,6 @@ class Main extends Component {
       switch (args[0]) {
         case "new":
         case "new_game":
-          if (this.name !== "MaiaVictor") return;
           if (args.length === 1) {
             var name = "game_"+((Math.random()*(2**32))>>>0);
             var players = this.room_players;
@@ -307,6 +308,19 @@ class Main extends Component {
         break;
     }
     this.forceUpdate();
+  }
+
+  // Selects a hero
+  pick_hero(hero) {
+    var picked_hid = TA.hero_id[hero.toLowerCase()];
+    if (picked_hid !== undefined) {
+      this.picked_hero = TA.hero_name[picked_hid];
+      if (this.game && this.game.gid === TA.OFF_GAME) {
+        this.game = null;
+        this.join(TA.OFF_GAME);
+      }
+      this.post("!" + this.picked_hero);
+    }
   }
 
   // Login procedure
@@ -474,17 +488,10 @@ class Main extends Component {
         var message = "Pick a hero. Options: " + heroes.join(", ");
         var picked_hero = prompt(message); 
         if (picked_hero) {
-          var picked_hid = TA.hero_id[picked_hero.toLowerCase()];
-          if (picked_hid !== undefined) {
-            this.picked_hero = TA.hero_name[picked_hid];
-            if (this.game && this.game.gid === TA.OFF_GAME) {
-              this.game = null;
-              this.join(TA.OFF_GAME);
-            }
-          }
-          return;
+          this.pick_hero(picked_hero);
+        } else {
+          alert("Invalid hero.");
         }
-        alert("Invalid hero.");
       },
       "style": {
         "text-decoration": "underline",
@@ -493,11 +500,29 @@ class Main extends Component {
     }, [
       this.picked_hero
     ]);
-    var current_game = this.game
-      ? (this.game.gid === TA.OFF_GAME
+    var current_game = h("span", {
+      "onclick": () => {
+        var gid = prompt("Enter game (or empty for offline):");
+        this.join(gid || TA.OFF_GAME);
+      },
+      "style": {
+        "text-decoration": this.auto_join ? null : "underline",
+        "cursor": this.auto_join ? null : "pointer",
+      }
+    }, [
+      !this.game || this.game.gid === TA.OFF_GAME
         ? "offline"
-        : "#" + this.game.gid)
-      : "";
+        : "#" + this.game.gid
+    ]);
+    var join_mode = h("span", {
+      "onclick": () => this.auto_join = !this.auto_join,
+      "style": {
+        "text-decoration": "underline",
+        "cursor": "pointer",
+      }
+    }, [
+      this.auto_join ? "auto-join" : "manual-join"
+    ]);
     var info_box = h("pre", {
       "style": {
         "width": "50%",
@@ -507,10 +532,11 @@ class Main extends Component {
       }
     }, [
       h("div", {}, "FPS  : " + (this.fps_numb||0)),
-      h("div", {}, ["Game : ", current_game]),
+      h("div", {}, ["Game : ", current_game, " (", join_mode, ")"]),
       h("div", {}, ["Mode : ", render_mode]),
       h("div", {}, ["Hero : ", picked_hero]),
       h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
+      h("div", {}, ["Room : ", this.room_players]),
     ]);
 
     // Bottom panel
