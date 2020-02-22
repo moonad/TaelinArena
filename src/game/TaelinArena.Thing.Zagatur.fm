@@ -27,7 +27,7 @@ zagatur_fun(self: Thing) : Thing
 
   // Middle
   |ZAGATUR_CLONE
-    let self = animate(self, 1, ZAGATUR_CLONE_000, 12, 24)
+    let self = animate(self, 1, ZAGATUR_IDLE_000, 4, 16)
     let make = new_thing(zagatur_clone_anim)
     let self = spawn(self, 10, self.trg, make)
     self
