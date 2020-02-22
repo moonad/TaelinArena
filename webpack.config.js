@@ -3,9 +3,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const formalityResolver = require('formality-loader').resolver
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   optimization: {
-    minimize: false
+    minimize: true
   },
   entry: './src/index.js',
   module: {

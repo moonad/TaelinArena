@@ -42,7 +42,7 @@ tophoro_fun(self: Thing) : Thing
     let self = spawn(self, 14, self.trg, new_thing(tophoro_eath_rise_effect_fun))
     self
 
-  // Space
+  // Q
   |TOPHORO_GROUND_FORCE
     let self = animate(self, 0, TOPHORO_GROUND_FORCE_000, 23, 23)
     let hand = new_thing(tophoro_ground_force_fun)
@@ -50,7 +50,7 @@ tophoro_fun(self: Thing) : Thing
     let self = spawn(self, 1, self.trg, hand)
     self
 
-  // He doesn't have a taunt neither a dash
+  // Space
   | TOPHORO_TAUNT
     animate(self, 0, TOPHORO_TAUNT_000, 19, 19)
 
