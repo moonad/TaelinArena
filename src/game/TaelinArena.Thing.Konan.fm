@@ -25,6 +25,7 @@ konan_fun(self: Thing) : Thing
   |KONAN_GIANT_PAPER_DESTRUCTION
     let self = animate(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_CAST_000, 2, 12)
     let paper = new_thing(konan_giant_paper_destruction_effect)
+    let paper = paper <= thing(dir = rot90_v3(look_dir(self)))
     let self = spawn(self, 0, self.trg, paper)
     self
 
@@ -37,15 +38,15 @@ konan_fun(self: Thing) : Thing
   // Right
   |KONAN_ORIGAMI_KNOCKDOWN
     let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_CAST_000, 3, 18)
-    let explosion = new_thing(konan_origami_knockdown_effect)
-    let explosion = explosion <= thing(dir = rot90_v3(look_dir(self)))
-    let self = spawn(self, 8, self.trg, explosion)
+    let origami = new_thing(konan_origami_knockdown_effect)
+    // let origami = origami <= thing(dir = rot90_v3(look_dir(self)))
+    let self = spawn(self, 8, self.trg, origami)
     self
 
   // Q Ultimate
   // TODO: do not invert the position she is looking at
   |KONAN_GODS_ANGEL
-    let self = animate(self, 0, KONAN_GODS_ANGEL_EFFECT_000, 15, 30)
+    let self = animate(self, 0, KONAN_GODS_ANGEL_CAST_000, 15, 30)
     let self = blink(self, 30, self.trg)
     self
     // let wings = new_thing(konan_gods_angel_effect)

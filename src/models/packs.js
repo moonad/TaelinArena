@@ -21,78 +21,78 @@ module.exports = {
   },
   "konan": {
     "from": 625,
-    "til": 742
+    "til": 738
   },
   "luffy": {
-    "from": 742,
-    "til": 843
+    "from": 738,
+    "til": 839
   },
   "mikegator": {
-    "from": 843,
-    "til": 915
+    "from": 839,
+    "til": 911
   },
   "min": {
-    "from": 915,
-    "til": 982
+    "from": 911,
+    "til": 978
   },
   "pichu": {
-    "from": 982,
-    "til": 1085
+    "from": 978,
+    "til": 1081
   },
   "pikachu": {
-    "from": 1085,
-    "til": 1190
+    "from": 1081,
+    "til": 1186
   },
   "poste": {
-    "from": 1190,
-    "til": 1191
+    "from": 1186,
+    "til": 1187
   },
   "ppg": {
-    "from": 1191,
-    "til": 1353
+    "from": 1187,
+    "til": 1349
   },
   "raichu": {
-    "from": 1353,
-    "til": 1456
+    "from": 1349,
+    "til": 1452
   },
   "ray": {
-    "from": 1456,
-    "til": 1530
+    "from": 1452,
+    "til": 1526
   },
   "shao": {
-    "from": 1530,
-    "til": 1637
+    "from": 1526,
+    "til": 1633
   },
   "sr_madruga": {
-    "from": 1637,
-    "til": 1759
+    "from": 1633,
+    "til": 1755
   },
   "teichi": {
-    "from": 1759,
-    "til": 1889
+    "from": 1755,
+    "til": 1885
   },
   "tophoro": {
-    "from": 1889,
-    "til": 1991
+    "from": 1885,
+    "til": 2006
   },
   "tupitree": {
-    "from": 1991,
-    "til": 2145
+    "from": 2006,
+    "til": 2160
   },
   "wall": {
-    "from": 2145,
-    "til": 2146
+    "from": 2160,
+    "til": 2161
   },
   "young_link": {
-    "from": 2146,
-    "til": 2175
+    "from": 2161,
+    "til": 2190
   },
   "zagatur": {
-    "from": 2175,
-    "til": 2263
+    "from": 2190,
+    "til": 2278
   },
   "zoio": {
-    "from": 2263,
-    "til": 2362
+    "from": 2278,
+    "til": 2377
   }
 }

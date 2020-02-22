@@ -52,7 +52,7 @@ tophoro_fun(self: Thing) : Thing
 
   // He doesn't have a taunt neither a dash
   | TOPHORO_TAUNT
-    animate(self, 0, TOPHORO_IDLE_000, 5, 10)
+    animate(self, 0, TOPHORO_TAUNT_000, 19, 19)
 
   | TOPHORO_DASH
     animate(self, 0, TOPHORO_IDLE_000, 5, 10)

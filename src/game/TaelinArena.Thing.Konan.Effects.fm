@@ -6,11 +6,11 @@ konan_giant_paper_destruction_effect(self: Thing) : Thing
   self
 
 konan_origami_knockdown_effect(self: Thing) : Thing
-  let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_EXPLOSION_000, 7, 14)
+  let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_EFFECT_000, 14, 28)
   let self = self <= thing(die = if tik === 14 then true else false)
   self
 
 konan_gods_angel_effect(self: Thing) : Thing
-  let self = animate(self, 0, KONAN_GODS_ANGEL_EFFECT_000, 15, 30)
-  let self = self <= thing(die = if tik === 30 then true else false)
+  let self = animate(self, 0, KONAN_GODS_ANGEL_EFFECT_000, 6, 12)
+  let self = self <= thing(die = if tik === 12 then true else false)
   self
