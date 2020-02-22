@@ -351,6 +351,7 @@ var hero_id = {
   wall: TA.WALL_THING,
   ppg: TA.PPG_THING,
   luffy: TA.LUFFY_THING,
+  konan: TA.KONAN_THING,
 };
 
 var hero_name = {
@@ -373,6 +374,7 @@ var hero_name = {
   [TA.WALL_THING]: "Wall",
   [TA.PPG_THING]: "PPG",
   [TA.LUFFY_THING]: "Luffy",
+  [TA.KONAN_THING]: "Konan",
 };
 
 module.exports = {
