@@ -1,0 +1,48 @@
+import TaelinArena.Game
+
+enum
+| BLASTOISE_IDLE
+| BLASTOISE_WATER_GUN
+| BLASTOISE_BUBBLE_BEAM
+| BLASTOISE_SKULL_BASH
+| BLASTOISE_HYDRO_PUMP
+| BLASTOISE_TAUNT
+| BLASTOISE_EVOLVE
+
+blastoise_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |BLASTOISE_IDLE
+    case self.wlk
+    | true  => animate(self, 1, BLASTOISE_WALK_000, 16, 32)
+    | false => animate(self, 1, BLASTOISE_IDLE_000, 29, 29)
+
+  // Left 
+  | BLASTOISE_WATER_GUN
+    animate(self, 0, BLASTOISE_WATER_GUN_000, 13, 26)
+
+  // Middle
+  |BLASTOISE_BUBBLE_BEAM
+    animate(self, 0, BLASTOISE_BUBBLE_BEAM_000, 16, 26)
+
+  // Right
+  |BLASTOISE_SKULL_BASH
+    let self = animate(self, 1, BLASTOISE_SKULL_BASH_000, 21, 42)
+    let dash = dash(self, 4, 10, 42)
+    self
+
+  // Q
+  |BLASTOISE_HYDRO_PUMP
+    animate(self, 1, BLASTOISE_HYDRO_PUMP_000, 28, 56)
+
+  // Space
+  | BLASTOISE_TAUNT
+    animate(self, 0, BLASTOISE_TAUNT_000, 16, 32)
+
+  // E
+  | BLASTOISE_EVOLVE
+    animate(self, 0, BLASTOISE_IDLE_000, 12, 24)
+
+  else self

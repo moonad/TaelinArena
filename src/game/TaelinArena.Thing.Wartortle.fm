@@ -1,0 +1,54 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Blastoise 
+
+enum
+| WARTORTLE_IDLE
+| WARTORTLE_WATER_GUN
+| WARTORTLE_BUBBLE_BEAM
+| WARTORTLE_SKULL_BASH
+| WARTORTLE_HYDRO_PUMP
+| WARTORTLE_TAUNT
+| WARTORTLE_EVOLVE
+
+wartortle_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |WARTORTLE_IDLE
+    case self.wlk
+    | true  => animate(self, 1, WARTORTLE_WALK_000, 6, 12)
+    | false => animate(self, 1, WARTORTLE_IDLE_000, 12, 24)
+
+  // Left 
+  | WARTORTLE_WATER_GUN
+    animate(self, 0, WARTORTLE_WATER_GUN_000, 14, 14)
+
+  // Middle
+  |WARTORTLE_BUBBLE_BEAM
+    animate(self, 1, WARTORTLE_BUBBLE_BEAM_000, 16, 26)
+
+  // Right
+  |WARTORTLE_SKULL_BASH
+    let self = animate(self, 1, WARTORTLE_SKULL_BASH_000, 15, 30)
+    let dash = dash(self, 4, 8, 30)
+    self
+
+  // Q
+  |WARTORTLE_HYDRO_PUMP
+    animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
+
+  // Space
+  | WARTORTLE_TAUNT
+    animate(self, 0, WARTORTLE_TAUNT_000, 23, 32)
+
+  // E
+  | WARTORTLE_EVOLVE
+    let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing(blastoise_fun) // evolve to Blastoise
+    let self = self <= thing(pos = new_pos)
+    self
+
+  else self
