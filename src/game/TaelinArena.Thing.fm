@@ -1,27 +1,27 @@
 import TaelinArena.Game
 import TaelinArena.ThingIds
 import TaelinArena.ModelIds
-// import TaelinArena.Thing.Mikegator
-// import TaelinArena.Thing.Mikegator.Earth
-// import TaelinArena.Thing.Shao
-// import TaelinArena.Thing.Shao.Balun
-// import TaelinArena.Thing.Shao.Hurricane
-// import TaelinArena.Thing.Min
-// import TaelinArena.Thing.Zoio
-// import TaelinArena.Thing.Teichi
-// import TaelinArena.Thing.Benfix
-// import TaelinArena.Thing.Ray
-// import TaelinArena.Thing.Tupitree
-// import TaelinArena.Thing.Tophoro
-// import TaelinArena.Thing.Kenko
-// import TaelinArena.Thing.SrMadruga
-// import TaelinArena.Thing.Bleskape 
-// import TaelinArena.Thing.Kakashi 
-// import TaelinArena.Thing.Finn 
-// import TaelinArena.Thing.Zagatur
-// import TaelinArena.Thing.Poste
-// import TaelinArena.Thing.Wall
-// import TaelinArena.Thing.PPG
+import TaelinArena.Thing.Mikegator
+import TaelinArena.Thing.Mikegator.Earth
+import TaelinArena.Thing.Shao
+import TaelinArena.Thing.Shao.Balun
+import TaelinArena.Thing.Shao.Hurricane
+import TaelinArena.Thing.Min
+import TaelinArena.Thing.Zoio
+import TaelinArena.Thing.Teichi
+import TaelinArena.Thing.Benfix
+import TaelinArena.Thing.Ray
+import TaelinArena.Thing.Tupitree
+import TaelinArena.Thing.Tophoro
+import TaelinArena.Thing.Kenko
+import TaelinArena.Thing.SrMadruga
+import TaelinArena.Thing.Bleskape 
+import TaelinArena.Thing.Kakashi 
+import TaelinArena.Thing.Finn 
+import TaelinArena.Thing.Zagatur
+import TaelinArena.Thing.Poste
+import TaelinArena.Thing.Wall
+import TaelinArena.Thing.PPG
 import TaelinArena.Thing.Luffy
 import TaelinArena.Thing.Konan
 import TaelinArena.Thing.Squirtle
@@ -30,27 +30,27 @@ import TaelinArena.Thing.Blastoise
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
-  // |MIKEGATOR_THING mikegator_fun
-  // |MIKEGATOR_EARTH_THING mikegator_earth_fun
-  // |SHAO_THING shao_fun
-  // |SHAO_BALUN_THING shao_balun_fun
-  // |SHAO_HURRICANE_THING shao_hurricane_fun
-  // |MIN_THING min_fun
-  // |ZOIO_THING zoio_fun
-  // |TEICHI_THING teichi_fun
-  // |BENFIX_THING benfix_fun
-  // |RAY_THING ray_fun
-  // |TUPITREE_THING tupitree_fun
-  // |TOPHORO_THING tophoro_fun
-  // |KENKO_THING kenko_fun
-  // |SR_MADRUGA_THING sr_madruga_fun
-  // |BLESKAPE_THING bleskape_fun
-  // |KAKASHI_THING kakashi_fun
-  // |FINN_THING finn_fun
-  // |ZAGATUR_THING zagatur_fun
-  // |POSTE_THING poste_fun
-  // |WALL_THING wall_fun
-  // |PPG_THING ppg_fun
+  |MIKEGATOR_THING mikegator_fun
+  |MIKEGATOR_EARTH_THING mikegator_earth_fun
+  |SHAO_THING shao_fun
+  |SHAO_BALUN_THING shao_balun_fun
+  |SHAO_HURRICANE_THING shao_hurricane_fun
+  |MIN_THING min_fun
+  |ZOIO_THING zoio_fun
+  |TEICHI_THING teichi_fun
+  |BENFIX_THING benfix_fun
+  |RAY_THING ray_fun
+  |TUPITREE_THING tupitree_fun
+  |TOPHORO_THING tophoro_fun
+  |KENKO_THING kenko_fun
+  |SR_MADRUGA_THING sr_madruga_fun
+  |BLESKAPE_THING bleskape_fun
+  |KAKASHI_THING kakashi_fun
+  |FINN_THING finn_fun
+  |ZAGATUR_THING zagatur_fun
+  |POSTE_THING poste_fun
+  |WALL_THING wall_fun
+  |PPG_THING ppg_fun
   |LUFFY_THING luffy_fun
   |KONAN_THING konan_fun
   |SQUIRTLE_THING squirtle_fun
