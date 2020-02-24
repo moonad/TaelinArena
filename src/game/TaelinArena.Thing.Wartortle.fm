@@ -7,8 +7,8 @@ enum
 | WARTORTLE_BUBBLE_BEAM
 | WARTORTLE_SKULL_BASH
 | WARTORTLE_HYDRO_PUMP
-| WARTORTLE_TAUNT
 | WARTORTLE_EVOLVE
+| WARTORTLE_TAUNT
 
 wartortle_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
@@ -39,10 +39,6 @@ wartortle_fun(self: Thing) : Thing
     animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
 
   // Space
-  | WARTORTLE_TAUNT
-    animate(self, 0, WARTORTLE_TAUNT_000, 23, 32)
-
-  // E
   | WARTORTLE_EVOLVE
     let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
     let new_pos = self.pos
@@ -50,5 +46,9 @@ wartortle_fun(self: Thing) : Thing
     let self = new_thing(blastoise_fun) // evolve to Blastoise
     let self = self <= thing(pos = new_pos)
     self
+  
+  // E
+  | WARTORTLE_TAUNT
+    animate(self, 0, WARTORTLE_TAUNT_000, 23, 32)
 
   else self

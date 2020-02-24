@@ -7,8 +7,8 @@ enum
 | SQUIRTLE_BUBBLE_BEAM
 | SQUIRTLE_SKULL_BASH
 | SQUIRTLE_HYDRO_PUMP
-| SQUIRTLE_TAUNT
 | SQUIRTLE_EVOLVE
+| SQUIRTLE_TAUNT
 
 squirtle_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
@@ -39,10 +39,6 @@ squirtle_fun(self: Thing) : Thing
     animate(self, 1, SQUIRTLE_HYDRO_PUMP_000, 23, 46)
 
   // Space
-  | SQUIRTLE_TAUNT
-    animate(self, 0, SQUIRTLE_TAUNT_000, 23, 32)
-
-  // E
   | SQUIRTLE_EVOLVE
     let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
     let new_pos = self.pos
@@ -50,5 +46,9 @@ squirtle_fun(self: Thing) : Thing
     let self = new_thing(wartortle_fun) // evolve to Wartortle
     let self = self <= thing(pos = new_pos)
     self
+
+  // E
+  | SQUIRTLE_TAUNT
+    animate(self, 0, SQUIRTLE_TAUNT_000, 23, 32)
 
   else self

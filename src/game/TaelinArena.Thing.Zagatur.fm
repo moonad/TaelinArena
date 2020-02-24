@@ -7,7 +7,7 @@ enum
 | ZAGATUR_CLONE
 | ZAGATUR_PROTECT
 | ZAGATUR_SACRIFICE
-| ZAGATUR_DASH
+| ZAGATUR_EXTRA
 | ZAGATUR_TAUNT
 
 zagatur_fun(self: Thing) : Thing
@@ -46,9 +46,11 @@ zagatur_fun(self: Thing) : Thing
     let self = spawn(self, 40, self.trg, ball)
     self
 
-  |ZAGATUR_DASH
-    animate(self, 1, ZAGATUR_IDLE_000, 4, 16)
+  // Space
+  |ZAGATUR_EXTRA
+    animate(self, 0, ZAGATUR_IDLE_000, 4, 16)
 
+  // E
   |ZAGATUR_TAUNT
     animate(self, 1, ZAGATUR_TAUNT_000, 13, 39)
 

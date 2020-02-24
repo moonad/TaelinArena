@@ -42,12 +42,13 @@ tupitree_fun(self: Thing) : Thing
     let self = spawn(self, 24, self.pos, root)
     self
    
-  // Q
+  // Space
   |TUPITREE_BLOCK
     let self = animate(self, 0, TUPITREE_BLOCK_000, 13, 26)
     let self = hit(self, 16, outward_hit(60, 0, 6)) 
     self
 
+  // E
   |TUPITREE_TAUNT
     animate(self, 0, TUPITREE_TAUNT_000, 12, 26)
 
