@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -p",
+    "build_models": "node src/models/script.js; webpack --config models.webpack.config.js",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,8 +26,8 @@
     "inferno": "^7.3.3",
     "inferno-hyperscript": "^7.3.3",
     "raw-loader": "^4.0.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
@@ -38,7 +39,7 @@
     "navigator": "^1.0.1",
     "peerjs": "^1.2.0",
     "simple-peer": "^9.6.2",
-    "vox.js": "^1.1.0",
+    "taelinarena-vox.js": "^1.1.0",
     "window": "^4.2.6",
     "wrtc": "^0.4.3",
     "xhr-request-promise": "^0.1.2"

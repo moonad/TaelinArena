@@ -1,6 +1,6 @@
 // Converts a MagicaVoxel .vox to a TaelinArena .json
 
-var vox = require("vox.js");
+var vox = require("taelinarena-vox.js");
 var parser = new vox.Parser();
 var fs = require("fs");
 

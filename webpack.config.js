@@ -1,19 +1,19 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const formalityResolver = require('formality-loader').resolver
+const webpack = require("webpack");
 
 module.exports = {
   mode: 'production',
-  optimization: {
-    minimize: true
-  },
+  optimization: {minimize: false},
+  //devtool: "source-map",
   entry: './src/index.js',
   module: {
     rules: [
       {
         test: /\.fm$/, 
         loader: 'formality-loader',  
-        options: { typeCheckMode: 'all' }
+        options: { typeCheckMode: 'none' }
       },
       {
         test: /\.vox$/i,
@@ -38,12 +38,15 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000
   },
-  //devtool: "source-map",
   resolve: { plugins: [formalityResolver] },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html', 
       inject: false
+    }),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('./docs/models.json')
     })
   ]
 };
