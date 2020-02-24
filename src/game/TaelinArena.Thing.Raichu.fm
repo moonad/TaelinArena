@@ -1,0 +1,53 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Raichu.Effects
+
+enum
+| RAICHU_IDLE
+| RAICHU_THUNDER_SHOCK
+| RAICHU_IRON_TAIL
+| RAICHU_FAST_ATTACK
+| RAICHU_THUNDER_CHARGE
+| RAICHU_EVOLVE
+| RAICHU_TAUNT
+
+raichu_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | RAICHU_IDLE
+    case self.wlk
+    | true  => animate(self, 1, RAICHU_WALK_000, 6, 12)
+    | false => animate(self, 1, RAICHU_IDLE_000, 4, 8)
+
+  // Left 
+  | RAICHU_THUNDER_SHOCK
+    let self = animate(self, 0, RAICHU_THUNDER_SHOCK_000, 6, 12)
+    let shock = new_thing(raichu_thunder_shock_effect)
+    let self = spawn(self, 0, self.trg, shock)
+    self
+
+  // Middle
+  | RAICHU_IRON_TAIL
+    animate(self, 1, RAICHU_IRON_TAIL_000, 14, 14)
+
+  // Right
+  | RAICHU_FAST_ATTACK
+    animate(self, 1, RAICHU_FAST_ATTACK_000, 6, 12)
+
+  // Q
+  | RAICHU_THUNDER_CHARGE
+    let self = animate(self, 1, RAICHU_ELECTRIC_BALL_000, 10, 20)
+    let shock = new_thing(raichu_thunder_charge_effect)
+    let self = spawn(self, 18, self.trg, shock)
+    self
+
+  // Space
+  | RAICHU_EVOLVE
+    animate(self, 1, RAICHU_IDLE_000, 4, 8)
+  
+  // E
+  | RAICHU_TAUNT
+    animate(self, 0, WARTORTLE_TAUNT_000, 30, 30)
+
+  else self

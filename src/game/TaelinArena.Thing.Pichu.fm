@@ -1,0 +1,58 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Pichu.Effects
+import TaelinArena.Thing.Pikachu 
+
+enum
+| PICHU_IDLE
+| PICHU_THUNDER_SHOCK
+| PICHU_IRON_TAIL
+| PICHU_FAST_ATTACK
+| PICHU_THUNDER_CHARGE
+| PICHU_EVOLVE
+| PICHU_TAUNT
+
+pichu_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | PICHU_IDLE
+    case self.wlk
+    | true  => animate(self, 1, PICHU_WALK_000, 6, 12)
+    | false => animate(self, 1, PICHU_IDLE_000, 3, 6)
+
+  // Left 
+  | PICHU_THUNDER_SHOCK
+    let self = animate(self, 0, PICHU_THUNDER_SHOCK_000, 6, 12)
+    let shock = new_thing(pichu_thunder_shock_effect)
+    let self = spawn(self, 0, self.trg, shock)
+    self
+
+  // Middle
+  | PICHU_IRON_TAIL
+    animate(self, 1, PICHU_IRON_TAIL_000, 14, 14)
+
+  // Right
+  | PICHU_FAST_ATTACK
+    animate(self, 1, PICHU_FAST_ATTACK_000, 6, 12)
+
+  // Q
+  | PICHU_THUNDER_CHARGE
+    let self = animate(self, 1, PICHU_ELECTRIC_BALL_000, 10, 20)
+    let shock = new_thing(pichu_thunder_charge_effect)
+    let self = spawn(self, 18, self.trg, shock)
+    self
+
+  // Space
+  | PICHU_EVOLVE
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing(pikachu_fun) // evolve to Pikachu
+    let self = self <= thing(pos = new_pos)
+    self
+  
+  // E
+  | PICHU_TAUNT
+    animate(self, 0, PICHU_TAUNT_000, 30, 30)
+
+  else self

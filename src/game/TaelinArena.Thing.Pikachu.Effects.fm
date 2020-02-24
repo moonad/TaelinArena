@@ -1,0 +1,16 @@
+import TaelinArena.Game
+
+pikachu_thunder_shock_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_THUNDER_SHOCK_EFFECT_000, 5, 10)
+  let self = self <= thing(die = if tik === 10 then true else false)
+  self
+
+pikachu_thunder_charge_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_EFFECT_000, 6, 12)
+  let self = self <= thing(die = if tik === 10 then true else false)
+  self
+
+pikachu_thunder_charge_ball_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_000, 10, 20)
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self

@@ -353,6 +353,7 @@ var hero_id = {
   luffy: TA.LUFFY_THING,
   konan: TA.KONAN_THING,
   squirtle: TA.SQUIRTLE_THING,
+  pichu: TA.PICHU_THING,
 };
 
 var hero_name = {
@@ -377,6 +378,7 @@ var hero_name = {
   [TA.LUFFY_THING]: "Luffy",
   [TA.KONAN_THING]: "Konan",
   [TA.SQUIRTLE_THING]: "Squirtle",
+  [TA.PICHU_THING]: "Pichu",
 };
 
 module.exports = {

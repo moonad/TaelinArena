@@ -27,6 +27,9 @@ import TaelinArena.Thing.Konan
 import TaelinArena.Thing.Squirtle
 import TaelinArena.Thing.Wartortle
 import TaelinArena.Thing.Blastoise
+import TaelinArena.Thing.Pichu
+import TaelinArena.Thing.Pikachu
+import TaelinArena.Thing.Raichu
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -56,6 +59,9 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |SQUIRTLE_THING squirtle_fun
   |WARTORTLE_THING wartortle_fun
   |BLASTOISE_THING blastoise_fun
+  |PICHU_THING pichu_fun
+  |PIKACHU_THING pikachu_fun
+  |RAICHU_THING raichu_fun
   else luffy_fun
 
 init_thing(tid: ThingId) : Thing
