@@ -130,22 +130,23 @@ module.exports = function Controls(on_input) {
   };
 
   window.onmousemove = (e) => {
-    self.set_mouse_pos(e.clientX, e.clientY);
+    var rect = e.target.getBoundingClientRect();
+    self.set_mouse_pos(e.clientX - rect.left, e.clientY - rect.top);
   };
 
   window.onmouseout = (e) => {
-    self.set_mouse_pos({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    });
+    //self.set_mouse_pos({
+      //x: window.innerWidth / 2,
+      //y: window.innerHeight / 2,
+    //});
   };
 
   window.onmousein = (e) => {
-    self.set_mouse_pos(e.clientX, e.clientY);
-    if (self.mouse_out_timeout) {
-      clearTimeout(self.mouse_out_timeout);
-      self.mouse_out_timeout = null;
-    }
+    //self.set_mouse_pos(e.clientX, e.clientY);
+    //if (self.mouse_out_timeout) {
+      //clearTimeout(self.mouse_out_timeout);
+      //self.mouse_out_timeout = null;
+    //}
   };
 
   // Moves camera with mouse
