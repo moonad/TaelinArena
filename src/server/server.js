@@ -10,11 +10,21 @@ var db = require("./db.js");
 var ethers = require("ethers");
 var TA = await require("./../TaelinArena.js");
 var GS = require("./game.js");
+var express_static_gzip = require("express-static-gzip");
 
 // API
 app.use(cors());
 app.use(express.json());
-app.use(express.static("docs"));
+
+// Enable cache for .js files
+app.use(function (req, res, next) {
+  if (req.url.slice(-3) === ".js") {
+    res.set('Cache-Control', 'public, max-age=31557600, immutable');
+  }
+  next();
+})
+
+app.use("/", express_static_gzip("docs"));
 
 // Registers a new account, i.e., an Address/Name pair
 app.post("/register", async (req, res) => {
