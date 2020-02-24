@@ -1,0 +1,53 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Mechwarrior.Effects
+
+enum
+| MECHWARRIOR_IDLE
+| MECHWARRIOR_LASER
+| MECHWARRIOR_ROCKET_LAUNCHER
+| MECHWARRIOR_MEGA_PUNCH
+| MECHWARRIOR_ELECTROMAGNETIC_PULSE
+| MECHWARRIOR_FORCE_FIELD
+| MECHWARRIOR_TAUNT
+
+mechwarrior_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  | MECHWARRIOR_IDLE
+    case self.wlk
+    | true  => animate(self, 1, MECHWARRIOR_WALK_000, 10, 20)
+    | false => animate(self, 1, MECHWARRIOR_IDLE_000, 10, 20)
+
+  // Left 
+  | MECHWARRIOR_LASER
+    let self = animate(self, 0, MECHWARRIOR_LASER_CASTING_000, 7, 14)
+    let laser = new_thing(mechwarrior_laser_effect)
+    let self = spawn(self, 0, self.trg, laser)
+    self
+
+  // Middle
+  | MECHWARRIOR_ROCKET_LAUNCHER
+    let self = animate(self, 0, MECHWARRIOR_ROCKET_LAUNCHER_CASTING_000, 16, 32)
+    let explosion = new_thing(mechwarrior_rocket_laucher_effect)
+    let self = spawn(self, 16, self.trg, explosion)
+    self
+
+  // Right
+  | MECHWARRIOR_MEGA_PUNCH
+    animate(self, 0, MECHWARRIOR_MEGA_PUNCH_CASTING_000, 14, 28)
+
+  // Q
+  | MECHWARRIOR_ELECTROMAGNETIC_PULSE
+    animate(self, 0, MECHWARRIOR_EMP_CASTING_000, 10, 30)
+
+  // Space
+  | MECHWARRIOR_FORCE_FIELD
+    animate(self, 0, MECHWARRIOR_FORCE_FIELD_000, 10, 20)
+
+  // E
+  | MECHWARRIOR_TAUNT
+    animate(self, 0, MECHWARRIOR_TAUNT_000, 8, 16)
+
+  else self

@@ -354,6 +354,7 @@ var hero_id = {
   konan: TA.KONAN_THING,
   squirtle: TA.SQUIRTLE_THING,
   pichu: TA.PICHU_THING,
+  mechwarrior: TA.MECHWARRIOR_THING,
 };
 
 var hero_name = {
@@ -379,6 +380,7 @@ var hero_name = {
   [TA.KONAN_THING]: "Konan",
   [TA.SQUIRTLE_THING]: "Squirtle",
   [TA.PICHU_THING]: "Pichu",
+  [TA.MECHWARRIOR_THING]: "Mechwarrior",
 };
 
 module.exports = {
