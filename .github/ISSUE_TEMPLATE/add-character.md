@@ -38,7 +38,7 @@ assignees: ''
 *Describe how you imagine the attack animation and cast.*  
 *You can add sketches, references and later on add gifs you did on MagicaVoxel*
 
-## [SPACE] *Ultimate: attack_name*
+## [Q] *Ultimate: attack_name*
 *Describe how you imagine the attack animation and cast.*  
 *You can add sketches, references and later on add gifs you did on MagicaVoxel*
 
@@ -47,7 +47,7 @@ assignees: ''
 ## [E] TAUNT
 *Taunt is a funny animation you character will do like laugh, dance aiming to make fun of the enemies*
 
-## [Q]/Shift *extra skill, usually dash*
+## [SPACE]/Shift *extra skill, usually dash*
 
 ### Tasks
  - [ ] Idle
@@ -56,4 +56,4 @@ assignees: ''
  - [ ] [LEFT] *add skill name*
  - [ ] [MIDDLE] *add skill name*
  - [ ] [RIGHT] *add skill name*
- - [ ] [SPACE] *add skill name*
+ - [ ] [Q] *add skill name*
