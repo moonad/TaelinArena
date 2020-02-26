@@ -24,7 +24,7 @@ pikachu_fun(self: Thing) : Thing
   // Left 
   | PIKACHU_THUNDER_SHOCK
     let self = animate(self, 0, PIKACHU_THUNDER_SHOCK_000, 6, 12)
-    let shock = new_thing(pikachu_thunder_shock_effect)
+    let shock = new_thing <= thing(fun=pikachu_thunder_shock_effect)
     let self = spawn(self, 0, self.trg, shock)
     self
 
@@ -39,7 +39,7 @@ pikachu_fun(self: Thing) : Thing
   // Q
   | PIKACHU_THUNDER_CHARGE
     let self = animate(self, 1, PIKACHU_ELECTRIC_BALL_000, 10, 20)
-    let shock = new_thing(pikachu_thunder_charge_effect)
+    let shock = new_thing <= thing(fun=pikachu_thunder_charge_effect)
     let self = spawn(self, 18, self.trg, shock)
     self
 
@@ -47,7 +47,7 @@ pikachu_fun(self: Thing) : Thing
   | PIKACHU_EVOLVE
     let new_pos = self.pos
     let self = self <= thing(die = true)
-    let self = new_thing(raichu_fun) // evolve to Raichu
+    let self = new_thing <= thing(fun=raichu_fun) // evolve to Raichu
     let self = self <= thing(pos = new_pos)
     self
   

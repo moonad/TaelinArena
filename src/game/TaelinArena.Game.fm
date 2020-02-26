@@ -1,12 +1,8 @@
 import Base#9y4x
 import TaelinArena.Geometry
 import TaelinArena.ModelIds
-import TaelinArena.ThingIds
 
 PlayerId : Type
-  Number
-
-ThingId : Type
   Number
 
 ModelId : Type
@@ -32,10 +28,10 @@ T Light
 T Thing
 | thing(
   fun : TxFunction,  // transaction function
-  tid : ThingId,     // id of thing that this is
   pid : PlayerId,    // number of player controlling this
   mid : ModelId,     // id of model to be rendered
-  act : ActionId,    // number of action this is performing
+  act : ActionId,    // number of performing action
+  nam : String,      // name of thing
   lit : List(Light), // list of lights to render
   tik : Number,      // ticks passed since last act change
   pos : V3,          // in-game position
@@ -49,7 +45,7 @@ T Thing
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
-  hit : Maybe(Hit),  // damage and knockback caused by this
+  hit : Maybe(Hit),  // damage/knockback caused by this
   die : Bool)        // should this be removed?
 
 T Game
@@ -71,10 +67,35 @@ T Command
 T Draw
 | draw(
   mid: Number,
+  nam: String,
   pos: V3,
   dir: V3,
   lit: List(Light),
   dmg: Number)
+
+// Creates a new default thing
+new_thing : Thing
+  thing(
+    ((x) => x), // fun
+    0xFFFFFFFF, // pid
+    0xFFFFFFFF, // mid
+    0,          // act
+    nil(_),     // nam
+    nil(_),     // lit
+    0,          // tik
+    v3(0,0,0),  // pos
+    8,          // mov
+    1,          // bst
+    false,      // wlk
+    v3(0,-1,0), // dir
+    v3(0,0,0),  // trg
+    v3(0,0,0),  // vel
+    cbox(12),   // box
+    0xFFFFFFFF, // dmg
+    v3(0,0,0),  // knk
+    nil(_),     // chi
+    none(_),    // hit
+    false)      // die
 
 // Gets a thing from game by its id
 get_thing_by_pid(pid: PlayerId, gm: Game) : Maybe(Thing)
@@ -104,32 +125,27 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
     | false => thi
   map_stage(effect, gm)
 
-// Creates a new reseted hero given its ThingId
-new_thing(fun: TxFunction) : Thing
-  let fun = fun
-  let tid = 0
-  let pid = 0
-  let mid = 0xFFFFFFFF
-  let act = 0
-  let lit = nil(_)
-  let tik = 0
-  let pos = v3(0,0,0)
-  let mov = 8
-  let bst = 1
-  let wlk = false
-  let dir = v3(0,-1,0)
-  let trg = v3(0,0,0)
-  let vel = v3(0,0,0)
-  let box = cbox(12)
-  let dmg = 0
-  let knk = v3(0,0,0)
-  let chi = []
-  let hit = none(_)
-  let die = false
-  thing(
-    fun,tid,pid,mid,act,lit,tik,pos,
-    mov,bst,wlk,dir,trg,vel,box,dmg,
-    knk,chi,hit,die)
+// Thing field setters
+set_thing_fun(thi:Thing, new_fun) thi<=thing(fun=new_fun)
+set_thing_pid(thi:Thing, new_pid) thi<=thing(pid=new_pid)
+set_thing_mid(thi:Thing, new_mid) thi<=thing(mid=new_mid)
+set_thing_act(thi:Thing, new_act) thi<=thing(act=new_act)
+set_thing_nam(thi:Thing, new_nam) thi<=thing(nam=new_nam)
+set_thing_lit(thi:Thing, new_lit) thi<=thing(lit=new_lit)
+set_thing_tik(thi:Thing, new_tik) thi<=thing(tik=new_tik)
+set_thing_pos(thi:Thing, new_pos) thi<=thing(pos=new_pos)
+set_thing_mov(thi:Thing, new_mov) thi<=thing(mov=new_mov)
+set_thing_bst(thi:Thing, new_bst) thi<=thing(bst=new_bst)
+set_thing_wlk(thi:Thing, new_wlk) thi<=thing(wlk=new_wlk)
+set_thing_dir(thi:Thing, new_dir) thi<=thing(dir=new_dir)
+set_thing_trg(thi:Thing, new_trg) thi<=thing(trg=new_trg)
+set_thing_vel(thi:Thing, new_vel) thi<=thing(vel=new_vel)
+set_thing_box(thi:Thing, new_box) thi<=thing(box=new_box)
+set_thing_dmg(thi:Thing, new_dmg) thi<=thing(dmg=new_dmg)
+set_thing_knk(thi:Thing, new_knk) thi<=thing(knk=new_knk)
+set_thing_chi(thi:Thing, new_chi) thi<=thing(chi=new_chi)
+set_thing_hit(thi:Thing, new_hit) thi<=thing(hit=new_hit)
+set_thing_die(thi:Thing, new_die) thi<=thing(die=new_die)
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated

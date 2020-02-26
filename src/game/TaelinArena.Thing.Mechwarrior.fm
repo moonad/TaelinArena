@@ -23,14 +23,14 @@ mechwarrior_fun(self: Thing) : Thing
   // Left 
   | MECHWARRIOR_LASER
     let self = animate(self, 0, MECHWARRIOR_LASER_CASTING_000, 7, 14)
-    let laser = new_thing(mechwarrior_laser_effect)
+    let laser = new_thing <= thing(fun=mechwarrior_laser_effect)
     let self = spawn(self, 0, self.trg, laser)
     self
 
   // Middle
   | MECHWARRIOR_ROCKET_LAUNCHER
     let self = animate(self, 0, MECHWARRIOR_ROCKET_LAUNCHER_CASTING_000, 16, 32)
-    let explosion = new_thing(mechwarrior_rocket_laucher_effect)
+    let explosion = new_thing <= thing(fun=mechwarrior_rocket_laucher_effect)
     let self = spawn(self, 16, self.trg, explosion)
     self
 

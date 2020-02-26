@@ -47,8 +47,6 @@ module.exports = function Controls(on_input) {
     var H = window.innerHeight;
     var T = Date.now()/1000;
     var ang = Math.PI * 1/4;
-    //var ang = Math.PI * 1/5;
-    //var ang = Math.PI * 1/4 + (Math.sin(T*0.5)-0.5)*Math.PI*0.1;
     var cos = Math.cos(ang);
     var sin = Math.sin(ang);
     var front = {x:0, y:cos, z:-sin};
@@ -67,8 +65,9 @@ module.exports = function Controls(on_input) {
     var swid = 896;
     var shei = 384;
     let fact = W / swid;
-    var size = {x:swid, y:shei*cos};
-    var port = {x:swid*fact, y:shei*fact*cos};
+    var hmul = Math.cos(Math.PI*0.5-ang);
+    var size = {x:swid, y:shei*hmul};
+    var port = {x:swid*fact, y:shei*fact*hmul};
     return {
       pos   : pos, // center pos
       ang   : ang, // camera angle

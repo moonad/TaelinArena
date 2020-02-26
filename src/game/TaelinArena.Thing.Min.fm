@@ -26,11 +26,11 @@ min_fun(self: Thing) : Thing
   // TODO: add fading effect and teleport
   |MIN_FIRE_MARK
     let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 12)
-    let make = new_thing(min_fire_mark_effect)
+    let make = new_thing <= thing(fun=min_fire_mark_effect)
     let self = spawn(self, 10, self.trg, make)
-    // let make = new_thing(min_fire_mark_effect_fading)
+    // let make = new_thing <= thing(fun=min_fire_mark_effect_fading)
     // let self = spawn(self, 10, self.trg, make)
-    // let tele = new_thing(min_fire_mark_teleport)
+    // let tele = new_thing <= thing(fun=min_fire_mark_teleport)
     // let self = spawn(self, 6, self.trg, tele)
     self
 
@@ -39,7 +39,7 @@ min_fun(self: Thing) : Thing
     
   |MIN_DRAGONS_PERISHMENT
     let self = animate(self, 1, MIN_DRAGONS_PERISHMENT_CAST_000, 1, 25)
-    let make = new_thing(min_dragons_perishment) 
+    let make = new_thing <= thing(fun=min_dragons_perishment) 
     let self = spawn(self, 0, self.pos, make)
     self
 

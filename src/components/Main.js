@@ -13,7 +13,6 @@ const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
 
-const Game = require("./Main.game.js");
 const Controls = require("./Main.controls.js");
 
 // Main HUD
@@ -32,6 +31,7 @@ class Main extends Component {
     this.render_mode = "GPU";
     this.picked_hero = "Tupitree";
     this.canvox = null;
+    this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
     this.pick_hero("Tupitree");
@@ -123,13 +123,25 @@ class Main extends Component {
     if (!this.game || this.game.gid !== gid) {
       var hero_list;
       if (gid === TA.OFF_GAME) {
-        hero_list = [this.picked_hero, "Poste", "PPG", "Wall"];
+        hero_list = [
+          this.picked_hero,
+          "Poste",
+          "PPG",
+          "Wall"
+        ];
       } else {
         hero_list = this.game_list[gid].players.split(",");
         hero_list = hero_list.map(TA.parse_player);
         hero_list = hero_list.map(p => p.hero);
       };
-      this.game = Game(gid, hero_list);
+      hero_list = hero_list.map((name, idx) => {
+        return [name, {
+          pid: idx,
+          pos: {x: -64 + idx*64, y: 0, z: 0},
+          nam: name,
+        }];
+      });
+      this.game = TA.Game(gid, hero_list);
     }
   }
 
@@ -182,11 +194,11 @@ class Main extends Component {
     // make sure the hero exists
     if (msg[0] === "!") {
       var hero_name = msg.slice(1).toLowerCase();
-      if (TA.hero_id[hero_name] === undefined) {
+      if (TA.thing_id[hero_name] === undefined) {
         alert("Hero '" + hero_name + "' not found.");
         return;
       }
-      msg = "!" + TA.hero_name[TA.hero_id[hero_name]];
+      msg = "!" + TA.thing_name[TA.thing_id[hero_name]];
     }
     try {
       this.peer.send(msg);
@@ -220,14 +232,20 @@ class Main extends Component {
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
       this.canvox = Canvox({mode: this.render_mode});
+      this.canhud = document.createElement("canvas");
+      this.canhud.context = this.canhud.getContext("2d");
+      this.canhud.style["position"] = "absolute";
+      this.canhud.style["image-rendering"] = "pixelated";
     }
     
     // Inject its canvas on the app
     if (game_screen) {
       if (game_screen.firstChild) {
         game_screen.removeChild(game_screen.firstChild);
+        game_screen.removeChild(game_screen.firstChild);
       }
       if (!game_screen.firstChild) {
+        game_screen.appendChild(this.canhud);
         game_screen.appendChild(this.canvox);
       }
     }
@@ -254,8 +272,16 @@ class Main extends Component {
       TA.render_game({
         game: this.game.state,
         canvox: this.canvox,
+        canhud: this.canhud,
         cam: cam,
       });
+      if (this.canhud.width !== this.canvox.width*2) {
+        this.canhud.width = this.canvox.width*2;
+        this.canhud.height = this.canvox.height*2;
+        this.canhud.context.scale(2,2);
+      };
+      this.canhud.style["width"] = this.canvox.style.width;
+      this.canhud.style["height"] = this.canvox.style.height;
     }
 
     // Repeat on every screen render
@@ -314,9 +340,9 @@ class Main extends Component {
 
   // Selects a hero
   pick_hero(hero) {
-    var picked_hid = TA.hero_id[hero.toLowerCase()];
+    var picked_hid = TA.thing_id[hero.toLowerCase()];
     if (picked_hid !== undefined) {
-      this.picked_hero = TA.hero_name[picked_hid];
+      this.picked_hero = TA.thing_name[picked_hid];
       if (this.game && this.game.gid === TA.OFF_GAME) {
         this.game = null;
         this.join(TA.OFF_GAME);
@@ -487,8 +513,8 @@ class Main extends Component {
     ]);
     var picked_hero = h("span", {
       "onclick": () => {
-        var heroes = Object.keys(TA.hero_id);
-        var heroes = heroes.map(name => TA.hero_name[TA.hero_id[name]]);
+        var heroes = Object.keys(TA.thing_id);
+        var heroes = heroes.map(name => TA.thing_name[TA.thing_id[name]]);
         var message = "Pick a hero. Options: " + heroes.join(", ");
         var picked_hero = prompt(message); 
         if (picked_hero) {

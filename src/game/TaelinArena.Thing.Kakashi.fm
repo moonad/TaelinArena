@@ -33,7 +33,7 @@ kakashi_fun(self: Thing) : Thing
   // Right
   |KAKASHI_FIREBALL_CASTING
     let self = animate(self, 0, KAKASHI_FIREBALL_CASTING_000, 9, 18)
-    let fire = new_thing(kakashi_fire_ball_effect)
+    let fire = new_thing <= thing(fun=kakashi_fire_ball_effect)
     let fire = fire <= thing(dir = look_dir(self))
     let self = spawn(self, 10, self.trg, fire)
     self

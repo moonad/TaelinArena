@@ -43,7 +43,7 @@ squirtle_fun(self: Thing) : Thing
     let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
     let new_pos = self.pos
     let self = self <= thing(die = true)
-    let self = new_thing(wartortle_fun) // evolve to Wartortle
+    let self = new_thing <= thing(fun=wartortle_fun) // evolve to Wartortle
     let self = self <= thing(pos = new_pos)
     self
 

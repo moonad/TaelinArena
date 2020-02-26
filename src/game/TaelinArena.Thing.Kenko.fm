@@ -31,7 +31,7 @@ kenko_fun(self: Thing) : Thing
 
   |KENKO_AMETHYST_SHIELD
     let self = animate(self, 0, KENKO_AMETHYST_SHIELD_000, 26, 40)
-    let self = spawn(self, 10, self.trg, new_thing(kenko_amethyst_shield_fun))
+    let self = spawn(self, 10, self.trg, new_thing <= thing(fun=kenko_amethyst_shield_fun))
     self
 
   |KENKO_DASH

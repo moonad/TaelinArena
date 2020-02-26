@@ -43,7 +43,7 @@ wartortle_fun(self: Thing) : Thing
     let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
     let new_pos = self.pos
     let self = self <= thing(die = true)
-    let self = new_thing(blastoise_fun) // evolve to Blastoise
+    let self = new_thing <= thing(fun = blastoise_fun) // evolve to Blastoise
     let self = self <= thing(pos = new_pos)
     self
   

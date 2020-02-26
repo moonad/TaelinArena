@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.ThingIds
 import TaelinArena.ModelIds
 import TaelinArena.Thing.Mikegator
 import TaelinArena.Thing.Mikegator.Earth
@@ -32,7 +31,39 @@ import TaelinArena.Thing.Pikachu
 import TaelinArena.Thing.Raichu
 import TaelinArena.Thing.Mechwarrior
 
-get_thing_fun(tid: ThingId) : Thing -> Thing
+enum
+| MIKEGATOR_THING
+| MIKEGATOR_EARTH_THING
+| SHAO_THING
+| SHAO_BALUN_THING
+| SHAO_HURRICANE_THING
+| MIN_THING
+| ZOIO_THING
+| TEICHI_THING
+| BENFIX_THING
+| RAY_THING
+| TUPITREE_THING
+| TOPHORO_THING
+| KENKO_THING
+| SR_MADRUGA_THING
+| BLESKAPE_THING 
+| KAKASHI_THING 
+| FINN_THING 
+| ZAGATUR_THING 
+| POSTE_THING
+| WALL_THING
+| PPG_THING
+| LUFFY_THING
+| KONAN_THING
+| SQUIRTLE_THING
+| WARTORTLE_THING
+| BLASTOISE_THING
+| PICHU_THING
+| PIKACHU_THING
+| RAICHU_THING
+| MECHWARRIOR_THING
+
+get_thing_fun(tid: Number) : Thing -> Thing
   switch tid
   |MIKEGATOR_THING mikegator_fun
   |MIKEGATOR_EARTH_THING mikegator_earth_fun
@@ -65,6 +96,3 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |RAICHU_THING raichu_fun
   |MECHWARRIOR_THING mechwarrior_fun
   else luffy_fun
-
-init_thing(tid: ThingId) : Thing
-  new_thing(get_thing_fun(tid))

@@ -38,6 +38,35 @@ if (typeof window !== "undefined") {
 const GAME_FPS = 24;
 const GAME_DURATION = GAME_FPS * 60;
 
+function slist_to_array(slist) {
+  var array = [];
+  (function go(slist) {
+    slist(null)(h => t => { array.push(h); go(t); });
+  })(slist);
+  return array;
+};
+
+function array_to_slist(array) {
+  var slist = TA.nil;
+  for (var i = array.length-1; i >= 0; --i) {
+    slist = TA.cons(array[i])(slist);
+  };
+  return slist;
+};
+
+function sstring_to_string(sstr) {
+  var chars = slist_to_array(sstr);
+  return chars.map(x => String.fromCharCode(x)).join("");
+};
+
+function string_to_sstring(str) {
+  var array = [];
+  for (var i = 0; i < str.length; ++i) {
+    array.push(str.charCodeAt(i));
+  }
+  return array_to_slist(array);
+};
+
 const now = (() => {
   var init_time = Date.now()/1000;
   return () => Date.now()/1000 - init_time;
@@ -50,9 +79,20 @@ var voxels = {
   size: 256*256*256*2,
   data: new Uint32Array(256*256*256*2)
 };
-function render_game({game, canvox, cam}) {
+
+function render_game({game, canvox, canhud, cam}) {
   var voxels_data = voxels.data;
   var voxels_size = 0;
+  var hmul = Math.cos(Math.PI*0.5-cam.ang);
+
+  // Clears canhud
+  if (canhud && canhud.clear_rects) {
+    for (var i = 0; i < canhud.clear_rects.length; ++i) {
+      var [x,y,w,h] = canhud.clear_rects[i];
+      canhud.context.clearRect(x-2, y-2, w+4, h+4);
+    }
+  }
+  canhud.clear_rects = [];
 
   // Gets the current time
   var T = now();
@@ -64,10 +104,13 @@ function render_game({game, canvox, cam}) {
   var hero_pos = TA.get_position_by_pid(0, game);
 
   // Renders each game thing
-  TA.map_stage((thing,k) => {
-    TA.draw_thing(thing)(mid=>pos=>dir=>lit=>dmg=>{
+  TA.map_stage((thing) => {
+    TA.draw_thing(thing)(mid=>nam=>pos=>dir=>lit=>dmg=>{
       var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
+      var name = sstring_to_string(nam);
+
+
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
 
@@ -116,24 +159,35 @@ function render_game({game, canvox, cam}) {
       })(lit);
 
       // Renders life bar
-      //for (var y = 0; y <= 1; ++y) {
-        //for (var x = -4; x <= 4; ++x) {
-          //var px = pos_x + x;
-          //var py = pos_y + y;
-          //var pz = max_z + 16;
-          //if ( -512 < px && px < 512
-            //&& -512 < py && py < 512
-            //&& -512 < pz && pz < 512) {
-            //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-            //var r = Math.min(dmg*16, 255);
-            //var g = Math.max(Math.min(512-dmg*16,255),0);
-            //var rgb = (r<<24)|(g<<16)|0xFF;
-            //voxels_data[voxels_size++] = xyz;
-            //voxels_data[voxels_size++] = rgb;
-          //}
-        //}
-      //}
-
+      var px = Math.floor(cam.size.x*0.5 + pos_x);
+      var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
+      var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
+      if (dmg !== 0xFFFFFFFF) {
+        // Life bar (backline)
+        canhud.context.beginPath();
+        canhud.context.fillStyle = "#30A038";
+        canhud.context.rect(px-12,py-42,24,2); // y -42 a -24
+        canhud.context.fill();
+        canhud.context.beginPath();
+        // Life bar (greenline)
+        canhud.context.fillStyle = "#303038";
+        canhud.context.rect(px+12-dm,py-42,dm,2); // y -42 a -24
+        canhud.context.fill();
+        canhud.context.lineWidth = 0.333333;
+      }
+      // Renders player name
+      if (name.length > 0) {
+        canhud.context.fillStyle = "#303038";
+        canhud.context.strokeStyle = "#303038";
+        canhud.context.font = 6+"px Arial"; // y -48 a -42
+        canhud.context.textAlign = "center";
+        canhud.context.textBaseline = "bottom";
+        canhud.context.fillText(name, (px), (py-42));
+        canhud.context.strokeText(name, (px), (py-42));
+        var clrw = name.length * 12;
+      };
+      // Marks area to clear later
+      canhud.clear_rects.push([px-clrw*0.5, py-48, clrw, 24]);
     });
   })(game);
 
@@ -302,7 +356,7 @@ function make_input_netcode(keyboard, mouse) {
 }
 
 // Executes a command inside Formality
-function exec_command(inp, game) {
+function execute_command(inp, game) {
   let cmd = null;
   if (inp.input === "SDIR") {
     let x = inp.params.dir.x;
@@ -310,8 +364,7 @@ function exec_command(inp, game) {
     let d = v3 => v3(x)(y)(0);
     cmd = TA.command(inp.player)(TA.sdir(d));
   } else if (inp.input === "TEXT") {
-    console.log(inp);
-    console.log(new Error("aff"));
+    console.log(new Error("Not implemented."));
     throw "TODO";
   } else {
     var x = inp.params.pos.x;
@@ -331,7 +384,7 @@ function exec_command(inp, game) {
   return TA.exec_command(cmd)(game);
 }
 
-var hero_id = {
+var thing_id = {
   mikegator: TA.MIKEGATOR_THING,
   shao: TA.SHAO_THING,
   min: TA.MIN_THING,
@@ -357,7 +410,7 @@ var hero_id = {
   mechwarrior: TA.MECHWARRIOR_THING,
 };
 
-var hero_name = {
+var thing_name = {
   [TA.MIKEGATOR_THING]: "MikeGator",
   [TA.SHAO_THING]: "Shao",
   [TA.MIN_THING]: "Min",
@@ -383,18 +436,79 @@ var hero_name = {
   [TA.MECHWARRIOR_THING]: "Mechwarrior",
 };
 
+function make_thing([name, {pid,pos,nam}]) {
+  var thing;
+  var tid = thing_id[name.toLowerCase()];
+  thing = TA.new_thing;
+  thing = TA.set_thing_dmg(thing)(0);
+  thing = TA.set_thing_fun(thing)(TA.get_thing_fun(tid));
+  thing = TA.set_thing_pid(thing)(pid);
+  thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));
+  thing = TA.set_thing_nam(thing)(string_to_sstring(nam)); 
+  return thing;
+};
+
+function Game(gid, things) {
+  var self = {};
+  self.gid = gid;
+  self.state = TA.game(array_to_slist(things.map(make_thing)));
+  self.turns = [];
+
+  function turn() {
+    if (self.state) {
+      self.state = TA.exec_turn(self.state);
+    }
+  }
+
+  function exec(input) {
+    self.state = execute_command(input, self.state);
+  }
+
+  // Given a string with turn data from the internet, parse
+  // it and add new information to turn list and game state
+  function absorb_turn_info(str) {
+    if (self.state && self.turns) {
+      var game = parseInt(str.slice(1,9), 16);
+      var from = parseInt(str.slice(9,17), 16);
+      var last = self.turns.length;
+      var new_turns = TA.parse_turns(str.slice(17))[1];
+      if (from <= last) {
+        for (var i = last-from; i<new_turns.length; ++i) {
+          self.turns[i+from] = new_turns[i];
+          for (var j = 0; j < new_turns[i].length; ++j) {
+            self.state = execute_command(new_turns[i][j], self.state);
+          }
+          self.state = TA.exec_turn(self.state);
+        }
+      }
+    }
+  }
+
+  self.exec = exec;
+  self.turn = turn;
+  self.absorb_turn_info = absorb_turn_info;
+
+  return self;
+};
+
 module.exports = {
   ...TA,
+  slist_to_array,
+  array_to_slist,
+  sstring_to_string,
+  string_to_sstring,
   GAME_FPS,
   GAME_DURATION,
   OFF_GAME,
-  hero_id,
-  hero_name,
+  thing_id,
+  thing_name,
   render_game,
   parse_turn,
   parse_turns,
   parse_player,
   parse_command,
-  exec_command,
+  execute_command,
   make_input_netcode,
+  make_thing,
+  Game,
 };

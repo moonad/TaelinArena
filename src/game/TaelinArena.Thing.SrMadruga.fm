@@ -23,7 +23,7 @@ sr_madruga_fun(self: Thing) : Thing
   // Left 
   |SR_MADRUGA_FRYING_PAN
     let self = animate(self, 0, SR_MADRUGA_FRYING_PAN_000, 5, 10)
-    let self = spawn(self, 8, self.trg, new_thing(sr_madruga_frying_pan_fun))
+    let self = spawn(self, 8, self.trg, new_thing <= thing(fun=sr_madruga_frying_pan_fun))
     self
 
   // Middle
@@ -35,7 +35,7 @@ sr_madruga_fun(self: Thing) : Thing
   // Right
   |SR_MADRUGA_SHOEMAKER_GLUE
     let self = animate(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_000, 8, 16)
-    let self = spawn(self, 14, self.trg, new_thing(sr_madruga_shoemaker_glue_fun))
+    let self = spawn(self, 14, self.trg, new_thing <= thing(fun=sr_madruga_shoemaker_glue_fun))
     self
 
   // Space
@@ -55,7 +55,7 @@ sr_madruga_fun(self: Thing) : Thing
     let lght = light(lpos,lrng,lsub,ladd)
     let self = illumine(self, 24, 40, [lght])
     let self = hit(self, 25, outward_hit(160, 0, 4)) 
-    //let self = spawn(self, 15, self.trg, new_thing(sr_madruga_explosive_photo_fun))
+    //let self = spawn(self, 15, self.trg, new_thing <= thing(fun=sr_madruga_explosive_photo_fun))
     self
 
   | SR_MADRUGA_DASH

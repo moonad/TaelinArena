@@ -25,7 +25,7 @@ mikegator_fun(self: Thing) : Thing
 
   |MIKEGATOR_EARTHBENDING
     let self = animate(self, 1, MIKEGATOR_EARTHBENDING_000, 9, 18)
-    let make = new_thing(mikegator_earth_fun)
+    let make = new_thing <= thing(fun=mikegator_earth_fun)
     let self = spawn(self, 10, self.trg, make)
     self
 

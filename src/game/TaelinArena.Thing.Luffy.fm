@@ -36,7 +36,7 @@ luffy_fun(self: Thing) : Thing
   // Q Ultimate
   |LUFFY_GIANT_ARM
     let self = animate(self, 0, LUFFY_GIANT_ARM_000, 23, 46)
-    let arm = new_thing(luffy_giant_arm_effect)
+    let arm = new_thing <= thing(fun=luffy_giant_arm_effect)
     let self = spawn(self, 36, self.trg, arm)
     self
 

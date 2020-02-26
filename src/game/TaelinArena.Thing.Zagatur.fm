@@ -21,28 +21,28 @@ zagatur_fun(self: Thing) : Thing
   // Left
   |ZAGATUR_CARNIVOROUS_BITE_CAST
     let self = animate(self, 0, ZAGATUR_CARNIVOROUS_BITE_CAST_000, 10, 20)
-    let bite = new_thing(zagatur_carnivorous_bite_anim)
+    let bite = new_thing <= thing(fun=zagatur_carnivorous_bite_anim)
     let self = spawn(self, 10, self.trg, bite)
     self
 
   // Middle
   |ZAGATUR_CLONE
     let self = animate(self, 1, ZAGATUR_IDLE_000, 4, 16)
-    let make = new_thing(zagatur_clone_anim)
+    let make = new_thing <= thing(fun=zagatur_clone_anim)
     let self = spawn(self, 10, self.trg, make)
     self
 
   // Left
   |ZAGATUR_PROTECT
     let self = animate(self, 0, ZAGATUR_PROTECT_CAST_000, 12, 24)
-    let make = new_thing(zagatur_protect_anim)
+    let make = new_thing <= thing(fun=zagatur_protect_anim)
     let self = spawn(self, 10, self.trg, make)
     self
 
   // Ultimate
   |ZAGATUR_SACRIFICE
     let self = animate(self, 0.5, ZAGATUR_SACRIFICE_CAST_000, 17, 51)
-    let ball = new_thing(zagatur_sacrifice_anim)
+    let ball = new_thing <= thing(fun=zagatur_sacrifice_anim)
     let self = spawn(self, 40, self.trg, ball)
     self
 
