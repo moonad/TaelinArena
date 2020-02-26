@@ -32,6 +32,7 @@ import TaelinArena.Thing.Pikachu
 import TaelinArena.Thing.Raichu
 import TaelinArena.Thing.Mechwarrior
 import TaelinArena.Thing.Steve
+import TaelinArena.Thing.Dorime
 
 get_thing_fun(tid: ThingId) : Thing -> Thing
   switch tid
@@ -66,6 +67,7 @@ get_thing_fun(tid: ThingId) : Thing -> Thing
   |RAICHU_THING raichu_fun
   |MECHWARRIOR_THING mechwarrior_fun
   |STEVE_THING steve_fun
+  |DORIME_THING dorime_fun
   else luffy_fun
 
 init_thing(tid: ThingId) : Thing
