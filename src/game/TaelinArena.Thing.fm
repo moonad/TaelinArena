@@ -30,6 +30,9 @@ import TaelinArena.Thing.Pichu
 import TaelinArena.Thing.Pikachu
 import TaelinArena.Thing.Raichu
 import TaelinArena.Thing.Mechwarrior
+import TaelinArena.Thing.Steve
+import TaelinArena.Thing.Dorime
+import TaelinArena.Thing.Punch_object
 
 enum
 | MIKEGATOR_THING
@@ -62,6 +65,9 @@ enum
 | PIKACHU_THING
 | RAICHU_THING
 | MECHWARRIOR_THING
+| STEVE_THING
+| DORIME_THING
+| PUNCH_OBJECT_THING
 
 get_thing_fun(tid: Number) : Thing -> Thing
   switch tid
@@ -95,4 +101,7 @@ get_thing_fun(tid: Number) : Thing -> Thing
   |PIKACHU_THING pikachu_fun
   |RAICHU_THING raichu_fun
   |MECHWARRIOR_THING mechwarrior_fun
+  |STEVE_THING steve_fun
+  |DORIME_THING dorime_fun
+  |PUNCH_OBJECT_THING punch_object_fun
   else luffy_fun

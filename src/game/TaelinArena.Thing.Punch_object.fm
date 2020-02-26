@@ -1,0 +1,6 @@
+import TaelinArena.Game
+
+punch_object_fun(self: Thing) : Thing
+  let self = self <= thing(pos = v3(180,20,0))
+  let self = animate(self, 0, PUNCH_OBJECT_ANGLE_000_000, 10, 20)
+  self

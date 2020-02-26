@@ -48,6 +48,6 @@ raichu_fun(self: Thing) : Thing
   
   // E
   | RAICHU_TAUNT
-    animate(self, 0, WARTORTLE_TAUNT_000, 30, 30)
+    animate(self, 0, RAICHU_TAUNT_000, 30, 30)
 
   else self

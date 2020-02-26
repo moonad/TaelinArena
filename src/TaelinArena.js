@@ -408,6 +408,9 @@ var thing_id = {
   squirtle: TA.SQUIRTLE_THING,
   pichu: TA.PICHU_THING,
   mechwarrior: TA.MECHWARRIOR_THING,
+  steve: TA.STEVE_THING,
+  dorime: TA.DORIME_THING,
+  punch_obj: TA.PUNCH_OBJECT_THING,
 };
 
 var thing_name = {
@@ -434,6 +437,9 @@ var thing_name = {
   [TA.SQUIRTLE_THING]: "Squirtle",
   [TA.PICHU_THING]: "Pichu",
   [TA.MECHWARRIOR_THING]: "Mechwarrior",
+  [TA.STEVE_THING]: "Steve",
+  [TA.DORIME_THING]: "Dorime",
+  [TA.PUNCH_OBJECT_THING] : "Punch_obj"
 };
 
 function make_thing([name, {pid,pos,nam}]) {
