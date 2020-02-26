@@ -79,36 +79,40 @@ module.exports = {
     "from": 2036,
     "til": 2158
   },
-  "teichi": {
+  "steve": {
     "from": 2158,
-    "til": 2288
+    "til": 2290
+  },
+  "teichi": {
+    "from": 2290,
+    "til": 2420
   },
   "tophoro": {
-    "from": 2288,
-    "til": 2409
+    "from": 2420,
+    "til": 2541
   },
   "tupitree": {
-    "from": 2409,
-    "til": 2563
+    "from": 2541,
+    "til": 2695
   },
   "wall": {
-    "from": 2563,
-    "til": 2564
+    "from": 2695,
+    "til": 2696
   },
   "wartortle": {
-    "from": 2564,
-    "til": 2702
+    "from": 2696,
+    "til": 2834
   },
   "young_link": {
-    "from": 2702,
-    "til": 2731
+    "from": 2834,
+    "til": 2863
   },
   "zagatur": {
-    "from": 2731,
-    "til": 2819
+    "from": 2863,
+    "til": 2951
   },
   "zoio": {
-    "from": 2819,
-    "til": 2918
+    "from": 2951,
+    "til": 3050
   }
 }

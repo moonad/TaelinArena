@@ -355,6 +355,7 @@ var hero_id = {
   squirtle: TA.SQUIRTLE_THING,
   pichu: TA.PICHU_THING,
   mechwarrior: TA.MECHWARRIOR_THING,
+  steve: TA.STEVE_THING,
 };
 
 var hero_name = {
@@ -381,6 +382,7 @@ var hero_name = {
   [TA.SQUIRTLE_THING]: "Squirtle",
   [TA.PICHU_THING]: "Pichu",
   [TA.MECHWARRIOR_THING]: "Mechwarrior",
+  [TA.STEVE_THING]: "Steve",
 };
 
 module.exports = {
