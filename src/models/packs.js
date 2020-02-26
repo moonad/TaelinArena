@@ -63,60 +63,64 @@ module.exports = {
     "from": 1636,
     "til": 1798
   },
-  "raichu": {
+  "punch_object": {
     "from": 1798,
-    "til": 1901
+    "til": 1903
+  },
+  "raichu": {
+    "from": 1903,
+    "til": 2006
   },
   "ray": {
-    "from": 1901,
-    "til": 1975
+    "from": 2006,
+    "til": 2080
   },
   "shao": {
-    "from": 1975,
-    "til": 2082
+    "from": 2080,
+    "til": 2187
   },
   "squirtle": {
-    "from": 2082,
-    "til": 2214
+    "from": 2187,
+    "til": 2319
   },
   "sr_madruga": {
-    "from": 2214,
-    "til": 2336
+    "from": 2319,
+    "til": 2441
   },
   "steve": {
-    "from": 2336,
-    "til": 2468
+    "from": 2441,
+    "til": 2573
   },
   "teichi": {
-    "from": 2468,
-    "til": 2598
+    "from": 2573,
+    "til": 2703
   },
   "tophoro": {
-    "from": 2598,
-    "til": 2719
+    "from": 2703,
+    "til": 2824
   },
   "tupitree": {
-    "from": 2719,
-    "til": 2873
+    "from": 2824,
+    "til": 2978
   },
   "wall": {
-    "from": 2873,
-    "til": 2874
+    "from": 2978,
+    "til": 2979
   },
   "wartortle": {
-    "from": 2874,
-    "til": 3012
+    "from": 2979,
+    "til": 3117
   },
   "young_link": {
-    "from": 3012,
-    "til": 3041
+    "from": 3117,
+    "til": 3146
   },
   "zagatur": {
-    "from": 3041,
-    "til": 3129
+    "from": 3146,
+    "til": 3234
   },
   "zoio": {
-    "from": 3129,
-    "til": 3228
+    "from": 3234,
+    "til": 3333
   }
 }
