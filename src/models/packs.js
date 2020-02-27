@@ -35,92 +35,96 @@ module.exports = {
     "from": 1080,
     "til": 1181
   },
-  "mechwarrior": {
+  "mando": {
     "from": 1181,
-    "til": 1288
+    "til": 1347
+  },
+  "mechwarrior": {
+    "from": 1347,
+    "til": 1454
   },
   "mikegator": {
-    "from": 1288,
-    "til": 1360
+    "from": 1454,
+    "til": 1526
   },
   "min": {
-    "from": 1360,
-    "til": 1427
+    "from": 1526,
+    "til": 1593
   },
   "pichu": {
-    "from": 1427,
-    "til": 1530
+    "from": 1593,
+    "til": 1696
   },
   "pikachu": {
-    "from": 1530,
-    "til": 1635
+    "from": 1696,
+    "til": 1801
   },
   "poste": {
-    "from": 1635,
-    "til": 1636
+    "from": 1801,
+    "til": 1802
   },
   "ppg": {
-    "from": 1636,
-    "til": 1798
+    "from": 1802,
+    "til": 1964
   },
   "punch_object": {
-    "from": 1798,
-    "til": 1903
+    "from": 1964,
+    "til": 2069
   },
   "raichu": {
-    "from": 1903,
-    "til": 2006
+    "from": 2069,
+    "til": 2172
   },
   "ray": {
-    "from": 2006,
-    "til": 2080
+    "from": 2172,
+    "til": 2246
   },
   "shao": {
-    "from": 2080,
-    "til": 2187
+    "from": 2246,
+    "til": 2353
   },
   "squirtle": {
-    "from": 2187,
-    "til": 2319
+    "from": 2353,
+    "til": 2485
   },
   "sr_madruga": {
-    "from": 2319,
-    "til": 2441
+    "from": 2485,
+    "til": 2607
   },
   "steve": {
-    "from": 2441,
-    "til": 2573
+    "from": 2607,
+    "til": 2739
   },
   "teichi": {
-    "from": 2573,
-    "til": 2703
+    "from": 2739,
+    "til": 2869
   },
   "tophoro": {
-    "from": 2703,
-    "til": 2824
+    "from": 2869,
+    "til": 2990
   },
   "tupitree": {
-    "from": 2824,
-    "til": 2978
+    "from": 2990,
+    "til": 3144
   },
   "wall": {
-    "from": 2978,
-    "til": 2979
+    "from": 3144,
+    "til": 3145
   },
   "wartortle": {
-    "from": 2979,
-    "til": 3117
+    "from": 3145,
+    "til": 3283
   },
   "young_link": {
-    "from": 3117,
-    "til": 3146
+    "from": 3283,
+    "til": 3312
   },
   "zagatur": {
-    "from": 3146,
-    "til": 3234
+    "from": 3312,
+    "til": 3400
   },
   "zoio": {
-    "from": 3234,
-    "til": 3333
+    "from": 3400,
+    "til": 3499
   }
 }

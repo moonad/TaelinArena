@@ -33,6 +33,7 @@ import TaelinArena.Thing.Mechwarrior
 import TaelinArena.Thing.Steve
 import TaelinArena.Thing.Dorime
 import TaelinArena.Thing.Punch_object
+import TaelinArena.Thing.Mando
 
 enum
 | MIKEGATOR_THING
@@ -68,6 +69,7 @@ enum
 | STEVE_THING
 | DORIME_THING
 | PUNCH_OBJECT_THING
+| MANDO_THING
 
 get_thing_fun(tid: Number) : Thing -> Thing
   switch tid
@@ -104,4 +106,5 @@ get_thing_fun(tid: Number) : Thing -> Thing
   |STEVE_THING steve_fun
   |DORIME_THING dorime_fun
   |PUNCH_OBJECT_THING punch_object_fun
+  |MANDO_THING mando_fun
   else luffy_fun

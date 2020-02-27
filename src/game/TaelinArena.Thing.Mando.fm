@@ -1,0 +1,60 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Mando.Effects
+
+enum
+| MANDO_IDLE
+| MANDO_SHOTTING
+| MANDO_PARALYZING_ROPE
+| MANDO_FLAMETHROWER
+| MANDO_FORCE
+| MANDO_EXTRA
+| MANDO_TAUNT
+
+mando_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | MANDO_IDLE
+    case self.wlk
+    | true  => animate(self, 1, MANDO_WALK_000, 10, 30)
+    | false => animate(self, 1, MANDO_IDLE_000, 7, 28)
+
+  // Left 
+  | MANDO_SHOTTING
+    let self = animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_CASTING_000, 9, 18)
+    let fire = new_thing <= thing(fun=mando_shooting_effect)
+    let self = spawn(self, 9, self.trg, fire)
+    self
+
+  // Middle
+  | MANDO_PARALYZING_ROPE
+    let self = animate(self, 0, MANDO_PARALYZING_ROPE_CASTING_000, 6, 18)
+    let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect)
+    let self = spawn(self, 10, self.trg, rope)
+    self
+
+  // Right
+  | MANDO_FLAMETHROWER
+    let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 20)
+    let flame = new_thing <= thing(fun=mando_flamethrower_effect)
+    let flame = flame <= thing(dir = look_dir(self))
+    let self = spawn(self, 5, self.trg, flame)
+    self
+
+  // Q
+  | MANDO_FORCE
+    let self = animate(self, 0, MANDO_FORCE_CASTING_000, 8, 16)
+    let force = new_thing <= thing(fun=mando_force_effect)
+    let self = spawn(self, 14, self.trg, force)
+    self
+
+  // Space
+  | MANDO_EXTRA
+    animate(self, 1, MANDO_IDLE_000, 7, 14)
+
+  // E
+  | MANDO_TAUNT
+    animate(self, 0, MANDO_TAUNT_000, 30, 30)
+
+  else self

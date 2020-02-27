@@ -425,6 +425,7 @@ var thing_id = {
   steve: TA.STEVE_THING,
   dorime: TA.DORIME_THING,
   punch_obj: TA.PUNCH_OBJECT_THING,
+  mando: TA.MANDO_THING,
 };
 
 var thing_name = {
@@ -453,7 +454,8 @@ var thing_name = {
   [TA.MECHWARRIOR_THING]: "Mechwarrior",
   [TA.STEVE_THING]: "Steve",
   [TA.DORIME_THING]: "Dorime",
-  [TA.PUNCH_OBJECT_THING] : "Punch_obj"
+  [TA.PUNCH_OBJECT_THING] : "Punch_obj",
+  [TA.MANDO_THING] : "Mando",
 };
 
 function make_thing([name, {pid,dmg,pos,nam}]) {
