@@ -167,7 +167,7 @@ animate(
     bst = if tik === durat
       then 1
       else boost,
-    dir = if is_false(wlk)
+    dir = if (act > 0) && is_false(wlk)
       then look_dir(self)
       else dir,
     act = if tik === durat
@@ -203,8 +203,7 @@ blink(
   at_tik : Number,
   to_pos : V3)
   self <= thing(
-    pos = if tik === at_tik then to_pos else pos,
-    dir = if tik === at_tik then lookat_v3(pos,trg,dir) else dir)
+    pos = if tik === at_tik then to_pos else pos)
 
 // Creates a hit box that damages and knockbacks
 // - self: thing that owns the hitbox

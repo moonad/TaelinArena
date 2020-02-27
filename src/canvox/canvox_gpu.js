@@ -269,13 +269,18 @@ function canvox() {
       if (hit.ctr == HIT) {
         vec4 col = uint_to_vec4(hit.val);
 
+        // Ambient 
+        col.r *= 0.5;
+        col.g *= 0.5;
+        col.b *= 0.5;
+
         // Applies sunlight
         vec3 sun_dir = vec3(0.0,0.0,1.0);
         Hit sky = march(hit.pos, sun_dir, voxels, inf);
         if (sky.ctr == HIT) {
-          col.r *= 0.85;
-          col.g *= 0.85;
-          col.b *= 0.85;
+          col.r *= 0.8;
+          col.g *= 0.8;
+          col.b *= 0.8;
         }
 
         // Applies other lights
@@ -293,20 +298,23 @@ function canvox() {
             ray_pos = hit.pos + vec3(0.0,0.0,2.0);
             lit_dir = normalize(lit_pos - ray_pos);
           }
+          // light_rng = range the light is at 100% power
           float lit_dst = distance(ray_pos, lit_pos);
-          if (lit_dst < light_rng) {
+          float lit_pow = min((light_rng*light_rng)/(lit_dst*lit_dst),64.0);
+          // stops casting shadows at 4*rng
+          if (lit_pow > 0.16 && lit_dst > light_rad) {
             Hit hit = march(ray_pos, lit_dir, voxels, lit_dst - light_rad);
             if (hit.ctr == HIT) {
-              lit_dst = inf;
+              lit_pow = 0.0;
             }
           }
-          float pw = 1.0 - min(lit_dst*lit_dst/(light_rng*light_rng),1.0);
-          col.r *= 1.0 - light_sub.x*(1.0-pw);
-          col.g *= 1.0 - light_sub.y*(1.0-pw);
-          col.b *= 1.0 - light_sub.z*(1.0-pw);
-          col.r *= 1.0 + light_add.x*pw;
-          col.g *= 1.0 + light_add.y*pw;
-          col.b *= 1.0 + light_add.z*pw;
+          //float pw = 1.0 - min(lit_dst*lit_dst/(light_rng*light_rng),1.0);
+          col.r *= 1.0 - light_sub.x*(1.0-lit_pow);
+          col.g *= 1.0 - light_sub.y*(1.0-lit_pow);
+          col.b *= 1.0 - light_sub.z*(1.0-lit_pow);
+          col.r *= 1.0 + light_add.x*lit_pow;
+          col.g *= 1.0 + light_add.y*lit_pow;
+          col.b *= 1.0 + light_add.z*lit_pow;
         }
 
         vec3 color  = vec3(col);
