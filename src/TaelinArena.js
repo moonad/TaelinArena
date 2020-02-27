@@ -196,25 +196,14 @@ function render_game({game, canvox, canhud, cam}) {
       })(lit);
 
       // Renders HUD
-      //var px = Math.floor(cam.size.x*0.5 + pos_x);
-      //var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
-      hud.push({
-        pos: {x:pos_x, y:pos_y, z:pos_z},
-        dmg: dmg, 
-        nam: sstring_to_string(nam),
-        hei: hei,
-      });
-      //var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
-      //if (dmg !== 0xFFFFFFFF) {
-        //// Life bar (backline)
-        //hud.push({ctor:"rect",col:0xFF38A030,x:px-12,y:py-42,w:24,h:2});
-        //hud.push({ctor:"rect",col:0xFF383030,x:px+12-dm,y:py-42,w:dm,h:2});
-      //}
-
-      //// Renders player name
-      //if (name.length > 0) {
-        //hud.push({ctor:"text",siz:6,txt:name,col:0xFF383030});
-      //};
+      if (canhud) {
+        hud.push({
+          pos: {x:pos_x, y:pos_y, z:pos_z},
+          dmg: dmg,
+          nam: sstring_to_string(nam),
+          hei: hei,
+        });
+      };
     });
   })(game);
 
@@ -222,7 +211,9 @@ function render_game({game, canvox, canhud, cam}) {
   voxels.size = voxels_size;
 
   canvox.draw({voxels, lights, stage, cam});
-  canhud.draw({hud, cam});
+  if (canhud) {
+    canhud.draw({hud, cam});
+  };
   
   return hud;
 };

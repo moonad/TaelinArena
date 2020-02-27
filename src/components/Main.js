@@ -6,6 +6,7 @@ const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
 const SimplePeer = require("simple-peer");
+const utils = require("./../utils.js");
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -52,7 +53,7 @@ class Main extends Component {
     }, 1000);
 
     // Executes turns on offline mode
-    this.offline_mode_turner = setInterval(() => {
+    this.offline_mode_turner = utils.set_precise_interval(() => {
       if (this.game && this.game.gid === TA.OFF_GAME) {
         this.game.turn();
       }
@@ -91,7 +92,31 @@ class Main extends Component {
     this.fps_last = Date.now();
     this.fps_tick = 0; 
     this.fps_numb = 0;
-    this.render_game();
+    this.render_game(true);
+
+    // Benchmarks
+    function benchmark_function(name, fn) {
+      console.log("benchmarking " + name);
+      var T = Date.now();
+      var C = 0;
+      while (Date.now() - T < 1000) {
+        fn();
+        C++;
+      };
+      console.log("done:", C, "calls");
+    };
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "k") {
+        benchmark_function("render", () => {
+          this.render_game(false)
+        });
+      };
+      if (e.key === "l") {
+        benchmark_function("turn", () => {
+          this.game.turn()
+        });
+      };
+    });
   }
 
   componentWillUnmount() {
@@ -225,7 +250,7 @@ class Main extends Component {
   }
 
   // Renders TaelinArena's screen with canvox
-  render_game() {
+  render_game(loop) {
     // Gets the game screen element
     var game_screen = document.getElementById("game_screen");
 
@@ -276,7 +301,11 @@ class Main extends Component {
     }
 
     // Repeat on every screen render
-    window.requestAnimationFrame(() => this.render_game());
+    if (loop) {
+      window.requestAnimationFrame(() => {
+        this.render_game(loop)
+      });
+    };
   }
 
   // Asks missing turns for watched game
