@@ -51,20 +51,38 @@ interact_with(this:Thing, that:Thing): Thing
   let this =
     case this |thing
     case that |thing
-      case this.box |cbox
-      case that.box |cbox
-        let dst = dist_v3(this.pos, that.pos)
-        let rad = this.box.rad + that.box.rad
-        if (dst > 0) && (dst < rad) then
-          let out_dir = norm_v3(sub_v3(this.pos, that.pos))
-          let out_vec = scale_v3(rad - dst, out_dir)
-          let new_pos = add_v3(this.pos, out_vec)
-          this <= thing(pos = new_pos)
-        else
-          this
-      | pbox => this
-      | pbox => this
-
+      case this.box
+      |cbox => case that.box
+        // circle-circle
+        |cbox =>
+          let dst = dist_v3(this.pos, that.pos)
+          let rad = this.box.rad + that.box.rad
+          if (dst > 0) && (dst < rad) then
+            let out_dir = norm_v3(sub_v3(this.pos, that.pos))
+            let out_vec = scale_v3(rad - dst, out_dir)
+            let new_pos = add_v3(this.pos, out_vec)
+            this <= thing(pos = new_pos)
+          else
+            this
+        // circle-polygon
+        | pbox =>
+          let nil  = this
+          let cons = (segment, this) =>
+            case this |thing
+            case segment |segment
+            let dst = point_segment_dist(this.pos, segment)
+            let rad = this.box.rad
+            if (dst < rad) then
+              let out_dir = rot90_v3(norm_v3(sub_v3(segment.a,segment.b)))
+              let out_vec = scale_v3(rad - dst, out_dir)
+              let new_pos = add_v3(this.pos, out_vec)
+              this <= thing(pos = new_pos)
+            else
+              this
+          let segs = polygon_to_segments(that.pos, that.dir, that.box.pts)
+          fold(Segment; Thing; nil, cons, segs)
+      | pbox =>
+        this
   // Hit by an attack
   let this =
     case this |thing
@@ -155,20 +173,19 @@ exec_turn(gm: Game) : Game
     stage = interact_list(Thing; _ [], tick, stage, (x)=>x))
 
 // Returns the draw object with info to render on screen
-draw_thing(thi: Thing) : Draw 
-  case thi |thing
-  let mid = thi.mid
-  let nam = thi.nam
-  let pos = thi.pos
-  let dir =
-    if thi.act === 0 then
-      thi.dir
-    else
-      lookat_v3(thi.pos, thi.trg, thi.dir)
-  let lit = thi.lit
-  let dmg = thi.dmg
-  draw(mid, nam, pos, dir, lit, dmg)
-
+//draw_thing(thi: Thing) : Draw 
+  //case thi |thing
+  //let mid = thi.mid
+  //let nam = thi.nam
+  //let pos = thi.pos
+  //let dir =
+    //if thi.act === 0 then
+      //thi.dir
+    //else
+      //lookat_v3(thi.pos, thi.trg, thi.dir)
+  //let lit = thi.lit
+  //let dmg = thi.dmg
+  //draw(mid, nam, pos, dir, lit, dmg)
 
 //T NewThing
 //| new_thing(pid: PlayerId, tid: ThingId, nam: String, pos: V3)

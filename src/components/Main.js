@@ -122,27 +122,27 @@ class Main extends Component {
   // Joins a game given its gid
   join(gid) {
     if (!this.game || this.game.gid !== gid) {
-      var hero_list;
+      var things;
       if (gid === TA.OFF_GAME) {
-        hero_list = [
-          this.picked_hero,
-          "Poste",
-          "PPG",
-          "Wall"
+        things = [
+          [this.picked_hero, {pid:0, dmg:0, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
+          ["Poste", {pos:{x:0,y:0,z:0}, nam:"Poste"}],
+          ["PPG", {pos:{x:64,y:0,z:0}, dmg:0, nam:"PPG"}],
+          ["Wall", {pos:{x:-64,y:-64,z:0}, nam:"Wall"}],
         ];
       } else {
-        hero_list = this.game_list[gid].players.split(",");
-        hero_list = hero_list.map(TA.parse_player);
-        hero_list = hero_list.map(p => p.hero);
+        things = this.game_list[gid].players.split(",");
+        things = things.map(TA.parse_player);
+        things = things.map(p => p.hero);
+        things = things.map((name, idx) => {
+          return [name, {
+            pid: idx,
+            pos: {x: -64 + idx*64, y: 0, z: 0},
+            nam: name,
+          }];
+        });
       };
-      hero_list = hero_list.map((name, idx) => {
-        return [name, {
-          pid: idx,
-          pos: {x: -64 + idx*64, y: 0, z: 0},
-          nam: name,
-        }];
-      });
-      this.game = TA.Game(gid, hero_list);
+      this.game = TA.GameRunner(gid, things);
     }
   }
 

@@ -97,8 +97,14 @@ function render_game({game, canvox, canhud, cam}) {
 
   // Renders each game thing
   TA.map_stage((thing) => {
-    TA.draw_thing(thing)(mid=>nam=>pos=>dir=>lit=>dmg=>{
-      var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
+    thing(
+      fun => pid => mid => act =>
+      nam => lit => tik => pos =>
+      mov => bst => wlk => dir =>
+      trg => vel => box => dmg =>
+      knk => chi => hit => die => {
+      let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
+      var [dir_x,dir_y,dir_z] = look_dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var name = sstring_to_string(nam);
 
@@ -135,6 +141,46 @@ function render_game({game, canvox, canhud, cam}) {
         }
       }
 
+      // Renders hitbox
+      let case_cbox = (rad) => {
+        for (var i = 0; i < 32; ++i) {
+          var px = pos_x + rad * Math.cos(i/32*Math.PI*2);
+          var py = pos_y + rad * Math.sin(i/32*Math.PI*2);
+          var pz = pos_z;
+          if ( -512 < px && px < 512
+            && -512 < py && py < 512
+            && -512 < pz && pz < 512) {
+            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+            var rgb = 0xA0F0A0FF;
+            voxels_data[voxels_size++] = xyz;
+            voxels_data[voxels_size++] = rgb;
+          }
+        }
+      };
+      let case_pbox = (pts) => {
+        var segs = slist_to_array(TA.polygon_to_segments(pos)(dir)(pts));
+        for (var i = 0; i < segs.length; ++i) {
+          var [p0,p1] = segs[i](a => b => ([
+            a(x => y => z => ({x,y,z})),
+            b(x => y => z => ({x,y,z}))
+          ]));
+          for (var n = 0; n <= 16; ++n) {
+            var px = p0.x + (p1.x - p0.x) * n/16;
+            var py = p0.y + (p1.y - p0.y) * n/16;
+            var pz = p0.z + (p1.z - p0.z) * n/16;
+            if ( -512 < px && px < 512
+              && -512 < py && py < 512
+              && -512 < pz && pz < 512) {
+              var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+              var rgb = 0xA0F0A0FF;
+              voxels_data[voxels_size++] = xyz;
+              voxels_data[voxels_size++] = rgb;
+            }
+          }
+        }
+      };
+      box(case_cbox)(case_pbox);
+
       // Renders lights
       (function go(lit) {
         var case_nil  = null;
@@ -158,6 +204,7 @@ function render_game({game, canvox, canhud, cam}) {
         hud.push({ctor:"rect",col:0xFF38A030,x:px-12,y:py-42,w:24,h:2});
         hud.push({ctor:"rect",col:0xFF383030,x:px+12-dm,y:py-42,w:dm,h:2});
       }
+
       // Renders player name
       if (name.length > 0) {
         hud.push({ctor:"text",siz:6,txt:name,col:0xFF383030});
@@ -411,19 +458,27 @@ var thing_name = {
   [TA.PUNCH_OBJECT_THING] : "Punch_obj"
 };
 
-function make_thing([name, {pid,pos,nam}]) {
+function make_thing([name, {pid,dmg,pos,nam}]) {
   var thing;
   var tid = thing_id[name.toLowerCase()];
   thing = TA.new_thing;
-  thing = TA.set_thing_dmg(thing)(0);
   thing = TA.set_thing_fun(thing)(TA.get_thing_fun(tid));
-  thing = TA.set_thing_pid(thing)(pid);
-  thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));
-  thing = TA.set_thing_nam(thing)(string_to_sstring(nam)); 
+  if (pid !== undefined) {
+    thing = TA.set_thing_pid(thing)(pid);
+  }
+  if (dmg !== undefined) {
+    thing = TA.set_thing_dmg(thing)(dmg);
+  }
+  if (pos !== undefined) {
+    thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));
+  }
+  if (nam !== undefined) {
+    thing = TA.set_thing_nam(thing)(string_to_sstring(nam)); 
+  }
   return thing;
 };
 
-function Game(gid, things) {
+function GameRunner(gid, things) {
   var self = {};
   self.gid = gid;
   self.state = TA.game(array_to_slist(things.map(make_thing)));
@@ -485,5 +540,5 @@ module.exports = {
   execute_command,
   make_input_netcode,
   make_thing,
-  Game,
+  GameRunner,
 };

@@ -64,14 +64,14 @@ T Input
 T Command
 | command(pid: PlayerId, inp: Input)
 
-T Draw
-| draw(
-  mid: Number,
-  nam: String,
-  pos: V3,
-  dir: V3,
-  lit: List(Light),
-  dmg: Number)
+//T Draw
+//| draw(
+  //mid: Number,
+  //nam: String,
+  //pos: V3,
+  //dir: V3,
+  //lit: List(Light),
+  //dmg: Number)
 
 // Creates a new default thing
 new_thing : Thing
