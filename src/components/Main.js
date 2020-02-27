@@ -1,6 +1,7 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const Canvox = require("./../canvox/canvox.js");
+const Canhud = require("./../canhud/canhud.js");
 const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
@@ -232,20 +233,17 @@ class Main extends Component {
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
       this.canvox = Canvox({mode: this.render_mode});
-      //this.canhud = document.createElement("canvas");
-      //this.canhud.context = this.canhud.getContext("2d");
-      //this.canhud.style["position"] = "absolute";
-      //this.canhud.style["image-rendering"] = "pixelated";
+      this.canhud = Canhud();
     }
     
     // Inject its canvas on the app
     if (game_screen) {
       if (game_screen.firstChild) {
         game_screen.removeChild(game_screen.firstChild);
-        //game_screen.removeChild(game_screen.firstChild);
+        game_screen.removeChild(game_screen.firstChild);
       }
       if (!game_screen.firstChild) {
-        //game_screen.appendChild(this.canhud);
+        game_screen.appendChild(this.canhud);
         game_screen.appendChild(this.canvox);
       }
     }
@@ -269,19 +267,12 @@ class Main extends Component {
       }
       // Renders the game
       var cam = this.controls.make_canvox_cam();
-      TA.render_game({
+      this.hud = TA.render_game({
         game: this.game.state,
         canvox: this.canvox,
-        //canhud: this.canhud,
+        canhud: this.canhud,
         cam: cam,
       });
-      //if (this.canhud.width !== this.canvox.width*2) {
-        //this.canhud.width = this.canvox.width*2;
-        //this.canhud.height = this.canvox.height*2;
-        //this.canhud.context.scale(2,2);
-      //};
-      //this.canhud.style["width"] = this.canvox.style.width;
-      //this.canhud.style["height"] = this.canvox.style.height;
     }
 
     // Repeat on every screen render
@@ -307,7 +298,7 @@ class Main extends Component {
         post("get_game", {id}).then((res) => {
           if (res.ctr === "ok") {
             this.game_list[id] = res.game;
-            this.forceUpdate();
+            //this.forceUpdate();
           }
         });
       }
@@ -324,18 +315,20 @@ class Main extends Component {
       case ">":
       case "^":
         this.room_players = str;
+        this.forceUpdate();
         break;
       // Receives turn info
       case "$":
         if (this.game) {
           this.game.absorb_turn_info(str);
+          this.forceUpdate();
         }
         break;
       default:
         this.chat_msgs.push(str);
+        this.forceUpdate();
         break;
     }
-    this.forceUpdate();
   }
 
   // Selects a hero
@@ -397,9 +390,6 @@ class Main extends Component {
         "font-size": "16px",
         "cursor": "pointer",
       },
-      onClick: () => {
-        this.forceUpdate();
-      }
     }, "Taelin::Arena ");
 
     // Top menu: login
@@ -469,6 +459,25 @@ class Main extends Component {
       top_rgt,
     ]);
 
+    // Game hud
+    //var hud = [];
+    //console.log("....", this.hud);
+    //for (var i = 0; i < this.hud.length; ++i) {
+      //var hud_el = this.hud[i];
+      //switch (hud_el.ctor) {
+        //case "rect":
+          //hud.push(h("div", {"style": {
+            //"position": "absolute",
+            //"left": hud_el.x+"px",
+            //"top": hud_el.y+"px",
+            //"width": hud_el.w+"px",
+            //"height": hud_el.h+"px",
+            //"background": hud_el.col,
+          //}}, ["x"]));
+          //break;
+      //}
+    //}
+
     // Game screen
     if (this.canvox) {
       var ch = Number(this.canvox.style.height.slice(0,-2));
@@ -482,8 +491,7 @@ class Main extends Component {
         "border-top": "1px solid #E0E0E0",
         "border-bottom": "1px solid #E0E0E0",
         "background": "#FCFCFC",
-      }
-    });
+      }});
 
     // Bottom panel: chat box
     var chat_box = h("div", {

@@ -76,18 +76,12 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
       canvas.style.width = Math.floor(cam.port.x) + "px";
       canvas.style.height = Math.floor(cam.port.y) + "px";
       if (!canvas.image_data) {
-        canvas.image_data = context.getImageData(
-          0, 0, canvas.width, canvas.height);
-        canvas.image_buf = new ArrayBuffer(
-          canvas.image_data.data.length);
-        canvas.image_u8 = new Uint8ClampedArray(
-          canvas.image_buf);
-        canvas.image_u32 = new Uint32Array(
-          canvas.image_buf);
-        canvas.depth_buf = new ArrayBuffer(
-          canvas.image_u32.length);
-        canvas.depth_u8 = new Uint8Array(
-          canvas.depth_buf);
+        canvas.image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+        canvas.image_buf = new ArrayBuffer(canvas.image_data.data.length);
+        canvas.image_u8 = new Uint8ClampedArray(canvas.image_buf);
+        canvas.image_u32 = new Uint32Array(canvas.image_buf);
+        canvas.depth_buf = new ArrayBuffer(canvas.image_u32.length);
+        canvas.depth_u8 = new Uint8Array(canvas.depth_buf);
       }
       var clr = [];
       var cos = Math.cos(cam.ang);

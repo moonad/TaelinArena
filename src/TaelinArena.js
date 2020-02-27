@@ -85,6 +85,8 @@ function render_game({game, canvox, canhud, cam}) {
   var voxels_size = 0;
   var hmul = Math.cos(Math.PI*0.5-cam.ang);
 
+  var hud = [];
+
   // Clears canhud
   //if (canhud && canhud.clear_rects) {
     //for (var i = 0; i < canhud.clear_rects.length; ++i) {
@@ -158,11 +160,13 @@ function render_game({game, canvox, canhud, cam}) {
       })(lit);
 
       // Renders life bar
-      //var px = Math.floor(cam.size.x*0.5 + pos_x);
-      //var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
-      //var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
-      //if (dmg !== 0xFFFFFFFF) {
-        //// Life bar (backline)
+      var px = Math.floor(cam.size.x*0.5 + pos_x);
+      var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
+      var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
+      if (dmg !== 0xFFFFFFFF) {
+        // Life bar (backline)
+        hud.push({ctor:"rect",col:0xFF38A030,x:px-12,y:py-42,w:24,h:2});
+        hud.push({ctor:"rect",col:0xFF383030,x:px+12-dm,y:py-42,w:dm,h:2});
         //canhud.context.beginPath();
         //canhud.context.fillStyle = "#30A038";
         //canhud.context.rect(px-12,py-42,24,2); // y -42 a -24
@@ -173,9 +177,10 @@ function render_game({game, canvox, canhud, cam}) {
         //canhud.context.rect(px+12-dm,py-42,dm,2); // y -42 a -24
         //canhud.context.fill();
         //canhud.context.lineWidth = 0.333333;
-      //}
-      //// Renders player name
-      //if (name.length > 0) {
+      }
+      // Renders player name
+      if (name.length > 0) {
+        hud.push({ctor:"text",siz:6,txt:name,col:0xFF383030});
         //canhud.context.fillStyle = "#303038";
         //canhud.context.strokeStyle = "#303038";
         //canhud.context.font = 6+"px Arial"; // y -48 a -42
@@ -184,8 +189,8 @@ function render_game({game, canvox, canhud, cam}) {
         //canhud.context.fillText(name, (px), (py-42));
         //canhud.context.strokeText(name, (px), (py-42));
         //var clrw = name.length * 12;
-      //};
-      //// Marks area to clear later
+      };
+      // Marks area to clear later
       //canhud.clear_rects.push([px-clrw*0.5, py-48, clrw, 24]);
     });
   })(game);
@@ -202,6 +207,9 @@ function render_game({game, canvox, canhud, cam}) {
     //rng: 256});
 
   canvox.draw({voxels, lights, stage, cam});
+  canhud.draw({hud, cam});
+  
+  return hud;
 };
 
 // Turns ::=
