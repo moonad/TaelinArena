@@ -25,7 +25,7 @@ pichu_fun(self: Thing) : Thing
   | PICHU_THUNDER_SHOCK
     let self = animate(self, 0, PICHU_THUNDER_SHOCK_000, 6, 12)
     let shock = new_thing <= thing(fun=pichu_thunder_shock_effect)
-    let self = spawn(self, 0, self.trg, shock)
+    let self = spawn(self, 0, [move(shock, self.trg)])
     self
 
   // Middle
@@ -40,7 +40,7 @@ pichu_fun(self: Thing) : Thing
   | PICHU_THUNDER_CHARGE
     let self = animate(self, 1, PICHU_ELECTRIC_BALL_000, 10, 20)
     let shock = new_thing <= thing(fun=pichu_thunder_charge_effect)
-    let self = spawn(self, 18, self.trg, shock)
+    let self = spawn(self, 18, [move(shock, self.trg)])
     self
 
   // Space

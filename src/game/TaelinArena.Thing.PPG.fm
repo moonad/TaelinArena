@@ -39,7 +39,7 @@ ppg_fun(self: Thing) : Thing
   |PPG_COSMIC_ICE_BALL_CASTING
     let self = animate(self, 0, PPG_COSMIC_ICE_BALL_CAST_000, 23, 50)
     let ice = new_thing <= thing(fun=ppg_ice_ball_effect)
-    let self = spawn(self, 23, self.trg, ice)
+    let self = spawn(self, 23, [move(ice, self.trg)])
     self
 
   // Space

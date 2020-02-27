@@ -13,7 +13,3 @@ wall_fun(self: Thing) : Thing
     v3(boxw *  1, boxh * -1, 0)
   ]))
   self
-
-main wall_fun
-
-//main wall_fun

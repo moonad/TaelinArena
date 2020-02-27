@@ -52,7 +52,14 @@ interact_with(this:Thing, that:Thing): Thing
     case this |thing
     case that |thing
       case this.box
+      // nothing
+      |nbox =>
+        this
+      // circle
       |cbox => case that.box
+        // circle-nothing
+        |nbox =>
+          this
         // circle-circle
         |cbox =>
           let dst = dist_v3(this.pos, that.pos)
@@ -81,6 +88,7 @@ interact_with(this:Thing, that:Thing): Thing
               this
           let segs = polygon_to_segments(that.pos, that.dir, that.box.pts)
           fold(Segment; Thing; nil, cons, segs)
+      // polygon
       | pbox =>
         this
   // Hit by an attack
@@ -97,7 +105,11 @@ interact_with(this:Thing, that:Thing): Thing
       if dst < (rad * rad) then
         let dir = lookat_v3(that.pos, this.pos, v3(1,0,0))
         let vec = scale_v3(that.hit.value.mag, dir)
-        this <= thing(knk = vec)
+        this <= thing(
+          knk = vec,
+          dmg = if dmg === 0xFFFFFFFF
+            then dmg
+            else dmg + that.hit.value.dmg)
       else
         this
   this

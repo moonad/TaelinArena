@@ -24,35 +24,35 @@ dorime_fun(self: Thing) : Thing
   | DORIME_BLESSING_FOR_WHO_DESERVE
     let self = animate(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_000, 14, 28)
     let fire = new_thing <= thing(fun=dorime_blessing_effect)
-    let self = spawn(self, 5, self.pos, fire)
+    let self = spawn(self, 5, [move(fire, self.pos)])
     self
 
   // Middle
   | DORIME_LEPTOSPIROSE_CURSE
     let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000, 5, 10)
     let puddle = new_thing <= thing(fun=dorime_leptospirose_curse_effect)
-    let self = spawn(self, 8, self.trg, puddle)
+    let self = spawn(self, 8, [move(puddle, self.trg)])
     self
 
   // Right
   | DORIME_HOLY_FLAME
     let self = animate(self, 0, DORIME_HOLY_FLAME_CAST_ANIMATION_000, 8, 16)
     let flame = new_thing <= thing(fun=dorime_holy_flame_effect)
-    let self = spawn(self, 5, self.trg, flame)
+    let self = spawn(self, 5, [move(flame, self.trg)])
     self
 
   // Q
   | DORIME_GODS_CHAMBER
     let self = animate(self, 0, DORIME_GODS_CHAMBER_CAST_ANIMATION_000, 9, 27)
     let effect = new_thing <= thing(fun=dorime_gods_chamber_effect)
-    let self = spawn(self, 9, self.trg, effect)
+    let self = spawn(self, 9, [move(effect, self.trg)])
     self
 
   // Space
   | DORIME_BLESS
     let self = animate(self, 0, DORIME_BLESS_CAST_000, 6, 12)
     let bless = new_thing <= thing(fun=dorime_bless_halo_effect)
-    let self = spawn(self, 1, self.pos, bless)
+    let self = spawn(self, 1, [move(bless, self.pos)])
     self
 
   // E

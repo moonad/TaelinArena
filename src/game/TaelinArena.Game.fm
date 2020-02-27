@@ -12,6 +12,7 @@ ActionId : Type
   Number
 
 T Hitbox
+| nbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
@@ -189,18 +190,9 @@ dash(
     else
       v3(0,0,0))
 
-// Spawns another thing
-// - self: thing that will create another thing
-// - at_tik: number of the tik when thing will be created
-// - at_pos: position on which thing will be created
-// - thing: thing that will be created
-spawn(
-  self   : Thing,
-  at_tik : Number,
-  at_pos : V3,
-  thing  : Thing)
-  let thing = thing <= thing(pid = -1, pos = at_pos)
-  self <= thing(chi = if tik === at_tik then [thing] else [])
+// Sets the position
+move(self: Thing, to_pos: V3)
+  self <= thing(pos = to_pos)
 
 // Blinks (teleports) to another position
 // - self: thing that will blink
@@ -224,10 +216,28 @@ hit(
   case self |thing
   if self.tik === at_tik then
     self <= thing(hit = some(_ do_hit))
-  else if self.tik === (at_tik + 2) then
+  else if self.tik === (at_tik + 1) then
     self <= thing(hit = none(_))
   else
     self
+
+// Spawns another thing
+// - self: thing that will create another thing
+// - at_tik: number of the tik when thing will be created
+// - at_pos: position on which thing will be created
+// - thing: thing that will be created
+spawn(
+  self   : Thing,
+  at_tik : Number,
+  childs : List(Thing))
+  //let thing = thing <= thing(pid = -1, pos = at_pos)
+  self <= thing(chi =
+    if tik === at_tik then
+      childs
+    else if tik === (at_tik + 1) then
+      []
+    else
+      chi)
 
 // Dies at given tick
 die(
@@ -250,3 +260,10 @@ illumine(
 look_dir(self: Thing)
   case self |thing
   lookat_v3(self.pos, self.trg, self.dir)
+
+// Returns the position at a given distance towards look_dir
+at_dist(self: Thing, dist: Number)
+  case self |thing
+  let dir = look_dir(self)
+  let pos = add_v3(self.pos, scale_v3(dist, dir))
+  pos

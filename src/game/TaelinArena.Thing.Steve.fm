@@ -28,7 +28,7 @@ steve_fun(self: Thing) : Thing
   | STEVE_TNT
     let self = animate(self, 0, STEVE_TNT_CASTING_000, 3, 9)
     let tnt = new_thing <= thing(fun=steve_tnt_effect)
-    let self = spawn(self, 5, self.trg, tnt)
+    let self = spawn(self, 5, [move(tnt, self.trg)])
     self
 
   // Right
@@ -42,14 +42,14 @@ steve_fun(self: Thing) : Thing
     let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_CASTING_000, 16, 32)
     let effect = new_thing <= thing(fun=steve_ender_dragons_fury_effect)
     let effect = effect <= thing(dir = look_dir(self))
-    let self = spawn(self, 16, self.trg, effect)
+    let self = spawn(self, 16, [move(effect, self.trg)])
     self
 
   // Space
   | STEVE_BLOCK
     let self = animate(self, 0, STEVE_BLOCK_000, 17, 17)
     let block = new_thing <= thing(fun=steve_block_effect)
-    let self = spawn(self, 1, self.trg, block)
+    let self = spawn(self, 1, [move(block, self.trg)])
     self
 
   // E
