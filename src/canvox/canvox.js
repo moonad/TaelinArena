@@ -2,7 +2,7 @@ const oct = require("./octree.js");
 
 var tree = null;
 function build_voxel_octree(voxels) {
-  tree = oct.empty(256*256*256, tree);
+  tree = oct.empty(256*256*64, tree);
   var voxels_data = voxels.data;
   var voxels_size = voxels.size;
   for (var i = 0; i < voxels_size / 2; ++i) {
@@ -82,8 +82,8 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         canvas.image_u32 = new Uint32Array(canvas.image_buf);
         canvas.depth_buf = new ArrayBuffer(canvas.image_u32.length);
         canvas.depth_u8 = new Uint8Array(canvas.depth_buf);
+        canvas.clear = {size:0, data:new Uint32Array(256*256*32)};
       }
-      var clr = [];
       var cos = Math.cos(cam.ang);
 
       // Draws shadows
@@ -101,7 +101,7 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         if (k >= dpt) {
           canvas.image_u32[idx] = col;
           canvas.depth_u8[idx] = k;
-          clr.push(idx);
+          canvas.clear.data[canvas.clear.size++] = idx;
         }
       }
 
@@ -124,7 +124,7 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
         if (k >= dpt) {
           canvas.image_u32[idx] = col;
           canvas.depth_u8[idx] = k;
-          clr.push(idx);
+          canvas.clear.data[canvas.clear.size++] = idx;
         }
       }
 
@@ -133,11 +133,12 @@ module.exports = function canvox(opts = {mode: "GPU"}) {
       context.putImageData(canvas.image_data, 0, 0);
 
       // Clears pixels
-      for (var i = 0; i < clr.length; ++i) {
-        var idx = clr[i];
+      for (var i = 0; i < canvas.clear.size; ++i) {
+        var idx = canvas.clear.data[i];
         canvas.image_u32[idx] = 0;
         canvas.depth_u8[idx] = 0;
       }
+      canvas.clear.size = 0;
     };
     return canvas;
   };

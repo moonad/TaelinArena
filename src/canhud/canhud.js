@@ -17,10 +17,7 @@ module.exports = function canhud() {
       canhud.image_u32 = new Uint32Array(canhud.image_buf);
       canhud.depth_buf = new ArrayBuffer(canhud.image_u32.length);
       canhud.depth_u8 = new Uint8Array(canhud.depth_buf);
-      canhud.clear = {
-        data: new Uint32Array(256*256),
-        size: 0,
-      };
+      canhud.clear = {size:0, data:new Uint32Array(256*256*32)};
     };
 
     // Draws shapes on buffer

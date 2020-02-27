@@ -76,25 +76,15 @@ var OFF_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
 var voxels = {
-  size: 256*256*256*2,
-  data: new Uint32Array(256*256*256*2)
+  size: 256*256*32*2,
+  data: new Uint32Array(256*256*32*2)
 };
 
 function render_game({game, canvox, canhud, cam}) {
   var voxels_data = voxels.data;
   var voxels_size = 0;
   var hmul = Math.cos(Math.PI*0.5-cam.ang);
-
   var hud = [];
-
-  // Clears canhud
-  //if (canhud && canhud.clear_rects) {
-    //for (var i = 0; i < canhud.clear_rects.length; ++i) {
-      //var [x,y,w,h] = canhud.clear_rects[i];
-      //canhud.context.clearRect(x-2, y-2, w+4, h+4);
-    //}
-  //}
-  //canhud.clear_rects = [];
 
   // Gets the current time
   var T = now();
@@ -167,44 +157,16 @@ function render_game({game, canvox, canhud, cam}) {
         // Life bar (backline)
         hud.push({ctor:"rect",col:0xFF38A030,x:px-12,y:py-42,w:24,h:2});
         hud.push({ctor:"rect",col:0xFF383030,x:px+12-dm,y:py-42,w:dm,h:2});
-        //canhud.context.beginPath();
-        //canhud.context.fillStyle = "#30A038";
-        //canhud.context.rect(px-12,py-42,24,2); // y -42 a -24
-        //canhud.context.fill();
-        //canhud.context.beginPath();
-        //// Life bar (greenline)
-        //canhud.context.fillStyle = "#303038";
-        //canhud.context.rect(px+12-dm,py-42,dm,2); // y -42 a -24
-        //canhud.context.fill();
-        //canhud.context.lineWidth = 0.333333;
       }
       // Renders player name
       if (name.length > 0) {
         hud.push({ctor:"text",siz:6,txt:name,col:0xFF383030});
-        //canhud.context.fillStyle = "#303038";
-        //canhud.context.strokeStyle = "#303038";
-        //canhud.context.font = 6+"px Arial"; // y -48 a -42
-        //canhud.context.textAlign = "center";
-        //canhud.context.textBaseline = "bottom";
-        //canhud.context.fillText(name, (px), (py-42));
-        //canhud.context.strokeText(name, (px), (py-42));
-        //var clrw = name.length * 12;
       };
-      // Marks area to clear later
-      //canhud.clear_rects.push([px-clrw*0.5, py-48, clrw, 24]);
     });
   })(game);
 
   voxels.data = voxels_data;
   voxels.size = voxels_size;
-
-  //lights.push({
-    //pos: {
-      //x: Math.cos(Date.now()/1000)*64,
-      //y: Math.sin(Date.now()/1000)*64,
-      //z: 64
-    //},
-    //rng: 256});
 
   canvox.draw({voxels, lights, stage, cam});
   canhud.draw({hud, cam});
