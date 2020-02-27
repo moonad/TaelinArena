@@ -232,20 +232,20 @@ class Main extends Component {
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
       this.canvox = Canvox({mode: this.render_mode});
-      this.canhud = document.createElement("canvas");
-      this.canhud.context = this.canhud.getContext("2d");
-      this.canhud.style["position"] = "absolute";
-      this.canhud.style["image-rendering"] = "pixelated";
+      //this.canhud = document.createElement("canvas");
+      //this.canhud.context = this.canhud.getContext("2d");
+      //this.canhud.style["position"] = "absolute";
+      //this.canhud.style["image-rendering"] = "pixelated";
     }
     
     // Inject its canvas on the app
     if (game_screen) {
       if (game_screen.firstChild) {
         game_screen.removeChild(game_screen.firstChild);
-        game_screen.removeChild(game_screen.firstChild);
+        //game_screen.removeChild(game_screen.firstChild);
       }
       if (!game_screen.firstChild) {
-        game_screen.appendChild(this.canhud);
+        //game_screen.appendChild(this.canhud);
         game_screen.appendChild(this.canvox);
       }
     }
@@ -272,16 +272,16 @@ class Main extends Component {
       TA.render_game({
         game: this.game.state,
         canvox: this.canvox,
-        canhud: this.canhud,
+        //canhud: this.canhud,
         cam: cam,
       });
-      if (this.canhud.width !== this.canvox.width*2) {
-        this.canhud.width = this.canvox.width*2;
-        this.canhud.height = this.canvox.height*2;
-        this.canhud.context.scale(2,2);
-      };
-      this.canhud.style["width"] = this.canvox.style.width;
-      this.canhud.style["height"] = this.canvox.style.height;
+      //if (this.canhud.width !== this.canvox.width*2) {
+        //this.canhud.width = this.canvox.width*2;
+        //this.canhud.height = this.canvox.height*2;
+        //this.canhud.context.scale(2,2);
+      //};
+      //this.canhud.style["width"] = this.canvox.style.width;
+      //this.canhud.style["height"] = this.canvox.style.height;
     }
 
     // Repeat on every screen render

@@ -86,13 +86,13 @@ function render_game({game, canvox, canhud, cam}) {
   var hmul = Math.cos(Math.PI*0.5-cam.ang);
 
   // Clears canhud
-  if (canhud && canhud.clear_rects) {
-    for (var i = 0; i < canhud.clear_rects.length; ++i) {
-      var [x,y,w,h] = canhud.clear_rects[i];
-      canhud.context.clearRect(x-2, y-2, w+4, h+4);
-    }
-  }
-  canhud.clear_rects = [];
+  //if (canhud && canhud.clear_rects) {
+    //for (var i = 0; i < canhud.clear_rects.length; ++i) {
+      //var [x,y,w,h] = canhud.clear_rects[i];
+      //canhud.context.clearRect(x-2, y-2, w+4, h+4);
+    //}
+  //}
+  //canhud.clear_rects = [];
 
   // Gets the current time
   var T = now();
@@ -109,7 +109,6 @@ function render_game({game, canvox, canhud, cam}) {
       var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
       var name = sstring_to_string(nam);
-
 
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
@@ -159,35 +158,35 @@ function render_game({game, canvox, canhud, cam}) {
       })(lit);
 
       // Renders life bar
-      var px = Math.floor(cam.size.x*0.5 + pos_x);
-      var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
-      var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
-      if (dmg !== 0xFFFFFFFF) {
-        // Life bar (backline)
-        canhud.context.beginPath();
-        canhud.context.fillStyle = "#30A038";
-        canhud.context.rect(px-12,py-42,24,2); // y -42 a -24
-        canhud.context.fill();
-        canhud.context.beginPath();
-        // Life bar (greenline)
-        canhud.context.fillStyle = "#303038";
-        canhud.context.rect(px+12-dm,py-42,dm,2); // y -42 a -24
-        canhud.context.fill();
-        canhud.context.lineWidth = 0.333333;
-      }
-      // Renders player name
-      if (name.length > 0) {
-        canhud.context.fillStyle = "#303038";
-        canhud.context.strokeStyle = "#303038";
-        canhud.context.font = 6+"px Arial"; // y -48 a -42
-        canhud.context.textAlign = "center";
-        canhud.context.textBaseline = "bottom";
-        canhud.context.fillText(name, (px), (py-42));
-        canhud.context.strokeText(name, (px), (py-42));
-        var clrw = name.length * 12;
-      };
-      // Marks area to clear later
-      canhud.clear_rects.push([px-clrw*0.5, py-48, clrw, 24]);
+      //var px = Math.floor(cam.size.x*0.5 + pos_x);
+      //var py = Math.floor(cam.size.y*0.5 - pos_y*hmul);
+      //var dm = Math.floor(Math.min(Math.max(dmg, 0), 24));
+      //if (dmg !== 0xFFFFFFFF) {
+        //// Life bar (backline)
+        //canhud.context.beginPath();
+        //canhud.context.fillStyle = "#30A038";
+        //canhud.context.rect(px-12,py-42,24,2); // y -42 a -24
+        //canhud.context.fill();
+        //canhud.context.beginPath();
+        //// Life bar (greenline)
+        //canhud.context.fillStyle = "#303038";
+        //canhud.context.rect(px+12-dm,py-42,dm,2); // y -42 a -24
+        //canhud.context.fill();
+        //canhud.context.lineWidth = 0.333333;
+      //}
+      //// Renders player name
+      //if (name.length > 0) {
+        //canhud.context.fillStyle = "#303038";
+        //canhud.context.strokeStyle = "#303038";
+        //canhud.context.font = 6+"px Arial"; // y -48 a -42
+        //canhud.context.textAlign = "center";
+        //canhud.context.textBaseline = "bottom";
+        //canhud.context.fillText(name, (px), (py-42));
+        //canhud.context.strokeText(name, (px), (py-42));
+        //var clrw = name.length * 12;
+      //};
+      //// Marks area to clear later
+      //canhud.clear_rects.push([px-clrw*0.5, py-48, clrw, 24]);
     });
   })(game);
 
