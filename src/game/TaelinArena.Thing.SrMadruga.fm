@@ -49,10 +49,11 @@ sr_madruga_fun(self: Thing) : Thing
       let lz = 23.0
       v3(lx, ly, lz)
     let lpow = 1 - ((self.tik - 24) \ 16)
+    let lrad = 1.0
     let lrng = 160.0
-    let lsub = 0.5 * lpow
-    let ladd = 2.0 * lpow
-    let lght = light(lpos,lrng,lsub,ladd)
+    let lsub = v3(0.5 * lpow, 0.5 * lpow, 0.5 * lpow)
+    let ladd = v3(2.0 * lpow, 2.0 * lpow, 2.0 * lpow)
+    let lght = light(lpos,lrad,lrng,lsub,ladd)
     let self = illumine(self, 24, 40, [lght])
     let self = hit(self, 25, outward_hit(160, 0, 4)) 
     //let self = spawn(self, 15, self.trg, new_thing <= thing(fun=sr_madruga_explosive_photo_fun))

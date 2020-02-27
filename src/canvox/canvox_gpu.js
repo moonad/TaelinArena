@@ -72,9 +72,10 @@ function canvox() {
 
     uniform int   light_len;
     uniform vec3  light_pos[32];
+    uniform float light_rad[32];
     uniform float light_rng[32];
-    uniform float light_sub[32];
-    uniform float light_add[32];
+    uniform vec3  light_sub[32];
+    uniform vec3  light_add[32];
 
     uniform sampler2D voxels;
     uniform sampler2D stage;
@@ -281,8 +282,9 @@ function canvox() {
         for (int i = 0; i < light_len; ++i) {
           vec3 lit_pos = light_pos[i];
           float light_rng = light_rng[i];
-          float light_sub = light_sub[i];
-          float light_add = light_add[i];
+          float light_rad = light_rad[i];
+          vec3 light_sub = light_sub[i];
+          vec3 light_add = light_add[i];
           vec3 lit_dir, ray_pos;
           if (hit.pos.z > 0.0) {
             lit_dir = normalize(lit_pos - hit.pos);
@@ -293,18 +295,18 @@ function canvox() {
           }
           float lit_dst = distance(ray_pos, lit_pos);
           if (lit_dst < light_rng) {
-            Hit hit = march(ray_pos, lit_dir, voxels, lit_dst);
+            Hit hit = march(ray_pos, lit_dir, voxels, lit_dst - light_rad);
             if (hit.ctr == HIT) {
               lit_dst = inf;
             }
           }
           float pw = 1.0 - min(lit_dst*lit_dst/(light_rng*light_rng),1.0);
-          col.r *= 1.0 - light_sub*(1.0-pw);
-          col.g *= 1.0 - light_sub*(1.0-pw);
-          col.b *= 1.0 - light_sub*(1.0-pw);
-          col.r *= 1.0 + light_add*pw;
-          col.g *= 1.0 + light_add*pw;
-          col.b *= 1.0 + light_add*pw;
+          col.r *= 1.0 - light_sub.x*(1.0-pw);
+          col.g *= 1.0 - light_sub.y*(1.0-pw);
+          col.b *= 1.0 - light_sub.z*(1.0-pw);
+          col.r *= 1.0 + light_add.x*pw;
+          col.g *= 1.0 + light_add.y*pw;
+          col.b *= 1.0 + light_add.z*pw;
         }
 
         vec3 color  = vec3(col);
@@ -418,19 +420,22 @@ function canvox() {
     // Uploads lights to GPU
     var light_pos = [];
     var light_rng = [];
+    var light_rad = [];
     var light_sub = [];
     var light_add = [];
     for (var i = 0; i < lights.length; ++i) {
       light_pos.push(lights[i].pos.x, lights[i].pos.y, lights[i].pos.z);
       light_rng.push(lights[i].rng);
-      light_sub.push(lights[i].sub);
-      light_add.push(lights[i].add);
+      light_rad.push(lights[i].rad);
+      light_sub.push(lights[i].sub.x, lights[i].sub.y, lights[i].sub.z);
+      light_add.push(lights[i].add.x, lights[i].add.y, lights[i].add.z);
     }
     gl.uniform1i(gl.getUniformLocation(shader, "light_len"), lights.length);
     gl.uniform3fv(gl.getUniformLocation(shader, "light_pos"), light_pos);
     gl.uniform1fv(gl.getUniformLocation(shader, "light_rng"), light_rng);
-    gl.uniform1fv(gl.getUniformLocation(shader, "light_sub"), light_sub);
-    gl.uniform1fv(gl.getUniformLocation(shader, "light_add"), light_add);
+    gl.uniform1fv(gl.getUniformLocation(shader, "light_rad"), light_rad);
+    gl.uniform3fv(gl.getUniformLocation(shader, "light_sub"), light_sub);
+    gl.uniform3fv(gl.getUniformLocation(shader, "light_add"), light_add);
 
     // Uploads camera to GPU
     gl.uniform3fv(

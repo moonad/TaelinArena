@@ -185,10 +185,11 @@ function render_game({game, canvox, canhud, cam}) {
       (function go(lit) {
         var case_nil  = null;
         var case_cons = head => tail => {
-          head(pos => rng => sub => add => {
-            pos(x => y => z => {
-              lights.push({pos:{x,y,z}, rng, sub, add});
-            });
+          head(pos => rad => rng => sub => add => {
+            pos = pos(x=>y=>z=>({x,y,z}));
+            sub = sub(x=>y=>z=>({x,y,z}));
+            add = add(x=>y=>z=>({x,y,z}));
+            lights.push({pos, rad, rng, sub, add});
           });
           go(tail);
         };

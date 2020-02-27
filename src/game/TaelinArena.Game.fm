@@ -23,7 +23,7 @@ TxFunction : Type
   Thing -> Thing
 
 T Light
-| light(pos: V3, rng: Number, sub: Number, add: Number)
+| light(pos: V3, rad: Number, rng: Number, sub: V3, add: V3)
 
 T Thing
 | thing(
