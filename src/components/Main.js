@@ -232,7 +232,7 @@ class Main extends Component {
     // If first render or mode changed, restart canvox
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
-      this.canvox = Canvox({mode: this.render_mode});
+      this.canvox = Canvox[this.render_mode]();
       this.canhud = Canhud();
     }
     
