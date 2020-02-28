@@ -31,7 +31,7 @@ class Main extends Component {
     this.auto_join = true;
     this.controls = Controls(nc => this.send_inputs(nc));
     this.render_mode = "GPU";
-    this.picked_hero = "Tupitree";
+    this.picked_hero = null;
     this.canvox = null;
     this.canhud = null;
     this.peer = null;
@@ -517,8 +517,8 @@ class Main extends Component {
       "id": "game_screen",
       "style": {
         "height": (ch + 2) + "px",
-        "border-top": "1px solid #E0E0E0",
-        "border-bottom": "1px solid #E0E0E0",
+        "border-top": "1px solid #A0A0A0",
+        "border-bottom": "1px solid #A0A0A0",
         "background": "#FCFCFC",
       }});
 

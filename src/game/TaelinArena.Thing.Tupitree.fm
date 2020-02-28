@@ -11,7 +11,7 @@ enum
 | TUPITREE_TAUNT
 
 tupitree_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3)
+  let self = self <= thing(mov = 2)
 
   case self |thing switch self.act
 
@@ -22,7 +22,26 @@ tupitree_fun(self: Thing) : Thing
 
   // Left 
   |TUPITREE_VINE_WHIP
-    animate(self, 0, TUPITREE_VINE_WHIP_000, 25, 30)
+    let self = animate(self, 0, TUPITREE_VINE_WHIP_000, 25, 25)
+    let whip = new_thing <= thing(fun=tupitree_vine_whip_hit_fun)
+    let self = spawn(self, 7, [
+      move(whip, at_dist(self, 30)),
+      move(whip, at_dist(self, 60)),
+      move(whip, at_dist(self, 90)),
+    ])
+    let self = spawn(self, 14, [
+      move(whip, at_dist(self, 30)),
+      move(whip, at_dist(self, 60)),
+      move(whip, at_dist(self, 90)),
+    ])
+    let self = spawn(self, 21, [
+      move(whip, at_dist(self, 30)),
+      move(whip, at_dist(self, 60)),
+      move(whip, at_dist(self, 90)),
+    ])
+    //let self = spawn(self, 6, at_dist(self, 48), [ehit])
+    //let self = spawn(self, 9, at_dist(self, 72), [ehit])
+    self
 
   // Middle
   |TUPITREE_POINTED_ROOT
@@ -31,21 +50,22 @@ tupitree_fun(self: Thing) : Thing
   // Right
   // TODO: calculate the maximun distance to spawn. Only spawn if hits an enemy in the area
   |TUPITREE_ENTANGLING
-    let self = animate(self, 0, TUPITREE_ENTANGLING_ANIM_000, 18, 36)
-    let self = spawn(self, 18, self.trg, new_thing <= thing(fun=tupitree_entangling_fun))
+    let self = animate(self, 0, TUPITREE_ENTANGLING_ANIM_000, 18, 18)
+    let tang = new_thing <= thing(fun=tupitree_entangling_fun)
+    let self = spawn(self, 12, [move(tang, at_dist(self,116))])
     self 
 
-  // Space
+  // Q
   |TUPITREE_NATURES_REVENGE
     let self = animate(self, 0, TUPITREE_NATURE_REVENGE_ANIM_000, 28, 28)
     let root = new_thing <= thing(fun=tupitree_natures_revenge_fun)
-    let self = spawn(self, 24, self.pos, root)
+    let self = spawn(self, 24, [move(root, self.pos)])
     self
    
   // Space
   |TUPITREE_BLOCK
     let self = animate(self, 0, TUPITREE_BLOCK_000, 13, 26)
-    let self = hit(self, 16, outward_hit(60, 0, 6)) 
+    let self = hit(self, 16, outward_hit(60, 1, 6))
     self
 
   // E

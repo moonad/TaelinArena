@@ -23,7 +23,7 @@ sr_madruga_fun(self: Thing) : Thing
   // Left 
   |SR_MADRUGA_FRYING_PAN
     let self = animate(self, 0, SR_MADRUGA_FRYING_PAN_000, 5, 10)
-    let self = spawn(self, 8, self.trg, new_thing <= thing(fun=sr_madruga_frying_pan_fun))
+    let self = spawn(self, 8, [move(new_thing <= thing(fun=sr_madruga_frying_pan_fun), self.trg)])
     self
 
   // Middle
@@ -35,7 +35,7 @@ sr_madruga_fun(self: Thing) : Thing
   // Right
   |SR_MADRUGA_SHOEMAKER_GLUE
     let self = animate(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_000, 8, 16)
-    let self = spawn(self, 14, self.trg, new_thing <= thing(fun=sr_madruga_shoemaker_glue_fun))
+    let self = spawn(self, 14, [move(new_thing <= thing(fun=sr_madruga_shoemaker_glue_fun), self.trg)])
     self
 
   // Space

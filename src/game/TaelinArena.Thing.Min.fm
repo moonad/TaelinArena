@@ -27,7 +27,7 @@ min_fun(self: Thing) : Thing
   |MIN_FIRE_MARK
     let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 12)
     let make = new_thing <= thing(fun=min_fire_mark_effect)
-    let self = spawn(self, 10, self.trg, make)
+    let self = spawn(self, 10, [move(make, self.trg)])
     // let make = new_thing <= thing(fun=min_fire_mark_effect_fading)
     // let self = spawn(self, 10, self.trg, make)
     // let tele = new_thing <= thing(fun=min_fire_mark_teleport)
@@ -40,7 +40,7 @@ min_fun(self: Thing) : Thing
   |MIN_DRAGONS_PERISHMENT
     let self = animate(self, 1, MIN_DRAGONS_PERISHMENT_CAST_000, 1, 25)
     let make = new_thing <= thing(fun=min_dragons_perishment) 
-    let self = spawn(self, 0, self.pos, make)
+    let self = spawn(self, 0, [move(make, self.pos)])
     self
 
   |MIN_DASH

@@ -32,7 +32,7 @@ finn_fun(self: Thing) : Thing
   |FINN_BOW
     let self = animate(self, 0, FINN_BOW_CAST_ANIMATION_000, 7, 14)
     let arrow = new_thing <= thing(fun=finn_bow_effect)
-    let self = spawn(self, 12, self.trg, arrow)
+    let self = spawn(self, 12, [move(arrow, self.trg)])
     self
 
   // Space

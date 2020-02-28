@@ -52,7 +52,14 @@ interact_with(this:Thing, that:Thing): Thing
     case this |thing
     case that |thing
       case this.box
+      // nothing
+      |nbox =>
+        this
+      // circle
       |cbox => case that.box
+        // circle-nothing
+        |nbox =>
+          this
         // circle-circle
         |cbox =>
           let dst = dist_v3(this.pos, that.pos)
@@ -81,6 +88,7 @@ interact_with(this:Thing, that:Thing): Thing
               this
           let segs = polygon_to_segments(that.pos, that.dir, that.box.pts)
           fold(Segment; Thing; nil, cons, segs)
+      // polygon
       | pbox =>
         this
   // Hit by an attack
@@ -97,7 +105,11 @@ interact_with(this:Thing, that:Thing): Thing
       if dst < (rad * rad) then
         let dir = lookat_v3(that.pos, this.pos, v3(1,0,0))
         let vec = scale_v3(that.hit.value.mag, dir)
-        this <= thing(knk = vec)
+        this <= thing(
+          knk = vec,
+          dmg = if dmg === 0xFFFFFFFF
+            then dmg
+            else dmg + that.hit.value.dmg)
       else
         this
   this
@@ -127,9 +139,6 @@ exec_turn(gm: Game) : Game
   let tick = (thi: Thing, stage: List(Thing), res: List(Thing)) =>
     case thi |thing
 
-    // Calls the transaction function
-    let thi = thi.fun(thi)
-
     // Integrates position with dash velocity
     let thi = thi <= thing(pos = add_v3(pos,vel))
 
@@ -142,6 +151,9 @@ exec_turn(gm: Game) : Game
     let thi = thi <= thing(
       pos = add_v3(pos, knk),
       knk = scale_v3(0.80, knk))
+
+    // Calls the transaction function
+    let thi = thi.fun(thi)
 
     // Calls interaction function with all other things
     let thi = fold(Thing; _ thi, intr, stage)
@@ -157,9 +169,9 @@ exec_turn(gm: Game) : Game
     // Keeps inside map
     let thi = thi <= thing(pos =
       case pos |v3
-      let x = min(max(-448, pos.x), 448)
+      let x = min(max(-384, pos.x), 384)
       let y = min(max(-192, pos.y), 192)
-      let z = min(max(   0, pos.z), 256)
+      let z = min(max(   0, pos.z), 192)
       v3(x, y, z))
     
     // Adds updated thing and new things to stage

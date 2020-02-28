@@ -142,6 +142,7 @@ function render_game({game, canvox, canhud, cam}) {
       }
 
       // Renders hitbox
+      let case_nbox = null;
       let case_cbox = (rad) => {
         for (var i = 0; i < 32; ++i) {
           var px = pos_x + rad * Math.cos(i/32*Math.PI*2);
@@ -179,7 +180,7 @@ function render_game({game, canvox, canhud, cam}) {
           }
         }
       };
-      box(case_cbox)(case_pbox);
+      box(case_nbox)(case_cbox)(case_pbox);
 
       // Renders lights
       (function go(lit) {

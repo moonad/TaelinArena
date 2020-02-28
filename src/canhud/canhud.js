@@ -33,13 +33,17 @@ module.exports = function canhud() {
         canvas.style.left = bx + "px";
         canvas.style.top = by + "px";
         if (canvas.last.dmg !== dmg) {
-          canvas.context.fillStyle = "#383030";
-          canvas.context.fillRect(0,ch-4,cw,4);
-          canvas.context.fillStyle = "#30A038";
-          canvas.context.fillRect(1,ch-4+1,Math.floor(Math.max(32-dmg*(32/ch),0)),2);
+          canvas.context.clearRect(0,ch-4,cw,4);
+          if (dmg !== 0xFFFFFFFF) {
+            canvas.context.fillStyle = "#383030";
+            canvas.context.fillRect(0,ch-4,cw,4);
+            canvas.context.fillStyle = "#30A038";
+            canvas.context.fillRect(1,ch-4+1,Math.floor(Math.max(32-dmg,0)),2);
+          };
           canvas.last.dmg = dmg;
         }
         if (canvas.last.nam !== nam) {
+          canvas.context.fillStyle = "#383030";
           canvas.context.clearRect(0,0,cw,ch-4);
           canvas.context.font = "8px Verdana";
           canvas.context.textBaseline = "bottom";
