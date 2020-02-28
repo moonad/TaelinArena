@@ -5,10 +5,10 @@ poste_fun(self: Thing) : Thing
   let self = self <= thing(mid = POSTE_IDLE_000)
   case self |thing
   let lpos = case self.pos|v3 v3(self.pos.x,self.pos.y,52)
-  let lrng = 128.0
+  let lrng = 32.0
   let lrad = 12.0
   let lsub = v3(0.0, 0.0, 0.0)
-  let ladd = v3(0.06, 0.05, 0.02)
+  let ladd = v3(0.72, 0.60, 0.24)
   let lght = light(lpos,lrad,lrng,lsub,ladd)
   let self = illumine(self, 0, 2147483648, [lght])
   self

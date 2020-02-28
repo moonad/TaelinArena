@@ -304,9 +304,10 @@ function canvox() {
           }
           // light_rng = range the light is at 100% power
           float lit_dst = distance(ray_pos, lit_pos);
-          float lit_pow = min((light_rng*light_rng)/(lit_dst*lit_dst),16.0);
+          float lit_pow = min((light_rng*light_rng)/(lit_dst*lit_dst),1.0);
+          float add_mag = length(light_add);
           // stops casting shadows at 4*rng
-          if (lit_pow > 0.0625 && lit_dst > light_rad) {
+          if (add_mag*lit_pow > 0.005 && lit_dst > light_rad) {
             Hit hit = march(ray_pos, lit_dir, voxels, lit_dst - light_rad);
             if (hit.ctr == HIT) {
               lit_pow = 0.0;

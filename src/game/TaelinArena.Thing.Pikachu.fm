@@ -26,7 +26,7 @@ pikachu_fun(self: Thing) : Thing
 
   // Middle 
   | PIKACHU_THUNDER_SHOCK
-    let lght = light(self.pos,10,36,v3(0,0,0),v3(0.05,0.05,0.013))
+    let lght = light(self.pos,10,10,v3(0,0,0),v3(0.32,0.32,0.08))
     let self = illumine(self, 0, 12, [lght])
     let self = animate(self, 0, PIKACHU_THUNDER_SHOCK_000, 6, 12)
     self
@@ -36,7 +36,7 @@ pikachu_fun(self: Thing) : Thing
     let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_000, 10, 20)
     let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+14)
     let lpos = add_v3(lpos, scale_v3(-14, look_dir(self)))
-    let lght = light(lpos,16,26,v3(0,0,0),v3(0.033,0.033,0.0077))
+    let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
     let self = illumine(self, 0, 12, [lght])
     let ball = new_thing <= thing(
       fun = pikachu_thunder_shock_effect,
@@ -62,7 +62,7 @@ pikachu_fun(self: Thing) : Thing
   
   // E
   | PIKACHU_TAUNT
-    let lght = light(self.pos,10,32,v3(0,0,0),v3(0.04,0.04,0.01))
+    let lght = light(self.pos,10,10,v3(0,0,0),v3(0.32,0.32,0.08))
     let self = illumine(self, 10, 30, [lght])
     let self = animate(self, 0, PIKACHU_TAUNT_000, 30, 30)
     self
@@ -74,9 +74,9 @@ pikachu_thunder_shock_effect(self: Thing) : Thing
   let self = self <= thing(lit =
     let lpos = case pos |v3 v3(pos.x,pos.y,26)
     let lrad = 24
-    let lrng = 64
+    let lrng = 16
     let lsub = v3(0,0,0)
-    let ladd = v3(0.1,0.1,0.0)
+    let ladd = v3(2.4,2.4,0.0)
     let lgth = light(lpos,lrad,lrng,lsub,ladd)
     [lgth])
   let self = self <= thing(die = if tik === 20 then true else false)
