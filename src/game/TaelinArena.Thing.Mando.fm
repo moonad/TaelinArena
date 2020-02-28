@@ -24,14 +24,14 @@ mando_fun(self: Thing) : Thing
   | MANDO_SHOTTING
     let self = animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_CASTING_000, 9, 18)
     let fire = new_thing <= thing(fun=mando_shooting_effect)
-    let self = spawn(self, 9, self.trg, fire)
+    let self = spawn(self, 9, [move(fire, self.trg)])
     self
 
   // Middle
   | MANDO_PARALYZING_ROPE
     let self = animate(self, 0, MANDO_PARALYZING_ROPE_CASTING_000, 6, 18)
     let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect)
-    let self = spawn(self, 10, self.trg, rope)
+    let self = spawn(self, 10, [move(rope, self.trg)])
     self
 
   // Right
@@ -39,14 +39,14 @@ mando_fun(self: Thing) : Thing
     let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 20)
     let flame = new_thing <= thing(fun=mando_flamethrower_effect)
     let flame = flame <= thing(dir = look_dir(self))
-    let self = spawn(self, 5, self.trg, flame)
+    let self = spawn(self, 5, [move(flame, self.trg)])
     self
 
   // Q
   | MANDO_FORCE
     let self = animate(self, 0, MANDO_FORCE_CASTING_000, 8, 16)
     let force = new_thing <= thing(fun=mando_force_effect)
-    let self = spawn(self, 14, self.trg, force)
+    let self = spawn(self, 14, [move(force, self.trg)])
     self
 
   // Space
