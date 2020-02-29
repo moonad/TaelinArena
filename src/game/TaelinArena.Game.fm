@@ -156,7 +156,7 @@ reset(
   self   : Thing,
   at_tik : Number)
   case self |thing
-  if self.tik === at_tik then
+  if self.tik > (at_tik - 1) then
     self <= thing(rst = true)
   else
     self
@@ -166,7 +166,7 @@ die(
   self   : Thing,
   at_tik : Number)
     case self |thing
-    if self.tik === at_tik then
+    if self.tik > (at_tik - 1) then
       self <= thing(die = true)
     else
       self
