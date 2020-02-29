@@ -16,9 +16,13 @@ T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
+T Effect
+| damage(dmg: Number)
+| repulse(mag: Number)
+| impulse(mag: Number, dir: V3)
+
 T Hit
-| pointed_hit(rad: Number, dmg: Number, vec: V3)
-| outward_hit(rad: Number, dmg: Number, mag: Number)
+| hit(eff: List(Effect), pos: V3, dir: V3, box: Hitbox)
 
 TxFunction : Type
   Thing -> Thing
@@ -46,7 +50,7 @@ T Thing
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
-  hit : Maybe(Hit),  // damage/knockback caused by this
+  hit : List(Hit),   // hits done by this
   rst : Bool,        // should this reset to idle
   die : Bool)        // should this be removed?
 
@@ -96,7 +100,7 @@ new_thing : Thing
     0xFFFFFFFF, // dmg
     v3(0,0,0),  // knk
     nil(_),     // chi
-    none(_),    // hit
+    nil(_),     // hit
     false,      // rst
     false)      // die
 
@@ -268,13 +272,13 @@ blink(
 // Creates a hit box that damages and knockbacks
 // - self: thing that owns the hitbox
 // - hitx: Hit object with damage and knockback info
-hit(
+cast(
   self   : Thing,
   at_tik : Number,
-  do_hit : Hit)
+  do_hit : List(Hit))
   case self |thing
   if self.tik === at_tik then
-    self <= thing(hit = some(_ do_hit))
+    self <= thing(hit = do_hit)
   else
     self
 

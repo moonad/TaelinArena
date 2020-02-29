@@ -95,14 +95,12 @@ dorime_leptospirose_curse_fun(self: Thing) : Thing
 
 // Damage: max 6
 dorime_leptospirose_curse_idle_fun(self: Thing) : Thing
-  let dmg = 2
-  let dmg_area = 40
+  case self |thing
   let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 29)
   let self = self <= thing(die = if tik === 58 then true else false)
   let self = self <= thing(box = nbox)
-  let self = hit(self, 0, outward_hit(dmg_area, dmg, 0))
-  let self = hit(self, 10, outward_hit(dmg_area, dmg, 0))
-  let self = hit(self, 25, outward_hit(dmg_area, dmg, 0))
+  let self = cast(self, 10, [hit([damage(10)], self.pos, self.dir, cbox(40))])
+  let self = cast(self, 25, [hit([damage(10)], self.pos, self.dir, cbox(40))])
   self
 
 dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
@@ -111,11 +109,10 @@ dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
   self
 
 dorime_holy_flame_fun(self: Thing) : Thing
-  let dmg = 3
-  let dmg_area = 20
+  case self |thing
   let self = animate_die(self, 0, DORIME_HOLY_FLAME_PILLAR_000, 5, 15)
   let self = self <= thing(box = nbox)
-  let self = hit(self, 0, outward_hit(dmg_area, dmg, 0))
+  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(20))])
   self
 
 dorime_gods_chamber_fun(self: Thing) : Thing
@@ -131,9 +128,8 @@ dorime_taunt_idle_fun(self: Thing) : Thing
   self
 
 dorime_jesus_power(self: Thing) : Thing
-  let dmg = 5
-  let dmg_area  = 20
+  case self |thing
   let self = self <= thing(box = nbox)
-  let self = hit(self, 0, outward_hit(dmg_area, dmg, 0))
+  let self = cast(self, 0, [hit([damage(5)], self.pos, self.dir, cbox(20))])
   let self = die(self, 6)
   self
