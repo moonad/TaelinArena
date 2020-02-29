@@ -52,6 +52,14 @@ class Main extends Component {
       this.ask_turns();
     }, 1000);
 
+    // Chat scroller
+    this.chat_scroller = setInterval(() => {
+      var chat_msgs = document.getElementById("chat_msgs");
+      if (chat_msgs) {
+        chat_msgs.scrollTop = chat_msgs.scrollHeight;
+      }
+    }, 250);
+
     // Executes turns on offline mode
     this.offline_mode_turner = utils.set_precise_interval(() => {
       if (this.game && this.game.gid === TA.OFF_GAME) {
@@ -125,6 +133,7 @@ class Main extends Component {
     clearInterval(this.game_pooler);
     clearInterval(this.render_loop);
     clearInterval(this.turn_asker);
+    clearInterval(this.chat_scroller);
     clearInterval(this.offline_mode_turner);
     clearInterval(this.game_joiner);
   }
