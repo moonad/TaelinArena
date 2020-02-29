@@ -1,110 +1,28 @@
 import TaelinArena.Game
 import TaelinArena.ModelIds
-import TaelinArena.Thing.Mikegator
-import TaelinArena.Thing.Mikegator.Earth
-import TaelinArena.Thing.Shao
-import TaelinArena.Thing.Shao.Balun
-import TaelinArena.Thing.Shao.Hurricane
-import TaelinArena.Thing.Min
-import TaelinArena.Thing.Zoio
-import TaelinArena.Thing.Teichi
 import TaelinArena.Thing.Benfix
-import TaelinArena.Thing.Ray
-import TaelinArena.Thing.Tupitree
-import TaelinArena.Thing.Tophoro
-import TaelinArena.Thing.Kenko
-import TaelinArena.Thing.SrMadruga
 import TaelinArena.Thing.Bleskape 
-import TaelinArena.Thing.Kakashi 
-import TaelinArena.Thing.Finn 
-import TaelinArena.Thing.Zagatur
-import TaelinArena.Thing.Poste
-import TaelinArena.Thing.Wall
-import TaelinArena.Thing.PPG
-import TaelinArena.Thing.Luffy
-import TaelinArena.Thing.Konan
-import TaelinArena.Thing.Squirtle
-import TaelinArena.Thing.Wartortle
-import TaelinArena.Thing.Blastoise
-import TaelinArena.Thing.Pichu
-import TaelinArena.Thing.Pikachu
-import TaelinArena.Thing.Raichu
-import TaelinArena.Thing.Mechwarrior
-import TaelinArena.Thing.Steve
 import TaelinArena.Thing.Dorime
-import TaelinArena.Thing.Punch_object
+import TaelinArena.Thing.Finn 
+import TaelinArena.Thing.Kakashi 
+import TaelinArena.Thing.Kenko
+import TaelinArena.Thing.Konan
+import TaelinArena.Thing.Luffy
 import TaelinArena.Thing.Mando
-
-enum
-| MIKEGATOR_THING
-| MIKEGATOR_EARTH_THING
-| SHAO_THING
-| SHAO_BALUN_THING
-| SHAO_HURRICANE_THING
-| MIN_THING
-| ZOIO_THING
-| TEICHI_THING
-| BENFIX_THING
-| RAY_THING
-| TUPITREE_THING
-| TOPHORO_THING
-| KENKO_THING
-| SR_MADRUGA_THING
-| BLESKAPE_THING 
-| KAKASHI_THING 
-| FINN_THING 
-| ZAGATUR_THING 
-| POSTE_THING
-| WALL_THING
-| PPG_THING
-| LUFFY_THING
-| KONAN_THING
-| SQUIRTLE_THING
-| WARTORTLE_THING
-| BLASTOISE_THING
-| PICHU_THING
-| PIKACHU_THING
-| RAICHU_THING
-| MECHWARRIOR_THING
-| STEVE_THING
-| DORIME_THING
-| PUNCH_OBJECT_THING
-| MANDO_THING
-
-get_thing_fun(tid: Number) : Thing -> Thing
-  switch tid
-  |MIKEGATOR_THING mikegator_fun
-  |MIKEGATOR_EARTH_THING mikegator_earth_fun
-  |SHAO_THING shao_fun
-  |SHAO_BALUN_THING shao_balun_fun
-  |SHAO_HURRICANE_THING shao_hurricane_fun
-  |MIN_THING min_fun
-  |ZOIO_THING zoio_fun
-  |TEICHI_THING teichi_fun
-  |BENFIX_THING benfix_fun
-  |RAY_THING ray_fun
-  |TUPITREE_THING tupitree_fun
-  |TOPHORO_THING tophoro_fun
-  |KENKO_THING kenko_fun
-  |SR_MADRUGA_THING sr_madruga_fun
-  |BLESKAPE_THING bleskape_fun
-  |KAKASHI_THING kakashi_fun
-  |FINN_THING finn_fun
-  |ZAGATUR_THING zagatur_fun
-  |POSTE_THING poste_fun
-  |WALL_THING wall_fun
-  |PPG_THING ppg_fun
-  |LUFFY_THING luffy_fun
-  |KONAN_THING konan_fun
-  |SQUIRTLE_THING squirtle_fun
-  |WARTORTLE_THING wartortle_fun
-  |BLASTOISE_THING blastoise_fun
-  |PICHU_THING pichu_fun
-  |PIKACHU_THING pikachu_fun
-  |RAICHU_THING raichu_fun
-  |MECHWARRIOR_THING mechwarrior_fun
-  |STEVE_THING steve_fun
-  |DORIME_THING dorime_fun
-  |PUNCH_OBJECT_THING punch_object_fun
-  |MANDO_THING mando_fun
-  else luffy_fun
+import TaelinArena.Thing.Mechwarrior
+import TaelinArena.Thing.Mikegator
+import TaelinArena.Thing.PPG
+import TaelinArena.Thing.Pichu
+import TaelinArena.Thing.Poste
+import TaelinArena.Thing.Punch_object
+import TaelinArena.Thing.Ray
+import TaelinArena.Thing.Shao
+import TaelinArena.Thing.Squirtle
+import TaelinArena.Thing.SrMadruga
+import TaelinArena.Thing.Steve
+import TaelinArena.Thing.Teichi
+import TaelinArena.Thing.Tophoro
+import TaelinArena.Thing.Tupitree
+import TaelinArena.Thing.Wall
+import TaelinArena.Thing.Zagatur
+import TaelinArena.Thing.Zoio

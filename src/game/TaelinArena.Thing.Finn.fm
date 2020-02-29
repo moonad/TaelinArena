@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Finn.Effects
 
 enum
 | FINN_IDLE
@@ -48,3 +47,8 @@ finn_fun(self: Thing) : Thing
     self
 
   else self
+
+finn_bow_effect(self: Thing) : Thing
+  let self = animate(self, 0, FINN_BOW_PROJECTILE_000, 0, 2)
+  let self = self <= thing(die = if tik === 2 then true else false)
+  self

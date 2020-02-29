@@ -1,6 +1,0 @@
-import TaelinArena.Game
-
-kakashi_fire_ball_effect(self: Thing) : Thing
-  let self = animate(self, 0, KAKASHI_FIREBALL_EFFECT_000, 11, 22)
-  let self = self <= thing(die = if tik === 22 then true else false)
-  self

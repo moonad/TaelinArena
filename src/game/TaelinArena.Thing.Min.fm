@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Min.Effects
 
 enum
 | MIN_IDLE
@@ -52,3 +51,23 @@ min_fun(self: Thing) : Thing
     animate(self, 1, MIN_TAUNT_000, 5, 12)
 
   else self
+
+min_fire_mark_effect(self: Thing) : Thing
+  let self = animate(self, 0, MIN_FIRE_MARK_EFFECT_000, 7, 20)
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self
+
+min_fire_mark_effect_fading(self: Thing) : Thing
+  let self = animate(self, 0, MIN_FIRE_MARK_FADING_EFFECT_000, 3, 6)
+  let self = self <= thing(die = if tik === 6 then true else false)
+  self
+
+min_fire_mark_teleport(self: Thing) : Thing
+  let self = animate(self, 1, MIN_FIRE_MARK_TELEPORT_000, 7, 14)
+  let self = self <= thing(die = if tik === 8 then true else false)
+  self
+
+min_dragons_perishment(self: Thing) : Thing
+  let self = animate(self, 0, MIN_DRAGONS_PERISHMENT_EFFECT_000, 7, 25)
+  let self = self <= thing(die = if tik === 25 then true else false)
+  self

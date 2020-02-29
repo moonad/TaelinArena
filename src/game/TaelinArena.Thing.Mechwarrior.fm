@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Mechwarrior.Effects
 
 enum
 | MECHWARRIOR_IDLE
@@ -51,3 +50,13 @@ mechwarrior_fun(self: Thing) : Thing
     animate(self, 0, MECHWARRIOR_TAUNT_000, 8, 16)
 
   else self
+
+mechwarrior_laser_effect(self: Thing) : Thing
+  let self = animate(self, 0, MECHWARRIOR_LASER_EFFECT_000, 1, 2)
+  let self = self <= thing(die = if tik === 2 then true else false)
+  self
+
+mechwarrior_rocket_laucher_effect(self: Thing) : Thing
+  let self = animate(self, 0, MECHWARRIOR_ROCKET_LAUNCHER_EFFECT_000, 17, 34)
+  let self = self <= thing(die = if tik === 34 then true else false)
+  self

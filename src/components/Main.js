@@ -15,7 +15,7 @@ const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
 
-const Controls = require("./Main.controls.js");
+const Controls = require("./Controls.js");
 
 // Main HUD
 class Main extends Component {
@@ -219,12 +219,12 @@ class Main extends Component {
     // If starts with '!', user wants to set its hero, so we
     // make sure the hero exists
     if (msg[0] === "!") {
-      var hero_name = msg.slice(1).toLowerCase();
-      if (TA.thing_id[hero_name] === undefined) {
-        alert("Hero '" + hero_name + "' not found.");
+      var hero = msg.slice(1).toLowerCase();
+      if (TA.hero_name[hero] === undefined) {
+        alert("Hero '" + hero + "' not found.");
         return;
       }
-      msg = "!" + TA.thing_name[TA.thing_id[hero_name]];
+      msg = "!" + TA.hero_name[hero];
     }
     try {
       this.peer.send(msg);
@@ -362,9 +362,9 @@ class Main extends Component {
 
   // Selects a hero
   pick_hero(hero) {
-    var picked_hid = TA.thing_id[hero.toLowerCase()];
-    if (picked_hid !== undefined) {
-      this.picked_hero = TA.thing_name[picked_hid];
+    hero = hero.toLowerCase();
+    if (TA.hero_name[hero]) {
+      this.picked_hero = TA.hero_name[hero];
       if (this.game && this.game.gid === TA.OFF_GAME) {
         this.game = null;
         this.join(TA.OFF_GAME);
@@ -571,9 +571,7 @@ class Main extends Component {
     ]);
     var picked_hero = h("span", {
       "onclick": () => {
-        var heroes = Object.keys(TA.thing_id);
-        var heroes = heroes.map(name => TA.thing_name[TA.thing_id[name]]);
-        var message = "Pick a hero. Options: " + heroes.join(", ");
+        var message = "Pick a hero. Options: " + TA.heroes.join(", ");
         var picked_hero = prompt(message); 
         if (picked_hero) {
           this.pick_hero(picked_hero);

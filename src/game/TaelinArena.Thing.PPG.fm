@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.PPG.Effects
 
 enum
 | PPG_IDLE
@@ -9,7 +8,6 @@ enum
 | PPG_COSMIC_ICE_BALL_CASTING
 | PPG_BLOCK
 | PPG_TAUNT
-
 
 ppg_fun(self: Thing) : Thing
   let self = self <= thing(mov = 4)
@@ -50,5 +48,9 @@ ppg_fun(self: Thing) : Thing
   | PPG_TAUNT
     animate(self, 0, PPG_TAUNT_000, 12, 24)
 
-
   else self
+
+ppg_ice_ball_effect(self: Thing) : Thing
+  let self = animate(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
+  let self = self <= thing(die = if tik === 30 then true else false)
+  self

@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Zagatur.Effects
 
 enum
 | ZAGATUR_IDLE
@@ -55,3 +54,25 @@ zagatur_fun(self: Thing) : Thing
     animate(self, 1, ZAGATUR_TAUNT_000, 13, 39)
 
   else self
+
+zagatur_carnivorous_bite_anim(self: Thing) : Thing
+  let self = animate(self, 0, ZAGATUR_CARNIVOROUS_BITE_ANIM_000, 7, 21)
+  let self = self <= thing(die = if tik === 21 then true else false, 
+                           box = cbox(0))
+  self
+
+zagatur_clone_anim(self: Thing) : Thing
+  let self = animate(self, 0, ZAGATUR_CLONE_000, 12, 100)
+  let self = self <= thing(die = if tik === 100 then true else false)
+  self
+
+zagatur_protect_anim(self: Thing) : Thing
+  let self = animate(self, 0, ZAGATUR_PROTECT_ANIM_000, 9, 27)
+  let self = self <= thing(die = if tik === 27 then true else false,
+                           box = cbox(0))
+  self
+
+zagatur_sacrifice_anim(self: Thing) : Thing
+  let self = animate(self, 0, ZAGATUR_SACRIFICE_ANIM_000, 4, 32)
+  let self = self <= thing(die = if tik === 32 then true else false)
+  self

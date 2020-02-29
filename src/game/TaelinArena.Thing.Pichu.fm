@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Pikachu 
 
 enum
 | PICHU_IDLE
@@ -89,5 +88,187 @@ pichu_thunder_charge_effect(self: Thing) : Thing
 
 pichu_thunder_charge_ball_effect(self: Thing) : Thing
   let self = animate(self, 0, PICHU_ELECTRIC_BALL_000, 10, 20)
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self
+
+enum
+| PIKACHU_IDLE
+| PIKACHU_IRON_TAIL
+| PIKACHU_THUNDER_SHOCK
+| PIKACHU_THUNDER_CHARGE
+| PIKACHU_EVOLVE
+| PIKACHU_FAST_ATTACK
+| PIKACHU_TAUNT
+
+pikachu_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4, box = cbox(4))
+
+  case self |thing switch self.act
+
+  | PIKACHU_IDLE
+    case self.wlk
+    | true  => animate(self, 1, PIKACHU_WALK_000, 7, 14)
+    | false => animate(self, 1, PIKACHU_IDLE_000, 4, 8)
+
+  // Left
+  | PIKACHU_IRON_TAIL
+    animate(self, 0, PIKACHU_IRON_TAIL_000, 14, 14)
+
+  // Middle 
+  | PIKACHU_THUNDER_SHOCK
+    let lght = light(self.pos,10,10,v3(0,0,0),v3(0.32,0.32,0.08))
+    let self = illumine(self, 0, 12, [lght])
+    let self = animate(self, 0, PIKACHU_THUNDER_SHOCK_000, 6, 12)
+    self
+
+  // Right
+  | PIKACHU_THUNDER_CHARGE
+    let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_000, 10, 20)
+    let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+14)
+    let lpos = add_v3(lpos, scale_v3(-14, look_dir(self)))
+    let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
+    let self = illumine(self, 0, 12, [lght])
+    let ball = new_thing <= thing(
+      fun = pikachu_thunder_shock_effect,
+      pos = self.pos,
+      vel = scale_v3(16, look_dir(self)),
+      box = nbox)
+    let self = spawn(self, 14, [ball])
+    self
+
+  // Q
+  | PIKACHU_EVOLVE
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=raichu_fun, pid=self.pid) // evolve to Raichu
+    let self = self <= thing(pos = new_pos)
+    self
+
+  // Space
+  | PIKACHU_FAST_ATTACK
+    let self = animate(self, 0, PIKACHU_FAST_ATTACK_000, 6, 12)
+    let self = blink(self, 12, at_dist(self, 64))
+    self
+  
+  // E
+  | PIKACHU_TAUNT
+    let lght = light(self.pos,10,10,v3(0,0,0),v3(0.32,0.32,0.08))
+    let self = illumine(self, 10, 30, [lght])
+    let self = animate(self, 0, PIKACHU_TAUNT_000, 30, 30)
+    self
+
+  else self
+
+pikachu_thunder_shock_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_THUNDER_SHOCK_EFFECT_000, 5, 20)
+  let self = self <= thing(lit =
+    let lpos = case pos |v3 v3(pos.x,pos.y,26)
+    let lrad = 24
+    let lrng = 16
+    let lsub = v3(0,0,0)
+    let ladd = v3(2.4,2.4,0.0)
+    let lgth = light(lpos,lrad,lrng,lsub,ladd)
+    [lgth])
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self
+
+pikachu_thunder_charge_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_EFFECT_000, 6, 12)
+  let self = self <= thing(die = if tik === 10 then true else false)
+  self
+
+pikachu_thunder_charge_ball_effect(self: Thing) : Thing
+  let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_000, 10, 20)
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self
+
+enum
+| RAICHU_IDLE
+| RAICHU_IRON_TAIL
+| RAICHU_THUNDER_SHOCK
+| RAICHU_THUNDER_CHARGE
+| RAICHU_EVOLVE
+| RAICHU_FAST_ATTACK
+| RAICHU_TAUNT
+
+raichu_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4, box = cbox(4))
+
+  case self |thing switch self.act
+
+  | RAICHU_IDLE
+    case self.wlk
+    | true  => animate(self, 1, RAICHU_WALK_000, 6, 12)
+    | false => animate(self, 1, RAICHU_IDLE_000, 4, 8)
+
+  // Left
+  | RAICHU_IRON_TAIL
+    animate(self, 0, RAICHU_IRON_TAIL_000, 14, 14)
+
+  // Middle 
+  | RAICHU_THUNDER_SHOCK
+    let lght = light(self.pos,10,12,v3(0,0,0),v3(0.32,0.32,0.08))
+    let self = illumine(self, 0, 12, [lght])
+    let self = animate(self, 0, RAICHU_THUNDER_SHOCK_000, 6, 12)
+    self
+
+  // Right
+  | RAICHU_THUNDER_CHARGE
+    let self = animate(self, 0, RAICHU_ELECTRIC_BALL_000, 10, 20)
+    let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+16)
+    let lpos = add_v3(lpos, scale_v3(-20, look_dir(self)))
+    let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
+    let self = illumine(self, 0, 12, [lght])
+    let ball = new_thing <= thing(
+      fun = raichu_thunder_shock_effect,
+      pos = self.pos,
+      vel = scale_v3(16, look_dir(self)),
+      box = nbox)
+    let self = spawn(self, 14, [ball])
+    self
+
+  // Q
+  | RAICHU_EVOLVE
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=raichu_fun, pid=self.pid) // evolve to raichu
+    let self = self <= thing(pos = new_pos)
+    self
+
+  // Space
+  | RAICHU_FAST_ATTACK
+    let self = animate(self, 0, RAICHU_FAST_ATTACK_000, 6, 12)
+    let self = blink(self, 12, at_dist(self, 64))
+    self
+  
+  // E
+  | RAICHU_TAUNT
+    let lght = light(self.pos,10,12,v3(0,0,0),v3(0.32,0.32,0.08))
+    let self = illumine(self, 10, 30, [lght])
+    let self = animate(self, 0, RAICHU_TAUNT_000, 30, 30)
+    self
+
+  else self
+
+raichu_thunder_shock_effect(self: Thing) : Thing
+  let self = animate(self, 0, RAICHU_THUNDER_SHOCK_EFFECT_000, 5, 20)
+  let self = self <= thing(lit =
+    let lpos = case pos |v3 v3(pos.x,pos.y,26)
+    let lrad = 24
+    let lrng = 16
+    let lsub = v3(0,0,0)
+    let ladd = v3(2.4,2.4,0.0)
+    let lgth = light(lpos,lrad,lrng,lsub,ladd)
+    [lgth])
+  let self = self <= thing(die = if tik === 20 then true else false)
+  self
+
+raichu_thunder_charge_effect(self: Thing) : Thing
+  let self = animate(self, 0, RAICHU_ELECTRIC_BALL_EFFECT_000, 6, 12)
+  let self = self <= thing(die = if tik === 10 then true else false)
+  self
+
+raichu_thunder_charge_ball_effect(self: Thing) : Thing
+  let self = animate(self, 0, RAICHU_ELECTRIC_BALL_000, 10, 20)
   let self = self <= thing(die = if tik === 20 then true else false)
   self

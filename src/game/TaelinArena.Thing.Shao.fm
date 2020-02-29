@@ -1,6 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Shao.Balun
-import TaelinArena.Thing.Shao.Hurricane
 
 enum
 | SHAO_IDLE
@@ -52,3 +50,13 @@ shao_fun(self: Thing) : Thing
     animate(self, 1, SHAO_TAUNT_000, 7, 14)
 
   else self
+
+shao_balun_fun(self: Thing) : Thing
+  let self = animate(self, 0, SHAO_BALUN_000, 16, 32)
+  let self = self <= thing(die = if tik === 32 then true else false)
+  self
+
+shao_hurricane_fun(self: Thing) : Thing
+  let self = animate(self, 0, SHAO_HURRICANE_000, 26, 52)
+  let self = die(self, 52)
+  self

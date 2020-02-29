@@ -100,18 +100,28 @@ module.exports = function Controls(on_input) {
   };
 
   document.body.onkeyup = (e) => {
-    var name = key_name[e.key.toLowerCase()];
-    if (name) {
-      self.keyboard[name] = [1,0];
-      emit_inputs();
+    if (document.activeElement.type !== "text") {
+      var name = key_name[e.key.toLowerCase()];
+      if (name) {
+        self.keyboard[name] = [1,0];
+        emit_inputs();
+      }
     }
   };
 
   document.body.onkeydown = (e) => {
-    var name = key_name[e.key.toLowerCase()];
-    if (name && !self.keyboard[name][1]) {
-      self.keyboard[name] = [1,1];
-      emit_inputs();
+    if (document.activeElement.type !== "text") {
+      var name = key_name[e.key.toLowerCase()];
+      if (e.key === "Enter") {
+        var chat_input = document.getElementById("chat_input");
+        if (chat_input) {
+          chat_input.focus();
+        }
+      }
+      if (name && !self.keyboard[name][1]) {
+        self.keyboard[name] = [1,1];
+        emit_inputs();
+      }
     }
   };
 

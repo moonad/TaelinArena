@@ -399,71 +399,13 @@ function execute_command(inp, game) {
   return TA.exec_command(cmd)(game);
 }
 
-var thing_id = {
-  mikegator: TA.MIKEGATOR_THING,
-  shao: TA.SHAO_THING,
-  min: TA.MIN_THING,
-  zoio: TA.ZOIO_THING,
-  teichi: TA.TEICHI_THING,
-  benfix: TA.BENFIX_THING,
-  ray: TA.RAY_THING,
-  tupitree: TA.TUPITREE_THING,
-  tophoro: TA.TOPHORO_THING,
-  kenko: TA.KENKO_THING,
-  sr_madruga: TA.SR_MADRUGA_THING,
-  bleskape: TA.BLESKAPE_THING,
-  kakashi: TA.KAKASHI_THING,
-  finn: TA.FINN_THING,
-  zagatur: TA.ZAGATUR_THING,
-  poste: TA.POSTE_THING,
-  wall: TA.WALL_THING,
-  ppg: TA.PPG_THING,
-  luffy: TA.LUFFY_THING,
-  konan: TA.KONAN_THING,
-  squirtle: TA.SQUIRTLE_THING,
-  pichu: TA.PICHU_THING,
-  mechwarrior: TA.MECHWARRIOR_THING,
-  steve: TA.STEVE_THING,
-  dorime: TA.DORIME_THING,
-  punch_obj: TA.PUNCH_OBJECT_THING,
-  mando: TA.MANDO_THING,
-};
-
-var thing_name = {
-  [TA.MIKEGATOR_THING]: "MikeGator",
-  [TA.SHAO_THING]: "Shao",
-  [TA.MIN_THING]: "Min",
-  [TA.ZOIO_THING]: "Zoio",
-  [TA.TEICHI_THING]: "Teichi",
-  [TA.BENFIX_THING]: "Benfix",
-  [TA.RAY_THING]: "Ray",
-  [TA.TUPITREE_THING]: "Tupitree",
-  [TA.TOPHORO_THING]: "Tophoro",
-  [TA.KENKO_THING]: "Kenko",
-  [TA.SR_MADRUGA_THING]: "Sr_Madruga",
-  [TA.BLESKAPE_THING]: "Bleskape",
-  [TA.KAKASHI_THING]: "Kakashi",
-  [TA.FINN_THING]: "Finn",
-  [TA.ZAGATUR_THING]: "Zagatur",
-  [TA.POSTE_THING]: "Poste",
-  [TA.WALL_THING]: "Wall",
-  [TA.PPG_THING]: "PPG",
-  [TA.LUFFY_THING]: "Luffy",
-  [TA.KONAN_THING]: "Konan",
-  [TA.SQUIRTLE_THING]: "Squirtle",
-  [TA.PICHU_THING]: "Pichu",
-  [TA.MECHWARRIOR_THING]: "Mechwarrior",
-  [TA.STEVE_THING]: "Steve",
-  [TA.DORIME_THING]: "Dorime",
-  [TA.PUNCH_OBJECT_THING] : "Punch_obj",
-  [TA.MANDO_THING] : "Mando",
-};
-
 function make_thing([name, {pid,dmg,pos,nam}]) {
   var thing;
-  var tid = thing_id[name.toLowerCase()];
+  name = name.toLowerCase();
   thing = TA.new_thing;
-  thing = TA.set_thing_fun(thing)(TA.get_thing_fun(tid));
+  if (TA[name+"_fun"]) {
+    thing = TA.set_thing_fun(thing)(TA[name+"_fun"]);
+  }
   if (pid !== undefined) {
     thing = TA.set_thing_pid(thing)(pid);
   }
@@ -522,6 +464,38 @@ function GameRunner(gid, things) {
   return self;
 };
 
+var heroes = [
+  "Benfix",
+  "Bleskape",
+  "Dorime",
+  "Finn",
+  "Kakashi",
+  "Kenko",
+  "Konan",
+  "Luffy",
+  "Mando",
+  "Mechwarrior",
+  "Mikegator",
+  "Min",
+  "PPG",
+  "Pichu",
+  "Ray",
+  "Shao",
+  "Squirtle",
+  "SrMadruga",
+  "Steve",
+  "Teichi",
+  "Tophoro",
+  "Tupitree",
+  "Zagatur",
+  "Zoio",
+];
+
+var hero_name = {};
+for (var i = 0; i < heroes.length; ++i) {
+  hero_name[heroes[i].toLowerCase()] = heroes[i];
+}
+
 module.exports = {
   ...TA,
   slist_to_array,
@@ -531,8 +505,6 @@ module.exports = {
   GAME_FPS,
   GAME_DURATION,
   OFF_GAME,
-  thing_id,
-  thing_name,
   render_game,
   parse_turn,
   parse_turns,
@@ -542,4 +514,6 @@ module.exports = {
   make_input_netcode,
   make_thing,
   GameRunner,
+  heroes,
+  hero_name,
 };
