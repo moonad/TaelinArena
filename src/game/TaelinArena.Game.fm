@@ -266,3 +266,17 @@ at_dist(self: Thing, dist: Number)
   let dir = look_dir(self)
   let pos = add_v3(self.pos, scale_v3(dist, dir))
   pos
+
+// Return the position within a maximum range towards look_dir
+at_max_dist(self: Thing, max_range: Number)
+  case self |thing
+  let dist_max = dist_v3(self.pos, at_dist(self, max_range))
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if dist_trg < dist_max then at_dist(self, dist_trg) else at_dist(self, max_range)
+
+// Return the position within a mininum range towards look_dir
+at_min_dist(self: Thing, min_range: Number)
+  case self |thing
+  let dist_min = dist_v3(self.pos, at_dist(self, min_range))
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if dist_trg > dist_min then at_dist(self, dist_trg) else at_dist(self, min_range)
