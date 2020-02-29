@@ -39,14 +39,15 @@ dorime_fun(self: Thing) : Thing
     let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000, 5, 15)
     let puddle = new_thing <= thing(fun=dorime_leptospirose_curse_fun)
     let puddle_idle = new_thing <= thing(fun=dorime_leptospirose_curse_idle_fun)
-    // let pot = new_thing <= thing(
-    //   fun = dorime_leptospirose_curse_pot_fun,
-    //   pos = self.pos,
-    //   vel = scale_v3(16, look_dir(self)),
-    //   box = nbox)
+    let pot = new_thing <= thing(
+      fun = dorime_leptospirose_curse_pot_fun,
+      pos = self.pos,
+      vel = scale_v3(15, look_dir(self)),
+      box = nbox)
+    let self = spawn(self, 12, [pot])
     let self = spawn(self, 14, 
-      [move(puddle, at_dist(self, medium_dist)), 
-      move(puddle_idle, at_dist(self, medium_dist))])
+      [move(puddle, at_max_dist(self, medium_dist)), 
+      move(puddle_idle, at_max_dist(self, medium_dist))])
     self
 
   // Right
@@ -55,7 +56,7 @@ dorime_fun(self: Thing) : Thing
     let self = illumine(self, 4, 16, [lght])
     let self = animate(self, 0, DORIME_HOLY_FLAME_CAST_ANIMATION_000, 8, 16)
     let flame = new_thing <= thing(fun = dorime_holy_flame_fun)
-    let self = spawn(self, 5, [move(flame, at_dist(self, short_dist))])
+    let self = spawn(self, 5, [move(flame, at_max_dist(self, short_dist))])
     self
 
   // Q
@@ -64,8 +65,8 @@ dorime_fun(self: Thing) : Thing
     let heal = new_thing <= thing(fun=dorime_gods_chamber_fun)
     let heal_idle = new_thing <= thing(fun=dorime_gods_chamber_idle_fun)
     let self = spawn(self, 9, [
-      move(heal, at_dist(self, short_dist)), 
-      move(heal_idle, at_dist(self, short_dist))])
+      move(heal, at_max_dist(self, short_dist)), 
+      move(heal_idle, at_max_dist(self, short_dist))])
     self
 
   // Space
@@ -107,10 +108,10 @@ dorime_leptospirose_curse_idle_fun(self: Thing) : Thing
   let self = hit(self, 25, outward_hit(dmg_area, dmg, 0))
   self
 
-// dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
-//   let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 4)
-//   let self = self <= thing(die = if tik === 4 then true else false)
-//   self
+dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
+  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 4)
+  let self = self <= thing(die = if tik === 4 then true else false)
+  self
 
 dorime_holy_flame_fun(self: Thing) : Thing
   let dmg = 3
