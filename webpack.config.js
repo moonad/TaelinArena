@@ -8,8 +8,8 @@ const fs = require("fs");
 module.exports = {
   mode: 'production',
   optimization: {minimize: true},
-  //devtool: "source-map",
-  entry: './src/index.js',
+  devtool: "source-map",
+  //entry: './src/index.js',
   module: {
     rules: [
       {

@@ -444,7 +444,7 @@ function GameRunner(gid, things) {
       var game = parseInt(str.slice(1,9), 16);
       var from = parseInt(str.slice(9,17), 16);
       var last = self.turns.length;
-      var new_turns = TA.parse_turns(str.slice(17))[1];
+      var new_turns = parse_turns(str.slice(17))[1];
       if (from <= last) {
         for (var i = last-from; i<new_turns.length; ++i) {
           self.turns[i+from] = new_turns[i];
