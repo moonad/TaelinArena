@@ -1,44 +1,44 @@
 import TaelinArena.Game
 
 enum
-| SR_MADRUGA_IDLE
-| SR_MADRUGA_FRYING_PAN
-| SR_MADRUGA_THE_FLYING_SAUCER_HAS_ARRIVED
-| SR_MADRUGA_SHOEMAKER_GLUE
-| SR_MADRUGA_EXPLOSIVE_PHOTO
-| SR_MADRUGA_DASH
-| SR_MADRUGA_TAUNT
+| SRMADRUGA_IDLE
+| SRMADRUGA_FRYING_PAN
+| SRMADRUGA_THE_FLYING_SAUCER_HAS_ARRIVED
+| SRMADRUGA_SHOEMAKER_GLUE
+| SRMADRUGA_EXPLOSIVE_PHOTO
+| SRMADRUGA_DASH
+| SRMADRUGA_TAUNT
 
-sr_madruga_fun(self: Thing) : Thing
+srmadruga_fun(self: Thing) : Thing
   let self = self <= thing(mov = 5)
 
   case self |thing switch self.act
 
-  |SR_MADRUGA_IDLE
+  |SRMADRUGA_IDLE
     case self.wlk
     | true  => animate(self, 1, SR_MADRUGA_WALK_000, 10, 20)
     | false => animate(self, 1, SR_MADRUGA_IDLE_000, 6, 12)
 
   // Left 
-  |SR_MADRUGA_FRYING_PAN
+  |SRMADRUGA_FRYING_PAN
     let self = animate(self, 0, SR_MADRUGA_FRYING_PAN_000, 5, 10)
-    let self = spawn(self, 8, [move(new_thing <= thing(fun=sr_madruga_frying_pan_fun), self.trg)])
+    let self = spawn(self, 8, [move(new_thing <= thing(fun=srmadruga_frying_pan_fun), self.trg)])
     self
 
   // Middle
-  |SR_MADRUGA_THE_FLYING_SAUCER_HAS_ARRIVED
+  |SRMADRUGA_THE_FLYING_SAUCER_HAS_ARRIVED
     let self = animate(self, 1, SR_MADRUGA_THE_FLYING_SAUCER_HAS_ARRIVED_000, 10, 20)
     let self = dash(self, 2, 0, 10)
     self
 
   // Right
-  |SR_MADRUGA_SHOEMAKER_GLUE
+  |SRMADRUGA_SHOEMAKER_GLUE
     let self = animate(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_000, 8, 16)
-    let self = spawn(self, 14, [move(new_thing <= thing(fun=sr_madruga_shoemaker_glue_fun), self.trg)])
+    let self = spawn(self, 14, [move(new_thing <= thing(fun=srmadruga_shoemaker_glue_fun), self.trg)])
     self
 
   // Space
-  |SR_MADRUGA_EXPLOSIVE_PHOTO
+  |SRMADRUGA_EXPLOSIVE_PHOTO
     let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_000, 10, 40)
     let lpos =
       case self.pos |v3
@@ -58,27 +58,24 @@ sr_madruga_fun(self: Thing) : Thing
     //let self = spawn(self, 15, self.trg, new_thing <= thing(fun=sr_madruga_explosive_photo_fun))
     self
 
-  | SR_MADRUGA_DASH
+  | SRMADRUGA_DASH
     let self = animate(self, 1, SR_MADRUGA_DASH_000, 10, 20)
     let self = dash(self, 3, 0, 10)
     self
 
-  | SR_MADRUGA_TAUNT
+  | SRMADRUGA_TAUNT
     animate(self, 0, SR_MADRUGA_TAUNT_000, 30, 50)
 
   else self
 
-sr_madruga_frying_pan_fun(self: Thing) : Thing
-  let self = animate(self, 0, SR_MADRUGA_FRYING_PAN_CASTING_000, 4, 8)
-  let self = self <= thing(die = if tik === 8 then true else false)
+srmadruga_frying_pan_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, SR_MADRUGA_FRYING_PAN_CASTING_000, 4, 8)
   self
 
-sr_madruga_shoemaker_glue_fun(self: Thing) : Thing
-  let self = animate(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_CASTING_000, 4, 8)
-  let self = self <= thing(die = if tik === 8 then true else false)
+srmadruga_shoemaker_glue_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, SR_MADRUGA_SHOEMAKER_GLUE_CASTING_000, 4, 8)
   self
 
-sr_madruga_explosive_photo_fun(self: Thing) : Thing
-  let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_CASTING_000, 3, 6)
-  let self = self <= thing(die = if tik === 6 then true else false)
+srmadruga_explosive_photo_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_CASTING_000, 3, 6)
   self

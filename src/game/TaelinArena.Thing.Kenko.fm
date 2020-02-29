@@ -44,6 +44,5 @@ kenko_fun(self: Thing) : Thing
   else self
 
 kenko_amethyst_shield_fun(self: Thing) : Thing
-  let self = animate(self, 0, KENKO_AMETHYST_SHIELD_SKILL_000, 23, 23)
-  let self = self <= thing(die = if tik === 23 then true else false)
+  let self = animate_die(self, 0, KENKO_AMETHYST_SHIELD_SKILL_000, 23, 23)
   self

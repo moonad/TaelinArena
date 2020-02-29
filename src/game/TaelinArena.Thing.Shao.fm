@@ -52,11 +52,9 @@ shao_fun(self: Thing) : Thing
   else self
 
 shao_balun_fun(self: Thing) : Thing
-  let self = animate(self, 0, SHAO_BALUN_000, 16, 32)
-  let self = self <= thing(die = if tik === 32 then true else false)
+  let self = animate_die(self, 0, SHAO_BALUN_000, 16, 32)
   self
 
 shao_hurricane_fun(self: Thing) : Thing
-  let self = animate(self, 0, SHAO_HURRICANE_000, 26, 52)
-  let self = die(self, 52)
+  let self = animate_die(self, 0, SHAO_HURRICANE_000, 26, 52)
   self

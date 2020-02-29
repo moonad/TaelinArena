@@ -45,8 +45,8 @@ dorime_fun(self: Thing) : Thing
       vel = scale_v3(15, look_dir(self)),
       box = nbox)
     let self = spawn(self, 12, [pot])
-    let self = spawn(self, 14, 
-      [move(puddle, at_max_dist(self, medium_dist)), 
+    let self = spawn(self, 14, [
+      move(puddle, at_max_dist(self, medium_dist)), 
       move(puddle_idle, at_max_dist(self, medium_dist))])
     self
 
@@ -86,22 +86,19 @@ dorime_fun(self: Thing) : Thing
 import TaelinArena.Game
 
 dorime_blessing_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 2)
-  let self = die(self, 2)
+  let self = animate_die(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 2)
   self
 
 dorime_leptospirose_curse_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 10)
-  let self = die(self, 10)
+  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 10)
   self
 
 // Damage: max 6
 dorime_leptospirose_curse_idle_fun(self: Thing) : Thing
   let dmg = 2
   let dmg_area = 40
-  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 29)
+  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 29)
   let self = self <= thing(die = if tik === 58 then true else false)
-  let self = die(self, 29)
   let self = self <= thing(box = nbox)
   let self = hit(self, 0, outward_hit(dmg_area, dmg, 0))
   let self = hit(self, 10, outward_hit(dmg_area, dmg, 0))
@@ -116,25 +113,21 @@ dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
 dorime_holy_flame_fun(self: Thing) : Thing
   let dmg = 3
   let dmg_area = 20
-  let self = animate(self, 0, DORIME_HOLY_FLAME_PILLAR_000, 5, 15)
-  let self = die(self, 15)
+  let self = animate_die(self, 0, DORIME_HOLY_FLAME_PILLAR_000, 5, 15)
   let self = self <= thing(box = nbox)
   let self = hit(self, 0, outward_hit(dmg_area, dmg, 0))
   self
 
 dorime_gods_chamber_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 51)
-  let self = die(self, 51)
+  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 51)
   self
 
 dorime_gods_chamber_idle_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 58)
-  let self = die(self, 58)
+  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 58)
   self
 
 dorime_taunt_idle_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_TAUNT_IDLE_000, 3, 6)
-  let self = die(self, 6)
+  let self = animate_die(self, 0, DORIME_TAUNT_IDLE_000, 3, 6)
   self
 
 dorime_jesus_power(self: Thing) : Thing

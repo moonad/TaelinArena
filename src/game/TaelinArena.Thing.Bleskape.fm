@@ -29,7 +29,10 @@ bleskape_fun(self: Thing) : Thing
 
   // Right
   |BLESKAPE_DEFENSE_MODE
-    animate(self, 1, BLESKAPE_DEFENSE_MODE_000, 3, 18)
+    let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_000, 3, 0,3)
+    let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_002, 1, 3,12)
+    let self = reset(self, 11)
+    self
 
   // Space
   |BLESKAPE_SUPREME_PUNCH_SEQUENCE

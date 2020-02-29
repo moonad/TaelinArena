@@ -59,21 +59,17 @@ mando_fun(self: Thing) : Thing
   else self
 
 mando_shooting_effect(self: Thing) : Thing
-  let self = animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 2)
-  let self = self <= thing(die = if tik === 2 then true else false)
+  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 2)
   self
 
 mando_paralyzing_rope_effect(self: Thing) : Thing
-  let self = animate(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 10, 20)
-  let self = self <= thing(die = if tik === 20 then true else false)
+  let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 10, 20)
   self
 
 mando_flamethrower_effect(self: Thing) : Thing
-  let self = animate(self, 0, MANDO_FLAMETHROWER_EFFECT_000, 23, 23)
-  let self = self <= thing(die = if tik === 23 then true else false)
+  let self = animate_die(self, 0, MANDO_FLAMETHROWER_EFFECT_000, 23, 23)
   self
 
 mando_force_effect(self: Thing) : Thing
-  let self = animate(self, 0, MANDO_FORCE_EFFECT_000, 28, 28)
-  let self = self <= thing(die = if tik === 28 then true else false)
+  let self = animate_die(self, 0, MANDO_FORCE_EFFECT_000, 28, 28)
   self

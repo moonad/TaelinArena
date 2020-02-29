@@ -40,10 +40,10 @@ squirtle_fun(self: Thing) : Thing
   // Space
   | SQUIRTLE_EVOLVE
     let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
-    let new_pos = self.pos
+    let npos = self.pos
     let self = self <= thing(die = true)
     let self = new_thing <= thing(fun=wartortle_fun) // evolve to Wartortle
-    let self = self <= thing(pos = new_pos)
+    let self = self <= thing(pos = npos)
     self
 
   // E
@@ -92,10 +92,10 @@ wartortle_fun(self: Thing) : Thing
   // Space
   | WARTORTLE_EVOLVE
     let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
-    let new_pos = self.pos
+    let npos = self.pos
     let self = self <= thing(die = true)
     let self = new_thing <= thing(fun = blastoise_fun) // evolve to Blastoise
-    let self = self <= thing(pos = new_pos)
+    let self = self <= thing(pos = npos)
     self
   
   // E

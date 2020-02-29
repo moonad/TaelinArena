@@ -51,6 +51,5 @@ kakashi_fun(self: Thing) : Thing
   else self
 
 kakashi_fire_ball_effect(self: Thing) : Thing
-  let self = animate(self, 0, KAKASHI_FIREBALL_EFFECT_000, 11, 22)
-  let self = self <= thing(die = if tik === 22 then true else false)
+  let self = animate_die(self, 0, KAKASHI_FIREBALL_EFFECT_000, 11, 22)
   self
