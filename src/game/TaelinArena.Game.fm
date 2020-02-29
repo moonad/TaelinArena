@@ -188,6 +188,7 @@ animate_between(
   case self |thing
   if is_between(from, til, self.tik) then
     self <= thing(
+      bst = boost,
       dir = if (act > 0) && is_false(wlk)
         then look_dir(self)
         else dir,

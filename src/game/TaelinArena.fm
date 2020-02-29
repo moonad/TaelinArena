@@ -186,6 +186,7 @@ exec_turn(gm: Game) : Game
         bst = 1,
         act = 0,
         tik = 0,
+        lit = nil(_),
         rst = false)
       | false => thi
     
