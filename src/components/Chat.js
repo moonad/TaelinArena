@@ -37,11 +37,13 @@ class Chat extends Component {
           this.props.on_say(value);
           setTimeout(() => {
             var el0 = document.getElementById("chat_input");
-            var el1 = document.getElementById("chat_msgs");
             el0.value = "";
-            el1.scrollTop = el1.scrollHeight;
             e.target.blur();
           }, 5);
+          setTimeout(() => {
+            var el1 = document.getElementById("chat_msgs");
+            el1.scrollTop = el1.scrollHeight;
+          }, 100);
         }
         this.forceUpdate();
       },

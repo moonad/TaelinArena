@@ -106,15 +106,17 @@ class Main extends Component {
       console.log("done:", C, "calls");
     };
     window.addEventListener("keydown", (e) => {
-      if (e.key === "k") {
-        benchmark_function("render", () => {
-          this.render_game(false)
-        });
-      };
-      if (e.key === "l") {
-        benchmark_function("turn", () => {
-          this.game.turn()
-        });
+      if (document.activeElement.type !== "text") {
+        if (e.key === "k") {
+          benchmark_function("render", () => {
+            this.render_game(false)
+          });
+        };
+        if (e.key === "l") {
+          benchmark_function("turn", () => {
+            this.game.turn()
+          });
+        };
       };
     });
   }
@@ -634,7 +636,7 @@ class Main extends Component {
         "color": "#D0D0D0",
         "background": "#202020",
         "width": "100%",
-        "flex-grow": "1",
+        "height": "calc(100% - " + Math.floor(24+(ch+2)) + "px)",
         "display": "flex",
         "flex-flow": "row nowrap",
         "justify-content": "center",
