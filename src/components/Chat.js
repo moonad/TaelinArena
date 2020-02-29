@@ -44,7 +44,7 @@ class Chat extends Component {
             setTimeout(() => {
               var el1 = document.getElementById("chat_msgs");
               el1.scrollTop = el1.scrollHeight;
-            }, 100);
+            }, t*100);
           };
         }
         this.forceUpdate();
