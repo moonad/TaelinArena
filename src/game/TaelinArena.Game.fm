@@ -244,7 +244,7 @@ dash(
   from_tik : Number,
   til_tik  : Number)
   self <= thing(vel =
-    if (tik > from_tik) && (tik < til_tik) then 
+    if is_between(from_tik, til_tik, tik) then 
       scale_v3(speed, lookat_v3(pos, trg, dir))
     else
       v3(0,0,0))

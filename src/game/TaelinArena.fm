@@ -181,7 +181,12 @@ exec_turn(gm: Game) : Game
     case thi |thing
     let thi =
       case thi.rst
-      | true  => thi <= thing(bst=1, act=0, tik=0, rst=false)
+      | true  => thi <= thing(
+        vel = v3(0,0,0),
+        bst = 1,
+        act = 0,
+        tik = 0,
+        rst = false)
       | false => thi
     
     // Adds updated thing and new things to stage
