@@ -22,9 +22,9 @@ tophoro_fun(self: Thing) : Thing
 
   // Left 
   |TOPHORO_HIGHER_GROUND
-    let self = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 20)
+    let self = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
     // let self = spawn(self, 17, self.pos, new_thing <= thing(fun=tophoro_higher_ground_init_fun))
-    let self = spawn(self, 18, [move(new_thing <= thing(fun=tophoro_higher_ground_effect_fun), self.pos)])
+    let self = spawn(self, 14, [move(new_thing <= thing(fun=tophoro_higher_ground_effect_fun), self.pos)])
     self
 
   // Middle
@@ -61,33 +61,27 @@ tophoro_fun(self: Thing) : Thing
 
 // Higher Ground
 tophoro_higher_ground_init_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_HIGHER_GROUND_ROCK_EXPLOSION_000, 4, 8)
-  let self = self <= thing(die = if tik === 8 then true else false)
+  let self = animate_die(self, 0, TOPHORO_HIGHER_GROUND_ROCK_EXPLOSION_000, 4, 8)
   self
 
 tophoro_higher_ground_effect_fun(self: Thing) : Thing
-  let self = animate(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 30)
-  let self = self <= thing(die = if tik === 30 then true else false)
+  let self = animate_die(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 30)
   self
 
 tophoro_earth_wall_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 9, 18)
-  let self = self <= thing(die = if tik === 18 then true else false)
+  let self = animate_die(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 9, 18)
   self
 
 // Earth Rise
 tophoro_eath_rise_rock_formation_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_EARTH_RISE_ROCK_FORMATION_000, 1, 4)
-  let self = self <= thing(die = if tik === 4 then true else false)
+  let self = animate_die(self, 0, TOPHORO_EARTH_RISE_ROCK_FORMATION_000, 1, 4)
   self
 
 tophoro_eath_rise_effect_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_EARTH_RISE_ROCK_000, 5, 10)
-  let self = self <= thing(die = if tik === 10 then true else false)
+  let self = animate_die(self, 0, TOPHORO_EARTH_RISE_ROCK_000, 5, 10)
   self
 
 // Ground force
 tophoro_ground_force_fun(self: Thing) : Thing
-  let self = animate(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 8, 25)
-  let self = self <= thing(die = if tik === 25 then true else false)
+  let self = animate_die(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 8, 25)
   self

@@ -48,6 +48,5 @@ mikegator_fun(self: Thing) : Thing
   else self
 
 mikegator_earth_fun(self: Thing) : Thing
-  let self = animate(self, 0, MIKEGATOR_EARTHBENDING_ROCK_000, 8, 16)
-  let self = self <= thing(die = if tik === 16 then true else false)
+  let self = animate_die(self, 0, MIKEGATOR_EARTHBENDING_ROCK_000, 8, 16)
   self

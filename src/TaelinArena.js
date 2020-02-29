@@ -101,7 +101,8 @@ function render_game({game, canvox, canhud, cam}) {
       nam => lit => tik => pos =>
       mov => bst => wlk => dir =>
       trg => vel => box => dmg =>
-      knk => chi => hit => die => {
+      knk => chi => hit => res =>
+      die => {
       let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
       var [dir_x,dir_y,dir_z] = look_dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));

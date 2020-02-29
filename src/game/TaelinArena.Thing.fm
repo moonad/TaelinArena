@@ -11,6 +11,7 @@ import TaelinArena.Thing.Luffy
 import TaelinArena.Thing.Mando
 import TaelinArena.Thing.Mechwarrior
 import TaelinArena.Thing.Mikegator
+import TaelinArena.Thing.Min
 import TaelinArena.Thing.PPG
 import TaelinArena.Thing.Pichu
 import TaelinArena.Thing.Poste

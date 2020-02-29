@@ -1,4 +1,4 @@
-import Base#uXFV
+import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.Game
 import TaelinArena.ModelIds
@@ -173,6 +173,21 @@ exec_turn(gm: Game) : Game
       let y = min(max(-192, pos.y), 192)
       let z = min(max(   0, pos.z), 192)
       v3(x, y, z))
+
+    // Removes hit and spawn
+    let thi = thi <= thing(hit = none(_), chi = [])
+
+    // Resets
+    case thi |thing
+    let thi =
+      case thi.rst
+      | true  => thi <= thing(
+        vel = v3(0,0,0),
+        bst = 1,
+        act = 0,
+        tik = 0,
+        rst = false)
+      | false => thi
     
     // Adds updated thing and new things to stage
     concat(_ chi_list,

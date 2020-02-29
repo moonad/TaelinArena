@@ -58,16 +58,13 @@ steve_fun(self: Thing) : Thing
   else self
 
 steve_tnt_effect(self: Thing) : Thing
-  let self = animate(self, 0, STEVE_TNT_000, 18, 36)
-  let self = self <= thing(die = if tik === 36 then true else false)
+  let self = animate_die(self, 0, STEVE_TNT_000, 18, 36)
   self
 
 steve_ender_dragons_fury_effect(self: Thing) : Thing
-  let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_000, 13, 26)
-  let self = self <= thing(die = if tik === 26 then true else false)
+  let self = animate_die(self, 0, STEVE_ENDER_DRAGONS_FURY_000, 13, 26)
   self
 
 steve_block_effect(self: Thing) : Thing
-  let self = animate(self, 0, STEVE_BLOCK_CASTING_000, 10, 100)
-  let self = self <= thing(die = if tik === 100 then true else false)
+  let self = animate_die(self, 0, STEVE_BLOCK_CASTING_000, 10, 100)
   self

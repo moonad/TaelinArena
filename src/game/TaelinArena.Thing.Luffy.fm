@@ -50,6 +50,5 @@ luffy_fun(self: Thing) : Thing
   else self
 
 luffy_giant_arm_effect(self: Thing) : Thing
-  let self = animate(self, 0, LUFFY_GIANT_ARM_IMPACT_SMOKE_000, 6, 12)
-  let self = self <= thing(die = if tik === 12 then true else false)
+  let self = animate_die(self, 0, LUFFY_GIANT_ARM_IMPACT_SMOKE_000, 6, 12)
   self

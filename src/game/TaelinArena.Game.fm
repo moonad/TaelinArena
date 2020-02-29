@@ -1,4 +1,4 @@
-import Base#uXFV
+import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.ModelIds
 
@@ -47,6 +47,7 @@ T Thing
   knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
   hit : Maybe(Hit),  // damage/knockback caused by this
+  rst : Bool,        // should this reset to idle
   die : Bool)        // should this be removed?
 
 T Game
@@ -96,6 +97,7 @@ new_thing : Thing
     v3(0,0,0),  // knk
     nil(_),     // chi
     none(_),    // hit
+    false,      // rst
     false)      // die
 
 // Gets a thing from game by its id
@@ -146,7 +148,56 @@ set_thing_dmg(thi:Thing, new_dmg) thi<=thing(dmg=new_dmg)
 set_thing_knk(thi:Thing, new_knk) thi<=thing(knk=new_knk)
 set_thing_chi(thi:Thing, new_chi) thi<=thing(chi=new_chi)
 set_thing_hit(thi:Thing, new_hit) thi<=thing(hit=new_hit)
+set_thing_rst(thi:Thing, new_rst) thi<=thing(rst=new_rst)
 set_thing_die(thi:Thing, new_die) thi<=thing(die=new_die)
+
+// Resets to given tick
+reset(
+  self   : Thing,
+  at_tik : Number)
+  case self |thing
+  if self.tik === at_tik then
+    self <= thing(rst = true)
+  else
+    self
+
+// Dies at given tick
+die(
+  self   : Thing,
+  at_tik : Number)
+    case self |thing
+    if self.tik === at_tik then
+      self <= thing(die = true)
+    else
+      self
+
+// Performs an animation, reseting to idle when it ends
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
+animate_between(
+  self  : Thing,
+  boost : Number,
+  model : Number,
+  count : Number,
+  from  : Number,
+  til   : Number
+  ) : Thing
+  case self |thing
+  if is_between(from, til, self.tik) then
+    self <= thing(
+      dir = if (act > 0) && is_false(wlk)
+        then look_dir(self)
+        else dir,
+      mid =
+        let duration = til - from
+        let curr_tik = tik - from
+        let curr_tim = curr_tik \ duration
+        model + (floor(curr_tim * count) % count))
+  else
+    self
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated
@@ -161,18 +212,26 @@ animate(
   count : Number,
   durat : Number
   ) : Thing
-  let delay = durat \ count
-  self <= thing(
-    mid = model + (floor(tik \ delay) % count),
-    bst = if tik === durat
-      then 1
-      else boost,
-    dir = if (act > 0) && is_false(wlk)
-      then look_dir(self)
-      else dir,
-    act = if tik === durat
-      then 0
-      else act)
+  let self = animate_between(self,boost,model,count,0,durat)
+  let self = reset(self, durat - 1)
+  self
+
+// Performs an animation, dying when it ends
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
+animate_die(
+  self  : Thing,
+  boost : Number,
+  model : Number,
+  count : Number,
+  durat : Number
+  ) : Thing
+  let self = animate_between(self,boost,model,count,0,durat)
+  let self = die(self, durat - 1)
+  self
 
 // Performs a dash between certain frames
 // - self: thing that will dash
@@ -185,7 +244,7 @@ dash(
   from_tik : Number,
   til_tik  : Number)
   self <= thing(vel =
-    if (tik > from_tik) && (tik < til_tik) then 
+    if is_between(from_tik, til_tik, tik) then 
       scale_v3(speed, lookat_v3(pos, trg, dir))
     else
       v3(0,0,0))
@@ -215,8 +274,6 @@ hit(
   case self |thing
   if self.tik === at_tik then
     self <= thing(hit = some(_ do_hit))
-  else if self.tik === (at_tik + 1) then
-    self <= thing(hit = none(_))
   else
     self
 
@@ -233,16 +290,8 @@ spawn(
   self <= thing(chi =
     if tik === at_tik then
       childs
-    else if tik === (at_tik + 1) then
-      []
     else
       chi)
-
-// Dies at given tick
-die(
-  self   : Thing,
-  at_tik : Number)
-  self <= thing(die = if tik === at_tik then true else false)
 
 // Creates lights at given tick
 illumine(
@@ -251,7 +300,7 @@ illumine(
   to_tik   : Number,
   lights   : List(Light))
   self <= thing(lit =
-    if (tik > from_tik) && (tik < to_tik) 
+    if is_between(from_tik, to_tik, tik)
       then lights
       else nil(_))
 
@@ -272,11 +321,15 @@ at_max_dist(self: Thing, max_range: Number)
   case self |thing
   let dist_max = dist_v3(self.pos, at_dist(self, max_range))
   let dist_trg = dist_v3(self.pos, self.trg)
-  if dist_trg < dist_max then at_dist(self, dist_trg) else at_dist(self, max_range)
+  if dist_trg < dist_max
+    then at_dist(self, dist_trg)
+    else at_dist(self, max_range)
 
 // Return the position within a mininum range towards look_dir
 at_min_dist(self: Thing, min_range: Number)
   case self |thing
   let dist_min = dist_v3(self.pos, at_dist(self, min_range))
   let dist_trg = dist_v3(self.pos, self.trg)
-  if dist_trg > dist_min then at_dist(self, dist_trg) else at_dist(self, min_range)
+  if dist_trg > dist_min
+    then at_dist(self, dist_trg)
+    else at_dist(self, min_range)
