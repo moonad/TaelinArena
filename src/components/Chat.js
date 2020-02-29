@@ -40,10 +40,12 @@ class Chat extends Component {
             el0.value = "";
             e.target.blur();
           }, 5);
-          setTimeout(() => {
-            var el1 = document.getElementById("chat_msgs");
-            el1.scrollTop = el1.scrollHeight;
-          }, 100);
+          for (let t = 100; t <= 800; t *= 2) {
+            setTimeout(() => {
+              var el1 = document.getElementById("chat_msgs");
+              el1.scrollTop = el1.scrollHeight;
+            }, 100);
+          };
         }
         this.forceUpdate();
       },
