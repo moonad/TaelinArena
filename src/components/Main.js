@@ -471,7 +471,8 @@ class Main extends Component {
     // Top menu
     var top_menu = h("div", {
       style: {
-        "background": "#F0F0F0",
+        "background": "#202020",
+        "color": "#D0D0D0",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -517,8 +518,8 @@ class Main extends Component {
       "id": "game_screen",
       "style": {
         "height": (ch + 2) + "px",
-        "border-top": "1px solid #A0A0A0",
-        "border-bottom": "1px solid #A0A0A0",
+        "border-top": "1px solid #000000",
+        "border-bottom": "1px solid #000000",
         "background": "#FCFCFC",
       }});
 
@@ -534,6 +535,26 @@ class Main extends Component {
         msgs: this.chat_msgs,
       })
     ]);
+
+    // Bottom panel: room box
+    var room_box = h("pre", {
+      "style": {
+        "width": "25%",
+        "height": "100%",
+        "padding": "4px",
+        "overflow-y": "scroll",
+      },
+    }, this.room_players && this.room_players
+      .split(",")
+      .map(room_player => {
+        return h("div", {
+          "style": {
+            "color":
+              room_player[0] === "<" ? "#A06060" :
+              room_player[0] === ">" ? "#60A060" : "#808080",
+          },
+        }, room_player.slice(1).replace("!", " @") + "\n");
+      }));
 
     // Bottom panel: info box
     var render_mode = h("span", {
@@ -588,27 +609,32 @@ class Main extends Component {
         "cursor": "pointer",
       }
     }, [
-      this.auto_join ? "auto-join" : "manual-join"
+      this.auto_join ? "auto" : "manual"
     ]);
     var info_box = h("pre", {
       "style": {
-        "width": "50%",
+        "width": "25%",
         "height": "100%",
         "padding": "4px",
         "font-family": "monospace",
       }
     }, [
-      h("div", {}, "FPS  : " + (this.fps_numb||0)),
-      h("div", {}, ["Game : ", current_game, " (", join_mode, ")"]),
+      h("div", {}, ["Game : ", current_game, " (join: ", join_mode, ")"]),
+      h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
+      h("div", {}, ["FPS  : " + (this.fps_numb||0)]),
       h("div", {}, ["Mode : ", render_mode]),
       h("div", {}, ["Hero : ", picked_hero]),
-      h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
-      h("div", {}, ["Room : ", this.room_players]),
+      h("div", {}, ["Room : ",
+        (this.room_players
+          ? this.room_players.split(",").length
+          : 1) + " online"]),
     ]);
 
     // Bottom panel
     var bottom_panel = h("div", {
       "style": {
+        "color": "#D0D0D0",
+        "background": "#202020",
         "width": "100%",
         "flex-grow": "1",
         "display": "flex",
@@ -616,7 +642,7 @@ class Main extends Component {
         "justify-content": "center",
         "align-items": "center",
       },
-    }, [chat_box, info_box]);
+    }, [chat_box, room_box, info_box]);
 
     // Main App
     return h("div", {

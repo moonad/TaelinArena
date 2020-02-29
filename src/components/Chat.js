@@ -51,8 +51,8 @@ class Chat extends Component {
         "margin": "5px",
         "border-radius": "4px",
         "border": "0px solid gray",
-        "background": "rgb(242,242,242)",
-        //"color": "black",
+        "background": "#303030",
+        "color": "#D0D0D0",
         //"background": "#F2F2F2",
       },
     });
@@ -67,7 +67,7 @@ class Chat extends Component {
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        "background": "white",
+        //"background": "white",
         "align-items": "center",
         //"color": "white",
       }

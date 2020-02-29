@@ -175,7 +175,7 @@ app.post("/offer", (req, res) => {
       players.push(player);
     }
     peer.do_send(players.join(","));
-  }, 1000);
+  }, 1500);
 
   peer.on("signal", data => {
     if (data.type === "offer") {

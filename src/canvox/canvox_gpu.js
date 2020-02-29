@@ -274,9 +274,9 @@ function canvox() {
         float fb = col.b;
 
         // Ambient 
-        col.r *= 0.6;
-        col.g *= 0.6;
-        col.b *= 0.6;
+        col.r *= 0.4;
+        col.g *= 0.4;
+        col.b *= 0.4;
 
         // Applies sunlight
         //vec3 sun_dir = vec3(0.0,0.0,1.0);
