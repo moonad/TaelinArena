@@ -54,7 +54,7 @@ srmadruga_fun(self: Thing) : Thing
     let ladd = v3(0.3 * lpow, 0.3 * lpow, 0.3 * lpow)
     let lght = light(lpos,lrad,lrng,lsub,ladd)
     let self = illumine(self, 24, 40, [lght])
-    let self = hit(self, 25, outward_hit(160, 0, 4)) 
+    let self = cast(self, 25, [hit([repulse(4)], self.pos, self.dir, cbox(160))])
     //let self = spawn(self, 15, self.trg, new_thing <= thing(fun=sr_madruga_explosive_photo_fun))
     self
 

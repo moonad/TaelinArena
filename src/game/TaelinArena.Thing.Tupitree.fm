@@ -50,21 +50,23 @@ tupitree_fun(self: Thing) : Thing
   // TODO: calculate the maximun distance to spawn. Only spawn if hits an enemy in the area
   |TUPITREE_ENTANGLING
     let self = animate(self, 0, TUPITREE_ENTANGLING_ANIM_000, 18, 18)
-    let tang = new_thing <= thing(fun=tupitree_entangling_fun)
+    let tang = new_thing <= thing(fun=tupitree_entangling_fun, dir=self.dir)
     let self = spawn(self, 12, [move(tang, at_dist(self,116))])
     self 
 
   // Q
   |TUPITREE_NATURES_REVENGE
     let self = animate(self, 0, TUPITREE_NATURE_REVENGE_ANIM_000, 28, 28)
-    let root = new_thing <= thing(fun=tupitree_natures_revenge_fun)
+    let root = new_thing <= thing(fun=tupitree_natures_revenge_fun, dir=self.dir)
     let self = spawn(self, 24, [move(root, self.pos)])
     self
    
   // Space
   |TUPITREE_BLOCK
     let self = animate(self, 0, TUPITREE_BLOCK_000, 13, 26)
-    let self = hit(self, 16, outward_hit(60, 1, 6))
+    let effs = [damage(1), repulse(6)]
+    let hits = [hit(effs, self.pos, self.dir, cbox(60))]
+    let self = cast(self, 16, hits)
     self
 
   // E
@@ -74,9 +76,11 @@ tupitree_fun(self: Thing) : Thing
   else self
 
 tupitree_vine_whip_hit_fun(self: Thing) : Thing
-  let rad  = 12
+  case self |thing
   let self = self <= thing(box = nbox)
-  let self = hit(self, 0, outward_hit(rad, 1, 0))
+  let effs = [damage(1)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(12))]
+  let self = cast(self, 0, hits)
   let self = die(self, 0)
   self
 
@@ -86,7 +90,10 @@ tupitree_entangling_fun(self: Thing) : Thing
   self
 
 tupitree_natures_revenge_fun(self: Thing) : Thing
+  case self |thing
   let self = animate_die(self, 0, TUPITREE_NATURE_REVENGE_ALL_000, 6, 12)
   let self = self <= thing(box = nbox)
-  let self = hit(self, 6, outward_hit(64, 5, 0))
+  let effs = [damage(5)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(60))]
+  let self = cast(self, 6, hits)
   self
