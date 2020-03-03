@@ -338,3 +338,11 @@ at_min_dist(self: Thing, min_range: Number)
   if dist_trg > dist_min
     then at_dist(self, dist_trg)
     else at_dist(self, min_range)
+
+// Return the position within a mininum and maximun range towards look_dir
+between_dist(self: Thing, min_range: Number, max_range: Number, default: Number)
+  case self |thing
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if ((dist_trg < max_range) && (dist_trg > min_range)) 
+  then at_dist(self, dist_trg)
+  else at_dist(self, default)
