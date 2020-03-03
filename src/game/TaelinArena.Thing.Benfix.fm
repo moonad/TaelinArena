@@ -31,15 +31,19 @@ benfix_fun(self: Thing) : Thing
   |BENFIX_STEEL_TORNADO
     animate(self, 1, BENFIX_STEEL_TORNADO_000, 4, 12)
 
-  // Spacels
+  // Q
   |BENFIX_GIGA_DASH
     let self = animate(self, 1, BENFIX_GIGA_DASH_000, 22, 22)
-    let self = dash(self, 4, 10, 22)
+    let self = dash(self, 4, 0, 22)
     self
     
+  // Space
   |BENFIX_DASH
-    animate(self, 1, BENFIX_DASH_000, 9, 18)
+    let self = animate(self, 1, BENFIX_DASH_000, 9, 18)
+    let self = dash(self, 3, 0, 18)
+    self
 
+  // E
   |BENFIX_TAUNT
     animate(self, 0, BENFIX_TAUNT_000, 16, 32)
 
