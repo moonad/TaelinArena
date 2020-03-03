@@ -16,9 +16,9 @@ tophoro_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |TOPHORO_IDLE
-    case self.wlk
-    | true  => animate(self, 1, TOPHORO_WALK_CYCLE_000, 9, 18)
-    | false => animate(self, 1, TOPHORO_IDLE_000, 5, 10)
+    if is_walking(self)
+    then animate(self, 1, TOPHORO_WALK_CYCLE_000, 9, 18)
+    else animate(self, 1, TOPHORO_IDLE_000, 5, 10)
 
   // Left 
   |TOPHORO_HIGHER_GROUND
@@ -31,7 +31,7 @@ tophoro_fun(self: Thing) : Thing
   |TOPHORO_EARTH_WALL
     let self = animate(self, 1, TOPHORO_EARTH_WALL_000, 6, 16)
     let rock = new_thing <= thing(fun=tophoro_earth_wall_fun)
-    let rock = rock <= thing(dir = look_dir(self))
+    let rock = rock <= thing(dir = targ_dir(self))
     let self = spawn(self, 10, [move(rock, self.trg)])
     self
 
@@ -45,7 +45,7 @@ tophoro_fun(self: Thing) : Thing
   |TOPHORO_GROUND_FORCE
     let self = animate(self, 0, TOPHORO_GROUND_FORCE_000, 23, 23)
     let hand = new_thing <= thing(fun=tophoro_ground_force_fun)
-    let hand = hand <= thing(dir = rot90_v3(look_dir(self)))
+    let hand = hand <= thing(dir = rot90_v3(targ_dir(self)))
     let self = spawn(self, 1, [move(hand, self.trg)])
     self
 

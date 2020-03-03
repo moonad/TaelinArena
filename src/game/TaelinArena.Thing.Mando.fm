@@ -15,9 +15,9 @@ mando_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | MANDO_IDLE
-    case self.wlk
-    | true  => animate(self, 1, MANDO_WALK_000, 10, 30)
-    | false => animate(self, 1, MANDO_IDLE_000, 7, 28)
+    if is_walking(self)
+    then animate(self, 1, MANDO_WALK_000, 10, 30)
+    else animate(self, 1, MANDO_IDLE_000, 7, 28)
 
   // Left 
   | MANDO_SHOTTING
@@ -37,7 +37,7 @@ mando_fun(self: Thing) : Thing
   | MANDO_FLAMETHROWER
     let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 20)
     let flame = new_thing <= thing(fun=mando_flamethrower_effect)
-    let flame = flame <= thing(dir = look_dir(self))
+    let flame = flame <= thing(dir = targ_dir(self))
     let self = spawn(self, 5, [move(flame, self.trg)])
     self
 

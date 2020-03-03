@@ -15,9 +15,9 @@ kakashi_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |KAKASHI_IDLE
-    case self.wlk
-    | true  => animate(self, 1, KAKASHI_RUN_000, 6, 12)
-    | false => animate(self, 1, KAKASHI_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, KAKASHI_RUN_000, 6, 12)
+    else animate(self, 1, KAKASHI_IDLE_000, 6, 12)
 
   // Left 
   |KAKASHI_PAKKUN_ATTACK
@@ -33,7 +33,7 @@ kakashi_fun(self: Thing) : Thing
   |KAKASHI_FIREBALL_CASTING
     let self = animate(self, 0, KAKASHI_FIREBALL_CASTING_000, 9, 18)
     let fire = new_thing <= thing(fun=kakashi_fire_ball_effect)
-    let fire = fire <= thing(dir = look_dir(self))
+    let fire = fire <= thing(dir = targ_dir(self))
     let self = spawn(self, 10, [move(fire, self.trg)])
     self
 

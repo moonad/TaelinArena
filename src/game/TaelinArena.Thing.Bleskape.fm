@@ -2,48 +2,48 @@ import TaelinArena.Game
 
 enum
 | BLESKAPE_IDLE
-| BLESKAPE_SHOCK_GROUND_WAVE
 | BLESKAPE_SHOCK_BALL
 | BLESKAPE_DEFENSE_MODE
+| BLESKAPE_SHOCK_GROUND_WAVE
 | BLESKAPE_SUPREME_PUNCH_SEQUENCE
-| BLESKAPE_TAUNT
 | BLESKAPE_DASH
+| BLESKAPE_TAUNT
 
 bleskape_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 4)
+  let self = self <= thing(mov = 2)
 
   case self |thing switch self.act
 
   |BLESKAPE_IDLE
-    case self.wlk
-    | true  => animate(self, 1, BLESKAPE_WALK_000, 4, 16)
-    | false => animate(self, 1, BLESKAPE_IDLE_000, 4, 16)
+    if is_walking(self)
+    then animate(self, 1, BLESKAPE_WALK_000, 4, 16)
+    else animate(self, 1, BLESKAPE_IDLE_000, 4, 16)
 
-  // Left 
-  |BLESKAPE_SHOCK_GROUND_WAVE
-    animate(self, 0, BLESKAPE_SHOCK_GROUND_WAVE_000, 12, 24)
-
-  // Middle
   |BLESKAPE_SHOCK_BALL
     animate(self, 0, BLESKAPE_SHOCK_BALL_000, 15, 30)
 
-  // Right
   |BLESKAPE_DEFENSE_MODE
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_000, 3, 0,3)
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_002, 1, 3,12)
     let self = reset(self, 11)
     self
 
-  // Space
-  |BLESKAPE_SUPREME_PUNCH_SEQUENCE
-    animate(self, 1, BLESKAPE_SUPREME_PUNCH_SEQUENCE_000, 25, 75)
+  |BLESKAPE_SHOCK_GROUND_WAVE
+    let self = animate(self, 0, BLESKAPE_SHOCK_GROUND_WAVE_000, 12, 24)
+    //let effs = [damage(2)]
+    //let hits = [hit(effs, self.pos, self.dir, cbox(12))]
+    //let self = cast(self, 0, hits)
+    self
 
-  | BLESKAPE_TAUNT
-    animate(self, 0, BLESKAPE_TAUNT_000, 10, 20)
+  |BLESKAPE_SUPREME_PUNCH_SEQUENCE
+    animate(self, 0, BLESKAPE_SUPREME_PUNCH_SEQUENCE_000, 25, 75)
 
   | BLESKAPE_DASH
     let self = animate(self, 1, BLESKAPE_DASH_000, 15, 30)
     let self = dash(self, 8, 15, 25)
     self
+
+  | BLESKAPE_TAUNT
+    animate(self, 0, BLESKAPE_TAUNT_000, 10, 20)
 
   else self

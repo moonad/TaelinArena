@@ -16,15 +16,15 @@ konan_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |KONAN_IDLE
-    case self.wlk
-    | true  => animate(self, 1, KONAN_RUN_000, 6, 12)
-    | false => animate(self, 1, KONAN_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, KONAN_RUN_000, 6, 12)
+    else animate(self, 1, KONAN_IDLE_000, 6, 12)
 
   // Left
   |KONAN_GIANT_PAPER_DESTRUCTION
     let self = animate(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_CAST_000, 2, 12)
     let paper = new_thing <= thing(fun=konan_giant_paper_destruction_effect)
-    let paper = paper <= thing(dir = rot90_v3(look_dir(self)))
+    let paper = paper <= thing(dir = rot90_v3(targ_dir(self)))
     let self = spawn(self, 0, [move(paper, self.trg)])
     self
 
@@ -38,7 +38,7 @@ konan_fun(self: Thing) : Thing
   |KONAN_ORIGAMI_KNOCKDOWN
     let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_CAST_000, 3, 18)
     let origami = new_thing <= thing(fun=konan_origami_knockdown_effect)
-    // let origami = origami <= thing(dir = rot90_v3(look_dir(self)))
+    // let origami = origami <= thing(dir = rot90_v3(targ_dir(self)))
     let self = spawn(self, 8, [move(origami, self.trg)])
     self
 

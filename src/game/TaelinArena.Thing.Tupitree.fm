@@ -15,9 +15,9 @@ tupitree_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |TUPITREE_IDLE
-    case self.wlk
-    | true  => animate(self, 1, TUPITREE_WALK_000, 6, 12)
-    | false => animate(self, 1, TUPITREE_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, TUPITREE_WALK_000, 6, 12)
+    else animate(self, 1, TUPITREE_IDLE_000, 6, 12)
 
   // Left 
   |TUPITREE_VINE_WHIP

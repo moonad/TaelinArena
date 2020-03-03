@@ -15,9 +15,9 @@ finn_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |FINN_IDLE
-    case self.wlk
-    | true  => animate(self, 1, FINN_WALK_CYCLE_000, 8, 16)
-    | false => animate(self, 1, FINN_IDLE_000, 5, 10)
+    if is_walking(self)
+    then animate(self, 1, FINN_WALK_CYCLE_000, 8, 16)
+    else animate(self, 1, FINN_IDLE_000, 5, 10)
 
   // Left 
   |FINN_TRIPLE_TAKE
