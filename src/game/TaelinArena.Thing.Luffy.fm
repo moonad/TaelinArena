@@ -16,9 +16,9 @@ luffy_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |LUFFY_IDLE
-    case self.wlk
-    | true  => animate(self, 1, LUFFY_RUN_000, 8, 16)
-    | false => animate(self, 1, LUFFY_IDLE_000, 13, 26)
+    if is_walking(self)
+    then animate(self, 1, LUFFY_RUN_000, 8, 16)
+    else animate(self, 1, LUFFY_IDLE_000, 13, 26)
 
   // Left
   |LUFFY_BASIC_ATTACK

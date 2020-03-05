@@ -15,9 +15,9 @@ benfix_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |BENFIX_IDLE
-    case self.wlk
-    | true  => animate(self, 1, BENFIX_WALK_000, 7, 14)
-    | false => animate(self, 0, BENFIX_IDLE_000, 12, 24)
+    if is_walking(self)
+    then animate(self, 1, BENFIX_WALK_000, 7, 14)
+    else animate(self, 0, BENFIX_IDLE_000, 12, 24)
 
   // Left 
   |BENFIX_DOUBLE_ATTACK

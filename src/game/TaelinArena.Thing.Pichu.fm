@@ -15,9 +15,9 @@ pichu_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | PICHU_IDLE
-    case self.wlk
-    | true  => animate(self, 1, PICHU_WALK_000, 6, 12)
-    | false => animate(self, 1, PICHU_IDLE_000, 3, 6)
+    if is_walking(self)
+    then animate(self, 1, PICHU_WALK_000, 6, 12)
+    else animate(self, 1, PICHU_IDLE_000, 3, 6)
 
   // Left
   | PICHU_IRON_TAIL
@@ -34,13 +34,13 @@ pichu_fun(self: Thing) : Thing
   | PICHU_THUNDER_CHARGE
     let self = animate(self, 0, PICHU_ELECTRIC_BALL_000, 10, 20)
     let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+8)
-    let lpos = add_v3(lpos, scale_v3(-8, look_dir(self)))
+    let lpos = add_v3(lpos, scale_v3(-8, targ_dir(self)))
     let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
     let self = illumine(self, 0, 12, [lght])
     let ball = new_thing <= thing(
       fun = pichu_thunder_shock_effect,
       pos = self.pos,
-      vel = scale_v3(16, look_dir(self)),
+      vel = scale_v3(16, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 14, [ball])
     self
@@ -103,9 +103,9 @@ pikachu_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | PIKACHU_IDLE
-    case self.wlk
-    | true  => animate(self, 1, PIKACHU_WALK_000, 7, 14)
-    | false => animate(self, 1, PIKACHU_IDLE_000, 4, 8)
+    if is_walking(self)
+    then animate(self, 1, PIKACHU_WALK_000, 7, 14)
+    else animate(self, 1, PIKACHU_IDLE_000, 4, 8)
 
   // Left
   | PIKACHU_IRON_TAIL
@@ -122,13 +122,13 @@ pikachu_fun(self: Thing) : Thing
   | PIKACHU_THUNDER_CHARGE
     let self = animate(self, 0, PIKACHU_ELECTRIC_BALL_000, 10, 20)
     let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+14)
-    let lpos = add_v3(lpos, scale_v3(-14, look_dir(self)))
+    let lpos = add_v3(lpos, scale_v3(-14, targ_dir(self)))
     let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
     let self = illumine(self, 0, 12, [lght])
     let ball = new_thing <= thing(
       fun = pikachu_thunder_shock_effect,
       pos = self.pos,
-      vel = scale_v3(16, look_dir(self)),
+      vel = scale_v3(16, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 14, [ball])
     self
@@ -194,9 +194,9 @@ raichu_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | RAICHU_IDLE
-    case self.wlk
-    | true  => animate(self, 1, RAICHU_WALK_000, 6, 12)
-    | false => animate(self, 1, RAICHU_IDLE_000, 4, 8)
+    if is_walking(self)
+    then animate(self, 1, RAICHU_WALK_000, 6, 12)
+    else animate(self, 1, RAICHU_IDLE_000, 4, 8)
 
   // Left
   | RAICHU_IRON_TAIL
@@ -213,13 +213,13 @@ raichu_fun(self: Thing) : Thing
   | RAICHU_THUNDER_CHARGE
     let self = animate(self, 0, RAICHU_ELECTRIC_BALL_000, 10, 20)
     let lpos = case self.pos |v3 v3(self.pos.x, self.pos.y, self.pos.z+16)
-    let lpos = add_v3(lpos, scale_v3(-20, look_dir(self)))
+    let lpos = add_v3(lpos, scale_v3(-20, targ_dir(self)))
     let lght = light(lpos,12,2,v3(0,0,0),v3(0.72,0.72,0.0))
     let self = illumine(self, 0, 12, [lght])
     let ball = new_thing <= thing(
       fun = raichu_thunder_shock_effect,
       pos = self.pos,
-      vel = scale_v3(16, look_dir(self)),
+      vel = scale_v3(16, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 14, [ball])
     self

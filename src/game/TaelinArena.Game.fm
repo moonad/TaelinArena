@@ -42,8 +42,8 @@ T Thing
   pos : V3,          // in-game position
   mov : Number,      // movement speed
   bst : Number,      // movement speed multiplier
-  wlk : Bool,        // is this walking?
-  dir : V3,          // facing direction
+  pad : V3,          // analog pad direction (len = 0 to 1)
+  dir : V3,          // facing direction (len = 1)
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
@@ -92,7 +92,7 @@ new_thing : Thing
     v3(0,0,0),  // pos
     8,          // mov
     1,          // bst
-    false,      // wlk
+    v3(0,0,0),  // pad
     v3(0,-1,0), // dir
     v3(0,0,0),  // trg
     v3(0,0,0),  // vel
@@ -143,7 +143,7 @@ set_thing_tik(thi:Thing, new_tik) thi<=thing(tik=new_tik)
 set_thing_pos(thi:Thing, new_pos) thi<=thing(pos=new_pos)
 set_thing_mov(thi:Thing, new_mov) thi<=thing(mov=new_mov)
 set_thing_bst(thi:Thing, new_bst) thi<=thing(bst=new_bst)
-set_thing_wlk(thi:Thing, new_wlk) thi<=thing(wlk=new_wlk)
+set_thing_pad(thi:Thing, new_pad) thi<=thing(pad=new_pad)
 set_thing_dir(thi:Thing, new_dir) thi<=thing(dir=new_dir)
 set_thing_trg(thi:Thing, new_trg) thi<=thing(trg=new_trg)
 set_thing_vel(thi:Thing, new_vel) thi<=thing(vel=new_vel)
@@ -193,9 +193,14 @@ animate_between(
   if is_between(from, til, self.tik) then
     self <= thing(
       bst = boost,
-      dir = if (act > 0) && is_false(wlk)
-        then look_dir(self)
-        else dir,
+      dir =
+        let pad_len = len_v3(pad)
+        if (act > 0) && (pad_len === 0) then
+          targ_dir(self)
+        else if pad_len > 0 then
+          norm_v3(pad)
+        else
+          dir,
       mid =
         let duration = til - from
         let curr_tik = tik - from
@@ -310,18 +315,18 @@ illumine(
       else nil(_))
 
 // Returns the direction the thing is looking to
-look_dir(self: Thing)
+targ_dir(self: Thing)
   case self |thing
   lookat_v3(self.pos, self.trg, self.dir)
 
-// Returns the position at a given distance towards look_dir
+// Returns the position at a given distance towards targ_dir
 at_dist(self: Thing, dist: Number)
   case self |thing
-  let dir = look_dir(self)
+  let dir = targ_dir(self)
   let pos = add_v3(self.pos, scale_v3(dist, dir))
   pos
 
-// Return the position within a maximum range towards look_dir
+// Return the position within a maximum range towards targ_dir
 at_max_dist(self: Thing, max_range: Number)
   case self |thing
   let dist_max = dist_v3(self.pos, at_dist(self, max_range))
@@ -330,7 +335,7 @@ at_max_dist(self: Thing, max_range: Number)
     then at_dist(self, dist_trg)
     else at_dist(self, max_range)
 
-// Return the position within a mininum range towards look_dir
+// Return the position within a mininum range towards targ_dir
 at_min_dist(self: Thing, min_range: Number)
   case self |thing
   let dist_min = dist_v3(self.pos, at_dist(self, min_range))
@@ -338,6 +343,18 @@ at_min_dist(self: Thing, min_range: Number)
   if dist_trg > dist_min
     then at_dist(self, dist_trg)
     else at_dist(self, min_range)
+
+// Sets a thing's act
+init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
+  this <= thing(
+    act = if act === 0 then new_act else act,
+    trg = if act === 0 then new_trg else trg,
+    tik = if act === 0 then 0 else tik)
+
+// Is this thing walking?
+is_walking(this: Thing) : Number
+  case this |thing
+  len_v3(this.pad) > 0
 
 // Return the position within a mininum and maximun range towards look_dir
 between_dist(self: Thing, min_range: Number, max_range: Number, default: Number)

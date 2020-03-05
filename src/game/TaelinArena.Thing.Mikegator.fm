@@ -15,9 +15,9 @@ mikegator_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |MIKEGATOR_IDLE
-    case self.wlk
-    | true  => animate(self, 1, MIKEGATOR_WALK_000, 8, 16)
-    | false => animate(self, 1, MIKEGATOR_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, MIKEGATOR_WALK_000, 8, 16)
+    else animate(self, 1, MIKEGATOR_IDLE_000, 6, 12)
 
   |MIKEGATOR_ATTACK
     animate(self, 1, MIKEGATOR_ATTACK_000, 6, 10)

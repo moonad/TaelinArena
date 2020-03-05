@@ -23,9 +23,9 @@ dorime_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | DORIME_IDLE
-    case self.wlk
-    | true  => animate(self, 1, DORIME_WALK_CYCLE_000, 8, 16)
-    | false => animate(self, 1, DORIME_IDLE_000, 5, 15)
+    if is_walking(self)
+    then animate(self, 1, DORIME_WALK_CYCLE_000, 8, 16)
+    else animate(self, 1, DORIME_IDLE_000, 5, 15)
 
   // Left 
   | DORIME_BLESSING_FOR_WHO_DESERVE
@@ -42,7 +42,7 @@ dorime_fun(self: Thing) : Thing
     let pot = new_thing <= thing(
       fun = dorime_leptospirose_curse_pot_fun,
       pos = self.pos,
-      vel = scale_v3(15, look_dir(self)),
+      vel = scale_v3(15, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 12, [pot])
     let self = spawn(self, 14, [

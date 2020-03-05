@@ -15,9 +15,9 @@ kenko_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |KENKO_IDLE
-    case self.wlk
-    | true  => animate(self, 1, KENKO_WALK_000, 6, 12)
-    | false => animate(self, 1, KENKO_IDLE_000, 7, 14)
+    if is_walking(self)
+    then animate(self, 1, KENKO_WALK_000, 6, 12)
+    else animate(self, 1, KENKO_IDLE_000, 7, 14)
 
   |KENKO_GOLEM_BLAST
     animate(self, 0, KENKO_GOLEM_BLAST_000, 14, 28)

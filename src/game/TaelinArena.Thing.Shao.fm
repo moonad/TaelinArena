@@ -15,9 +15,9 @@ shao_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |SHAO_IDLE
-    case self.wlk
-    | true  => animate(self, 1, SHAO_RUN_000, 6, 12)
-    | false => animate(self, 1, SHAO_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, SHAO_RUN_000, 6, 12)
+    else animate(self, 1, SHAO_IDLE_000, 6, 12)
 
   // Left 
   |SHAO_HEAVY_WATER
@@ -27,7 +27,7 @@ shao_fun(self: Thing) : Thing
   |SHAO_BALUN
     let self = animate(self, 1, SHAO_BALUN_CAST_000, 6, 12)
     let blun = new_thing <= thing(fun=shao_balun_fun)
-    let blun = blun <= thing(dir = look_dir(self))
+    let blun = blun <= thing(dir = targ_dir(self))
     let self = spawn(self, 10, [move(blun, self.trg)])
     self
 

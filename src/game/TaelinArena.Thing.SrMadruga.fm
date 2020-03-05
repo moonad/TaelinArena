@@ -15,9 +15,9 @@ srmadruga_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |SRMADRUGA_IDLE
-    case self.wlk
-    | true  => animate(self, 1, SR_MADRUGA_WALK_000, 10, 20)
-    | false => animate(self, 1, SR_MADRUGA_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, SR_MADRUGA_WALK_000, 10, 20)
+    else animate(self, 1, SR_MADRUGA_IDLE_000, 6, 12)
 
   // Left 
   |SRMADRUGA_FRYING_PAN
@@ -42,7 +42,7 @@ srmadruga_fun(self: Thing) : Thing
     let self = animate(self, 0, SR_MADRUGA_EXPLOSIVE_PHOTO_000, 10, 40)
     let lpos =
       case self.pos |v3
-      case look_dir(self) as dir |v3
+      case targ_dir(self) as dir |v3
       let lx = self.pos.x + (dir.x * 22.0)
       let ly = self.pos.y + (dir.y * 22.0)
       let lz = 23.0

@@ -7,42 +7,17 @@ import TaelinArena.Thing
 // Apply a player input to the game state
 exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
-  let fn = (thi: Thing) =>
+  let fn = (this: Thing) =>
     case cmd.inp as inp
-    with thi : Thing
-    | sdir =>
-      case thi |thing
-      let is_idle = len_v3(inp.dir) === 0
-      let map_dir = (d: V3) => if is_idle then d else inp.dir
-      let map_wlk = (s: Bool) => if is_idle then false else true
-      let thi = thi <= thing(dir = map_dir(dir))
-      let thi = thi <= thing(wlk = map_wlk(wlk))
-      thi
-    | key0 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 1 else act,
-      tik = if act === 0 then 0 else tik)
-    | key1 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 2 else act,
-      tik = if act === 0 then 0 else tik)
-    | key2 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 3 else act,
-      tik = if act === 0 then 0 else tik)
-    | key3 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 4 else act,
-      tik = if act === 0 then 0 else tik)
-    | key4 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 5 else act,
-      tik = if act === 0 then 0 else tik)
-    | key5 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 6 else act,
-      tik = if act === 0 then 0 else tik)
-    | cmsg => thi
+    with this : Thing
+    | sdir => this <= thing(pad = inp.dir)
+    | key0 => init_act(this, 1, inp.pos)
+    | key1 => init_act(this, 2, inp.pos)
+    | key2 => init_act(this, 3, inp.pos)
+    | key3 => init_act(this, 4, inp.pos)
+    | key4 => init_act(this, 5, inp.pos)
+    | key5 => init_act(this, 6, inp.pos)
+    | cmsg => this
   with_thing(cmd.pid, fn, gm)
 
 // Checks if two boxes collide, returns outwards vector
@@ -158,13 +133,24 @@ exec_turn(gm: Game) : Game
     // Removes past hits
     let this = this <= thing(hit = [])
 
+    // Resets
+    case this |thing
+    let this =
+      case this.rst
+      | true  => this <= thing(
+        vel = v3(0,0,0),
+        bst = 1,
+        act = 0,
+        tik = 0,
+        lit = nil(_),
+        rst = false)
+      | false => this
+
     // Integrates position with dash velocity
     let this = this <= thing(pos = add_v3(pos,vel))
 
     // Integrates position with walk vector
-    let this = this <= thing(pos = case wlk
-      | true  => add_v3(pos,scale_v3(mov*bst,dir))
-      | false => pos)
+    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*bst,pad)))
 
     // Integrates position with knockback
     let this = this <= thing(
@@ -193,19 +179,6 @@ exec_turn(gm: Game) : Game
       let y = min(max(-192, pos.y), 192)
       let z = min(max(   0, pos.z), 192)
       v3(x, y, z))
-
-    // Resets
-    case this |thing
-    let this =
-      case this.rst
-      | true  => this <= thing(
-        vel = v3(0,0,0),
-        bst = 1,
-        act = 0,
-        tik = 0,
-        lit = nil(_),
-        rst = false)
-      | false => this
     
     // Adds updated thing and new things to stage
     concat(_ chi_list,

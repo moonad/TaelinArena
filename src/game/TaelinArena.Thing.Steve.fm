@@ -15,9 +15,9 @@ steve_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | STEVE_IDLE
-    case self.wlk
-    | true  => animate(self, 1, STEVE_WALK_000, 8, 16)
-    | false => animate(self, 1, STEVE_IDLE_000, 1, 2)
+    if is_walking(self)
+    then animate(self, 1, STEVE_WALK_000, 8, 16)
+    else animate(self, 1, STEVE_IDLE_000, 1, 2)
 
   // Left 
   | STEVE_DIAMON_SWORD
@@ -40,7 +40,7 @@ steve_fun(self: Thing) : Thing
   | STEVE_ENDER_DRAGONS_FURY
     let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_CASTING_000, 16, 32)
     let effect = new_thing <= thing(fun=steve_ender_dragons_fury_effect)
-    let effect = effect <= thing(dir = look_dir(self))
+    let effect = effect <= thing(dir = targ_dir(self))
     let self = spawn(self, 16, [move(effect, self.trg)])
     self
 

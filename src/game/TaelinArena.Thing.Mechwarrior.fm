@@ -15,9 +15,9 @@ mechwarrior_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   | MECHWARRIOR_IDLE
-    case self.wlk
-    | true  => animate(self, 1, MECHWARRIOR_WALK_000, 10, 20)
-    | false => animate(self, 1, MECHWARRIOR_IDLE_000, 10, 20)
+    if is_walking(self)
+    then animate(self, 1, MECHWARRIOR_WALK_000, 10, 20)
+    else animate(self, 1, MECHWARRIOR_IDLE_000, 10, 20)
 
   // Left 
   | MECHWARRIOR_LASER

@@ -15,9 +15,9 @@ min_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |MIN_IDLE
-    case self.wlk
-    | true  => animate(self, 1, MIN_RUN_000, 6, 12)
-    | false => animate(self, 1, MIN_IDLE_000, 3, 12)
+    if is_walking(self)
+    then animate(self, 1, MIN_RUN_000, 6, 12)
+    else animate(self, 1, MIN_IDLE_000, 3, 12)
 
   // Left
   // TODO: adjust this function
