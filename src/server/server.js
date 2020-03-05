@@ -276,7 +276,7 @@ app.post("/answer", (req, res) => {
 });
 
 // Starts serving files and API on port 80
-app.listen(80);
+app.listen(process.argv[2] || 80);
 
 // Initializes game service
 var gs = await GS();
