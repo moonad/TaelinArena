@@ -74,144 +74,164 @@ const now = (() => {
 
 var OFF_GAME = 0xFFFFFFFF;
 
-// Renders the game state to screen using the canvox library
-var voxels = {
-  size: 256*256*32*2,
-  data: new Uint32Array(256*256*32*2)
+// The function below use those global objects for
+// performance reasons, preventing extra allocs
+var voxels = {size: 256*256*32*2, data: new Uint32Array(256*256*32*2)};
+var lights = [];
+var hud = [];
+
+function render_hitbox(pos, dir, box, col = 0xA0A0F0FF) {
+  var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
+  let case_nbox = null;
+  let case_cbox = (rad) => {
+    for (var i = 0; i < 64; ++i) {
+      var px = pos_x + rad * Math.cos(i/64*Math.PI*2);
+      var py = pos_y + rad * Math.sin(i/64*Math.PI*2);
+      var pz = pos_z;
+      if ( -512 < px && px < 512
+        && -512 < py && py < 512
+        && -512 < pz && pz < 512) {
+        var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+        var rgb = col;
+        voxels.data[voxels.size++] = xyz;
+        voxels.data[voxels.size++] = rgb;
+      }
+    }
+  };
+  let case_pbox = (pts) => {
+    var segs = slist_to_array(TA.polygon_to_segments(pos)(dir)(pts));
+    for (var i = 0; i < segs.length; ++i) {
+      var [p0,p1] = segs[i](a => b => ([
+        a(x => y => z => ({x,y,z})),
+        b(x => y => z => ({x,y,z}))
+      ]));
+      for (var n = 0; n <= 32; ++n) {
+        var px = p0.x + (p1.x - p0.x) * n/32;
+        var py = p0.y + (p1.y - p0.y) * n/32;
+        var pz = p0.z + (p1.z - p0.z) * n/32;
+        if ( -512 < px && px < 512
+          && -512 < py && py < 512
+          && -512 < pz && pz < 512) {
+          var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+          var rgb = col;
+          voxels.data[voxels.size++] = xyz;
+          voxels.data[voxels.size++] = rgb;
+        }
+      }
+    }
+  };
+  box(case_nbox)(case_cbox)(case_pbox);
+};
+
+function render_hits(hits) {
+  let case_nil  = null;
+  let case_cons = hit => hits => {
+    hit(eff => pos => dir => box => {
+      render_hitbox(pos, dir, box, 0xFFA0A0FF);
+    });
+    render_hits(hits);
+  };
+  hits(case_nil)(case_cons);
+};
+
+function render_model(pos, dir, mid) {
+  var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
+  var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
+  var ang = Math.atan2(dir_y, dir_x);
+  var ang = ang + Math.PI*0.5;
+  var hei = 0;
+  var model = get_model(mid);
+  if (model) {
+    for (var i = 0; i < model.length; ++i) {
+      var [{x,y,z},{r,g,b}] = model[i];
+      var max_z = Math.max(max_z, z);
+      var cx = pos_x;
+      var cy = pos_y;
+      var cz = pos_z;
+      var px = cx + x;
+      var py = cy + y;
+      var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
+      var pa = Math.atan2(py-cy,px-cx);
+      var px = cx + pl * Math.cos(pa + ang) + 0.5;
+      var py = cy + pl * Math.sin(pa + ang) + 0.5;
+      var pz = cz + z;
+      if ( -512 < px && px < 512
+        && -512 < py && py < 512
+        && -512 < pz && pz < 512) {
+        var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+        var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
+        voxels.data[voxels.size++] = xyz;
+        voxels.data[voxels.size++] = rgb;
+      }
+      hei = Math.max(hei, z);
+    }
+  }
+  return hei;
+};
+
+function render_lights(lit) {
+  (function go(lit) {
+    var case_nil  = null;
+    var case_cons = head => tail => {
+      head(pos => rad => rng => sub => add => {
+        pos = pos(x=>y=>z=>({x,y,z}));
+        sub = sub(x=>y=>z=>({x,y,z}));
+        add = add(x=>y=>z=>({x,y,z}));
+        lights.push({pos, rad, rng, sub, add});
+      });
+      go(tail);
+    };
+    lit(case_nil)(case_cons);
+  })(lit);
+};
+
+function render_thing(thing) {
+  thing(
+    fun => pid => mid => act =>
+    nam => lit => tik => pos =>
+    mov => bst => wlk => dir =>
+    trg => vel => box => dmg =>
+    knk => chi => hit => res =>
+    die => {
+    // Renders model voxels
+    var max_z = 0;
+    if (mid !== 0xFFFFFFFF) {
+      let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
+      max_z = render_model(pos, look_dir, mid);
+    }
+
+    // Renders hits
+    render_hits(hit);
+
+    // Renders hitbox
+    render_hitbox(pos, dir, box);
+
+    // Renders lights
+    render_lights(lit);
+
+    // Renders HUD
+    hud.push({
+      pos: pos(x=>y=>z=>({x,y,z})),
+      dmg: dmg,
+      nam: sstring_to_string(nam),
+      hei: max_z,
+    });
+  });
 };
 
 function render_game({game, canvox, canhud, cam}) {
-  var voxels_data = voxels.data;
-  var voxels_size = 0;
-  var hud = [];
+  voxels.size = 0;
+  hud.length = 0;
+  lights.length = 0;
 
   // Gets the current time
   var T = now();
-
-  // Lights object
-  var lights = [];
 
   // Gets the main hero position
   var hero_pos = TA.get_position_by_pid(0, game);
 
   // Renders each game thing
-  TA.map_stage((thing) => {
-    thing(
-      fun => pid => mid => act =>
-      nam => lit => tik => pos =>
-      mov => bst => wlk => dir =>
-      trg => vel => box => dmg =>
-      knk => chi => hit => res =>
-      die => {
-      let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
-      var [dir_x,dir_y,dir_z] = look_dir(x=>y=>z=>([x,y,z]));
-      var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
-
-      var ang = Math.atan2(dir_y, dir_x);
-      var ang = ang + Math.PI*0.5;
-      var hei = 0;
-
-      // Renders model voxels
-      var max_z = 0;
-      if (mid !== 0xFFFFFFFF) {
-        var model = get_model(mid);
-        if (model) {
-          for (var i = 0; i < model.length; ++i) {
-            var [{x,y,z},{r,g,b}] = model[i];
-            var max_z = Math.max(max_z, z);
-            var cx = pos_x;
-            var cy = pos_y;
-            var cz = pos_z;
-            var px = cx + x;
-            var py = cy + y;
-            var pl = Math.sqrt((px-cx)**2+(py-cy)**2);
-            var pa = Math.atan2(py-cy,px-cx);
-            var px = cx + pl * Math.cos(pa + ang) + 0.5;
-            var py = cy + pl * Math.sin(pa + ang) + 0.5;
-            var pz = cz + z;
-            if ( -512 < px && px < 512
-              && -512 < py && py < 512
-              && -512 < pz && pz < 512) {
-              var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-              var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-              voxels_data[voxels_size++] = xyz;
-              voxels_data[voxels_size++] = rgb;
-            }
-            hei = Math.max(hei, z);
-          }
-        }
-      }
-
-      // Renders hitbox
-      let case_nbox = null;
-      let case_cbox = (rad) => {
-        for (var i = 0; i < 32; ++i) {
-          var px = pos_x + rad * Math.cos(i/32*Math.PI*2);
-          var py = pos_y + rad * Math.sin(i/32*Math.PI*2);
-          var pz = pos_z;
-          if ( -512 < px && px < 512
-            && -512 < py && py < 512
-            && -512 < pz && pz < 512) {
-            var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-            var rgb = 0xA0A0F0FF;
-            voxels_data[voxels_size++] = xyz;
-            voxels_data[voxels_size++] = rgb;
-          }
-        }
-      };
-      let case_pbox = (pts) => {
-        var segs = slist_to_array(TA.polygon_to_segments(pos)(dir)(pts));
-        for (var i = 0; i < segs.length; ++i) {
-          var [p0,p1] = segs[i](a => b => ([
-            a(x => y => z => ({x,y,z})),
-            b(x => y => z => ({x,y,z}))
-          ]));
-          for (var n = 0; n <= 16; ++n) {
-            var px = p0.x + (p1.x - p0.x) * n/16;
-            var py = p0.y + (p1.y - p0.y) * n/16;
-            var pz = p0.z + (p1.z - p0.z) * n/16;
-            if ( -512 < px && px < 512
-              && -512 < py && py < 512
-              && -512 < pz && pz < 512) {
-              var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-              var rgb = 0xA0A0F0FF;
-              voxels_data[voxels_size++] = xyz;
-              voxels_data[voxels_size++] = rgb;
-            }
-          }
-        }
-      };
-      box(case_nbox)(case_cbox)(case_pbox);
-
-      // Renders lights
-      (function go(lit) {
-        var case_nil  = null;
-        var case_cons = head => tail => {
-          head(pos => rad => rng => sub => add => {
-            pos = pos(x=>y=>z=>({x,y,z}));
-            sub = sub(x=>y=>z=>({x,y,z}));
-            add = add(x=>y=>z=>({x,y,z}));
-            lights.push({pos, rad, rng, sub, add});
-          });
-          go(tail);
-        };
-        lit(case_nil)(case_cons);
-      })(lit);
-
-      // Renders HUD
-      if (canhud) {
-        hud.push({
-          pos: {x:pos_x, y:pos_y, z:pos_z},
-          dmg: dmg,
-          nam: sstring_to_string(nam),
-          hei: hei,
-        });
-      };
-    });
-  })(game);
-
-  voxels.data = voxels_data;
-  voxels.size = voxels_size;
+  TA.map_stage(thing=>render_thing(thing,hud,lights))(game);
 
   canvox.draw({voxels, lights, stage, cam});
   if (canhud) {
