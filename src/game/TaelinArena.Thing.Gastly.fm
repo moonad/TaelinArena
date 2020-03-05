@@ -1,0 +1,47 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Haunter
+
+enum
+| GASTLY_IDLE
+| GASTLY_LICK
+| GASTLY_MEAN_LOOK
+| GASTLY_DREAM_EATER
+| GASTLY_INVISIBILITY
+| GASTLY_EVOLVE
+| GASTLY_TAUNT
+
+gastly_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | GASTLY_IDLE
+    case self.wlk
+    | true  => animate(self, 1, GASTLY_WALK_000, 6, 12)
+    | false => animate(self, 1, GASTLY_IDLE_000, 13, 26)
+
+  // Left 
+  | GASTLY_LICK
+    animate(self, 0, GASTLY_ATTACK_LICK_000, 10, 20)
+
+  // Middle
+  | GASTLY_MEAN_LOOK
+    animate(self, 0, GASTLY_ATTACK_MEAN_LOOK_000, 16, 32)
+
+  // Right
+  | GASTLY_DREAM_EATER
+    animate(self, 0, GASTLY_ATTACK_DREAM_EATER_000, 10, 20)
+
+  // Q
+  | GASTLY_INVISIBILITY
+    animate(self, 1, GASTLY_ULTIMATE_INVISIBILITY_000, 12, 50)
+
+  // Space
+  | GASTLY_EVOLVE
+    animate(self, 1, GASTLY_IDLE_000, 13, 26)
+
+  // E
+  | GASTLY_TAUNT
+    animate(self, 1, GASTLY_IDLE_000, 13, 26)
+
+  else self

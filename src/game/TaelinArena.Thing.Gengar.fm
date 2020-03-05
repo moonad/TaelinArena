@@ -1,0 +1,46 @@
+import TaelinArena.Game
+
+enum
+| GENGAR_IDLE
+| GENGAR_LICK
+| GENGAR_HYPNOSIS
+| GENGAR_DREAM_EATER
+| GENGAR_INVISIBILITY
+| GENGAR_EVOLVE
+| GENGAR_TAUNT
+
+gengar_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | GENGAR_IDLE
+    case self.wlk
+    | true  => animate(self, 1, GENGAR_WALK_000, 3, 6)
+    | false => animate(self, 1, GENGAR_IDLE_000, 7, 14)
+
+  // Left 
+  | GENGAR_LICK
+    animate(self, 0, GENGAR_ATTACK_LICK_000, 9, 18)
+
+  // Middle
+  | GENGAR_MEAN_LOOK
+    animate(self, 0, GENGAR_ATTACK_HYPNOSIS_000, 14, 28)
+
+  // Right
+  | GENGAR_DREAM_EATER
+    animate(self, 0, GENGAR_ATTACK_DREAM_EATER_000, 12, 24)
+
+  // Q
+  | GENGAR_INVISIBILITY
+    animate(self, 1, GENGAR_ULTIMATE_INVISIBILITY_000, 10, 30)
+
+  // Space
+  | GENGAR_EVOLVE
+   animate(self, 1, GENGAR_IDLE_000, 7, 14)
+    
+  // E
+  | GENGAR_TAUNT
+   animate(self, 1, GENGAR_TAUNT_000, 18, 40)
+
+  else self

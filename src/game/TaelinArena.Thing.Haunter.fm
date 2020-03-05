@@ -1,0 +1,47 @@
+import TaelinArena.Game
+import TaelinArena.Thing.Gengar
+
+enum
+| HAUNTER_IDLE
+| HAUNTER_LICK
+| HAUNTER_MEAN_LOOK
+| HAUNTER_DREAM_EATER
+| HAUNTER_INVISIBILITY
+| HAUNTER_EVOLVE
+| HAUNTER_TAUNT
+
+haunter_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | HAUNTER_IDLE
+    case self.wlk
+    | true  => animate(self, 1, HAUNTER_WALK_000, 4, 8)
+    | false => animate(self, 1, HAUNTER_IDLE_000, 5, 10)
+
+  // Left 
+  | HAUNTER_LICK
+    animate(self, 0, HAUNTER_ATTACK_LICK_000, 9, 18)
+
+  // Middle
+  | HAUNTER_MEAN_LOOK
+    animate(self, 0, HAUNTER_ATTACK_MEAN_LOOK_000, 14, 28)
+
+  // Right
+  | HAUNTER_DREAM_EATER
+    animate(self, 0, HAUNTER_ATTACK_DREAM_EATER_000, 10, 20)
+
+  // Q
+  | HAUNTER_INVISIBILITY
+    animate(self, 1, HAUNTER_ULTIMATE_INVISIBILITY_000, 12, 40)
+
+  // Space
+  | HAUNTER_EVOLVE
+    animate(self, 1, HAUNTER_IDLE_000, 13, 26)
+    
+  // E
+  | HAUNTER_TAUNT
+    animate(self, 1, HAUNTER_IDLE_000, 13, 26)
+
+  else self
