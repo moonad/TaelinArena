@@ -9,6 +9,9 @@ enum
 | MIN_DASH
 | MIN_TAUNT
 
+medium_dist : Number
+  200
+
 min_fun(self: Thing) : Thing
   let self = self <= thing(mov = 6)
 
@@ -36,18 +39,18 @@ min_fun(self: Thing) : Thing
   |MIN_FIRE_MARK
     let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 15)
     let mark = new_thing <= thing(fun=min_fire_mark_fun)
-    let self = spawn(self, 0, [move(mark, self.trg)])
-    let self = blink(self, 10, self.trg)
+    let self = spawn(self, 0, [move(mark, at_max_dist(self, medium_dist))])
+    let self = blink(self, 10, at_max_dist(self, medium_dist))
     let mark = new_thing <= thing(fun=min_fire_mark_fading_fun)
-    let self = spawn(self, 14, [move(mark, self.trg)])
+    let self = spawn(self, 14, [move(mark, self.pos)])
     // let tele = new_thing <= thing(fun=min_fire_mark_teleport)
     // let self = spawn(self, 6, self.trg, tele)
     self
 
   // Right
   |MIN_MELTING_CUTS
-    let self = animate(self, 1, MIN_MELTING_CUTS_000, 9, 20)
-    let dmg = new_thing <= thing(fun=min_melting_cuts_fun, dir=look_dir(self))
+    let self = animate(self, 1, MIN_MELTING_CUTS_000, 10, 20)
+    let dmg = new_thing <= thing(fun=min_melting_cuts_fun, dir=targ_dir(self))
     let self = spawn(self, 5, [move(dmg, at_dist(self, 30))])
     // let self = self <= thing(box = cbox(15), pos = at_dist(self, 10))
     // let effs = [damage(3)]
@@ -86,14 +89,19 @@ min_flame_slash_fun(self: Thing) : Thing
 min_fire_mark_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MIN_FIRE_MARK_EFFECT_000, 7, 14)
-  let self = self <= thing(box = cbox(20))
+  let self = self <= thing(box = nbox)
   let effs = [damage(4)]
   let hits = [hit(effs, self.pos, self.dir, cbox(20))]
   let self = cast(self, 5, hits)
   self
 
 min_fire_mark_fading_fun(self: Thing) : Thing
+  case self |thing
   let self = animate_die(self, 0, MIN_FIRE_MARK_FADING_EFFECT_000, 3, 6)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(1)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(20))]
+  let self = cast(self, 5, hits)
   self
 
 min_fire_mark_teleport(self: Thing) : Thing
