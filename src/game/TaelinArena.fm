@@ -1,4 +1,4 @@
-import Base#9y4x
+import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.Game
 import TaelinArena.ModelIds
@@ -7,43 +7,60 @@ import TaelinArena.Thing
 // Apply a player input to the game state
 exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
-  let fn = (thi: Thing) =>
+  let fn = (this: Thing) =>
     case cmd.inp as inp
-    with thi : Thing
-    | sdir =>
-      case thi |thing
-      let is_idle = len_v3(inp.dir) === 0
-      let map_dir = (d: V3) => if is_idle then d else inp.dir
-      let map_wlk = (s: Bool) => if is_idle then false else true
-      let thi = thi <= thing(dir = map_dir(dir))
-      let thi = thi <= thing(wlk = map_wlk(wlk))
-      thi
-    | key0 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 1 else act,
-      tik = if act === 0 then 0 else tik)
-    | key1 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 2 else act,
-      tik = if act === 0 then 0 else tik)
-    | key2 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 3 else act,
-      tik = if act === 0 then 0 else tik)
-    | key3 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 4 else act,
-      tik = if act === 0 then 0 else tik)
-    | key4 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 5 else act,
-      tik = if act === 0 then 0 else tik)
-    | key5 => thi <= thing(
-      trg = if act === 0 then inp.pos else trg,
-      act = if act === 0 then 6 else act,
-      tik = if act === 0 then 0 else tik)
-    | cmsg => thi
+    with this : Thing
+    | sdir => this <= thing(pad = inp.dir)
+    | key0 => init_act(this, 1, inp.pos)
+    | key1 => init_act(this, 2, inp.pos)
+    | key2 => init_act(this, 3, inp.pos)
+    | key3 => init_act(this, 4, inp.pos)
+    | key4 => init_act(this, 5, inp.pos)
+    | key5 => init_act(this, 6, inp.pos)
+    | cmsg => this
   with_thing(cmd.pid, fn, gm)
+
+// Checks if two boxes collide, returns outwards vector
+collide_with(
+  a_pos: V3,
+  a_dir: V3,
+  a_box: Hitbox,
+  b_pos: V3,
+  b_dir: V3,
+  b_box: Hitbox
+) : Maybe(V3)
+  case a_box
+  |nbox => none(_)
+  |cbox => case b_box
+    |nbox => none(_)
+    |cbox =>
+      let dst = dist_v3(a_pos, b_pos)
+      let rad = a_box.rad + b_box.rad
+      if (dst > 0) && (dst < rad) then
+        let out_dir = norm_v3(sub_v3(a_pos, b_pos))
+        let out_vec = scale_v3(rad - dst, out_dir)
+        some(_ out_vec)
+      else
+        none(_)
+    |pbox =>
+      let nil  = none(_)
+      let cons = (segment, result) =>
+        case result
+        |none =>
+          case segment |segment
+          let dst = point_segment_dist(a_pos, segment)
+          let rad = a_box.rad
+          if (dst < rad) then
+            let out_dir = rot90_v3(norm_v3(sub_v3(segment.a,segment.b)))
+            let out_vec = scale_v3(rad - dst, out_dir)
+            some(_ out_vec)
+          else
+            none(_)
+        |some => some(_ result.value)
+      let segs = polygon_to_segments(b_pos, b_dir, b_box.pts)
+      fold(Segment; Maybe(V3); nil, cons, segs)
+  |pbox =>
+    none(_) // TODO
 
 // Interaction function between two things
 interact_with(this:Thing, that:Thing): Thing
@@ -51,41 +68,45 @@ interact_with(this:Thing, that:Thing): Thing
   let this =
     case this |thing
     case that |thing
-      case this.box |cbox
-      case that.box |cbox
-        let dst = dist_v3(this.pos, that.pos)
-        let rad = this.box.rad + that.box.rad
-        if (dst > 0) && (dst < rad) then
-          let out_dir = norm_v3(sub_v3(this.pos, that.pos))
-          let out_vec = scale_v3(rad - dst, out_dir)
-          let new_pos = add_v3(this.pos, out_vec)
-          this <= thing(pos = new_pos)
-        else
-          this
-      | pbox => this
-      | pbox => this
-
-  // Hit by an attack
+    let out_vec = collide_with(
+      this.pos, this.dir, this.box,
+      that.pos, that.dir, that.box)
+    case out_vec
+    | none => this
+    | some => this <= thing(pos = add_v3(pos,out_vec.value))
+  // Hit by an effect
   let this =
-    case this |thing
     case that |thing
-    case that.hit |none this |some
-    case that.hit.value
-    | pointed_hit => // TODO: implement
-      this
-    | outward_hit =>
-      let dst = sqrdist_v3(that.pos, this.pos)
-      let rad = that.hit.value.rad
-      if dst < (rad * rad) then
-        let dir = lookat_v3(that.pos, this.pos, v3(1,0,0))
-        let vec = scale_v3(that.hit.value.mag, dir)
-        this <= thing(knk = vec)
-      else
-        this
+    let apply_hit = (hit, this) =>
+      case hit |hit
+      case this |thing
+      let out_vec = collide_with(
+        this.pos, this.dir, this.box,
+        hit.pos, hit.dir, hit.box)
+      case out_vec
+      | none => this
+      | some =>
+        let apply_eff = (eff, this) =>
+          case eff
+          | damage =>
+            let new_dmg =
+              if this.dmg === 0xFFFFFFFF
+              then this.dmg
+              else this.dmg + eff.dmg
+            this <= thing(dmg = new_dmg)
+          | repulse =>
+            let dir = lookat_v3(hit.pos, this.pos, v3(1,0,0))
+            let vec = scale_v3(eff.mag, dir)
+            this <= thing(knk = vec)
+          | impulse =>
+            let vec = scale_v3(eff.mag, eff.dir)
+            this <= thing(knk = vec)
+        fold(Effect; Thing; this, apply_eff, hit.eff)
+    fold(Hit; Thing; this, apply_hit, that.hit)
   this
 
 // Like a fold, but with access to a list of other elements
-interact_list(A; B;
+fold_with_context(A; B;
   i: B,
   f: A -> List(A) -> B -> B,
   xs: List(A),
@@ -97,7 +118,7 @@ interact_list(A; B;
     let self = xs.head
     let tail = xs.tail
     let ys2  = (x) => ys(cons(_ xs.head, x))
-    let rest = interact_list(A; B; i, f, xs.tail, ys2)
+    let rest = fold_with_context(A; B; i, f, xs.tail, ys2)
     f(xs.head, ys(xs.tail), rest)
 
 // Game's main loop
@@ -106,74 +127,65 @@ exec_turn(gm: Game) : Game
   let intr = (that,this) => interact_with(this,that)
 
   // For each thing in the game...
-  let tick = (thi: Thing, stage: List(Thing), res: List(Thing)) =>
-    case thi |thing
+  let tick = (this: Thing, others: List(Thing), res: List(Thing)) =>
+    case this |thing
 
-    // Calls the transaction function
-    let thi = thi.fun(thi)
+    // Removes past hits
+    let this = this <= thing(hit = [])
+
+    // Resets
+    case this |thing
+    let this =
+      case this.rst
+      | true  => this <= thing(
+        vel = v3(0,0,0),
+        bst = 1,
+        act = 0,
+        tik = 0,
+        lit = nil(_),
+        rst = false)
+      | false => this
 
     // Integrates position with dash velocity
-    let thi = thi <= thing(pos = add_v3(pos,vel))
+    let this = this <= thing(pos = add_v3(pos,vel))
 
     // Integrates position with walk vector
-    let thi = thi <= thing(pos = case wlk
-      | true  => add_v3(pos,scale_v3(mov*bst,dir))
-      | false => pos)
+    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*bst,pad)))
 
     // Integrates position with knockback
-    let thi = thi <= thing(
+    let this = this <= thing(
       pos = add_v3(pos, knk),
       knk = scale_v3(0.80, knk))
 
+    // Calls the transaction function
+    let this = this.fun(this)
+
     // Calls interaction function with all other things
-    let thi = fold(Thing; _ thi, intr, stage)
+    let this = fold(Thing; _ this, intr, others)
 
     // Increments tik counter
-    let thi = thi <= thing(tik = tik + 1)
+    let this = this <= thing(tik = tik + 1)
 
     // Spawns children
-    case thi |thing
+    case this |thing
     let chi_init = (chi) => case chi |thing chi.fun(chi)
-    let chi_list = map(Thing; Thing; chi_init, thi.chi)
+    let chi_list = map(Thing; Thing; chi_init, this.chi)
+    let this = this <= thing(chi = [])
 
     // Keeps inside map
-    let thi = thi <= thing(pos =
+    let this = this <= thing(pos =
       case pos |v3
-      let x = min(max(-448, pos.x), 448)
+      let x = min(max(-384, pos.x), 384)
       let y = min(max(-192, pos.y), 192)
-      let z = min(max(   0, pos.z), 256)
+      let z = min(max(   0, pos.z), 192)
       v3(x, y, z))
     
     // Adds updated thing and new things to stage
     concat(_ chi_list,
-      case thi.die
+      case this.die
       |true res
-      |false cons(_thi,res))
+      |false cons(_ this,res))
 
   // Ticks every thing on stage
   gm <= game(
-    stage = interact_list(Thing; _ [], tick, stage, (x)=>x))
-
-// Returns the draw object with info to render on screen
-draw_thing(thi: Thing) : Draw 
-  case thi |thing
-  let mid = thi.mid
-  let pos = thi.pos
-  let dir =
-    if thi.act === 0 then
-      thi.dir
-    else
-      lookat_v3(thi.pos, thi.trg, thi.dir)
-  let dmg = thi.dmg
-  draw(mid, pos, dir, dmg)
-
-// Creates a brand new game
-new_game(tids: List(ThingId)) : Game
-  let nil = (pid) => []
-  let cons = (tid, heroes, pid) => 
-    let hpid = pid
-    let hpos = v3((pid * 64) - 64, 0, 0)
-    let hero = init_thing(tid) <= thing(pid=hpid, pos=hpos)
-    let rest = heroes(pid + 1)
-    cons(_ hero, rest)
-  game(fold(_ Number -> List(Thing); nil, cons, tids, 0))
+    stage = fold_with_context(Thing; _ [], tick, stage, (x)=>x))

@@ -15,9 +15,9 @@ zoio_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |ZOIO_IDLE
-    case self.wlk
-    | true  => animate(self, 1, ZOIO_WALK_000, 7, 14)
-    | false => animate(self, 1, ZOIO_IDLE_000, 7, 14)
+    if is_walking(self)
+    then animate(self, 1, ZOIO_WALK_000, 7, 14)
+    else animate(self, 1, ZOIO_IDLE_000, 7, 14)
 
   |ZOIO_SPINNING_JUMP
     animate(self, 1, ZOIO_SPINNING_JUMP_000, 11, 22)

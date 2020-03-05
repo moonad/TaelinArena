@@ -1,12 +1,8 @@
-import Base#9y4x
+import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.ModelIds
-import TaelinArena.ThingIds
 
 PlayerId : Type
-  Number
-
-ThingId : Type
   Number
 
 ModelId : Type
@@ -16,36 +12,46 @@ ActionId : Type
   Number
 
 T Hitbox
+| nbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
+T Effect
+| damage(dmg: Number)
+| repulse(mag: Number)
+| impulse(mag: Number, dir: V3)
+
 T Hit
-| pointed_hit(rad: Number, dmg: Number, vec: V3)
-| outward_hit(rad: Number, dmg: Number, mag: Number)
+| hit(eff: List(Effect), pos: V3, dir: V3, box: Hitbox)
 
 TxFunction : Type
   Thing -> Thing
 
+T Light
+| light(pos: V3, rad: Number, rng: Number, sub: V3, add: V3)
+
 T Thing
 | thing(
   fun : TxFunction,  // transaction function
-  tid : ThingId,     // id of thing that this is
   pid : PlayerId,    // number of player controlling this
   mid : ModelId,     // id of model to be rendered
-  act : ActionId,    // number of action this is performing
+  act : ActionId,    // number of performing action
+  nam : String,      // name of thing
+  lit : List(Light), // list of lights to render
   tik : Number,      // ticks passed since last act change
   pos : V3,          // in-game position
   mov : Number,      // movement speed
   bst : Number,      // movement speed multiplier
-  wlk : Bool,        // is this walking?
-  dir : V3,          // facing direction
+  pad : V3,          // analog pad direction (len = 0 to 1)
+  dir : V3,          // facing direction (len = 1)
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
-  hit : Maybe(Hit),  // damage and knockback caused by this
+  hit : List(Hit),   // hits done by this
+  rst : Bool,        // should this reset to idle
   die : Bool)        // should this be removed?
 
 T Game
@@ -64,8 +70,39 @@ T Input
 T Command
 | command(pid: PlayerId, inp: Input)
 
-T Draw
-| draw(model: Number, pos: V3, dir: V3, dmg: Number)
+//T Draw
+//| draw(
+  //mid: Number,
+  //nam: String,
+  //pos: V3,
+  //dir: V3,
+  //lit: List(Light),
+  //dmg: Number)
+
+// Creates a new default thing
+new_thing : Thing
+  thing(
+    ((x) => x), // fun
+    0xFFFFFFFF, // pid
+    0xFFFFFFFF, // mid
+    0,          // act
+    nil(_),     // nam
+    nil(_),     // lit
+    0,          // tik
+    v3(0,0,0),  // pos
+    8,          // mov
+    1,          // bst
+    v3(0,0,0),  // pad
+    v3(0,-1,0), // dir
+    v3(0,0,0),  // trg
+    v3(0,0,0),  // vel
+    cbox(12),   // box
+    0xFFFFFFFF, // dmg
+    v3(0,0,0),  // knk
+    nil(_),     // chi
+    nil(_),     // hit
+    false,      // rst
+    false)      // die
 
 // Gets a thing from game by its id
 get_thing_by_pid(pid: PlayerId, gm: Game) : Maybe(Thing)
@@ -95,31 +132,82 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
     | false => thi
   map_stage(effect, gm)
 
-// Creates a new reseted hero given its ThingId
-new_thing(fun: TxFunction) : Thing
-  let fun = fun
-  let tid = 0
-  let pid = 0
-  let mid = 0xFFFFFFFF
-  let act = 0
-  let tik = 0
-  let pos = v3(0,0,0)
-  let mov = 8
-  let bst = 1
-  let wlk = false
-  let dir = v3(0,-1,0)
-  let trg = v3(0,0,0)
-  let vel = v3(0,0,0)
-  let box = cbox(12)
-  let dmg = 0
-  let knk = v3(0,0,0)
-  let chi = []
-  let hit = none(_)
-  let die = false
-  thing(
-    fun,tid,pid,mid,act,tik,pos,mov,
-    bst,wlk,dir,trg,vel,box,dmg,knk,
-    chi,hit,die)
+// Thing field setters
+set_thing_fun(thi:Thing, new_fun) thi<=thing(fun=new_fun)
+set_thing_pid(thi:Thing, new_pid) thi<=thing(pid=new_pid)
+set_thing_mid(thi:Thing, new_mid) thi<=thing(mid=new_mid)
+set_thing_act(thi:Thing, new_act) thi<=thing(act=new_act)
+set_thing_nam(thi:Thing, new_nam) thi<=thing(nam=new_nam)
+set_thing_lit(thi:Thing, new_lit) thi<=thing(lit=new_lit)
+set_thing_tik(thi:Thing, new_tik) thi<=thing(tik=new_tik)
+set_thing_pos(thi:Thing, new_pos) thi<=thing(pos=new_pos)
+set_thing_mov(thi:Thing, new_mov) thi<=thing(mov=new_mov)
+set_thing_bst(thi:Thing, new_bst) thi<=thing(bst=new_bst)
+set_thing_pad(thi:Thing, new_pad) thi<=thing(pad=new_pad)
+set_thing_dir(thi:Thing, new_dir) thi<=thing(dir=new_dir)
+set_thing_trg(thi:Thing, new_trg) thi<=thing(trg=new_trg)
+set_thing_vel(thi:Thing, new_vel) thi<=thing(vel=new_vel)
+set_thing_box(thi:Thing, new_box) thi<=thing(box=new_box)
+set_thing_dmg(thi:Thing, new_dmg) thi<=thing(dmg=new_dmg)
+set_thing_knk(thi:Thing, new_knk) thi<=thing(knk=new_knk)
+set_thing_chi(thi:Thing, new_chi) thi<=thing(chi=new_chi)
+set_thing_hit(thi:Thing, new_hit) thi<=thing(hit=new_hit)
+set_thing_rst(thi:Thing, new_rst) thi<=thing(rst=new_rst)
+set_thing_die(thi:Thing, new_die) thi<=thing(die=new_die)
+
+// Resets to given tick
+reset(
+  self   : Thing,
+  at_tik : Number)
+  case self |thing
+  if self.tik > (at_tik - 1) then
+    self <= thing(rst = true)
+  else
+    self
+
+// Dies at given tick
+die(
+  self   : Thing,
+  at_tik : Number)
+    case self |thing
+    if self.tik > (at_tik - 1) then
+      self <= thing(die = true)
+    else
+      self
+
+// Performs an animation, reseting to idle when it ends
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
+animate_between(
+  self  : Thing,
+  boost : Number,
+  model : Number,
+  count : Number,
+  from  : Number,
+  til   : Number
+  ) : Thing
+  case self |thing
+  if is_between(from, til, self.tik) then
+    self <= thing(
+      bst = boost,
+      dir =
+        let pad_len = len_v3(pad)
+        if (act > 0) && (pad_len === 0) then
+          targ_dir(self)
+        else if pad_len > 0 then
+          norm_v3(pad)
+        else
+          dir,
+      mid =
+        let duration = til - from
+        let curr_tik = tik - from
+        let curr_tim = curr_tik \ duration
+        model + (floor(curr_tim * count) % count))
+  else
+    self
 
 // Performs an animation, reseting to idle when it ends
 // - self: thing to be animated
@@ -134,11 +222,26 @@ animate(
   count : Number,
   durat : Number
   ) : Thing
-  let delay = durat \ count
-  self <= thing(
-    bst = if tik === durat then 1 else boost,
-    mid = model + (floor(tik \ delay) % count),
-    act = if tik === durat then 0 else act)
+  let self = animate_between(self,boost,model,count,0,durat)
+  let self = reset(self, durat - 1)
+  self
+
+// Performs an animation, dying when it ends
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
+animate_die(
+  self  : Thing,
+  boost : Number,
+  model : Number,
+  count : Number,
+  durat : Number
+  ) : Thing
+  let self = animate_between(self,boost,model,count,0,durat)
+  let self = die(self, durat - 1)
+  self
 
 // Performs a dash between certain frames
 // - self: thing that will dash
@@ -151,23 +254,14 @@ dash(
   from_tik : Number,
   til_tik  : Number)
   self <= thing(vel =
-    if (tik > from_tik) && (tik < til_tik) then 
+    if is_between(from_tik, til_tik, tik) then 
       scale_v3(speed, lookat_v3(pos, trg, dir))
     else
       v3(0,0,0))
 
-// Spawns another thing
-// - self: thing that will create another thing
-// - at_tik: number of the tik when thing will be created
-// - at_pos: position on which thing will be created
-// - thing: thing that will be created
-spawn(
-  self   : Thing,
-  at_tik : Number,
-  at_pos : V3,
-  thing  : Thing)
-  let thing = thing <= thing(pid = -1, pos = at_pos)
-  self <= thing(chi = if tik === at_tik then [thing] else [])
+// Sets the position
+move(self: Thing, to_pos: V3)
+  self <= thing(pos = to_pos)
 
 // Blinks (teleports) to another position
 // - self: thing that will blink
@@ -178,31 +272,94 @@ blink(
   at_tik : Number,
   to_pos : V3)
   self <= thing(
-    pos = if tik === at_tik then to_pos else pos,
-    dir = if tik === at_tik then lookat_v3(pos,trg,dir) else dir)
+    pos = if tik === at_tik then to_pos else pos)
 
 // Creates a hit box that damages and knockbacks
 // - self: thing that owns the hitbox
 // - hitx: Hit object with damage and knockback info
-hit(
+cast(
   self   : Thing,
   at_tik : Number,
-  do_hit : Hit)
+  do_hit : List(Hit))
   case self |thing
   if self.tik === at_tik then
-    self <= thing(hit = some(_ do_hit))
-  else if self.tik === (at_tik + 2) then
-    self <= thing(hit = none(_))
+    self <= thing(hit = do_hit)
   else
     self
 
-// Dies at given tick
-die(
+// Spawns another thing
+// - self: thing that will create another thing
+// - at_tik: number of the tik when thing will be created
+// - at_pos: position on which thing will be created
+// - thing: thing that will be created
+spawn(
   self   : Thing,
-  at_tik : Number)
-  self <= thing(die = if tik === at_tik then true else false)
+  at_tik : Number,
+  childs : List(Thing))
+  //let thing = thing <= thing(pid = -1, pos = at_pos)
+  self <= thing(chi =
+    if tik === at_tik then
+      childs
+    else
+      chi)
+
+// Creates lights at given tick
+illumine(
+  self     : Thing,
+  from_tik : Number,
+  to_tik   : Number,
+  lights   : List(Light))
+  self <= thing(lit =
+    if is_between(from_tik, to_tik, tik)
+      then lights
+      else nil(_))
 
 // Returns the direction the thing is looking to
-look_dir(self: Thing)
+targ_dir(self: Thing)
   case self |thing
   lookat_v3(self.pos, self.trg, self.dir)
+
+// Returns the position at a given distance towards targ_dir
+at_dist(self: Thing, dist: Number)
+  case self |thing
+  let dir = targ_dir(self)
+  let pos = add_v3(self.pos, scale_v3(dist, dir))
+  pos
+
+// Return the position within a maximum range towards targ_dir
+at_max_dist(self: Thing, max_range: Number)
+  case self |thing
+  let dist_max = dist_v3(self.pos, at_dist(self, max_range))
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if dist_trg < dist_max
+    then at_dist(self, dist_trg)
+    else at_dist(self, max_range)
+
+// Return the position within a mininum range towards targ_dir
+at_min_dist(self: Thing, min_range: Number)
+  case self |thing
+  let dist_min = dist_v3(self.pos, at_dist(self, min_range))
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if dist_trg > dist_min
+    then at_dist(self, dist_trg)
+    else at_dist(self, min_range)
+
+// Sets a thing's act
+init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
+  this <= thing(
+    act = if act === 0 then new_act else act,
+    trg = if act === 0 then new_trg else trg,
+    tik = if act === 0 then 0 else tik)
+
+// Is this thing walking?
+is_walking(this: Thing) : Number
+  case this |thing
+  len_v3(this.pad) > 0
+
+// Return the position within a mininum and maximun range towards look_dir
+between_dist(self: Thing, min_range: Number, max_range: Number, default: Number)
+  case self |thing
+  let dist_trg = dist_v3(self.pos, self.trg)
+  if ((dist_trg < max_range) && (dist_trg > min_range)) 
+  then at_dist(self, dist_trg)
+  else at_dist(self, default)

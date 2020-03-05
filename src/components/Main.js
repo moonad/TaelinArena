@@ -1,10 +1,12 @@
 const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const Canvox = require("./../canvox/canvox.js");
+const Canhud = require("./../canhud/canhud.js");
 const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
 const request = require("xhr-request-promise");
 const SimplePeer = require("simple-peer");
+const utils = require("./../utils.js");
 const post = (func, body) => {
   return request("/"+func, {method:"POST",body,json:true});
 };
@@ -13,8 +15,7 @@ const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
 
-const Game = require("./Main.game.js");
-const Controls = require("./Main.controls.js");
+const Controls = require("./Controls.js");
 
 // Main HUD
 class Main extends Component {
@@ -30,8 +31,9 @@ class Main extends Component {
     this.auto_join = true;
     this.controls = Controls(nc => this.send_inputs(nc));
     this.render_mode = "GPU";
-    this.picked_hero = "Tupitree";
+    this.picked_hero = null;
     this.canvox = null;
+    this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
     this.pick_hero("Tupitree");
@@ -50,8 +52,16 @@ class Main extends Component {
       this.ask_turns();
     }, 1000);
 
+    // Chat scroller
+    this.chat_scroller = setInterval(() => {
+      var chat_msgs = document.getElementById("chat_msgs");
+      if (chat_msgs) {
+        chat_msgs.scrollTop = chat_msgs.scrollHeight;
+      }
+    }, 250);
+
     // Executes turns on offline mode
-    this.offline_mode_turner = setInterval(() => {
+    this.offline_mode_turner = utils.set_precise_interval(() => {
       if (this.game && this.game.gid === TA.OFF_GAME) {
         this.game.turn();
       }
@@ -90,13 +100,40 @@ class Main extends Component {
     this.fps_last = Date.now();
     this.fps_tick = 0; 
     this.fps_numb = 0;
-    this.render_game();
+    this.render_game(true);
+
+    // Benchmarks
+    function benchmark_function(name, fn) {
+      console.log("benchmarking " + name);
+      var T = Date.now();
+      var C = 0;
+      while (Date.now() - T < 1000) {
+        fn();
+        C++;
+      };
+      console.log("done:", C, "calls");
+    };
+    window.addEventListener("keydown", (e) => {
+      if (document.activeElement.type !== "text") {
+        if (e.key === "k") {
+          benchmark_function("render", () => {
+            this.render_game(false)
+          });
+        };
+        if (e.key === "l") {
+          benchmark_function("turn", () => {
+            this.game.turn()
+          });
+        };
+      };
+    });
   }
 
   componentWillUnmount() {
     clearInterval(this.game_pooler);
     clearInterval(this.render_loop);
     clearInterval(this.turn_asker);
+    clearInterval(this.chat_scroller);
     clearInterval(this.offline_mode_turner);
     clearInterval(this.game_joiner);
   }
@@ -121,15 +158,27 @@ class Main extends Component {
   // Joins a game given its gid
   join(gid) {
     if (!this.game || this.game.gid !== gid) {
-      var hero_list;
+      var things;
       if (gid === TA.OFF_GAME) {
-        hero_list = [this.picked_hero, "MikeGator"];
+        things = [
+          [this.picked_hero, {pid:0, dmg:0, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
+          ["Poste", {pos:{x:0,y:0,z:0}, nam:"Poste"}],
+          ["PPG", {pos:{x:64,y:0,z:0}, dmg:0, nam:"PPG"}],
+          ["Wall", {pos:{x:-64,y:-64,z:0}, nam:"Wall"}],
+        ];
       } else {
-        hero_list = this.game_list[gid].players.split(",");
-        hero_list = hero_list.map(TA.parse_player);
-        hero_list = hero_list.map(p => p.hero);
+        things = this.game_list[gid].players.split(",");
+        things = things.map(TA.parse_player);
+        things = things.map(p => p.hero);
+        things = things.map((name, idx) => {
+          return [name, {
+            pid: idx,
+            pos: {x: -64 + idx*64, y: 0, z: 0},
+            nam: name,
+          }];
+        });
       };
-      this.game = Game(gid, hero_list);
+      this.game = TA.GameRunner(gid, things);
     }
   }
 
@@ -181,12 +230,12 @@ class Main extends Component {
     // If starts with '!', user wants to set its hero, so we
     // make sure the hero exists
     if (msg[0] === "!") {
-      var hero_name = msg.slice(1).toLowerCase();
-      if (TA.hero_id[hero_name] === undefined) {
-        alert("Hero '" + hero_name + "' not found.");
+      var hero = msg.slice(1).toLowerCase();
+      if (TA.hero_name[hero] === undefined) {
+        alert("Hero '" + hero + "' not found.");
         return;
       }
-      msg = "!" + TA.hero_name[TA.hero_id[hero_name]];
+      msg = "!" + TA.hero_name[hero];
     }
     try {
       this.peer.send(msg);
@@ -212,22 +261,25 @@ class Main extends Component {
   }
 
   // Renders TaelinArena's screen with canvox
-  render_game() {
+  render_game(loop) {
     // Gets the game screen element
     var game_screen = document.getElementById("game_screen");
 
     // If first render or mode changed, restart canvox
     if (!this.canvox || this.render_mode !== this.canvox.render_mode) {
       // Init canvox object
-      this.canvox = Canvox({mode: this.render_mode});
+      this.canvox = Canvox[this.render_mode]();
+      this.canhud = Canhud();
     }
     
     // Inject its canvas on the app
     if (game_screen) {
       if (game_screen.firstChild) {
         game_screen.removeChild(game_screen.firstChild);
+        game_screen.removeChild(game_screen.firstChild);
       }
       if (!game_screen.firstChild) {
+        game_screen.appendChild(this.canhud);
         game_screen.appendChild(this.canvox);
       }
     }
@@ -251,15 +303,20 @@ class Main extends Component {
       }
       // Renders the game
       var cam = this.controls.make_canvox_cam();
-      TA.render_game({
+      this.hud = TA.render_game({
         game: this.game.state,
         canvox: this.canvox,
+        canhud: this.canhud,
         cam: cam,
       });
     }
 
     // Repeat on every screen render
-    window.requestAnimationFrame(() => this.render_game());
+    if (loop) {
+      window.requestAnimationFrame(() => {
+        this.render_game(loop)
+      });
+    };
   }
 
   // Asks missing turns for watched game
@@ -281,7 +338,7 @@ class Main extends Component {
         post("get_game", {id}).then((res) => {
           if (res.ctr === "ok") {
             this.game_list[id] = res.game;
-            this.forceUpdate();
+            //this.forceUpdate();
           }
         });
       }
@@ -298,25 +355,27 @@ class Main extends Component {
       case ">":
       case "^":
         this.room_players = str;
+        this.forceUpdate();
         break;
       // Receives turn info
       case "$":
         if (this.game) {
           this.game.absorb_turn_info(str);
+          this.forceUpdate();
         }
         break;
       default:
         this.chat_msgs.push(str);
+        this.forceUpdate();
         break;
     }
-    this.forceUpdate();
   }
 
   // Selects a hero
   pick_hero(hero) {
-    var picked_hid = TA.hero_id[hero.toLowerCase()];
-    if (picked_hid !== undefined) {
-      this.picked_hero = TA.hero_name[picked_hid];
+    hero = hero.toLowerCase();
+    if (TA.hero_name[hero]) {
+      this.picked_hero = TA.hero_name[hero];
       if (this.game && this.game.gid === TA.OFF_GAME) {
         this.game = null;
         this.join(TA.OFF_GAME);
@@ -371,9 +430,6 @@ class Main extends Component {
         "font-size": "16px",
         "cursor": "pointer",
       },
-      onClick: () => {
-        this.forceUpdate();
-      }
     }, "Taelin::Arena ");
 
     // Top menu: login
@@ -426,7 +482,8 @@ class Main extends Component {
     // Top menu
     var top_menu = h("div", {
       style: {
-        "background": "#F0F0F0",
+        "background": "#202020",
+        "color": "#D0D0D0",
         "height": "24px",
         "display": "flex",
         "flex-flow": "row nowrap",
@@ -443,6 +500,25 @@ class Main extends Component {
       top_rgt,
     ]);
 
+    // Game hud
+    //var hud = [];
+    //console.log("....", this.hud);
+    //for (var i = 0; i < this.hud.length; ++i) {
+      //var hud_el = this.hud[i];
+      //switch (hud_el.ctor) {
+        //case "rect":
+          //hud.push(h("div", {"style": {
+            //"position": "absolute",
+            //"left": hud_el.x+"px",
+            //"top": hud_el.y+"px",
+            //"width": hud_el.w+"px",
+            //"height": hud_el.h+"px",
+            //"background": hud_el.col,
+          //}}, ["x"]));
+          //break;
+      //}
+    //}
+
     // Game screen
     if (this.canvox) {
       var ch = Number(this.canvox.style.height.slice(0,-2));
@@ -453,11 +529,10 @@ class Main extends Component {
       "id": "game_screen",
       "style": {
         "height": (ch + 2) + "px",
-        "border-top": "1px solid #E0E0E0",
-        "border-bottom": "1px solid #E0E0E0",
+        "border-top": "1px solid #000000",
+        "border-bottom": "1px solid #000000",
         "background": "#FCFCFC",
-      }
-    });
+      }});
 
     // Bottom panel: chat box
     var chat_box = h("div", {
@@ -471,6 +546,26 @@ class Main extends Component {
         msgs: this.chat_msgs,
       })
     ]);
+
+    // Bottom panel: room box
+    var room_box = h("pre", {
+      "style": {
+        "width": "25%",
+        "height": "100%",
+        "padding": "4px",
+        "overflow-y": "scroll",
+      },
+    }, this.room_players && this.room_players
+      .split(",")
+      .map(room_player => {
+        return h("div", {
+          "style": {
+            "color":
+              room_player[0] === "<" ? "#A06060" :
+              room_player[0] === ">" ? "#60A060" : "#808080",
+          },
+        }, room_player.slice(1).replace("!", " @") + "\n");
+      }));
 
     // Bottom panel: info box
     var render_mode = h("span", {
@@ -487,9 +582,7 @@ class Main extends Component {
     ]);
     var picked_hero = h("span", {
       "onclick": () => {
-        var heroes = Object.keys(TA.hero_id);
-        var heroes = heroes.map(name => TA.hero_name[TA.hero_id[name]]);
-        var message = "Pick a hero. Options: " + heroes.join(", ");
+        var message = "Pick a hero. Options: " + TA.heroes.join(", ");
         var picked_hero = prompt(message); 
         if (picked_hero) {
           this.pick_hero(picked_hero);
@@ -525,35 +618,40 @@ class Main extends Component {
         "cursor": "pointer",
       }
     }, [
-      this.auto_join ? "auto-join" : "manual-join"
+      this.auto_join ? "auto" : "manual"
     ]);
     var info_box = h("pre", {
       "style": {
-        "width": "50%",
+        "width": "25%",
         "height": "100%",
         "padding": "4px",
         "font-family": "monospace",
       }
     }, [
-      h("div", {}, "FPS  : " + (this.fps_numb||0)),
-      h("div", {}, ["Game : ", current_game, " (", join_mode, ")"]),
+      h("div", {}, ["Game : ", current_game, " (join: ", join_mode, ")"]),
+      h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
+      h("div", {}, ["FPS  : " + (this.fps_numb||0)]),
       h("div", {}, ["Mode : ", render_mode]),
       h("div", {}, ["Hero : ", picked_hero]),
-      h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
-      h("div", {}, ["Room : ", this.room_players]),
+      h("div", {}, ["Room : ",
+        (this.room_players
+          ? this.room_players.split(",").length
+          : 1) + " online"]),
     ]);
 
     // Bottom panel
     var bottom_panel = h("div", {
       "style": {
+        "color": "#D0D0D0",
+        "background": "#202020",
         "width": "100%",
-        "flex-grow": "1",
+        "height": "calc(100% - " + Math.floor(24+(ch+2)) + "px)",
         "display": "flex",
         "flex-flow": "row nowrap",
         "justify-content": "center",
         "align-items": "center",
       },
-    }, [chat_box, info_box]);
+    }, [chat_box, room_box, info_box]);
 
     // Main App
     return h("div", {

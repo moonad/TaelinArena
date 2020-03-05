@@ -1,0 +1,15 @@
+import TaelinArena.Game
+
+wall_fun(self: Thing) : Thing
+  let self = self <= thing(pos = v3(-64,64,0))
+  let self = self <= thing(dir = v3(0.7071,0.7071,0))
+  let self = self <= thing(mid = WALL_IDLE_000)
+  let boxw = 60
+  let boxh = 6
+  let self = self <= thing(box = pbox([
+    v3(boxw * -1, boxh * -1, 0),
+    v3(boxw * -1, boxh *  1, 0),
+    v3(boxw *  1, boxh *  1, 0),
+    v3(boxw *  1, boxh * -1, 0)
+  ]))
+  self

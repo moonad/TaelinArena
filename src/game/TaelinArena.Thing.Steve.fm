@@ -1,0 +1,70 @@
+import TaelinArena.Game
+
+enum
+| STEVE_IDLE
+| STEVE_DIAMON_SWORD
+| STEVE_TNT
+| STEVE_ENDER_PEARL
+| STEVE_ENDER_DRAGONS_FURY
+| STEVE_BLOCK
+| STEVE_TAUNT
+
+steve_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | STEVE_IDLE
+    if is_walking(self)
+    then animate(self, 1, STEVE_WALK_000, 8, 16)
+    else animate(self, 1, STEVE_IDLE_000, 1, 2)
+
+  // Left 
+  | STEVE_DIAMON_SWORD
+    animate(self, 0, STEVE_DIAMOND_SWORD_000, 5, 10)
+
+  // Middle
+  | STEVE_TNT
+    let self = animate(self, 0, STEVE_TNT_CASTING_000, 3, 9)
+    let tnt = new_thing <= thing(fun=steve_tnt_effect)
+    let self = spawn(self, 5, [move(tnt, self.trg)])
+    self
+
+  // Right
+  | STEVE_ENDER_PEARL
+    let self = animate(self, 0, STEVE_ENDER_PEARL_000, 10, 20)
+    let self = blink(self, 20, self.trg)
+    self
+
+  // Q
+  | STEVE_ENDER_DRAGONS_FURY
+    let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_CASTING_000, 16, 32)
+    let effect = new_thing <= thing(fun=steve_ender_dragons_fury_effect)
+    let effect = effect <= thing(dir = targ_dir(self))
+    let self = spawn(self, 16, [move(effect, self.trg)])
+    self
+
+  // Space
+  | STEVE_BLOCK
+    let self = animate(self, 0, STEVE_BLOCK_000, 17, 17)
+    let block = new_thing <= thing(fun=steve_block_effect)
+    let self = spawn(self, 1, [move(block, self.trg)])
+    self
+
+  // E
+  | STEVE_TAUNT
+    animate(self, 0, STEVE_TAUNT_000, 28, 28)
+
+  else self
+
+steve_tnt_effect(self: Thing) : Thing
+  let self = animate_die(self, 0, STEVE_TNT_000, 18, 36)
+  self
+
+steve_ender_dragons_fury_effect(self: Thing) : Thing
+  let self = animate_die(self, 0, STEVE_ENDER_DRAGONS_FURY_000, 13, 26)
+  self
+
+steve_block_effect(self: Thing) : Thing
+  let self = animate_die(self, 0, STEVE_BLOCK_CASTING_000, 10, 100)
+  self

@@ -30,15 +30,15 @@ class Chat extends Component {
     }, [msgs]);
     var input = h("input", {
       id: "chat_input",
+      autocomplete: "off",
       onkeydown: (e) => {
         var value = e.target.value;
         if (e.key === "Enter") {
           this.props.on_say(value);
           setTimeout(() => {
             var el0 = document.getElementById("chat_input");
-            var el1 = document.getElementById("chat_msgs");
             el0.value = "";
-            el1.scrollTop = el1.scrollHeight;
+            e.target.blur();
           }, 5);
         }
         this.forceUpdate();
@@ -50,9 +50,9 @@ class Chat extends Component {
         "height": "24px",
         "margin": "5px",
         "border-radius": "4px",
-        "border": "0px solid gray",
-        "background": "rgb(242,242,242)",
-        //"color": "black",
+        "border": "0px solid #D0D0D0",
+        "background": "#303030",
+        "color": "#D0D0D0",
         //"background": "#F2F2F2",
       },
     });
@@ -67,7 +67,7 @@ class Chat extends Component {
         "display": "flex",
         "flex-flow": "column nowrap",
         "justify-content": "flex-end",
-        "background": "white",
+        //"background": "white",
         "align-items": "center",
         //"color": "white",
       }

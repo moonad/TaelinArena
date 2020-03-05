@@ -1,5 +1,4 @@
 import TaelinArena.Game
-import TaelinArena.Thing.Mikegator.Earth
 
 enum
 | MIKEGATOR_IDLE
@@ -16,17 +15,17 @@ mikegator_fun(self: Thing) : Thing
   case self |thing switch self.act
 
   |MIKEGATOR_IDLE
-    case self.wlk
-    | true  => animate(self, 1, MIKEGATOR_WALK_000, 8, 16)
-    | false => animate(self, 1, MIKEGATOR_IDLE_000, 6, 12)
+    if is_walking(self)
+    then animate(self, 1, MIKEGATOR_WALK_000, 8, 16)
+    else animate(self, 1, MIKEGATOR_IDLE_000, 6, 12)
 
   |MIKEGATOR_ATTACK
     animate(self, 1, MIKEGATOR_ATTACK_000, 6, 10)
 
   |MIKEGATOR_EARTHBENDING
     let self = animate(self, 1, MIKEGATOR_EARTHBENDING_000, 9, 18)
-    let make = new_thing(mikegator_earth_fun)
-    let self = spawn(self, 10, self.trg, make)
+    let make = new_thing <= thing(fun=mikegator_earth_fun)
+    let self = spawn(self, 10, [move(make, self.trg)])
     self
 
   |MIKEGATOR_SPINTAIL
@@ -47,3 +46,7 @@ mikegator_fun(self: Thing) : Thing
     self
 
   else self
+
+mikegator_earth_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, MIKEGATOR_EARTHBENDING_ROCK_000, 8, 16)
+  self

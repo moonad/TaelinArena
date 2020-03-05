@@ -1,4 +1,4 @@
-import Base#9y4x
+import Base#kqQ2
 
 T V3
 | v3(x: Number, y: Number, z: Number) 
@@ -134,10 +134,9 @@ point_segment_sqrdist(p: V3, s: Segment) : Number
   let d = d + k
   d
 
-
 // Distance between a point and a segment
 point_segment_dist(p: V3, s: Segment): Number
-  point_segment_dist(p, s) ** 0.5
+  point_segment_sqrdist(p, s) ** 0.5
 
 // The two intersection points of a circle and a line
 circle_line_intersection(circle: Circle, line: Line)
@@ -216,3 +215,38 @@ circle_boundary_intersects(c: Circle, b: Boundary): Number
       else
         let boun = boundary(cons(_ l1.head, l1.tail))
         circle_boundary_intersects(c, boun)
+
+// Polygon to segments
+polygon_to_segments(pos: V3, dir: V3, pts: List(V3)) : List(Segment)
+  let transform = (pnt: V3) =>
+    case pnt |v3
+    case dir |v3
+    let a = atan(dir.y, dir.x)
+    let x = (pnt.x * cos(a)) - (pnt.y * sin(a))
+    let y = (pnt.x * sin(a)) + (pnt.y * cos(a))
+    let z = pnt.z
+    add_v3(pos, v3(x,y,z))
+  let nil = (pt_a, pt_0) =>
+    case pt_0
+    |none => nil(_)
+    |some => case pt_a
+      |none => nil(_)
+      |some =>
+        let p0 = transform(pt_a.value)
+        let p1 = transform(pt_0.value)
+        let sg = segment(p0, p1)
+        cons(_ sg, nil(_))
+  let cons = (pt_b, segs, pt_a, pt_0) =>
+    case pt_a
+    with pt_b : V3
+    with pt_0 : Maybe(V3)
+    |none =>
+      segs(some(_ pt_b), some(_ pt_b))
+    |some =>
+      let pt_0 = case pt_0 |none some(_ pt_b) |some pt_0
+      let p0 = transform(pt_a.value)
+      let p1 = transform(pt_b)
+      let sg = segment(p0, p1)
+      cons(_ sg, segs(some(_ pt_b), pt_0))
+  fold(V3; Maybe(V3) -> Maybe(V3) -> List(Segment);
+    nil, cons, pts, none(_), none(_))

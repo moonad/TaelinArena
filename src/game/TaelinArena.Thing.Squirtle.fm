@@ -1,0 +1,152 @@
+import TaelinArena.Game
+
+enum
+| SQUIRTLE_IDLE
+| SQUIRTLE_WATER_GUN
+| SQUIRTLE_BUBBLE_BEAM
+| SQUIRTLE_SKULL_BASH
+| SQUIRTLE_HYDRO_PUMP
+| SQUIRTLE_EVOLVE
+| SQUIRTLE_TAUNT
+
+squirtle_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |SQUIRTLE_IDLE
+    if is_walking(self)
+    then animate(self, 1, SQUIRTLE_WALK_000, 6, 12)
+    else animate(self, 1, SQUIRTLE_IDLE_000, 12, 24)
+
+  // Left 
+  | SQUIRTLE_WATER_GUN
+    animate(self, 0, SQUIRTLE_WATER_GUN_000, 12, 12)
+
+  // Middle
+  |SQUIRTLE_BUBBLE_BEAM
+    animate(self, 0, SQUIRTLE_BUBBLE_BEAM_000, 16, 16)
+
+  // Right
+  |SQUIRTLE_SKULL_BASH
+    let self = animate(self, 1, SQUIRTLE_SKULL_BASH_000, 16, 32)
+    let dash = dash(self, 4, 8, 32)
+    self
+
+  // Q
+  |SQUIRTLE_HYDRO_PUMP
+    animate(self, 1, SQUIRTLE_HYDRO_PUMP_000, 23, 46)
+
+  // Space
+  | SQUIRTLE_EVOLVE
+    let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
+    let npos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=wartortle_fun) // evolve to Wartortle
+    let self = self <= thing(pos = npos)
+    self
+
+  // E
+  | SQUIRTLE_TAUNT
+    animate(self, 0, SQUIRTLE_TAUNT_000, 23, 32)
+
+  else self
+
+enum
+| WARTORTLE_IDLE
+| WARTORTLE_WATER_GUN
+| WARTORTLE_BUBBLE_BEAM
+| WARTORTLE_SKULL_BASH
+| WARTORTLE_HYDRO_PUMP
+| WARTORTLE_EVOLVE
+| WARTORTLE_TAUNT
+
+wartortle_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |WARTORTLE_IDLE
+    if is_walking(self)
+    then animate(self, 1, WARTORTLE_WALK_000, 6, 12)
+    else animate(self, 1, WARTORTLE_IDLE_000, 12, 24)
+
+  // Left 
+  | WARTORTLE_WATER_GUN
+    animate(self, 0, WARTORTLE_WATER_GUN_000, 14, 14)
+
+  // Middle
+  |WARTORTLE_BUBBLE_BEAM
+    animate(self, 1, WARTORTLE_BUBBLE_BEAM_000, 16, 26)
+
+  // Right
+  |WARTORTLE_SKULL_BASH
+    let self = animate(self, 1, WARTORTLE_SKULL_BASH_000, 15, 30)
+    let dash = dash(self, 4, 8, 30)
+    self
+
+  // Q
+  |WARTORTLE_HYDRO_PUMP
+    animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
+
+  // Space
+  | WARTORTLE_EVOLVE
+    let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
+    let npos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun = blastoise_fun) // evolve to Blastoise
+    let self = self <= thing(pos = npos)
+    self
+  
+  // E
+  | WARTORTLE_TAUNT
+    animate(self, 0, WARTORTLE_TAUNT_000, 23, 32)
+
+  else self
+
+enum
+| BLASTOISE_IDLE
+| BLASTOISE_WATER_GUN
+| BLASTOISE_BUBBLE_BEAM
+| BLASTOISE_SKULL_BASH
+| BLASTOISE_HYDRO_PUMP
+| BLASTOISE_EVOLVE
+| BLASTOISE_TAUNT
+
+blastoise_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |BLASTOISE_IDLE
+    if is_walking(self)
+    then animate(self, 1, BLASTOISE_WALK_000, 16, 32)
+    else animate(self, 1, BLASTOISE_IDLE_000, 29, 29)
+
+  // Left 
+  | BLASTOISE_WATER_GUN
+    animate(self, 0, BLASTOISE_WATER_GUN_000, 13, 26)
+
+  // Middle
+  |BLASTOISE_BUBBLE_BEAM
+    animate(self, 0, BLASTOISE_BUBBLE_BEAM_000, 16, 26)
+
+  // Right
+  |BLASTOISE_SKULL_BASH
+    let self = animate(self, 1, BLASTOISE_SKULL_BASH_000, 21, 42)
+    let dash = dash(self, 4, 10, 42)
+    self
+
+  // Q
+  |BLASTOISE_HYDRO_PUMP
+    animate(self, 1, BLASTOISE_HYDRO_PUMP_000, 28, 56)
+
+    // Space
+  | BLASTOISE_EVOLVE
+    animate(self, 0, BLASTOISE_IDLE_000, 12, 24)
+
+  // E
+  | BLASTOISE_TAUNT
+    animate(self, 0, BLASTOISE_TAUNT_000, 16, 32)
+
+  else self

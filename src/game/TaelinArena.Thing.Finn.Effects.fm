@@ -1,6 +1,0 @@
-import TaelinArena.Game
-
-finn_bow_effect(self: Thing) : Thing
-  let self = animate(self, 0, FINN_BOW_PROJECTILE_000, 0, 2)
-  let self = self <= thing(die = if tik === 2 then true else false)
-  self

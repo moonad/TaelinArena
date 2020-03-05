@@ -10,18 +10,18 @@ enum
 | BENFIX_TAUNT
 
 benfix_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 5)
+  let self = self <= thing(mov = 2)
 
   case self |thing switch self.act
 
   |BENFIX_IDLE
-    case self.wlk
-    | true  => animate(self, 1, BENFIX_WALK_000, 7, 14)
-    | false => animate(self, 1, BENFIX_IDLE_000, 12, 24)
+    if is_walking(self)
+    then animate(self, 1, BENFIX_WALK_000, 7, 14)
+    else animate(self, 0, BENFIX_IDLE_000, 12, 24)
 
   // Left 
   |BENFIX_DOUBLE_ATTACK
-    animate(self, 0, BENFIX_TRIPLE_ATTACK_1_000, 14, 28)
+    animate(self, 0, BENFIX_TRIPLE_ATTACK_1_000, 16, 32)
 
   // Middle
   |BENFIX_SEISMIC_JUMP
@@ -29,15 +29,21 @@ benfix_fun(self: Thing) : Thing
 
   // Right
   |BENFIX_STEEL_TORNADO
-    animate(self, 0, BENFIX_STEEL_TORNADO_000, 4, 12)
+    animate(self, 1, BENFIX_STEEL_TORNADO_000, 4, 12)
 
-  // Space
+  // Q
   |BENFIX_GIGA_DASH
-    animate(self, 1, BENFIX_GIGA_DASH_000, 22, 44)
+    let self = animate(self, 1, BENFIX_GIGA_DASH_000, 22, 22)
+    let self = dash(self, 4, 0, 22)
+    self
     
+  // Space
   |BENFIX_DASH
-    animate(self, 1, BENFIX_DASH_000, 9, 18)
+    let self = animate(self, 1, BENFIX_DASH_000, 9, 18)
+    let self = dash(self, 3, 0, 18)
+    self
 
+  // E
   |BENFIX_TAUNT
     animate(self, 0, BENFIX_TAUNT_000, 16, 32)
 

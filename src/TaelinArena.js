@@ -38,6 +38,35 @@ if (typeof window !== "undefined") {
 const GAME_FPS = 24;
 const GAME_DURATION = GAME_FPS * 60;
 
+function slist_to_array(slist) {
+  var array = [];
+  (function go(slist) {
+    slist(null)(h => t => { array.push(h); go(t); });
+  })(slist);
+  return array;
+};
+
+function array_to_slist(array) {
+  var slist = TA.nil;
+  for (var i = array.length-1; i >= 0; --i) {
+    slist = TA.cons(array[i])(slist);
+  };
+  return slist;
+};
+
+function sstring_to_string(sstr) {
+  var chars = slist_to_array(sstr);
+  return chars.map(x => String.fromCharCode(x)).join("");
+};
+
+function string_to_sstring(str) {
+  var array = [];
+  for (var i = 0; i < str.length; ++i) {
+    array.push(str.charCodeAt(i));
+  }
+  return array_to_slist(array);
+};
+
 const now = (() => {
   var init_time = Date.now()/1000;
   return () => Date.now()/1000 - init_time;
@@ -46,67 +75,46 @@ const now = (() => {
 var OFF_GAME = 0xFFFFFFFF;
 
 // Renders the game state to screen using the canvox library
-var voxels = {size: 65536*2, data: new Uint32Array(65536*2)};
-function render_game({game, canvox, cam}) {
+var voxels = {
+  size: 256*256*32*2,
+  data: new Uint32Array(256*256*32*2)
+};
+
+function render_game({game, canvox, canhud, cam}) {
   var voxels_data = voxels.data;
   var voxels_size = 0;
+  var hud = [];
 
   // Gets the current time
   var T = now();
+
+  // Lights object
+  var lights = [];
 
   // Gets the main hero position
   var hero_pos = TA.get_position_by_pid(0, game);
 
   // Renders each game thing
-  TA.map_stage((thing,k) => {
-    TA.draw_thing(thing)(model_id => pos => dir => dmg => {
-      var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
+  TA.map_stage((thing) => {
+    thing(
+      fun => pid => mid => act =>
+      nam => lit => tik => pos =>
+      mov => bst => wlk => dir =>
+      trg => vel => box => dmg =>
+      knk => chi => hit => res =>
+      die => {
+      let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
+      var [dir_x,dir_y,dir_z] = look_dir(x=>y=>z=>([x,y,z]));
       var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
+
       var ang = Math.atan2(dir_y, dir_x);
       var ang = ang + Math.PI*0.5;
+      var hei = 0;
 
-      //for (var j = -12; j <= 12; ++j) {
-        //for (var i = -12; i <= 12; ++i) {
-          //if ( i === -12 || i === 0 || i === 12
-            //|| j === -12 || j === 0 || j === 12) {
-            //var px = pos_x + i;
-            //var py = pos_y + j;
-            //var pz = 0;
-            //var bpos = (px+512)<<20|(py+512)<<10|(pz+512);
-            //var bcol = 0xE0E0E0FF;
-            //voxels[voxels.length] = bpos;
-            //voxels[voxels.length] = bcol;
-          //}
-        //}
-      //}
-
-      //// Top red line
-      //for (var x = -512; x <= 512; ++x) {
-        //var px = x;
-        //var py = -255;
-        //var pz = 0;
-        //var rgb = 0xFF4040FF;
-        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-        //voxels[voxels.length] = xyz;
-        //voxels[voxels.length] = rgb;
-      //}
-
-      //// Bot red line
-      //for (var x = -512; x <= 512; ++x) {
-        //var px = x;
-        //var py = 255;
-        //var pz = 0;
-        //var rgb = 0xFF4040FF;
-        //var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-        //var rgb = (r<<24)|(g<<16)|(b<<8)|0xFF;
-        //voxels[voxels.length] = xyz;
-        //voxels[voxels.length] = rgb;
-      //}
-
+      // Renders model voxels
       var max_z = 0;
-      if (model_id !== 0xFFFFFFFF) {
-        var model = get_model(model_id);
+      if (mid !== 0xFFFFFFFF) {
+        var model = get_model(mid);
         if (model) {
           for (var i = 0; i < model.length; ++i) {
             var [{x,y,z},{r,g,b}] = model[i];
@@ -129,34 +137,88 @@ function render_game({game, canvox, cam}) {
               voxels_data[voxels_size++] = xyz;
               voxels_data[voxels_size++] = rgb;
             }
+            hei = Math.max(hei, z);
           }
         }
       }
 
-      for (var y = 0; y <= 1; ++y) {
-        for (var x = -4; x <= 4; ++x) {
-          var px = pos_x + x;
-          var py = pos_y + y;
-          var pz = max_z + 16;
+      // Renders hitbox
+      let case_nbox = null;
+      let case_cbox = (rad) => {
+        for (var i = 0; i < 32; ++i) {
+          var px = pos_x + rad * Math.cos(i/32*Math.PI*2);
+          var py = pos_y + rad * Math.sin(i/32*Math.PI*2);
+          var pz = pos_z;
           if ( -512 < px && px < 512
             && -512 < py && py < 512
             && -512 < pz && pz < 512) {
             var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
-            var r = Math.min(dmg*16, 255);
-            var g = Math.max(Math.min(512-dmg*16,255),0);
-            var rgb = (r<<24)|(g<<16)|0xFF;
+            var rgb = 0xA0A0F0FF;
             voxels_data[voxels_size++] = xyz;
             voxels_data[voxels_size++] = rgb;
           }
         }
-      }
+      };
+      let case_pbox = (pts) => {
+        var segs = slist_to_array(TA.polygon_to_segments(pos)(dir)(pts));
+        for (var i = 0; i < segs.length; ++i) {
+          var [p0,p1] = segs[i](a => b => ([
+            a(x => y => z => ({x,y,z})),
+            b(x => y => z => ({x,y,z}))
+          ]));
+          for (var n = 0; n <= 16; ++n) {
+            var px = p0.x + (p1.x - p0.x) * n/16;
+            var py = p0.y + (p1.y - p0.y) * n/16;
+            var pz = p0.z + (p1.z - p0.z) * n/16;
+            if ( -512 < px && px < 512
+              && -512 < py && py < 512
+              && -512 < pz && pz < 512) {
+              var xyz = (px+512)<<20|(py+512)<<10|(pz+512);
+              var rgb = 0xA0A0F0FF;
+              voxels_data[voxels_size++] = xyz;
+              voxels_data[voxels_size++] = rgb;
+            }
+          }
+        }
+      };
+      box(case_nbox)(case_cbox)(case_pbox);
 
+      // Renders lights
+      (function go(lit) {
+        var case_nil  = null;
+        var case_cons = head => tail => {
+          head(pos => rad => rng => sub => add => {
+            pos = pos(x=>y=>z=>({x,y,z}));
+            sub = sub(x=>y=>z=>({x,y,z}));
+            add = add(x=>y=>z=>({x,y,z}));
+            lights.push({pos, rad, rng, sub, add});
+          });
+          go(tail);
+        };
+        lit(case_nil)(case_cons);
+      })(lit);
+
+      // Renders HUD
+      if (canhud) {
+        hud.push({
+          pos: {x:pos_x, y:pos_y, z:pos_z},
+          dmg: dmg,
+          nam: sstring_to_string(nam),
+          hei: hei,
+        });
+      };
     });
   })(game);
 
   voxels.data = voxels_data;
   voxels.size = voxels_size;
-  canvox.draw({voxels, stage, cam});
+
+  canvox.draw({voxels, lights, stage, cam});
+  if (canhud) {
+    canhud.draw({hud, cam});
+  };
+  
+  return hud;
 };
 
 // Turns ::=
@@ -310,7 +372,7 @@ function make_input_netcode(keyboard, mouse) {
 }
 
 // Executes a command inside Formality
-function exec_command(inp, game) {
+function execute_command(inp, game) {
   let cmd = null;
   if (inp.input === "SDIR") {
     let x = inp.params.dir.x;
@@ -318,8 +380,7 @@ function exec_command(inp, game) {
     let d = v3 => v3(x)(y)(0);
     cmd = TA.command(inp.player)(TA.sdir(d));
   } else if (inp.input === "TEXT") {
-    console.log(inp);
-    console.log(new Error("aff"));
+    console.log(new Error("Not implemented."));
     throw "TODO";
   } else {
     var x = inp.params.pos.x;
@@ -339,54 +400,121 @@ function exec_command(inp, game) {
   return TA.exec_command(cmd)(game);
 }
 
-var hero_id = {
-  mikegator: TA.MIKEGATOR_THING,
-  shao: TA.SHAO_THING,
-  min: TA.MIN_THING,
-  zoio: TA.ZOIO_THING,
-  teichi: TA.TEICHI_THING,
-  benfix: TA.BENFIX_THING,
-  ray: TA.RAY_THING,
-  tupitree: TA.TUPITREE_THING,
-  tophoro: TA.TOPHORO_THING,
-  kenko: TA.KENKO_THING,
-  sr_madruga: TA.SR_MADRUGA_THING,
-  bleskape: TA.BLESKAPE_THING,
-  kakashi: TA.KAKASHI_THING,
-  finn: TA.FINN_THING,
-  zagatur: TA.ZAGATUR_THING,
+function make_thing([name, {pid,dmg,pos,nam}]) {
+  var thing;
+  name = name.toLowerCase();
+  thing = TA.new_thing;
+  if (TA[name+"_fun"]) {
+    thing = TA.set_thing_fun(thing)(TA[name+"_fun"]);
+  }
+  if (pid !== undefined) {
+    thing = TA.set_thing_pid(thing)(pid);
+  }
+  if (dmg !== undefined) {
+    thing = TA.set_thing_dmg(thing)(dmg);
+  }
+  if (pos !== undefined) {
+    thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));
+  }
+  if (nam !== undefined) {
+    thing = TA.set_thing_nam(thing)(string_to_sstring(nam)); 
+  }
+  return thing;
 };
 
-var hero_name = {
-  [TA.MIKEGATOR_THING]: "MikeGator",
-  [TA.SHAO_THING]: "Shao",
-  [TA.MIN_THING]: "Min",
-  [TA.ZOIO_THING]: "Zoio",
-  [TA.TEICHI_THING]: "Teichi",
-  [TA.BENFIX_THING]: "Benfix",
-  [TA.RAY_THING]: "Ray",
-  [TA.TUPITREE_THING]: "Tupitree",
-  [TA.TOPHORO_THING]: "Tophoro",
-  [TA.KENKO_THING]: "Kenko",
-  [TA.SR_MADRUGA_THING]: "Sr_Madruga",
-  [TA.BLESKAPE_THING]: "Bleskape",
-  [TA.KAKASHI_THING]: "Kakashi",
-  [TA.FINN_THING]: "Finn",
-  [TA.ZAGATUR_THING]: "Zagatur",
+function GameRunner(gid, things) {
+  var self = {};
+  self.gid = gid;
+  self.state = TA.game(array_to_slist(things.map(make_thing)));
+  self.turns = [];
+
+  function turn() {
+    if (self.state) {
+      self.state = TA.exec_turn(self.state);
+    }
+  }
+
+  function exec(input) {
+    self.state = execute_command(input, self.state);
+  }
+
+  // Given a string with turn data from the internet, parse
+  // it and add new information to turn list and game state
+  function absorb_turn_info(str) {
+    if (self.state && self.turns) {
+      var game = parseInt(str.slice(1,9), 16);
+      var from = parseInt(str.slice(9,17), 16);
+      var last = self.turns.length;
+      var new_turns = parse_turns(str.slice(17))[1];
+      if (from <= last) {
+        for (var i = last-from; i<new_turns.length; ++i) {
+          self.turns[i+from] = new_turns[i];
+          for (var j = 0; j < new_turns[i].length; ++j) {
+            self.state = execute_command(new_turns[i][j], self.state);
+          }
+          self.state = TA.exec_turn(self.state);
+        }
+      }
+    }
+  }
+
+  self.exec = exec;
+  self.turn = turn;
+  self.absorb_turn_info = absorb_turn_info;
+
+  return self;
 };
+
+var heroes = [
+  "Benfix",
+  "Bleskape",
+  "Dorime",
+  "Finn",
+  "Kakashi",
+  "Kenko",
+  "Konan",
+  "Luffy",
+  "Mando",
+  "Mechwarrior",
+  "Mikegator",
+  "Min",
+  "PPG",
+  "Pichu",
+  "Ray",
+  "Shao",
+  "Squirtle",
+  "SrMadruga",
+  "Steve",
+  "Teichi",
+  "Tophoro",
+  "Tupitree",
+  "Zagatur",
+  "Zoio",
+];
+
+var hero_name = {};
+for (var i = 0; i < heroes.length; ++i) {
+  hero_name[heroes[i].toLowerCase()] = heroes[i];
+}
 
 module.exports = {
   ...TA,
+  slist_to_array,
+  array_to_slist,
+  sstring_to_string,
+  string_to_sstring,
   GAME_FPS,
   GAME_DURATION,
   OFF_GAME,
-  hero_id,
-  hero_name,
   render_game,
   parse_turn,
   parse_turns,
   parse_player,
   parse_command,
-  exec_command,
+  execute_command,
   make_input_netcode,
+  make_thing,
+  GameRunner,
+  heroes,
+  hero_name,
 };

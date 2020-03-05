@@ -9,6 +9,8 @@ Cybernetics](http://sunshinecybernetics.com/).
 
 ![Test render!](https://media.giphy.com/media/iFIbmfxlFkcNv4ygVW/giphy.gif)
 
+![Test render!](https://media.giphy.com/media/TL11C3bEnJn4rzE1RQ/giphy.gif)
+
 ### Fully modable
 
 Taelin Arena is designed to be modified. 

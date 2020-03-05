@@ -1,6 +1,7 @@
 const db = require("./db.js");
 const TA = require("./../TaelinArena.js");
 const ethers = require("ethers");
+const utils = require("./../utils.js");
 
 async function game_server() {
   // Loads existing games from disk to memory
@@ -13,7 +14,7 @@ async function game_server() {
   }
 
   // Main loop: passes time on all active games
-  setInterval(() => {
+  utils.set_precise_interval(() => {
     for (var gid = 0; gid < games.length; ++gid) {
       add_new_turn(gid);
     }

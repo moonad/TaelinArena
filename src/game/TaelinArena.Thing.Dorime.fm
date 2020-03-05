@@ -1,0 +1,135 @@
+import TaelinArena.Game
+// import TaelinArena.Thing.Dorime.Effects
+
+enum
+| DORIME_IDLE
+| DORIME_BLESSING_FOR_WHO_DESERVE
+| DORIME_LEPTOSPIROSE_CURSE
+| DORIME_HOLY_FLAME
+| DORIME_GODS_CHAMBER
+| DORIME_JESUS_POWER
+| DORIME_TAUNT
+
+short_dist : Number 
+  100
+medium_dist : Number
+  200
+
+dorime_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+  // let medium_dist = 200
+  // let short_dist = 120
+
+  case self |thing switch self.act
+
+  | DORIME_IDLE
+    if is_walking(self)
+    then animate(self, 1, DORIME_WALK_CYCLE_000, 8, 16)
+    else animate(self, 1, DORIME_IDLE_000, 5, 15)
+
+  // Left 
+  | DORIME_BLESSING_FOR_WHO_DESERVE
+    let self = animate(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_000, 14, 28)
+    let fire = new_thing <= thing(fun=dorime_blessing_fun)
+    let self = spawn(self, 5, [move(fire, self.pos)])
+    self
+
+  // Middle
+  | DORIME_LEPTOSPIROSE_CURSE
+    let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000, 5, 15)
+    let puddle = new_thing <= thing(fun=dorime_leptospirose_curse_fun)
+    let puddle_idle = new_thing <= thing(fun=dorime_leptospirose_curse_idle_fun)
+    let pot = new_thing <= thing(
+      fun = dorime_leptospirose_curse_pot_fun,
+      pos = self.pos,
+      vel = scale_v3(15, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 12, [pot])
+    let self = spawn(self, 14, [
+      move(puddle, at_max_dist(self, medium_dist)), 
+      move(puddle_idle, at_max_dist(self, medium_dist))])
+    self
+
+  // Right
+  | DORIME_HOLY_FLAME
+    let lght = light(at_dist(self, short_dist), 20, 32, v3(0,0,0), v3(0.2,0.04,0.05))
+    let self = illumine(self, 4, 16, [lght])
+    let self = animate(self, 0, DORIME_HOLY_FLAME_CAST_ANIMATION_000, 8, 16)
+    let flame = new_thing <= thing(fun = dorime_holy_flame_fun)
+    let self = spawn(self, 5, [move(flame, at_max_dist(self, short_dist))])
+    self
+
+  // Q
+  | DORIME_GODS_CHAMBER
+    let self = animate(self, 0, DORIME_GODS_CHAMBER_CAST_ANIMATION_000, 9, 27)
+    let heal = new_thing <= thing(fun=dorime_gods_chamber_fun)
+    let heal_idle = new_thing <= thing(fun=dorime_gods_chamber_idle_fun)
+    let self = spawn(self, 9, [
+      move(heal, at_max_dist(self, short_dist)), 
+      move(heal_idle, at_max_dist(self, short_dist))])
+    self
+
+  // Space
+  | DORIME_JESUS_POWER
+    let self = animate(self, 0, DORIME_JESUS_POWER_000, 21, 21)
+    let hit = new_thing <= thing(fun=dorime_jesus_power)
+    let self = spawn(self, 14, [move(hit, at_dist(self, 30))])
+    self
+
+  // E
+  | DORIME_TAUNT
+    animate(self, 0, DORIME_TAUNT_000, 3, 15)
+
+
+  else self
+
+import TaelinArena.Game
+
+dorime_blessing_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 2)
+  self
+
+dorime_leptospirose_curse_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 10)
+  self
+
+// Damage: max 6
+dorime_leptospirose_curse_idle_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 29)
+  let self = self <= thing(die = if tik === 58 then true else false)
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 10, [hit([damage(10)], self.pos, self.dir, cbox(40))])
+  let self = cast(self, 25, [hit([damage(10)], self.pos, self.dir, cbox(40))])
+  self
+
+dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
+  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 4)
+  let self = self <= thing(die = if tik === 4 then true else false)
+  self
+
+dorime_holy_flame_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, DORIME_HOLY_FLAME_PILLAR_000, 5, 15)
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(20))])
+  self
+
+dorime_gods_chamber_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 51)
+  self
+
+dorime_gods_chamber_idle_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 58)
+  self
+
+dorime_taunt_idle_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, DORIME_TAUNT_IDLE_000, 3, 6)
+  self
+
+dorime_jesus_power(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 0, [hit([damage(5)], self.pos, self.dir, cbox(20))])
+  let self = die(self, 6)
+  self
