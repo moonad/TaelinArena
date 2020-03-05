@@ -9,6 +9,12 @@ enum
 | KONAN_BLOCK
 | KONAN_TAUNT
 
+short_dist : Number 
+  100
+medium_dist : Number
+  200
+long_dist : Number
+  270
 
 konan_fun(self: Thing) : Thing
   let self = self <= thing(mov = 4)
@@ -22,35 +28,43 @@ konan_fun(self: Thing) : Thing
 
   // Left
   |KONAN_GIANT_PAPER_DESTRUCTION
-    let self = animate(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_CAST_000, 2, 12)
-    let paper = new_thing <= thing(fun=konan_giant_paper_destruction_effect)
-    let paper = paper <= thing(dir = rot90_v3(targ_dir(self)))
-    let self = spawn(self, 0, [move(paper, self.trg)])
+    let self = animate(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_CAST_000, 2, 14)
+    let paper = new_thing <= thing(fun=konan_giant_paper_destruction_fun, dir=targ_dir(self))
+    let explo = new_thing <= thing(fun=konan_giant_paper_destruction_explosion_fun, dir=targ_dir(self))
+    // let paper = new_thing <= thing(fun=konan_giant_paper_destruction_projectile_fun)
+    let self = spawn(self, 0, [move(paper, self.pos)])
+    // let paper_dist = dist_v3(self.pos, self.trg)
+    // let paper_plane = new_thing <= thing(
+    //   fun = konan_giant_paper_destruction_projectile_fun,
+    //   pos = self.pos,
+    //   dir = targ_dir(self),
+    //   vel = scale_v3(5, targ_dir(self)),
+    //   box = nbox)
+    // let self = spawn(self, 9, [paper_plane])
+    let self = spawn(self, 13, [move(explo, at_max_dist(self, medium_dist))])
     self
 
   // Middle
   |KONAN_SHIKIGAMIS_DANCE
     let self = animate(self, 0, KONAN_SHIKIGAMIS_DANCE_000, 16, 32)
-    let self = blink(self, 32, self.trg)
+    let self = blink(self, 31, at_dist(self, 100))
     self
 
   // Right
   |KONAN_ORIGAMI_KNOCKDOWN
-    let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_CAST_000, 3, 18)
-    let origami = new_thing <= thing(fun=konan_origami_knockdown_effect)
-    // let origami = origami <= thing(dir = rot90_v3(targ_dir(self)))
-    let self = spawn(self, 8, [move(origami, self.trg)])
+    let self = animate(self, 0, KONAN_ORIGAMI_KNOCKDOWN_CAST_000, 2, 10)
+    let origami = new_thing <= thing(fun = konan_origami_knockdown_fun, dir = targ_dir(self))
+    let self = spawn(self, 8, [move(origami, at_max_dist(self, short_dist))])
     self
 
   // Q Ultimate
   // TODO: do not invert the position she is looking at
   |KONAN_GODS_ANGEL
     let self = animate(self, 0, KONAN_GODS_ANGEL_CAST_000, 15, 30)
-    let self = blink(self, 30, self.trg)
+    let self = blink(self, 29, between_dist(self, 60, 70, 65))
+    let wings = new_thing <= thing(fun = konan_gods_angel_fun, dir = targ_dir(self))
+    let self = spawn(self, 15, [move(wings, self.pos)])
     self
-    // let wings = new_thing <= thing(fun = konan_gods_angel_effect)
-    // let self = spawn(self, 10, self.trg, [wings])
-    // self
 
   // Space
   |KONAN_BLOCK
@@ -62,14 +76,40 @@ konan_fun(self: Thing) : Thing
 
   else self
 
-konan_giant_paper_destruction_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_EFFECT_000, 9, 18)
+konan_giant_paper_destruction_fun(self: Thing) : Thing
+  animate_die(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_EFFECT_000, 9, 18)
+
+konan_giant_paper_destruction_projectile_fun(self: Thing) : Thing
+  animate_die(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_EFFECT_008, 9, 6)
+
+// High damage on a small area
+konan_giant_paper_destruction_explosion_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, KONAN_GIANT_PAPER_DESTRUCTION_EXPLOSION_EFFECT_000, 4, 8)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(5)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(12))]
+  let self = cast(self, 0, hits)
   self
 
-konan_origami_knockdown_effect(self: Thing) : Thing
+// Low damage and knock back
+// TODO: update box to a polygon
+konan_origami_knockdown_fun(self: Thing) : Thing
+  case self |thing
   let self = animate_die(self, 0, KONAN_ORIGAMI_KNOCKDOWN_EFFECT_000, 14, 28)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(2), repulse(8)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(12))]
+  let self = cast(self, 10, hits)
   self
 
-konan_gods_angel_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, KONAN_GODS_ANGEL_EFFECT_000, 6, 12)
+konan_gods_angel_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, KONAN_GODS_ANGEL_EFFECT_000, 7, 14)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(2)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(30))]
+  let self = cast(self, 2, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 14, hits)
   self
