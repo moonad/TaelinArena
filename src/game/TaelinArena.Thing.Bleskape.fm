@@ -30,9 +30,10 @@ bleskape_fun(self: Thing) : Thing
 
   |BLESKAPE_SHOCK_GROUND_WAVE
     let self = animate(self, 0, BLESKAPE_SHOCK_GROUND_WAVE_000, 12, 24)
-    //let effs = [damage(2)]
-    //let hits = [hit(effs, self.pos, self.dir, cbox(12))]
-    //let self = cast(self, 0, hits)
+    let effs = [damage(2)]
+    let hpos = add_v3(self.pos, scale_v3(12, self.dir))
+    let hits = [hit(effs, hpos, self.dir, cbox(12))]
+    let self = cast(self, 2, hits)
     self
 
   |BLESKAPE_SUPREME_PUNCH_SEQUENCE
@@ -47,3 +48,5 @@ bleskape_fun(self: Thing) : Thing
     animate(self, 0, BLESKAPE_TAUNT_000, 10, 20)
 
   else self
+
+main bleskape_fun

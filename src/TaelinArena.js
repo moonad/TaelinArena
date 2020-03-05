@@ -188,11 +188,11 @@ function render_lights(lit) {
 function render_thing(thing) {
   thing(
     fun => pid => mid => act =>
-    nam => lit => tik => pos =>
-    mov => bst => wlk => dir =>
-    trg => vel => box => dmg =>
-    knk => chi => hit => res =>
-    die => {
+    stt => nam => lit => tik =>
+    pos => mov => bst => wlk =>
+    dir => trg => vel => box =>
+    dmg => knk => chi => hit =>
+    res => die => {
     // Renders model voxels
     var max_z = 0;
     if (mid !== 0xFFFFFFFF) {
