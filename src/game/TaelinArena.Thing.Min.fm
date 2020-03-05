@@ -19,44 +19,80 @@ min_fun(self: Thing) : Thing
     | true  => animate(self, 1, MIN_RUN_000, 6, 12)
     | false => animate(self, 1, MIN_IDLE_000, 3, 12)
 
+  // Left
+  // TODO: adjust this function
   |MIN_FLAME_SLASH
-    animate(self, 0, MIN_FLAME_SLASH_CAST_000, 6, 14)
+    let self = animate(self, 0, MIN_FLAME_SLASH_CAST_000, 3, 18)
+    let self = dash(self, 10, 8, 16)
+    // let blink_dist = between_dist(self, 50, 52, 51)
+    // let self = blink(self, 3, blink_dist)
+    // let effect = new_thing <= thing(fun = min_flame_slash_fun, dir = look_dir(self))
+    // let self = spawn(self, 17, [move(effect, self.pos)])
+    self
 
-  // TODO: add fading effect and teleport
+  // Middle
+  // TODO: I have to use another animation for the character, but I can't.
+  // What to do?
   |MIN_FIRE_MARK
-    let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 12)
-    let make = new_thing <= thing(fun=min_fire_mark_effect)
-    let self = spawn(self, 10, [move(make, self.trg)])
-    // let make = new_thing <= thing(fun=min_fire_mark_effect_fading)
-    // let self = spawn(self, 10, self.trg, make)
+    let self = animate(self, 1, MIN_FIRE_MARK_CAST_000, 3, 15)
+    let mark = new_thing <= thing(fun=min_fire_mark_fun)
+    let self = spawn(self, 0, [move(mark, self.trg)])
+    let self = blink(self, 10, self.trg)
+    let mark = new_thing <= thing(fun=min_fire_mark_fading_fun)
+    let self = spawn(self, 14, [move(mark, self.trg)])
     // let tele = new_thing <= thing(fun=min_fire_mark_teleport)
     // let self = spawn(self, 6, self.trg, tele)
     self
 
+  // Right
   |MIN_MELTING_CUTS
-    animate(self, 1, MIN_MELTING_CUTS_000, 9, 20)
+    let self = animate(self, 1, MIN_MELTING_CUTS_000, 9, 20)
+    let dmg = new_thing <= thing(fun=min_melting_cuts_fun, dir=look_dir(self))
+    let self = spawn(self, 5, [move(dmg, at_dist(self, 30))])
+    // let self = self <= thing(box = cbox(15), pos = at_dist(self, 10))
+    // let effs = [damage(3)]
+    // let hits = [hit(effs, self.pos, self.dir, cbox(20))]
+    // let self = cast(self, 5, hits)
+    self
     
+  // Q
   |MIN_DRAGONS_PERISHMENT
     let self = animate(self, 1, MIN_DRAGONS_PERISHMENT_CAST_000, 1, 25)
-    let make = new_thing <= thing(fun=min_dragons_perishment) 
-    let self = spawn(self, 0, [move(make, self.pos)])
+    let circle = new_thing <= thing(fun=min_dragons_perishment_fun) 
+    let self = spawn(self, 0, [move(circle, self.pos)])
     self
 
+  // Space
   |MIN_DASH
-    let self = animate(self, 0, MIN_DASH_000, 3, 6)
-    let self = dash(self, 12, 0,3)
+    let self = animate(self, 0, MIN_DASH_000, 3, 12)
+    let self = dash(self, 12, 4, 11)
     self
 
+  // E
   |MIN_TAUNT
     animate(self, 1, MIN_TAUNT_000, 5, 12)
 
   else self
 
-min_fire_mark_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, MIN_FIRE_MARK_EFFECT_000, 7, 20)
+min_flame_slash_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MIN_FLAME_SLASH_EFFECT_000, 9, 9)
+  let self = self <= thing(box = cbox(12))
+  let effs = [damage(4)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(12))]
+  let self = cast(self, 5, hits)
   self
 
-min_fire_mark_effect_fading(self: Thing) : Thing
+min_fire_mark_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MIN_FIRE_MARK_EFFECT_000, 7, 14)
+  let self = self <= thing(box = cbox(20))
+  let effs = [damage(4)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(20))]
+  let self = cast(self, 5, hits)
+  self
+
+min_fire_mark_fading_fun(self: Thing) : Thing
   let self = animate_die(self, 0, MIN_FIRE_MARK_FADING_EFFECT_000, 3, 6)
   self
 
@@ -64,6 +100,21 @@ min_fire_mark_teleport(self: Thing) : Thing
   let self = animate_die(self, 1, MIN_FIRE_MARK_TELEPORT_000, 7, 14)
   self
 
-min_dragons_perishment(self: Thing) : Thing
-  let self = animate_die(self, 0, MIN_DRAGONS_PERISHMENT_EFFECT_000, 7, 25)
+// TODO: not working. I don't know why
+min_melting_cuts_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MIN_MELTING_CUTS_AUX_000, 1, 2)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(3)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(15))]
+  let self = cast(self, 0, hits)
+  self
+
+min_dragons_perishment_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MIN_DRAGONS_PERISHMENT_EFFECT_000, 7, 35)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(8)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(60))]
+  let self = cast(self, 33, hits)
   self
