@@ -155,7 +155,9 @@ exec_turn(gm: Game) : Game
     // Integrates position with knockback
     let this = this <= thing(
       pos = add_v3(pos, knk),
-      knk = scale_v3(0.80, knk))
+      knk = if len_v3(knk) > 0
+        then scale_v3(max(len_v3(knk)-1,0), norm_v3(knk))
+        else knk)
 
     // Calls the transaction function
     let this = this.fun(this)
@@ -189,3 +191,4 @@ exec_turn(gm: Game) : Game
   // Ticks every thing on stage
   gm <= game(
     stage = fold_with_context(Thing; _ [], tick, stage, (x)=>x))
+
