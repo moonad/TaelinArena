@@ -36,6 +36,7 @@ T Thing
   pid : PlayerId,    // number of player controlling this
   mid : ModelId,     // id of model to be rendered
   act : ActionId,    // number of performing action
+  stt : Map(Number), // an arbitrary state
   nam : String,      // name of thing
   lit : List(Light), // list of lights to render
   tik : Number,      // ticks passed since last act change
@@ -70,15 +71,6 @@ T Input
 T Command
 | command(pid: PlayerId, inp: Input)
 
-//T Draw
-//| draw(
-  //mid: Number,
-  //nam: String,
-  //pos: V3,
-  //dir: V3,
-  //lit: List(Light),
-  //dmg: Number)
-
 // Creates a new default thing
 new_thing : Thing
   thing(
@@ -86,6 +78,7 @@ new_thing : Thing
     0xFFFFFFFF, // pid
     0xFFFFFFFF, // mid
     0,          // act
+    empty(_),   // stt
     nil(_),     // nam
     nil(_),     // lit
     0,          // tik
@@ -136,6 +129,7 @@ with_thing(pid:PlayerId, fn: Thing -> Thing, gm:Game) : Game
 set_thing_fun(thi:Thing, new_fun) thi<=thing(fun=new_fun)
 set_thing_pid(thi:Thing, new_pid) thi<=thing(pid=new_pid)
 set_thing_mid(thi:Thing, new_mid) thi<=thing(mid=new_mid)
+set_thing_stt(thi:Thing, new_stt) thi<=thing(stt=new_stt)
 set_thing_act(thi:Thing, new_act) thi<=thing(act=new_act)
 set_thing_nam(thi:Thing, new_nam) thi<=thing(nam=new_nam)
 set_thing_lit(thi:Thing, new_lit) thi<=thing(lit=new_lit)
@@ -344,6 +338,12 @@ at_min_dist(self: Thing, min_range: Number)
     then at_dist(self, dist_trg)
     else at_dist(self, min_range)
 
+// Return the position within a mininum and maximun range towards look_dir
+between_dist(self: Thing, min_range: Number, max_range: Number)
+  case self |thing
+  let dist_trg = dist_v3(self.pos, self.trg)
+  at_dist(self, max(min_range, min(max_range, dist_trg)))
+
 // Sets a thing's act
 init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
   this <= thing(
@@ -355,11 +355,3 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 is_walking(this: Thing) : Number
   case this |thing
   len_v3(this.pad) > 0
-
-// Return the position within a mininum and maximun range towards look_dir
-between_dist(self: Thing, min_range: Number, max_range: Number, default: Number)
-  case self |thing
-  let dist_trg = dist_v3(self.pos, self.trg)
-  if ((dist_trg < max_range) && (dist_trg > min_range)) 
-  then at_dist(self, dist_trg)
-  else at_dist(self, default)
