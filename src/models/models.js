@@ -638,6 +638,7 @@ module.exports = [
   ()=>import("./../../models/finn/taunt/014.json"),
   ()=>import("./../../models/finn/taunt/015.json"),
   ()=>import("./../../models/finn/taunt/016.json"),
+  ()=>import("./../../models/finn/triple_take_aux/000.json"),
   ()=>import("./../../models/finn/triple_take/000.json"),
   ()=>import("./../../models/finn/triple_take/001.json"),
   ()=>import("./../../models/finn/triple_take/002.json"),

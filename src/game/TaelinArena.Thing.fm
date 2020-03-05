@@ -3,7 +3,8 @@ import TaelinArena.ModelIds
 import TaelinArena.Thing.Benfix
 import TaelinArena.Thing.Bleskape 
 import TaelinArena.Thing.Dorime
-import TaelinArena.Thing.Finn 
+import TaelinArena.Thing.Finn
+import TaelinArena.Thing.Gastly
 import TaelinArena.Thing.Kakashi 
 import TaelinArena.Thing.Kenko
 import TaelinArena.Thing.Konan
