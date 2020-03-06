@@ -9,8 +9,14 @@ enum
 | FINN_TAUNT
 | FINN_EVADE
 
+medium_dist : Number
+  200
+long_dist : Number
+  300
+
+
 finn_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 5)
+  let self = self <= thing(mov = 3)
 
   case self |thing switch self.act
 
@@ -22,30 +28,46 @@ finn_fun(self: Thing) : Thing
   // Left 
   |FINN_TRIPLE_TAKE
     let self = animate(self, 1, FINN_TRIPLE_TAKE_000, 17, 34)
-    let attack = new_thing <= thing(fun=finn_triple_take_effect, dir=targ_dir(self))
-    let self = spawn(self, 0, [move(attack, at_max_dist(self, 35))])
-    let self = spawn(self, 10, [move(attack, at_max_dist(self, 35))])
-    let self = spawn(self, 30, [move(attack, at_max_dist(self, 35))])
+    let effs = [damage(2)]
+    let hits = [hit(effs, at_dist(self, 35), self.dir, cbox(20))]
+    let crit = [hit([damage(4)], at_dist(self, 35), self.dir, cbox(20))]
+    let self = cast(self, 0, hits)
+    let self = cast(self, 10, hits)
+    let self = cast(self, 30, crit)
     self 
 
   // Middle
   |FINN_BMO_S_FLASH
-    animate(self, 0, FINN_BMO_S_FLASH_000, 13, 26)
+    let self = animate(self, 0, FINN_BMO_S_FLASH_000, 13, 26)
+    let effs = [damage(2)]
+    let hits = [hit(effs, at_dist(self, 45), self.dir, cbox(25))]
+    let self = cast(self,16, hits)
+    self
 
   // Right
   |FINN_BOW
     let self = animate(self, 0, FINN_BOW_CAST_ANIMATION_000, 7, 14)
-    let arrow = new_thing <= thing(fun=finn_bow_effect)
-    let self = spawn(self, 12, [move(arrow, self.trg)])
+    let effs = [damage(3)]
+    let hits = [hit(effs, at_dist(self, 140), self.dir, cbox(10))]
+    let proj = new_thing <= thing(
+      fun = finn_arrow_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(15, targ_dir(self)))
+    let self = spawn(self, 3, [proj])
+    let self = cast(self, 13, hits)
     self
 
-  // Space
+  // Q
   |FINN_JAKES_FURY
-    animate(self, 1, FINN_JAKE_S_FURY_000, 26, 52)
+    let self = animate(self, 1, FINN_TAUNT_000, 17, 17)
+    let self = 
 
+  // E
   | FINN_TAUNT
     animate(self, 0, FINN_TAUNT_000, 17, 34)
 
+  // Space
   | FINN_EVADE
     let self = animate(self, 1, FINN_EVADE_000, 6, 12)
     let self = dash(self, 4, 0, 12)
@@ -53,9 +75,10 @@ finn_fun(self: Thing) : Thing
 
   else self
 
-finn_bow_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, FINN_BOW_PROJECTILE_000, 0, 2)
-  self
+
+// Effects
+finn_arrow_fun(self: Thing) : Thing
+  animate_die(self, 0, FINN_BOW_PROJECTILE_000, 1, 10)
 
 finn_triple_take_effect(self: Thing) : Thing 
   case self |thing
@@ -66,12 +89,11 @@ finn_triple_take_effect(self: Thing) : Thing
   let self = cast(self, 0, hits)
   self
   
-finn_triple_take_effect(self: Thing) : Thing 
-  case self |thing
-  let self = animate_die(self, 0, FINN_TRIPLE_TAKE_AUX_000, 1, 2)
+finn_jakes_fury_fun(self: Thing) : Thing
+   case self |thing
+  let self = animate_die(self, 0, FINN_JAKE_S_FURY_000, 26, 26)
   let self = self <= thing(box = nbox)
-  let effs = [damage(2)]
+  let effs = [damage(4)]
   let hits = [hit(effs, self.pos, self.dir, cbox(20))]
   let self = cast(self, 0, hits)
   self
-  
