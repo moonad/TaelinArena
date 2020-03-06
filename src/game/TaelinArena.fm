@@ -186,9 +186,9 @@ exec_turn(gm: Game) : Game
     // Keeps inside map
     let this = this <= thing(pos =
       case pos |v3
-      let x = min(max(-384, pos.x), 384)
-      let y = min(max(-192, pos.y), 192)
-      let z = min(max(   0, pos.z), 192)
+      let x = min(max(-256, pos.x), 256)
+      let y = min(max(-160, pos.y), 160)
+      let z = min(max(   0, pos.z), 256)
       v3(x, y, z))
 
     // Bounds HP
