@@ -31,7 +31,7 @@ bleskape_fun(self: Thing) : Thing
   |BLESKAPE_DEFENSE_MODE
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_000, 3, 0,3)
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_002, 1, 3,12)
-    let self = reset(self, 11)
+    let self = reset(self, 12)
     self
 
   |BLESKAPE_SHOCK_GROUND_WAVE
