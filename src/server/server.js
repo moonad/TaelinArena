@@ -164,7 +164,7 @@ app.post("/offer", (req, res) => {
     var players = [];
     for (var peer_name in peers) {
       var player = "";
-      console.log("...", peer_name, peers[peer_name].side);
+      //console.log("...", peer_name, peers[peer_name].side);
       switch (peers[peer_name].side) {
         case "^": player += "^"; break;
         case "<": player += "<"; break;

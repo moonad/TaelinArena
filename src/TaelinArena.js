@@ -36,7 +36,7 @@ if (typeof window !== "undefined") {
 }
 
 const GAME_FPS = 24;
-const GAME_DURATION = GAME_FPS * 10;
+const GAME_DURATION = GAME_FPS * 30;
 
 function slist_to_array(slist) {
   var array = [];
