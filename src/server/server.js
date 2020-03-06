@@ -134,7 +134,7 @@ app.post("/offer", (req, res) => {
   var turn = 0;
 
   peer.team = "spec";
-  peer.hero = "Tupitree";
+  peer.hero = "Dorime";
   peer.do_send = (msg) => {
     if (peer._pcReady) {
       try { peer.send(msg); }
