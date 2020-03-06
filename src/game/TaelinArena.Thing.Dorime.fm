@@ -38,36 +38,38 @@ dorime_fun(self: Thing) : Thing
   // Middle
   | DORIME_LEPTOSPIROSE_CURSE
     let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000, 5, 15)
-    let puddle = new_thing <= thing(fun=dorime_leptospirose_curse_fun)
-    //let puddle_idle = new_thing <= thing(fun=dorime_leptospirose_curse_idle_fun)
     let pot = new_thing <= thing(
+      sid = self.sid,
       fun = dorime_leptospirose_puddle_pot_fun,
       pos = self.pos,
       vel = scale_v3(9, targ_dir(self)))
     let self = spawn(self, 14, [pot])
-    //let self = spawn(self, 14, [
-      //move(puddle, at_max_dist(self, medium_dist)), 
-      //move(puddle_idle, at_max_dist(self, medium_dist))])
     self
 
   // Right
   | DORIME_HOLY_FLAME
     let self = animate(self, 0, DORIME_HOLY_FLAME_CAST_ANIMATION_000, 8, 16)
-    let flame = new_thing <= thing(fun = dorime_holy_flame_fun)
+    let flame = new_thing <= thing(
+      sid = self.sid,
+      fun = dorime_holy_flame_fun)
     let self = spawn(self, 5, [move(flame, at_max_dist(self, 128))])
     self
 
   // Q
   | DORIME_JESUS_POWER
     let self = animate(self, 0, DORIME_JESUS_POWER_000, 21, 21)
-    let hit = new_thing <= thing(fun=dorime_jesus_power)
+    let hit = new_thing <= thing(
+      sid = self.sid,
+      fun = dorime_jesus_power)
     let self = spawn(self, 18, [move(hit, at_dist(self, 30))])
     self
 
   // SPACE
   | DORIME_GODS_CHAMBER
     let self = animate(self, 0, DORIME_GODS_CHAMBER_CAST_ANIMATION_000, 9, 27)
-    let heal = new_thing <= thing(fun=dorime_gods_chamber_fun)
+    let heal = new_thing <= thing(
+      sid = self.sid,
+      fun = dorime_gods_chamber_fun)
     let self = spawn(self, 9, [move(heal, at_max_dist(self, 128))]) 
     self
 
@@ -110,8 +112,9 @@ dorime_leptospirose_puddle_pot_fun(self: Thing) : Thing
   let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 10)
   let self = self <= thing(box = cbox(10))
   let pudd = new_thing <= thing(
-    fun=dorime_leptospirose_puddle_fun,
-    pos=self.pos)
+    sid = self.sid,
+    fun = dorime_leptospirose_puddle_fun,
+    pos = self.pos)
   let self = spawn(self, 9, [pudd])
   self
 
@@ -144,7 +147,7 @@ dorime_gods_chamber_fun(self: Thing) : Thing
   let self = self <= thing(box = nbox)
   let self = animate_between(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 0,34)
   let self = animate_between(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 34, 92)
-  let hits = [hit([damage(-1)], self.pos, self.dir, cbox(52))]
+  let hits = [hit([heal(1)], self.pos, self.dir, cbox(52))]
   let self = cast(self, 34, hits)
   let self = cast(self, 38, hits)
   let self = cast(self, 42, hits)

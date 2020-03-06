@@ -88,6 +88,11 @@ interact_with(this:Thing, that:Thing): Thing
       | some =>
         let apply_eff = (eff, this) =>
           case eff
+          | heal =>
+            if this.sid === that.sid then
+              this <= thing(dmg = dmg - eff.lif)
+            else
+              this
           | damage =>
             if this.sid === that.sid then
               this

@@ -20,6 +20,7 @@ T Hitbox
 | pbox(pts: List(V3))
 
 T Effect
+| heal(lif: Number)
 | damage(dmg: Number)
 | repulse(mag: Number)
 | impulse(mag: Number, dir: V3)
