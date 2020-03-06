@@ -165,9 +165,9 @@ app.post("/offer", (req, res) => {
     for (var peer_name in peers) {
       var player = "";
       switch (peers[peer_name].team) {
-        case "red" : player += "<"; break;
-        case "spec": player += "^"; break;
-        case "blue": player += ">"; break;
+        case "^": player += "^"; break;
+        case "<": player += "<"; break;
+        case ">": player += ">"; break;
       }
       player += peer_name;
       player += "!";
@@ -193,30 +193,30 @@ app.post("/offer", (req, res) => {
     var str = "" + data;
     switch (str[0]) {
 
-      // Mod wants to set someone's team to red.
-      case "<":
-        if (name !== "MaiaVictor") return;
-        var pname = str.slice(1);
-        if (peers[pname]) {
-          peers[pname].team = "red";
-        }
-        break;
-
-      // Mod wants to set someone's team to blue.
-      case ">":
-        if (name !== "MaiaVictor") return;
-        var pname = str.slice(1);
-        if (peers[pname]) {
-          peers[pname].team = "blue";
-        }
-        break;
-
-      // Mod wants to set someone's team to spec.
+      // Mod wants to set someone's team to ^.
       case "^":
         if (name !== "MaiaVictor") return;
         var pname = str.slice(1);
         if (peers[pname]) {
-          peers[pname].team = "spec";
+          peers[pname].team = "^";
+        }
+        break;
+
+      // Mod wants to set someone's team to <.
+      case "<":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].team = "<";
+        }
+        break;
+
+      // Mod wants to set someone's team to >.
+      case ">":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].team = ">";
         }
         break;
 

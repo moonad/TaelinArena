@@ -16,7 +16,7 @@ import TaelinArena.Thing.Min
 import TaelinArena.Thing.PPG
 import TaelinArena.Thing.Pichu
 import TaelinArena.Thing.Poste
-import TaelinArena.Thing.Punch_object
+import TaelinArena.Thing.PunchingBag
 import TaelinArena.Thing.Ray
 import TaelinArena.Thing.Shao
 import TaelinArena.Thing.Squirtle

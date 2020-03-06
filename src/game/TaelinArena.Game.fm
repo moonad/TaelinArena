@@ -11,6 +11,9 @@ ModelId : Type
 ActionId : Type
   Number
 
+SideId : Type
+  Number
+
 T Hitbox
 | nbox
 | cbox(rad: Number)
@@ -36,6 +39,7 @@ T Thing
   pid : PlayerId,    // number of player controlling this
   mid : ModelId,     // id of model to be rendered
   act : ActionId,    // number of performing action
+  sid : SideId,      // player side
   stt : Map(Number), // an arbitrary state
   nam : String,      // name of thing
   lit : List(Light), // list of lights to render
@@ -48,6 +52,7 @@ T Thing
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
+  mhp : Number,      // max health points
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
   chi : List(Thing), // child thing to create on next tick
@@ -78,6 +83,7 @@ new_thing : Thing
     0xFFFFFFFF, // pid
     0xFFFFFFFF, // mid
     0,          // act
+    0,          // sid
     empty(_),   // stt
     nil(_),     // nam
     nil(_),     // lit
@@ -90,7 +96,8 @@ new_thing : Thing
     v3(0,0,0),  // trg
     v3(0,0,0),  // vel
     cbox(12),   // box
-    0xFFFFFFFF, // dmg
+    24,         // mhp
+    0,          // dmg
     v3(0,0,0),  // knk
     nil(_),     // chi
     nil(_),     // hit
@@ -131,6 +138,7 @@ set_thing_pid(thi:Thing, new_pid) thi<=thing(pid=new_pid)
 set_thing_mid(thi:Thing, new_mid) thi<=thing(mid=new_mid)
 set_thing_stt(thi:Thing, new_stt) thi<=thing(stt=new_stt)
 set_thing_act(thi:Thing, new_act) thi<=thing(act=new_act)
+set_thing_sid(thi:Thing, new_sid) thi<=thing(sid=new_sid)
 set_thing_nam(thi:Thing, new_nam) thi<=thing(nam=new_nam)
 set_thing_lit(thi:Thing, new_lit) thi<=thing(lit=new_lit)
 set_thing_tik(thi:Thing, new_tik) thi<=thing(tik=new_tik)
@@ -355,7 +363,3 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 is_walking(this: Thing) : Number
   case this |thing
   len_v3(this.pad) > 0
-
-// This thing can be damaged
-suffers(this: Thing) : Thing
-  this <= thing(dmg = if dmg === 0xFFFFFFFF then 0 else dmg)

@@ -10,8 +10,7 @@ enum
 | GASTLY_TAUNT
 
 gastly_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3)
-  let self = suffers(self)
+  let self = self <= thing(mov = 3, mhp = 24)
 
   case self |thing switch self.act
 

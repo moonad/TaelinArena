@@ -12,8 +12,7 @@ enum
 
 
 dorime_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3)
-  let self = suffers(self)
+  let self = self <= thing(mov = 3, mhp = 24)
 
   case self |thing switch self.act
 
@@ -26,6 +25,7 @@ dorime_fun(self: Thing) : Thing
   | DORIME_BLESSING_FOR_WHO_DESERVE
     let self = animate(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_000, 14, 28)
     let fire = new_thing <= thing(
+      sid = self.sid,
       fun = dorime_blessing_fun,
       vel = scale_v3(8, targ_dir(self)),
       dir = targ_dir(self),

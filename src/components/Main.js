@@ -161,17 +161,17 @@ class Main extends Component {
       var things;
       if (gid === TA.OFF_GAME) {
         things = [
-          [this.picked_hero, {pid:0, dmg:0, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
+          [this.picked_hero, {pid:0, sid:1, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
           ["Poste", {pos:{x:0,y:0,z:0}, nam:"Poste"}],
-          ["PPG", {pos:{x:64,y:0,z:0}, dmg:0, nam:"PPG"}],
+          ["PunchingBag", {pos:{x:64,y:0,z:0}, sid: 2, nam:"PunchingBag"}],
           ["Wall", {pos:{x:-64,y:-64,z:0}, nam:"Wall"}],
         ];
       } else {
         things = this.game_list[gid].players.split(",");
         things = things.map(TA.parse_player);
-        things = things.map(p => p.hero);
-        things = things.map((name, idx) => {
+        things = things.map(({name,team}, idx) => {
           return [name, {
+            sid: ({"^":0,"<":1,">":2})[team]||0,
             pid: idx,
             pos: {x: -64 + idx*64, y: 0, z: 0},
             nam: name,
@@ -499,25 +499,6 @@ class Main extends Component {
       top_lft,
       top_rgt,
     ]);
-
-    // Game hud
-    //var hud = [];
-    //console.log("....", this.hud);
-    //for (var i = 0; i < this.hud.length; ++i) {
-      //var hud_el = this.hud[i];
-      //switch (hud_el.ctor) {
-        //case "rect":
-          //hud.push(h("div", {"style": {
-            //"position": "absolute",
-            //"left": hud_el.x+"px",
-            //"top": hud_el.y+"px",
-            //"width": hud_el.w+"px",
-            //"height": hud_el.h+"px",
-            //"background": hud_el.col,
-          //}}, ["x"]));
-          //break;
-      //}
-    //}
 
     // Game screen
     if (this.canvox) {

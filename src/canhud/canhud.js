@@ -1,55 +1,64 @@
 module.exports = function canhud() {
+  var cw = 64;
+  var ch = 16;
   var canhud = document.createElement("div");
   canhud.style.position = "absolute";
   var canvas_array = [];
-  for (var i = 0; i < 64; ++i) {
+  for (var i = 0; i < 32; ++i) {
     var canvas = document.createElement("canvas");
-    canvas.last = {dmg: null, nam: null};
+    canvas.last = {sid: null, dmg: null, mhp: null, nam: null};
     canvas.context = canvas.getContext("2d");
-    canvas.width = 34;
-    canvas.height = 14;
+    canvas.width = cw;
+    canvas.height = ch;
+    //canvas.style.width = cw + "px";
+    //canvas.style.height = ch + "px";
+    //canvas.context.scale(2,2);
     canvas.style.position = "absolute";
     canvas_array.push(canvas);
     canhud.appendChild(canvas);
+    //canvas.style.border = "1px solid black";
   };
 
   canhud.draw = ({hud, cam}) => {
     canhud.style.width = Math.floor(cam.port.x) + "px";
     canhud.style.height = Math.floor(cam.port.y) + "px";
-    for (var i = 0; i < 64; ++i) {
-      var canvas = canvas_array[i];
-      var cw = canvas.width;
-      var ch = canvas.height;
+    var canvas_idx = 0;
+    for (var i = 0; i < 32; ++i) {
+      var canvas = canvas_array[canvas_idx];
       if (i >= hud.length) {
         canvas.style.visibility = "hidden";
       } else {
-        var {pos:{x,y,z},nam,dmg,hei} = hud[i];
-        var ym = Math.cos(Math.PI*0.5-cam.ang);
-        var sx = cam.port.x/cam.size.x;
-        var sy = cam.port.y/cam.size.y;
-        var bx = Math.floor((cam.size.x*0.5+x)*sx-cw/2);
-        var by = Math.floor((cam.size.y*0.5-y*ym)*sy-(hei+8)*ym*sy-20);
-        canvas.style.visibility = null;
-        canvas.style.left = bx + "px";
-        canvas.style.top = by + "px";
-        if (canvas.last.dmg !== dmg) {
-          canvas.context.clearRect(0,ch-4,cw,4);
-          if (dmg !== 0xFFFFFFFF) {
+        var {pos:{x,y,z},nam,sid,dmg,mhp,hei} = hud[i];
+        if (sid !== 0 && nam.length !== 0) {
+          canvas_idx++;
+          var ym = Math.cos(Math.PI*0.5-cam.ang);
+          var sx = cam.port.x/cam.size.x;
+          var sy = cam.port.y/cam.size.y;
+          var bx = Math.floor((cam.size.x*0.5+x)*sx-cw/2);
+          var by = Math.floor((cam.size.y*0.5-y*ym)*sy-(hei+8)*ym*sy-20);
+          canvas.style.visibility = null;
+          canvas.style.left = bx + "px";
+          canvas.style.top = by + "px";
+          if (canvas.last.dmg !== dmg || canvas.last.mhp !== mhp) {
+            var pad = 12;
+            canvas.context.clearRect(0,ch-5,cw,5);
             canvas.context.fillStyle = "#383030";
-            canvas.context.fillRect(0,ch-4,cw,4);
+            canvas.context.fillRect(pad,ch-5,cw-pad*2,5);
             canvas.context.fillStyle = "#30A038";
-            canvas.context.fillRect(1,ch-4+1,Math.floor(Math.max(32-dmg,0)),2);
-          };
-          canvas.last.dmg = dmg;
-        }
-        if (canvas.last.nam !== nam) {
-          canvas.context.fillStyle = "#383030";
-          canvas.context.clearRect(0,0,cw,ch-4);
-          canvas.context.font = "8px Verdana";
-          canvas.context.textBaseline = "bottom";
-          canvas.context.textAlign = "center";
-          canvas.context.fillText(nam, cw/2, ch-4);
-          canvas.last.nam = nam;
+            var perc = Math.max(0, Math.min(1, 1-dmg/mhp));
+            canvas.context.fillRect(pad+1,ch-5+1,Math.floor((cw-pad*2-2)*perc),3);
+            canvas.last.dmg = dmg;
+            canvas.last.mhp = mhp;
+          }
+          if (canvas.last.nam !== nam) {
+            canvas.context.fillStyle = "#383030";
+            canvas.context.clearRect(0,0,cw,ch-5);
+            canvas.context.font = "10px Arial";
+            canvas.context.textBaseline = "bottom";
+            canvas.context.textAlign = "center";
+            canvas.context.fillText(nam, cw/2, ch-5);
+            canvas.last.nam = nam;
+          }
         }
       }
     }
