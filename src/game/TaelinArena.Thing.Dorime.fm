@@ -6,14 +6,10 @@ enum
 | DORIME_BLESSING_FOR_WHO_DESERVE
 | DORIME_LEPTOSPIROSE_CURSE
 | DORIME_HOLY_FLAME
-| DORIME_GODS_CHAMBER
 | DORIME_JESUS_POWER
+| DORIME_GODS_CHAMBER
 | DORIME_TAUNT
 
-short_dist : Number 
-  100
-medium_dist : Number
-  200
 
 dorime_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
@@ -30,82 +26,110 @@ dorime_fun(self: Thing) : Thing
   // Left 
   | DORIME_BLESSING_FOR_WHO_DESERVE
     let self = animate(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_000, 14, 28)
-    let fire = new_thing <= thing(fun=dorime_blessing_fun)
-    let self = spawn(self, 5, [move(fire, self.pos)])
+    let fire = new_thing <= thing(
+      fun = dorime_blessing_fun,
+      vel = scale_v3(8, targ_dir(self)),
+      pos = self.pos)
+    let self = spawn(self, 8, [fire])
+    let self = spawn(self, 16, [fire])
+    let self = spawn(self, 22, [fire])
     self
 
   // Middle
   | DORIME_LEPTOSPIROSE_CURSE
     let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000, 5, 15)
     let puddle = new_thing <= thing(fun=dorime_leptospirose_curse_fun)
-    let puddle_idle = new_thing <= thing(fun=dorime_leptospirose_curse_idle_fun)
+    //let puddle_idle = new_thing <= thing(fun=dorime_leptospirose_curse_idle_fun)
     let pot = new_thing <= thing(
-      fun = dorime_leptospirose_curse_pot_fun,
+      fun = dorime_leptospirose_puddle_pot_fun,
       pos = self.pos,
-      vel = scale_v3(15, targ_dir(self)),
-      box = nbox)
-    let self = spawn(self, 12, [pot])
-    let self = spawn(self, 14, [
-      move(puddle, at_max_dist(self, medium_dist)), 
-      move(puddle_idle, at_max_dist(self, medium_dist))])
+      vel = scale_v3(9, targ_dir(self)))
+    let self = spawn(self, 14, [pot])
+    //let self = spawn(self, 14, [
+      //move(puddle, at_max_dist(self, medium_dist)), 
+      //move(puddle_idle, at_max_dist(self, medium_dist))])
     self
 
   // Right
   | DORIME_HOLY_FLAME
-    let lght = light(at_dist(self, short_dist), 20, 32, v3(0,0,0), v3(0.2,0.04,0.05))
-    let self = illumine(self, 4, 16, [lght])
     let self = animate(self, 0, DORIME_HOLY_FLAME_CAST_ANIMATION_000, 8, 16)
     let flame = new_thing <= thing(fun = dorime_holy_flame_fun)
-    let self = spawn(self, 5, [move(flame, at_max_dist(self, short_dist))])
+    let self = spawn(self, 5, [move(flame, at_max_dist(self, 128))])
     self
 
   // Q
-  | DORIME_GODS_CHAMBER
-    let self = animate(self, 0, DORIME_GODS_CHAMBER_CAST_ANIMATION_000, 9, 27)
-    let heal = new_thing <= thing(fun=dorime_gods_chamber_fun)
-    let heal_idle = new_thing <= thing(fun=dorime_gods_chamber_idle_fun)
-    let self = spawn(self, 9, [
-      move(heal, at_max_dist(self, short_dist)), 
-      move(heal_idle, at_max_dist(self, short_dist))])
-    self
-
-  // Space
   | DORIME_JESUS_POWER
     let self = animate(self, 0, DORIME_JESUS_POWER_000, 21, 21)
     let hit = new_thing <= thing(fun=dorime_jesus_power)
-    let self = spawn(self, 14, [move(hit, at_dist(self, 30))])
+    let self = spawn(self, 18, [move(hit, at_dist(self, 30))])
+    self
+
+  // SPACE
+  | DORIME_GODS_CHAMBER
+    let self = animate(self, 0, DORIME_GODS_CHAMBER_CAST_ANIMATION_000, 9, 27)
+    let heal = new_thing <= thing(fun=dorime_gods_chamber_fun)
+    let self = spawn(self, 9, [move(heal, at_max_dist(self, 128))]) 
     self
 
   // E
   | DORIME_TAUNT
-    animate(self, 0, DORIME_TAUNT_000, 3, 15)
-
+    let self = animate_between(self, 0, DORIME_TAUNT_000, 3, 0,6)
+    let self = animate_between(self, 0, DORIME_TAUNT_002, 1, 6,36)
+    let self = reset(self, 36)
+    self
 
   else self
 
 import TaelinArena.Game
 
 dorime_blessing_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 2)
-  self
-
-dorime_leptospirose_curse_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 10)
-  self
-
-// Damage: max 6
-dorime_leptospirose_curse_idle_fun(self: Thing) : Thing
   case self |thing
-  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 29)
-  let self = self <= thing(die = if tik === 58 then true else false)
+  let self = animate_die(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let self = cast(self, 10, [hit([damage(10)], self.pos, self.dir, cbox(40))])
-  let self = cast(self, 25, [hit([damage(10)], self.pos, self.dir, cbox(40))])
+  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(4))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
   self
 
-dorime_leptospirose_curse_pot_fun(self: Thing) : Thing
-  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 4)
-  let self = self <= thing(die = if tik === 4 then true else false)
+dorime_leptospirose_puddle_pot_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, DORIME_LEPTOSPIROSE_CURSE_POT_000, 1, 10)
+  let self = self <= thing(box = cbox(10))
+  let pudd = new_thing <= thing(
+    fun=dorime_leptospirose_puddle_fun,
+    pos=self.pos)
+  let self = spawn(self, 9, [pudd])
+  self
+
+dorime_leptospirose_puddle_fun(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = animate_between(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 0,10)
+  let self = animate_between(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 10,39)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(48))]
+  let self = cast(self, 10, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 18, hits)
+  let self = cast(self, 22, hits)
+  let self = cast(self, 26, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 34, hits)
+  let self = cast(self, 38, hits)
+  let self = die(self, 39)
   self
 
 dorime_holy_flame_fun(self: Thing) : Thing
@@ -116,11 +140,27 @@ dorime_holy_flame_fun(self: Thing) : Thing
   self
 
 dorime_gods_chamber_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 51)
-  self
-
-dorime_gods_chamber_idle_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 58)
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = animate_between(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_000, 17, 0,34)
+  let self = animate_between(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000, 29, 34, 92)
+  let hits = [hit([damage(-1)], self.pos, self.dir, cbox(52))]
+  let self = cast(self, 34, hits)
+  let self = cast(self, 38, hits)
+  let self = cast(self, 42, hits)
+  let self = cast(self, 46, hits)
+  let self = cast(self, 50, hits)
+  let self = cast(self, 54, hits)
+  let self = cast(self, 58, hits)
+  let self = cast(self, 62, hits)
+  let self = cast(self, 66, hits)
+  let self = cast(self, 70, hits)
+  let self = cast(self, 74, hits)
+  let self = cast(self, 78, hits)
+  let self = cast(self, 82, hits)
+  let self = cast(self, 86, hits)
+  let self = cast(self, 90, hits)
+  let self = die(self, 92)
   self
 
 dorime_taunt_idle_fun(self: Thing) : Thing
