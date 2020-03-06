@@ -75,7 +75,8 @@ class Main extends Component {
         var game = this.game_list[gid];
         if (game) {
           var game_curr_time = (Date.now() - game.init)/1000;
-          var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
+          var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+1;
+          console.log(game_curr_time, game_stop_time, game_stop_time - game_curr_time);
           // If it is still running, join and return it
           if (game_curr_time < game_stop_time) {
             return this.join(gid);
