@@ -490,6 +490,7 @@ var heroes = [
   "Bleskape",
   "Dorime",
   "Finn",
+  "Gastly",
   "Kakashi",
   "Kenko",
   "Konan",
