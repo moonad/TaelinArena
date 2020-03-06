@@ -355,3 +355,7 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 is_walking(this: Thing) : Number
   case this |thing
   len_v3(this.pad) > 0
+
+// This thing can be damaged
+suffers(this: Thing) : Thing
+  this <= thing(dmg = if dmg === 0xFFFFFFFF then 0 else dmg)

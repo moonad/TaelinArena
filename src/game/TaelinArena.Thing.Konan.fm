@@ -18,6 +18,7 @@ long_dist : Number
 
 konan_fun(self: Thing) : Thing
   let self = self <= thing(mov = 4)
+  let self = suffers(self)
 
   case self |thing switch self.act
 

@@ -11,6 +11,7 @@ enum
 
 zagatur_fun(self: Thing) : Thing
   let self = self <= thing(mov = 0)
+  let self = suffers(self)
 
   case self |thing switch self.act
 

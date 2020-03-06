@@ -13,8 +13,7 @@ enum
 
 dorime_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
-  // let medium_dist = 200
-  // let short_dist = 120
+  let self = suffers(self)
 
   case self |thing switch self.act
 
