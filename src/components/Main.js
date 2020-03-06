@@ -415,7 +415,7 @@ class Main extends Component {
           if (res.ctr === "ok") {
             this.name = res.name;
             // TODO: proper signatures
-            for (let t = 125; t <= 4000; t *= 2) {
+            for (let t = 125; t <= 16000; t = Math.floor(t*1.5)) {
               setTimeout(() => this.post("+"+this.name), t);
             }
             this.forceUpdate();
