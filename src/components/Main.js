@@ -167,6 +167,19 @@ class Main extends Component {
           pos: {x:-64,y:0,z:0},
           nam: this.picked_hero,
         }]);
+        things.push(["Poste", {
+          pos: {x:0,y:0,z:0},
+          nam: "Poste",
+        }]);
+        things.push(["PunchingBag", {
+          pos: {x:64,y:0,z:0},
+          sid: 3,
+          nam: "PunchingBag",
+        }]);
+        things.push(["Wall", {
+          pos:{x:-64,y:-64,z:0},
+          nam:"Wall",
+        }]);
       } else {
         things = this.game_list[gid].players.split(",");
         things = things.map(TA.parse_player);
@@ -179,19 +192,6 @@ class Main extends Component {
           }];
         });
       };
-      things.push(["Poste", {
-        pos: {x:0,y:0,z:0},
-        nam: "Poste",
-      }]);
-      things.push(["PunchingBag", {
-        pos: {x:64,y:0,z:0},
-        sid: 3,
-        nam: "PunchingBag",
-      }]);
-      things.push(["Wall", {
-        pos:{x:-64,y:-64,z:0},
-        nam:"Wall",
-      }]);
       this.game = TA.GameRunner(gid, things);
     }
   }
