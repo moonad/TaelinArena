@@ -133,7 +133,7 @@ app.post("/offer", (req, res) => {
   var game = TA.OFF_GAME;
   var turn = 0;
 
-  peer.team = "spec";
+  peer.side = Math.random() < 0.5 ? "<" : ">";
   peer.hero = "Dorime";
   peer.do_send = (msg) => {
     if (peer._pcReady) {
@@ -164,7 +164,8 @@ app.post("/offer", (req, res) => {
     var players = [];
     for (var peer_name in peers) {
       var player = "";
-      switch (peers[peer_name].team) {
+      console.log("...", peer_name, peers[peer_name].side);
+      switch (peers[peer_name].side) {
         case "^": player += "^"; break;
         case "<": player += "<"; break;
         case ">": player += ">"; break;
@@ -193,30 +194,30 @@ app.post("/offer", (req, res) => {
     var str = "" + data;
     switch (str[0]) {
 
-      // Mod wants to set someone's team to ^.
+      // Mod wants to set someone's side to ^.
       case "^":
         if (name !== "MaiaVictor") return;
         var pname = str.slice(1);
         if (peers[pname]) {
-          peers[pname].team = "^";
+          peers[pname].side = "^";
         }
         break;
 
-      // Mod wants to set someone's team to <.
+      // Mod wants to set someone's side to <.
       case "<":
         if (name !== "MaiaVictor") return;
         var pname = str.slice(1);
         if (peers[pname]) {
-          peers[pname].team = "<";
+          peers[pname].side = "<";
         }
         break;
 
-      // Mod wants to set someone's team to >.
+      // Mod wants to set someone's side to >.
       case ">":
         if (name !== "MaiaVictor") return;
         var pname = str.slice(1);
         if (peers[pname]) {
-          peers[pname].team = ">";
+          peers[pname].side = ">";
         }
         break;
 

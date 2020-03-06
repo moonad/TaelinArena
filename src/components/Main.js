@@ -160,24 +160,38 @@ class Main extends Component {
     if (!this.game || this.game.gid !== gid) {
       var things;
       if (gid === TA.OFF_GAME) {
-        things = [
-          [this.picked_hero, {pid:0, sid:1, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
-          ["Poste", {pos:{x:0,y:0,z:0}, nam:"Poste"}],
-          ["PunchingBag", {pos:{x:64,y:0,z:0}, sid: 2, nam:"PunchingBag"}],
-          ["Wall", {pos:{x:-64,y:-64,z:0}, nam:"Wall"}],
-        ];
+        things = [];
+        things.push([this.picked_hero, {
+          pid: 0,
+          sid: 1,
+          pos: {x:-64,y:0,z:0},
+          nam: this.picked_hero,
+        }]);
       } else {
         things = this.game_list[gid].players.split(",");
         things = things.map(TA.parse_player);
-        things = things.map(({name,team}, idx) => {
-          return [name, {
-            sid: ({"^":0,"<":1,">":2})[team]||0,
+        things = things.map(({name,hero,side}, idx) => {
+          return [hero, {
+            sid: ({"^":0,"<":1,">":2})[side]||0,
             pid: idx,
-            pos: {x: -64 + idx*64, y: 0, z: 0},
+            pos: {x: -64 + idx*64, y: 64, z: 0},
             nam: name,
           }];
         });
       };
+      things.push(["Poste", {
+        pos: {x:0,y:0,z:0},
+        nam: "Poste",
+      }]);
+      things.push(["PunchingBag", {
+        pos: {x:64,y:0,z:0},
+        sid: 3,
+        nam: "PunchingBag",
+      }]);
+      things.push(["Wall", {
+        pos:{x:-64,y:-64,z:0},
+        nam:"Wall",
+      }]);
       this.game = TA.GameRunner(gid, things);
     }
   }

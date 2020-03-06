@@ -4,7 +4,7 @@ punchingbag_fun(self: Thing) : Thing
   let smhp = 32
   let self = self <= thing(mhp = smhp)
   let self = self <= thing(dir = v3(0.707,-0.707,0))
-  let self = self <= thing(dmg = dmg - (1 \ 24))
+  let self = self <= thing(dmg = dmg - (2 \ 24))
   let self = self <= thing(mid =
     let pow = max(0, min(1, dmg \ smhp))
     let ang = ((sin(tik \ 6) * 12 * pow) + 24 + 0.5) % 24

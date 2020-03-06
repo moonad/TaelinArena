@@ -36,7 +36,7 @@ if (typeof window !== "undefined") {
 }
 
 const GAME_FPS = 24;
-const GAME_DURATION = GAME_FPS * 60;
+const GAME_DURATION = GAME_FPS * 10;
 
 function slist_to_array(slist) {
   var array = [];
@@ -207,6 +207,7 @@ function render_thing(thing) {
     render_hitbox(pos, dir, box, 
       sid === 1 ? 0xA0F0A0FF :
       sid === 2 ? 0xA0A0F0FF :
+      sid === 3 ? 0xA0F0F0FF :
       0xA0A0A0FF);
 
     // Renders lights
@@ -300,14 +301,14 @@ function parse_command(code, idx=0) {
 }
 
 function parse_player(player) {
-  var team;
+  var side;
   switch(player[0]) {
-    case "<": team = "L"; break;
-    case "^": team = "S"; break;
-    case ">": team = "R"; break;
+    case "<": side = "<"; break;
+    case "^": side = "^"; break;
+    case ">": side = ">"; break;
   }
   var [name,hero] = player.slice(1).split("!");
-  return {team,name,hero};
+  return {side,name,hero};
 }
 
 // Parses a player turn code into an array of player inputs
