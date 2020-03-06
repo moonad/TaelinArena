@@ -29,7 +29,7 @@ dorime_fun(self: Thing) : Thing
     let fire = new_thing <= thing(
       fun = dorime_blessing_fun,
       vel = scale_v3(8, targ_dir(self)),
-      dir = self.dir,
+      dir = targ_dir(self),
       pos = self.pos)
     let self = spawn(self, 8, [fire])
     let self = spawn(self, 16, [fire])
