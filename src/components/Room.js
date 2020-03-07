@@ -88,18 +88,18 @@ class GameRoom extends Component {
       var players = [];
     }
 
-    var red_list = players
-      .filter((player) => player.team === "red")
+    var s_list = players
+      .filter((player) => player.team === "^")
       .map((player) => h("div", {},
         player.name+" !"+player.hero));
 
-    var spec_list = players
-      .filter((player) => player.team === "spec")
+    var a_list = players
+      .filter((player) => player.team === "<")
       .map((player) => h("div", {},
         player.name+" !"+player.hero));
 
-    var blue_list = players
-      .filter((player) => player.team === "blue")
+    var b_list = players
+      .filter((player) => player.team === ">")
       .map((player) => h("div", {},
         player.name+" !"+player.hero));
 
@@ -117,9 +117,9 @@ class GameRoom extends Component {
         //"background": "#142342",
       }
     }, [
-      player_list("Red", red_list),
-      player_list("Spectators", spec_list),
-      player_list("Blue", blue_list),
+      player_list("Red", a_list),
+      player_list("Spectators", s_list),
+      player_list("Blue", b_list),
     ]);
   }
 };

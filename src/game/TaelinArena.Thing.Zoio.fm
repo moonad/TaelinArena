@@ -10,7 +10,7 @@ enum
 | ZOIO_BLOCK
 
 zoio_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2)
+  let self = self <= thing(mov = 2, mhp = 24)
 
   case self |thing switch self.act
 

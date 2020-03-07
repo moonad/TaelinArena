@@ -10,7 +10,7 @@ enum
 | PICHU_TAUNT
 
 pichu_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 4, box = cbox(4))
+  let self = self <= thing(mov = 4, box = cbox(4), mhp = 24)
 
   case self |thing switch self.act
 

@@ -88,19 +88,29 @@ interact_with(this:Thing, that:Thing): Thing
       | some =>
         let apply_eff = (eff, this) =>
           case eff
+          | heal =>
+            if this.sid === that.sid then
+              this <= thing(dmg = dmg - eff.lif)
+            else
+              this
           | damage =>
-            let new_dmg =
-              if this.dmg === 0xFFFFFFFF
-              then this.dmg
-              else this.dmg + eff.dmg
-            this <= thing(dmg = new_dmg)
+            if this.sid === that.sid then
+              this
+            else
+              this <= thing(dmg = dmg + eff.dmg)
           | repulse =>
-            let dir = lookat_v3(hit.pos, this.pos, v3(1,0,0))
-            let vec = scale_v3(eff.mag, dir)
-            this <= thing(knk = vec)
+            if this.sid === that.sid then
+              this
+            else
+              let dir = lookat_v3(hit.pos, this.pos, v3(1,0,0))
+              let vec = scale_v3(eff.mag, dir)
+              this <= thing(knk = vec)
           | impulse =>
-            let vec = scale_v3(eff.mag, eff.dir)
-            this <= thing(knk = vec)
+            if this.sid === that.sid then
+              this
+            else
+              let vec = scale_v3(eff.mag, eff.dir)
+              this <= thing(knk = vec)
         fold(Effect; Thing; this, apply_eff, hit.eff)
     fold(Hit; Thing; this, apply_hit, that.hit)
   this
@@ -134,7 +144,6 @@ exec_turn(gm: Game) : Game
     let this = this <= thing(hit = [])
 
     // Resets
-    case this |thing
     let this =
       case this.rst
       | true  => this <= thing(
@@ -155,7 +164,9 @@ exec_turn(gm: Game) : Game
     // Integrates position with knockback
     let this = this <= thing(
       pos = add_v3(pos, knk),
-      knk = scale_v3(0.80, knk))
+      knk = if len_v3(knk) > 0
+        then scale_v3(max(len_v3(knk)-1,0), norm_v3(knk))
+        else knk)
 
     // Calls the transaction function
     let this = this.fun(this)
@@ -175,17 +186,30 @@ exec_turn(gm: Game) : Game
     // Keeps inside map
     let this = this <= thing(pos =
       case pos |v3
-      let x = min(max(-384, pos.x), 384)
-      let y = min(max(-192, pos.y), 192)
-      let z = min(max(   0, pos.z), 192)
+      let x = min(max(-256, pos.x), 256)
+      let y = min(max(-160, pos.y), 160)
+      let z = min(max(   0, pos.z), 256)
       v3(x, y, z))
+
+    // Bounds HP
+    let this = this <= thing(dmg = max(0, min(mhp, dmg)))
+
+    // Dies when 0 is 0
+    let no_hp =
+      false
+      //if (this.sid > 0) && gte(this.dmg, this.mhp)
+      //then true
+      //else false
     
     // Adds updated thing and new things to stage
     concat(_ chi_list,
-      case this.die
+      case or(this.die, no_hp) as dead
       |true res
-      |false cons(_ this,res))
+      |false cons(_ this, res))
 
   // Ticks every thing on stage
   gm <= game(
     stage = fold_with_context(Thing; _ [], tick, stage, (x)=>x))
+
+
+main exec_turn

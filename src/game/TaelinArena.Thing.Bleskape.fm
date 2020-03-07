@@ -10,7 +10,7 @@ enum
 | BLESKAPE_TAUNT
 
 bleskape_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2)
+  let self = self <= thing(mov = 1.6, mhp = 24)
 
   case self |thing switch self.act
 
@@ -20,27 +20,49 @@ bleskape_fun(self: Thing) : Thing
     else animate(self, 1, BLESKAPE_IDLE_000, 4, 16)
 
   |BLESKAPE_SHOCK_BALL
-    animate(self, 0, BLESKAPE_SHOCK_BALL_000, 15, 30)
+    let self = animate(self, 0, BLESKAPE_SHOCK_BALL_000, 15, 30)
+    let effs = [damage(3), impulse(12, self.dir)]
+    let hits = [
+      hit(effs, at_dist(self, 40), self.dir, cbox(20)),
+      hit(effs, at_dist(self, 80), self.dir, cbox(24))]
+    let self = cast(self, 18, hits)
+    self
 
   |BLESKAPE_DEFENSE_MODE
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_000, 3, 0,3)
     let self = animate_between(self, 1, BLESKAPE_DEFENSE_MODE_002, 1, 3,12)
-    let self = reset(self, 11)
+    let self = reset(self, 12)
     self
 
   |BLESKAPE_SHOCK_GROUND_WAVE
     let self = animate(self, 0, BLESKAPE_SHOCK_GROUND_WAVE_000, 12, 24)
-    //let effs = [damage(2)]
-    //let hits = [hit(effs, self.pos, self.dir, cbox(12))]
-    //let self = cast(self, 0, hits)
+    let effs = [damage(5)]
+    let hits = [hit(effs, self.pos, self.dir, cbox(58))]
+    let self = cast(self, 20, hits)
     self
 
   |BLESKAPE_SUPREME_PUNCH_SEQUENCE
-    animate(self, 0, BLESKAPE_SUPREME_PUNCH_SEQUENCE_000, 25, 75)
+    let self = animate(self, 0, BLESKAPE_SUPREME_PUNCH_SEQUENCE_000, 25, 50)
+    let effs = [damage(1)]
+    let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
+    let self = cast(self, 26, hits)
+    let self = cast(self, 30, hits)
+    let self = cast(self, 34, hits)
+    let self = cast(self, 38, hits)
+    let self = cast(self, 42, hits)
+    let effs = [damage(2), impulse(18, self.dir)]
+    let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
+    let self = cast(self, 46, hits)
+    self
 
   | BLESKAPE_DASH
-    let self = animate(self, 1, BLESKAPE_DASH_000, 15, 30)
+    let self = animate(self, 0, BLESKAPE_DASH_000, 15, 30)
     let self = dash(self, 8, 15, 25)
+    let effs = [damage(1), repulse(8)]
+    let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
+    let self = cast(self, 17, hits)
+    let self = cast(self, 20, hits)
+    let self = cast(self, 23, hits)
     self
 
   | BLESKAPE_TAUNT

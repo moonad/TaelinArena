@@ -10,7 +10,7 @@ enum
 | FINN_EVADE
 
 finn_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 5)
+  let self = self <= thing(mov = 5, mhp = 24)
 
   case self |thing switch self.act
 
@@ -21,7 +21,12 @@ finn_fun(self: Thing) : Thing
 
   // Left 
   |FINN_TRIPLE_TAKE
-    animate(self, 1, FINN_TRIPLE_TAKE_000, 17, 34)
+    let self = animate(self, 1, FINN_TRIPLE_TAKE_000, 17, 34)
+    let attack = new_thing <= thing(fun=finn_triple_take_effect, dir=targ_dir(self))
+    let self = spawn(self, 0, [move(attack, at_max_dist(self, 35))])
+    let self = spawn(self, 10, [move(attack, at_max_dist(self, 35))])
+    let self = spawn(self, 30, [move(attack, at_max_dist(self, 35))])
+    self 
 
   // Middle
   |FINN_BMO_S_FLASH
@@ -51,3 +56,22 @@ finn_fun(self: Thing) : Thing
 finn_bow_effect(self: Thing) : Thing
   let self = animate_die(self, 0, FINN_BOW_PROJECTILE_000, 0, 2)
   self
+
+finn_triple_take_effect(self: Thing) : Thing 
+  case self |thing
+  let self = animate_die(self, 0, FINN_TRIPLE_TAKE_AUX_000, 1, 2)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(2)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(20))]
+  let self = cast(self, 0, hits)
+  self
+  
+finn_triple_take_effect(self: Thing) : Thing 
+  case self |thing
+  let self = animate_die(self, 0, FINN_TRIPLE_TAKE_AUX_000, 1, 2)
+  let self = self <= thing(box = nbox)
+  let effs = [damage(2)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(20))]
+  let self = cast(self, 0, hits)
+  self
+  

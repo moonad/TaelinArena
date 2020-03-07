@@ -1,0 +1,152 @@
+import TaelinArena.Game
+
+enum
+| GASTLY_IDLE
+| GASTLY_LICK
+| GASTLY_MEAN_LOOK
+| GASTLY_DREAM_EATER
+| GASTLY_INVISIBILITY
+| GASTLY_EVOLVE
+| GASTLY_TAUNT
+
+gastly_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  | GASTLY_IDLE
+    if is_walking(self)
+    then animate(self, 1, GASTLY_WALK_000, 6, 12)
+    else animate(self, 1, GASTLY_IDLE_000, 13, 39)
+
+  // Left 
+  | GASTLY_LICK
+    animate(self, 0, GASTLY_ATTACK_LICK_000, 10, 20)
+
+  // Middle
+  | GASTLY_MEAN_LOOK
+    animate(self, 0, GASTLY_ATTACK_MEAN_LOOK_000, 16, 32)
+
+  // Right
+  | GASTLY_DREAM_EATER
+    animate(self, 0, GASTLY_ATTACK_DREAM_EATER_000, 10, 20)
+
+  // Q
+  | GASTLY_INVISIBILITY
+    animate(self, 1, GASTLY_ULTIMATE_INVISIBILITY_000, 12, 50)
+
+  // Space
+  | GASTLY_EVOLVE
+    let self = animate(self, 1, GASTLY_EVOLUTION_000, 11, 22)
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=haunter_fun, pid=self.pid) // evolve to Haunter
+    let self = self <= thing(pos = new_pos)
+    self
+
+  // E
+  | GASTLY_TAUNT
+    animate(self, 1, GASTLY_TAUNT_000, 18, 36)
+
+  else self
+
+
+// -------
+// Haunter
+enum
+| HAUNTER_IDLE
+| HAUNTER_LICK
+| HAUNTER_MEAN_LOOK
+| HAUNTER_DREAM_EATER
+| HAUNTER_INVISIBILITY
+| HAUNTER_EVOLVE
+| HAUNTER_TAUNT
+
+haunter_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | HAUNTER_IDLE
+    if is_walking(self)
+    then animate(self, 1, HAUNTER_WALK_000, 4, 8)
+    else animate(self, 1, HAUNTER_IDLE_000, 5, 15)
+
+  // Left 
+  | HAUNTER_LICK
+    animate(self, 0, HAUNTER_ATTACK_LICK_000, 9, 18)
+
+  // Middle
+  | HAUNTER_MEAN_LOOK
+    animate(self, 0, HAUNTER_ATTACK_MEAN_LOOK_000, 14, 28)
+
+  // Right
+  | HAUNTER_DREAM_EATER
+    animate(self, 0, HAUNTER_ATTACK_DREAM_EATER_000, 10, 20)
+
+  // Q
+  | HAUNTER_INVISIBILITY
+    animate(self, 1, HAUNTER_ULTIMATE_INVISIBILITY_000, 12, 40)
+
+  // Space
+  | HAUNTER_EVOLVE
+    let self = animate(self, 1, HAUNTER_EVOLUTION_000, 13, 26)
+    let new_pos = self.pos
+    let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=gengar_fun, pid=self.pid) // evolve to Gengar
+    let self = self <= thing(pos = new_pos)
+    self
+    
+  // E
+  | HAUNTER_TAUNT
+    animate(self, 1, HAUNTER_TAUNT_000, 18, 36)
+
+  else self
+
+
+// ------
+// Gengar
+enum
+| GENGAR_IDLE
+| GENGAR_LICK
+| GENGAR_HYPNOSIS
+| GENGAR_DREAM_EATER
+| GENGAR_INVISIBILITY
+| GENGAR_EVOLVE
+| GENGAR_TAUNT
+
+gengar_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  | GENGAR_IDLE
+    if is_walking(self)
+    then animate(self, 1, GENGAR_WALK_000, 3, 6)
+    else animate(self, 1, GENGAR_IDLE_000, 7, 21)
+
+  // Left 
+  | GENGAR_LICK
+    animate(self, 0, GENGAR_ATTACK_LICK_000, 9, 18)
+
+  // Middle
+  | GENGAR_HYPNOSIS
+    animate(self, 0, GENGAR_ATTACK_HYPNOSIS_000, 14, 28)
+
+  // Right
+  | GENGAR_DREAM_EATER
+    animate(self, 0, GENGAR_ATTACK_DREAM_EATER_000, 12, 24)
+
+  // Q
+  | GENGAR_INVISIBILITY
+    animate(self, 1, GENGAR_ULTIMATE_INVISIBILITY_000, 10, 30)
+
+  // Space
+  | GENGAR_EVOLVE
+   animate(self, 1, GENGAR_IDLE_000, 7, 14)
+    
+  // E
+  | GENGAR_TAUNT
+   animate(self, 1, GENGAR_TAUNT_000, 18, 40)
+
+  else self
