@@ -6,8 +6,9 @@ enum
 | FINN_BMO_S_FLASH
 | FINN_BOW
 | FINN_JAKES_FURY
-| FINN_TAUNT
 | FINN_EVADE
+| FINN_TAUNT
+
 
 medium_dist : Number
   200
@@ -53,25 +54,39 @@ finn_fun(self: Thing) : Thing
       fun = finn_arrow_fun,
       pos = self.pos,
       dir = self.dir,
-      vel = scale_v3(15, targ_dir(self)))
+      vel = scale_v3(15, targ_dir(self)),
+      box = nbox)
     let self = spawn(self, 3, [proj])
     let self = cast(self, 13, hits)
     self
 
   // Q
   |FINN_JAKES_FURY
-    let self = animate(self, 1, FINN_TAUNT_000, 17, 17)
-    let self = 
+    let self = animate(self, 1, FINN_TAUNT_000, 17, 34)
+    let jake = new_thing <= thing(fun=finn_jakes_fury_fun, dir=targ_dir(self))
+    let self = spawn(self, 14, [move(jake, at_dist(self, 35))])
+    let effs = [damage(2)]
+    let hits0 = [hit(effs, at_dist(self, 35), self.dir, cbox(15))]
+    let hits1 = [hit(effs, at_dist(self, 45), self.dir, cbox(15))]
+    let hits2 = [hit(effs, at_dist(self, 60), self.dir, cbox(15))]
+    let crit = [damage(4), impulse(10, self.dir)]
+    let hits_critical = [hit(crit, at_dist(self, 80), self.dir, cbox(15))]
+    let self = cast(self, 15, hits0)
+    let self = cast(self, 20, hits1)
+    let self = cast(self, 25, hits2)
+    let self = cast(self, 30, hits_critical)
+    self
+
+  // Space
+  | FINN_EVADE
+    let self = animate(self, 1, FINN_EVADE_000, 6, 12)
+    let self = dash(self, 4, 0, 12) 
+    self
 
   // E
   | FINN_TAUNT
     animate(self, 0, FINN_TAUNT_000, 17, 34)
 
-  // Space
-  | FINN_EVADE
-    let self = animate(self, 1, FINN_EVADE_000, 6, 12)
-    let self = dash(self, 4, 0, 12)
-    self
 
   else self
 
@@ -89,11 +104,7 @@ finn_triple_take_effect(self: Thing) : Thing
   let self = cast(self, 0, hits)
   self
   
+// TODO: second attack out of position
 finn_jakes_fury_fun(self: Thing) : Thing
-   case self |thing
-  let self = animate_die(self, 0, FINN_JAKE_S_FURY_000, 26, 26)
-  let self = self <= thing(box = nbox)
-  let effs = [damage(4)]
-  let hits = [hit(effs, self.pos, self.dir, cbox(20))]
-  let self = cast(self, 0, hits)
-  self
+  animate_die(self, 0, FINN_JAKE_S_FURY_000, 26, 26)
+
