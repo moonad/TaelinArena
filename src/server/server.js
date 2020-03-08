@@ -133,8 +133,8 @@ app.post("/offer", (req, res) => {
   var game = TA.OFF_GAME;
   var turn = 0;
 
-  peer.team = "spec";
-  peer.hero = "Tupitree";
+  peer.side = Math.random() < 0.5 ? "<" : ">";
+  peer.hero = "Dorime";
   peer.do_send = (msg) => {
     if (peer._pcReady) {
       try { peer.send(msg); }
@@ -164,10 +164,11 @@ app.post("/offer", (req, res) => {
     var players = [];
     for (var peer_name in peers) {
       var player = "";
-      switch (peers[peer_name].team) {
-        case "red" : player += "<"; break;
-        case "spec": player += "^"; break;
-        case "blue": player += ">"; break;
+      //console.log("...", peer_name, peers[peer_name].side);
+      switch (peers[peer_name].side) {
+        case "^": player += "^"; break;
+        case "<": player += "<"; break;
+        case ">": player += ">"; break;
       }
       player += peer_name;
       player += "!";
@@ -193,30 +194,30 @@ app.post("/offer", (req, res) => {
     var str = "" + data;
     switch (str[0]) {
 
-      // Mod wants to set someone's team to red.
-      case "<":
-        if (name !== "MaiaVictor") return;
-        var pname = str.slice(1);
-        if (peers[pname]) {
-          peers[pname].team = "red";
-        }
-        break;
-
-      // Mod wants to set someone's team to blue.
-      case ">":
-        if (name !== "MaiaVictor") return;
-        var pname = str.slice(1);
-        if (peers[pname]) {
-          peers[pname].team = "blue";
-        }
-        break;
-
-      // Mod wants to set someone's team to spec.
+      // Mod wants to set someone's side to ^.
       case "^":
         if (name !== "MaiaVictor") return;
         var pname = str.slice(1);
         if (peers[pname]) {
-          peers[pname].team = "spec";
+          peers[pname].side = "^";
+        }
+        break;
+
+      // Mod wants to set someone's side to <.
+      case "<":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].side = "<";
+        }
+        break;
+
+      // Mod wants to set someone's side to >.
+      case ">":
+        if (name !== "MaiaVictor") return;
+        var pname = str.slice(1);
+        if (peers[pname]) {
+          peers[pname].side = ">";
         }
         break;
 

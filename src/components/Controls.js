@@ -62,8 +62,8 @@ module.exports = function Controls(on_input) {
     var pos_z = 2048*sin;
     var pos = {x:pos_x, y:pos_y, z:pos_z};
     // Maximum screen size covers 1024x512 in-game pixels
-    var swid = 768;
-    var shei = 384;
+    var swid = 512;
+    var shei = 320;
     let fact = W / swid;
     var hmul = Math.cos(Math.PI*0.5-ang);
     var size = {x:swid, y:shei*hmul};

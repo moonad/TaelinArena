@@ -1,0 +1,11 @@
+T Any
+| any(T: Type; value: T)
+
+T Nat
+| zero
+| succ(pred: Nat)
+
+main
+  case any(Nat; zero) as x
+  | any => x.value
+  : Number

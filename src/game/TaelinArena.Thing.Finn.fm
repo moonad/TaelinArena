@@ -17,7 +17,7 @@ long_dist : Number
 
 
 finn_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3)
+  let self = self <= thing(mov = 5, mhp = 24)
 
   case self |thing switch self.act
 

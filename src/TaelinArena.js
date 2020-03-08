@@ -36,7 +36,7 @@ if (typeof window !== "undefined") {
 }
 
 const GAME_FPS = 24;
-const GAME_DURATION = GAME_FPS * 60;
+const GAME_DURATION = GAME_FPS * 30;
 
 function slist_to_array(slist) {
   var array = [];
@@ -188,11 +188,11 @@ function render_lights(lit) {
 function render_thing(thing) {
   thing(
     fun => pid => mid => act =>
-    stt => nam => lit => tik =>
-    pos => mov => bst => wlk =>
-    dir => trg => vel => box =>
-    dmg => knk => chi => hit =>
-    res => die => {
+    sid => stt => nam => lit =>
+    tik => pos => mov => bst =>
+    wlk => dir => trg => vel =>
+    box => mhp => dmg => knk =>
+    chi => hit => res => die => {
     // Renders model voxels
     var max_z = 0;
     if (mid !== 0xFFFFFFFF) {
@@ -204,7 +204,11 @@ function render_thing(thing) {
     render_hits(hit);
 
     // Renders hitbox
-    render_hitbox(pos, dir, box);
+    render_hitbox(pos, dir, box, 
+      sid === 1 ? 0xA0F0A0FF :
+      sid === 2 ? 0xA0A0F0FF :
+      sid === 3 ? 0xA0F0F0FF :
+      0xA0A0A0FF);
 
     // Renders lights
     render_lights(lit);
@@ -212,7 +216,9 @@ function render_thing(thing) {
     // Renders HUD
     hud.push({
       pos: pos(x=>y=>z=>({x,y,z})),
+      sid: sid,
       dmg: dmg,
+      mhp: mhp,
       nam: sstring_to_string(nam),
       hei: max_z,
     });
@@ -295,14 +301,14 @@ function parse_command(code, idx=0) {
 }
 
 function parse_player(player) {
-  var team;
+  var side;
   switch(player[0]) {
-    case "<": team = "red"; break;
-    case "^": team = "spec"; break;
-    case ">": team = "blue"; break;
+    case "<": side = "<"; break;
+    case "^": side = "^"; break;
+    case ">": side = ">"; break;
   }
   var [name,hero] = player.slice(1).split("!");
-  return {team,name,hero};
+  return {side,name,hero};
 }
 
 // Parses a player turn code into an array of player inputs
@@ -420,18 +426,18 @@ function execute_command(inp, game) {
   return TA.exec_command(cmd)(game);
 }
 
-function make_thing([name, {pid,dmg,pos,nam}]) {
+function make_thing([name, {pid,sid,pos,nam}]) {
   var thing;
   name = name.toLowerCase();
   thing = TA.new_thing;
   if (TA[name+"_fun"]) {
     thing = TA.set_thing_fun(thing)(TA[name+"_fun"]);
   }
+  if (sid !== undefined) {
+    thing = TA.set_thing_sid(thing)(sid);
+  }
   if (pid !== undefined) {
     thing = TA.set_thing_pid(thing)(pid);
-  }
-  if (dmg !== undefined) {
-    thing = TA.set_thing_dmg(thing)(dmg);
   }
   if (pos !== undefined) {
     thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));

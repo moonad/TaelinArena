@@ -36,7 +36,7 @@ class Main extends Component {
     this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
-    this.pick_hero("Finn");
+    this.pick_hero("Dorime");
     this.login();
   }
 
@@ -75,7 +75,7 @@ class Main extends Component {
         var game = this.game_list[gid];
         if (game) {
           var game_curr_time = (Date.now() - game.init)/1000;
-          var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+3;
+          var game_stop_time = TA.GAME_DURATION/TA.GAME_FPS+1;
           // If it is still running, join and return it
           if (game_curr_time < game_stop_time) {
             return this.join(gid);
@@ -160,20 +160,34 @@ class Main extends Component {
     if (!this.game || this.game.gid !== gid) {
       var things;
       if (gid === TA.OFF_GAME) {
-        things = [
-          [this.picked_hero, {pid:0, dmg:0, pos:{x:-64,y:0,z:0}, nam:this.picked_hero}],
-          ["Poste", {pos:{x:0,y:0,z:0}, nam:"Poste"}],
-          ["PPG", {pos:{x:64,y:0,z:0}, dmg:0, nam:"PPG"}],
-          ["Wall", {pos:{x:-64,y:-64,z:0}, nam:"Wall"}],
-        ];
+        things = [];
+        things.push([this.picked_hero, {
+          pid: 0,
+          sid: 1,
+          pos: {x:-64,y:0,z:0},
+          nam: this.picked_hero,
+        }]);
+        things.push(["Poste", {
+          pos: {x:0,y:0,z:0},
+          nam: "Poste",
+        }]);
+        things.push(["PunchingBag", {
+          pos: {x:64,y:0,z:0},
+          sid: 3,
+          nam: "PunchingBag",
+        }]);
+        things.push(["Wall", {
+          pos:{x:-64,y:-64,z:0},
+          nam:"Wall",
+        }]);
       } else {
         things = this.game_list[gid].players.split(",");
         things = things.map(TA.parse_player);
-        things = things.map(p => p.hero);
-        things = things.map((name, idx) => {
-          return [name, {
+        things = things.map(({name,hero,side}, idx) => {
+          return [hero, {
+            sid: ({"^":0,"<":1,">":2})[side]||0,
             pid: idx,
-            pos: {x: -64 + idx*64, y: 0, z: 0},
+            pos: {x: -64 + idx*64, y: 64, z: 0},
             nam: name,
           }];
         });
@@ -400,7 +414,7 @@ class Main extends Component {
           if (res.ctr === "ok") {
             this.name = res.name;
             // TODO: proper signatures
-            for (let t = 125; t <= 4000; t *= 2) {
+            for (let t = 125; t <= 16000; t = Math.floor(t*1.5)) {
               setTimeout(() => this.post("+"+this.name), t);
             }
             this.forceUpdate();
@@ -499,25 +513,6 @@ class Main extends Component {
       top_lft,
       top_rgt,
     ]);
-
-    // Game hud
-    //var hud = [];
-    //console.log("....", this.hud);
-    //for (var i = 0; i < this.hud.length; ++i) {
-      //var hud_el = this.hud[i];
-      //switch (hud_el.ctor) {
-        //case "rect":
-          //hud.push(h("div", {"style": {
-            //"position": "absolute",
-            //"left": hud_el.x+"px",
-            //"top": hud_el.y+"px",
-            //"width": hud_el.w+"px",
-            //"height": hud_el.h+"px",
-            //"background": hud_el.col,
-          //}}, ["x"]));
-          //break;
-      //}
-    //}
 
     // Game screen
     if (this.canvox) {

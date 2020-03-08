@@ -10,7 +10,7 @@ enum
 | BLESKAPE_TAUNT
 
 bleskape_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 1.6)
+  let self = self <= thing(mov = 1.6, mhp = 24)
 
   case self |thing switch self.act
 
