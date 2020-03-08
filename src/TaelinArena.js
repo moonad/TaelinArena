@@ -191,8 +191,9 @@ function render_thing(thing) {
     sid => stt => nam => lit =>
     tik => pos => mov => bst =>
     wlk => dir => trg => vel =>
-    box => mhp => dmg => knk =>
-    chi => hit => res => die => {
+    box => wei => mhp => dmg =>
+    knk => chi => hit => res =>
+    die => {
     // Renders model voxels
     var max_z = 0;
     if (mid !== 0xFFFFFFFF) {

@@ -165,7 +165,9 @@ exec_turn(gm: Game) : Game
     let this = this <= thing(
       pos = add_v3(pos, knk),
       knk = if len_v3(knk) > 0
-        then scale_v3(max(len_v3(knk)-1,0), norm_v3(knk))
+        then
+          let force = max(len_v3(knk) - this.wei, 0)
+          scale_v3(force, norm_v3(knk))
         else knk)
 
     // Calls the transaction function

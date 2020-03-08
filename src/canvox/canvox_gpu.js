@@ -201,7 +201,7 @@ function canvox() {
         if (ray.z <= 0.0) {
           hit.ctr = HIT;
           hit.pos = ray;
-          hit.val = 0xFCFCFCu & VAL;
+          hit.val = 0xB0B0B0u & VAL;
           return hit;
         }
         // Misses if travelled more than maximum dist

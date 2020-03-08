@@ -53,6 +53,7 @@ T Thing
   trg : V3,          // targeted position
   vel : V3,          // dash velocity vector
   box : Hitbox,      // hitbox (space occupied)
+  wei : Number,      // weight (affects friction)
   mhp : Number,      // max health points
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
@@ -97,6 +98,7 @@ new_thing : Thing
     v3(0,0,0),  // trg
     v3(0,0,0),  // vel
     cbox(12),   // box
+    1,          // wei
     24,         // mhp
     0,          // dmg
     v3(0,0,0),  // knk
