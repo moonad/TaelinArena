@@ -6,8 +6,12 @@ enum
 | KAKASHI_TELEPORT
 | KAKASHI_FIREBALL_CASTING
 | KAKASHI_RAIKIRI
-| KAKASHI_TAUNT
 | KAKASHI_BLOCK
+| KAKASHI_TAUNT
+
+
+short_dist : Number
+  100
 
 kakashi_fun(self: Thing) : Thing
   let self = self <= thing(mov = 4)
@@ -21,35 +25,54 @@ kakashi_fun(self: Thing) : Thing
 
   // Left 
   |KAKASHI_PAKKUN_ATTACK
-    animate(self, 0, KAKASHI_PAKKUN_ATTACK_000, 26, 52)
+    let self = animate(self, 0, KAKASHI_PAKKUN_ATTACK_000, 26, 52)
+    let effs = [damage(5)]
+    let hits = [hit(effs, at_dist(self, 85), self.dir, cbox(15))]
+    let self = cast(self, 40, hits)
+    self
 
   // Middle
   |KAKASHI_TELEPORT
     let self = animate(self, 1, KAKASHI_TELEPORT_000, 14, 28)
-    let self = blink(self, 18, self.trg)
+    let self = blink(self, 18, at_max_dist(self, short_dist))
     self
 
   // Right
   |KAKASHI_FIREBALL_CASTING
+    case self |thing
     let self = animate(self, 0, KAKASHI_FIREBALL_CASTING_000, 9, 18)
-    let fire = new_thing <= thing(fun=kakashi_fire_ball_effect)
-    let fire = fire <= thing(dir = targ_dir(self))
-    let self = spawn(self, 10, [move(fire, self.trg)])
+    let hits0 = [hit([damage(3)], at_dist(self, 45), self.dir, cbox(15))]
+    let hits1 = [hit([damage(3), repulse(10)], at_dist(self, 90), self.dir, cbox(30))]
+    let self = cast(self, 9, hits0)
+    let self = cast(self, 16, hits1)
+    let fire = new_thing <= thing(
+      fun = kakashi_fire_ball_effect,
+      pos = at_dist(self, 35), // probably we will have to change this
+      dir = self.dir,
+      vel = scale_v3(4, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 5, [fire])
     self
 
   // Space
-  // TODO: after finishing the ultimate, stay in that place
   |KAKASHI_RAIKIRI
-    animate(self, 1, KAKASHI_RAIKIRI_000, 24, 48)
+    let self = animate(self, 1, KAKASHI_RAIKIRI_000, 25, 50)
+    let hits0 = [hit([damage(4)], at_dist(self, 45), self.dir, cbox(10))]
+    let hits1 = [hit([damage(6)], at_dist(self, 90), self.dir, cbox(15))]
+    let self = cast(self, 35, hits0)
+    let self = cast(self, 42, hits1)
+    let self = blink(self, 49, at_dist(self, 80))
+    self
 
-  | KAKASHI_TAUNT
-    animate(self, 0, KAKASHI_TAUNT_000, 19, 19)
-
+  // Space
   | KAKASHI_BLOCK
     animate(self, 1, KAKASHI_BLOCK_000, 15, 30)
+
+  // E
+  | KAKASHI_TAUNT
+    animate(self, 0, KAKASHI_TAUNT_000, 19, 19)
 
   else self
 
 kakashi_fire_ball_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, KAKASHI_FIREBALL_EFFECT_000, 11, 22)
-  self
+  animate_die(self, 0, KAKASHI_FIREBALL_EFFECT_000, 11, 22)

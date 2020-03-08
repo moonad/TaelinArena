@@ -1018,6 +1018,7 @@ module.exports = [
   ()=>import("./../../models/kakashi/raikiri/021.json"),
   ()=>import("./../../models/kakashi/raikiri/022.json"),
   ()=>import("./../../models/kakashi/raikiri/023.json"),
+  ()=>import("./../../models/kakashi/raikiri/024.json"),
   ()=>import("./../../models/kakashi/run/000.json"),
   ()=>import("./../../models/kakashi/run/001.json"),
   ()=>import("./../../models/kakashi/run/002.json"),

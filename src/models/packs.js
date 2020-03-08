@@ -33,110 +33,110 @@ module.exports = {
   },
   "kakashi": {
     "from": 927,
-    "til": 1057
+    "til": 1058
   },
   "kenko": {
-    "from": 1057,
-    "til": 1230
+    "from": 1058,
+    "til": 1231
   },
   "konan": {
-    "from": 1230,
-    "til": 1342
+    "from": 1231,
+    "til": 1343
   },
   "luffy": {
-    "from": 1342,
-    "til": 1443
+    "from": 1343,
+    "til": 1444
   },
   "mando": {
-    "from": 1443,
-    "til": 1611
+    "from": 1444,
+    "til": 1612
   },
   "mechwarrior": {
-    "from": 1611,
-    "til": 1718
+    "from": 1612,
+    "til": 1719
   },
   "mikegator": {
-    "from": 1718,
-    "til": 1790
+    "from": 1719,
+    "til": 1791
   },
   "min": {
-    "from": 1790,
-    "til": 1862
+    "from": 1791,
+    "til": 1863
   },
   "pichu": {
-    "from": 1862,
-    "til": 1965
+    "from": 1863,
+    "til": 1966
   },
   "pikachu": {
-    "from": 1965,
-    "til": 2070
-  },
-  "poste": {
-    "from": 2070,
+    "from": 1966,
     "til": 2071
   },
-  "ppg": {
+  "poste": {
     "from": 2071,
-    "til": 2233
+    "til": 2072
+  },
+  "ppg": {
+    "from": 2072,
+    "til": 2234
   },
   "punch_object": {
-    "from": 2233,
-    "til": 2338
+    "from": 2234,
+    "til": 2339
   },
   "raichu": {
-    "from": 2338,
-    "til": 2441
+    "from": 2339,
+    "til": 2442
   },
   "ray": {
-    "from": 2441,
-    "til": 2515
+    "from": 2442,
+    "til": 2516
   },
   "shao": {
-    "from": 2515,
-    "til": 2622
+    "from": 2516,
+    "til": 2623
   },
   "squirtle": {
-    "from": 2622,
-    "til": 2754
+    "from": 2623,
+    "til": 2755
   },
   "sr_madruga": {
-    "from": 2754,
-    "til": 2876
+    "from": 2755,
+    "til": 2877
   },
   "steve": {
-    "from": 2876,
-    "til": 3008
+    "from": 2877,
+    "til": 3009
   },
   "teichi": {
-    "from": 3008,
-    "til": 3138
+    "from": 3009,
+    "til": 3139
   },
   "tophoro": {
-    "from": 3138,
-    "til": 3259
+    "from": 3139,
+    "til": 3260
   },
   "tupitree": {
-    "from": 3259,
-    "til": 3413
-  },
-  "wall": {
-    "from": 3413,
+    "from": 3260,
     "til": 3414
   },
-  "wartortle": {
+  "wall": {
     "from": 3414,
-    "til": 3552
+    "til": 3415
+  },
+  "wartortle": {
+    "from": 3415,
+    "til": 3553
   },
   "young_link": {
-    "from": 3552,
-    "til": 3581
+    "from": 3553,
+    "til": 3582
   },
   "zagatur": {
-    "from": 3581,
-    "til": 3669
+    "from": 3582,
+    "til": 3670
   },
   "zoio": {
-    "from": 3669,
-    "til": 3768
+    "from": 3670,
+    "til": 3769
   }
 }
