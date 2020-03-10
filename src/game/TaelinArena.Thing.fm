@@ -8,6 +8,7 @@ import TaelinArena.Thing.Finn
 import TaelinArena.Thing.Gastly
 import TaelinArena.Thing.Gon
 import TaelinArena.Thing.Grimer
+import TaelinArena.Thing.Jinx
 import TaelinArena.Thing.Kakashi 
 import TaelinArena.Thing.Kenko
 import TaelinArena.Thing.Konan

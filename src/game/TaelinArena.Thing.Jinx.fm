@@ -1,0 +1,158 @@
+import TaelinArena.Game
+
+enum
+| JINX_IDLE
+| JINX_GATLING
+| JINX_FLAMING_BITE
+| JINX_POW
+| JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH
+| JINX_ZAP
+| JINX_TAUNT
+
+medium_dist : Number
+  200
+long_dist : Number
+  300
+
+jinx_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |JINX_IDLE
+    if is_walking(self)
+    then animate(self, 1, JINX_WALK_000, 7, 14)
+    else animate(self, 1, JINX_IDLE_000, 4, 16)
+
+  // Left 
+  |JINX_GATLING
+    let self = animate(self, 0, JINX_GATLING_CAST_ANIMATION_000, 4, 12)
+    let proj = new_thing <= thing(
+      fun = jinx_gatling_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(15, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 8, [proj])
+    self
+
+  // Middle
+  |JINX_FLAMING_BITE
+    // let self = animate_between(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 3, 12, 3) // dur: 6
+    // let self = animate_between(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_003, 3, 12, 6)
+    // let self = reset(self, 23)
+    let self = animate(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 6, 24)
+    let trap0 = new_thing <= thing(
+      fun = jinx_flaming_bite_fun,
+      pos = at_dist(self, 60),
+      dir = self.dir,
+      box = nbox)
+    let trap1 = new_thing <= thing(
+      fun = jinx_flaming_bite_idle_fun,
+      pos = at_dist(self, 60),
+      dir = self.dir,
+      box = nbox)
+    let trap2 = new_thing <= thing(
+      fun = jinx_flaming_bite_end_fun,
+      pos = at_dist(self, 60),
+      dir = self.dir,
+      box = nbox)
+    let self = spawn(self, 3, [trap0])
+    let self = spawn(self, 10, [trap1])
+    let self = spawn(self, 23, [trap2])
+    self
+
+  // Right
+  |JINX_POW
+    let self = animate(self, 0, JINX_POW_CAST_ANIMATION_000, 5, 15)
+    let proj = new_thing <= thing(
+      fun = jinx_pow_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(12, targ_dir(self)),
+      box = nbox)
+    let explo = new_thing <= thing(
+      fun = jinx_pow_explosion_fun,
+      pos = at_dist(self, 90),
+      dir = self.dir,
+      box = nbox)
+    let self = spawn(self, 5, [proj])
+    let self = spawn(self, 14, [explo])
+    self
+
+  // Q
+  // TOOD: ajust position that the missile is being throw
+  |JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH
+    let self = animate(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_CAST_ANIMATION_000, 12, 36)
+    let proj = new_thing <= thing(
+      fun = jinx_ultimate_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let explo = new_thing <= thing(
+      fun = jinx_ultimate_explo_fun,
+      pos = at_dist(self, 120),
+      dir = self.dir,
+      box = nbox)
+    let self = spawn(self, 12, [proj])
+    let self = spawn(self, 32, [explo])
+    self
+    
+  // Space
+  | JINX_ZAP
+    let self = animate(self, 0, JINX_ZAP_CAST_ANIMATION_000, 11, 22)
+    let proj = new_thing <= thing(
+      fun = jinx_zap_proj_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(15, targ_dir(self)),
+      box = nbox)
+    let path = new_thing <= thing(
+      fun = jinx_zap_path_fun,
+      pos = at_dist(self, 30),
+      dir = self.dir,
+      box = nbox)
+    let self = spawn(self, 6, [proj])
+    let self = spawn(self, 15, [path])
+    self
+
+
+  // E
+  | JINX_TAUNT
+    animate(self, 0, JINX_TAUNT_000, 12, 24)
+
+  else self
+
+jinx_gatling_fun(self: Thing) : Thing 
+  animate_die(self, 0, JINX_GATLING_PROJECTILE_000, 3, 6)
+
+// Flaming bite
+jinx_flaming_bite_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_FLAMING_BITE_TRAP_HITTING_THE_FLOOR_000, 4, 8)
+
+jinx_flaming_bite_idle_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_FLAMING_BITE_TRAP_IDLE_000, 3, 18)
+
+jinx_flaming_bite_end_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_FLAMING_BITE_TRAP_END_000, 6, 12)
+
+jinx_pow_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_POW_PROJECTILE_000, 3, 9)
+
+jinx_pow_explosion_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_POW_EXPLOSION_000, 4, 8)
+
+// Zap
+jinx_zap_proj_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_ZAP_PROJECTILE_000, 3, 6)
+
+jinx_zap_path_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_ZAP_PATH_000, 5, 5)
+
+// Ulti
+jinx_ultimate_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_PROJECTILE_000, 1, 10)
+
+jinx_ultimate_explo_fun(self: Thing) : Thing
+  animate_die(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_COLISSION_000, 9, 18)

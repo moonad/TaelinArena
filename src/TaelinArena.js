@@ -500,6 +500,7 @@ var heroes = [
   "Gastly",
   "Gon",
   "Grimer",
+  "Jinx",
   "Kakashi",
   "Kenko",
   "Konan",
