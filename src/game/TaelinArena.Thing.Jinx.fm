@@ -37,10 +37,8 @@ jinx_fun(self: Thing) : Thing
     self
 
   // Middle
+  // TODO: Adjust time to throw the trap. Use animate_between
   |JINX_FLAMING_BITE
-    // let self = animate_between(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 3, 12, 3) // dur: 6
-    // let self = animate_between(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_003, 3, 12, 6)
-    // let self = reset(self, 23)
     let self = animate(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 6, 24)
     let trap0 = new_thing <= thing(
       fun = jinx_flaming_bite_fun,
@@ -92,11 +90,11 @@ jinx_fun(self: Thing) : Thing
       box = nbox)
     let explo = new_thing <= thing(
       fun = jinx_ultimate_explo_fun,
-      pos = at_dist(self, 120),
+      pos = at_dist(self, 150),
       dir = self.dir,
       box = nbox)
-    let self = spawn(self, 12, [proj])
-    let self = spawn(self, 32, [explo])
+    let self = spawn(self, 22, [proj])
+    let self = spawn(self, 35, [explo])
     self
     
   // Space
@@ -113,8 +111,8 @@ jinx_fun(self: Thing) : Thing
       pos = at_dist(self, 30),
       dir = self.dir,
       box = nbox)
-    let self = spawn(self, 6, [proj])
-    let self = spawn(self, 15, [path])
+    let self = spawn(self, 6, [path])
+    let self = spawn(self, 13, [proj])
     self
 
 
@@ -145,14 +143,14 @@ jinx_pow_explosion_fun(self: Thing) : Thing
 
 // Zap
 jinx_zap_proj_fun(self: Thing) : Thing
-  animate_die(self, 0, JINX_ZAP_PROJECTILE_000, 3, 6)
+  animate_die(self, 0, JINX_ZAP_PROJECTILE_000, 3, 12)
 
 jinx_zap_path_fun(self: Thing) : Thing
   animate_die(self, 0, JINX_ZAP_PATH_000, 5, 5)
 
 // Ulti
 jinx_ultimate_fun(self: Thing) : Thing
-  animate_die(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_PROJECTILE_000, 1, 10)
+  animate_die(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_PROJECTILE_000, 8, 16)
 
 jinx_ultimate_explo_fun(self: Thing) : Thing
   animate_die(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_COLISSION_000, 9, 18)
