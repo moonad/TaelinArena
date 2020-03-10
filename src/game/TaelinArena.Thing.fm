@@ -30,3 +30,4 @@ import TaelinArena.Thing.Tupitree
 import TaelinArena.Thing.Wall
 import TaelinArena.Thing.Zagatur
 import TaelinArena.Thing.Zoio
+import TaelinArena.Thing.Grimer

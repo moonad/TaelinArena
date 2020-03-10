@@ -498,6 +498,7 @@ var heroes = [
   "Finn",
   "Gastly",
   "Gon",
+  "Grimer",
   "Kakashi",
   "Kenko",
   "Konan",
@@ -518,6 +519,7 @@ var heroes = [
   "Tupitree",
   "Zagatur",
   "Zoio",
+  "Grimer",
 ];
 
 var hero_name = {};
