@@ -2,6 +2,7 @@ import TaelinArena.Game
 import TaelinArena.ModelIds
 import TaelinArena.Thing.Benfix
 import TaelinArena.Thing.Bleskape 
+import TaelinArena.Thing.Dilma
 import TaelinArena.Thing.Dorime
 import TaelinArena.Thing.Finn
 import TaelinArena.Thing.Gastly
@@ -30,4 +31,3 @@ import TaelinArena.Thing.Tupitree
 import TaelinArena.Thing.Wall
 import TaelinArena.Thing.Zagatur
 import TaelinArena.Thing.Zoio
-import TaelinArena.Thing.Grimer

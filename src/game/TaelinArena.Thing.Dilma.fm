@@ -1,0 +1,73 @@
+import TaelinArena.Game
+
+enum
+| DILMA_IDLE
+| DILMA_PROTECTION
+| DILMA_CONFUSION
+| DILMA_SALUTING_THE_CASSAVA
+| DILMA_STOCKING_WIND
+| DILMA_EXTRA
+| DILMA_TAUNT
+
+medium_dist : Number
+  200
+long_dist : Number
+  300
+
+dilma_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |DILMA_IDLE
+    if is_walking(self)
+    then animate(self, 1, DILMA_WALK_000, 8, 16)
+    else animate(self, 1, DILMA_IDLE_000, 4, 16)
+
+  // Left 
+  |DILMA_PROTECTION
+    let self = animate_between(self, 0, DILMA_PROTECTION_000, 6, 3, 7)
+    let self = animate_between(self, 0, DILMA_PROTECTION_007, 5, 28, 14)
+    let self = reset(self, 27)
+    self 
+
+  // Middle
+  |DILMA_CONFUSION
+    let self = animate(self, 0, DILMA_CONFUSION_CASTING_000, 19, 38)
+    let speech = new_thing <= thing(fun=dilma_confusion_fun, dir=targ_dir(self))
+    let self = spawn(self, 25, [move(speech, at_max_dist(self, 80))])
+    self
+
+  // Right
+  |DILMA_SALUTING_THE_CASSAVA
+    animate(self, 0, DILMA_SALUTING_THE_CASSAVA_000, 18, 54)
+
+  // Q
+  |DILMA_STOCKING_WIND
+    let new_pos = self.pos
+    let self = animate(self, 0, DILMA_STOCKING_WIND_CASTING_000, 10, 30)
+    let wind = new_thing <= thing(
+      fun = dilma_stocking_wind_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(6, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 8, [wind])
+    self
+
+  // Space
+  | DILMA_EXTRA
+    animate(self, 1, DILMA_IDLE_000, 4, 16)
+
+  // E
+  | DILMA_TAUNT
+    animate(self, 0, DILMA_TAUNT_000, 6, 18)
+
+  else self
+
+
+dilma_confusion_fun(self: Thing) : Thing
+  animate_die(self, 0, DILMA_CONFUSION_ANIM_000, 4, 16)
+
+dilma_stocking_wind_fun(self: Thing) : Thing
+  animate_die(self, 0, DILMA_STOCKING_WIND_ANIM_000, 3, 15)
