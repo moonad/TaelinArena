@@ -497,6 +497,7 @@ var heroes = [
   "Dorime",
   "Finn",
   "Gastly",
+  "Gon",
   "Kakashi",
   "Kenko",
   "Konan",

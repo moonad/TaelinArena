@@ -364,3 +364,18 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 is_walking(this: Thing) : Number
   case this |thing
   len_v3(this.pad) > 0
+
+// Spawns another thing
+// - self: thing that will create another thing
+// - at_tik: number of the tik when thing will be created
+// - at_pos: position on which thing will be created
+// - thing: thing that will be created
+create_at(
+  self   : Thing,
+  at_tik : Number
+  new_thing: TxFunction)
+  case self |thing
+  if self.tik === at_tik then
+    self <= thing(fun=new_thing, pid=self.pid, pos=self.pos)
+  else 
+    self
