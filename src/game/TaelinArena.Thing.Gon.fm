@@ -32,7 +32,15 @@ gon_fun(self: Thing) : Thing
 
   // Middle
   |GON_PAPER
-    animate(self, 0, GON_FREECS_JAJANKEN_PAPER_000, 22, 44)
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_PAPER_CASTING_000, 17, 34)
+    let fire = new_thing <= thing(
+      fun = gon_paper_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 25, [fire])
+    self
 
   // Right
   |GON_SCISSOR
@@ -62,7 +70,8 @@ gon_fun(self: Thing) : Thing
 
   else self
 
-
+gon_paper_fun(self: Thing) : Thing 
+  animate_die(self, 0, GON_FREECS_JAJANKEN_PAPER_PROJECTILE_000, 8, 16)
 
 // Transformed Gon
 // ---------------
