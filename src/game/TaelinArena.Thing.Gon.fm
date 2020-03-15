@@ -1,0 +1,130 @@
+import TaelinArena.Game
+
+enum
+| GON_IDLE
+| GON_STONE
+| GON_PAPER
+| GON_SCISSOR
+| GON_MAX_POWER
+| GON_INTENSIFICATION
+| GON_TAUNT
+
+medium_dist : Number
+  200
+long_dist : Number
+  300
+
+gon_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |GON_IDLE
+    if is_walking(self)
+    then animate(self, 1, GON_FREECS_WALK_000, 6, 12)
+    else animate(self, 1, GON_FREECS_IDLE_000, 16, 32)
+
+  // Left 
+  |GON_STONE
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_STONE_000, 23, 46)
+    let self = blink(self, 43, at_max_dist(self, 55))
+    self
+
+  // Middle
+  |GON_PAPER
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_PAPER_CASTING_000, 17, 34)
+    let fire = new_thing <= thing(
+      fun = gon_paper_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 25, [fire])
+    self
+
+  // Right
+  |GON_SCISSOR
+    animate(self, 0, GON_FREECS_JAJANKEN_SCISSORS_000, 18, 36)
+
+  // Q
+  |GON_MAX_POWER
+    let new_pos = self.pos
+    let self = animate(self, 0, GON_FREECS_ULTIMATE_TRANSFORMATION_000, 16, 32)
+    // TODO: check why this function isn't working
+    // let self = create_at(self, 30, gon_transformed_fun)
+    // self
+    if self.tik === 30 then
+      let self = new_thing <= thing(fun=gon_transformed_fun, pid=self.pid) // Gon transformed
+      let self = self <= thing(pos = new_pos)
+      self
+    else 
+      self
+
+  // Space
+  | GON_INTENSIFICATION
+    animate(self, 1, GON_FREECS_INTENSIFICATION_000, 10, 30)
+
+  // E
+  | GON_TAUNT
+    animate(self, 0, GON_FREECS_TAUNT_000, 17, 34)
+
+  else self
+
+gon_paper_fun(self: Thing) : Thing 
+  animate_die(self, 0, GON_FREECS_JAJANKEN_PAPER_PROJECTILE_000, 8, 16)
+
+// Transformed Gon
+// ---------------
+gon_transformed_fun(self: Thing) : Thing
+    let self = self <= thing(mov = 1.5)
+
+  case self |thing switch self.act
+
+  |GON_IDLE
+    if is_walking(self)
+    then animate(self, 1, GON_FREECS_TRANSFORMED_WALK_000, 8, 16)
+    else animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 27)
+
+  // Left 
+  |GON_STONE
+    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, 17, 34)
+    let self = blink(self, 33, at_max_dist(self, 60))
+    self
+
+  // Middle
+  |GON_PAPER
+    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_010, 16, 32)
+    let fire = new_thing <= thing(
+      fun = gon_t_paper_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 8, [fire])
+    self
+
+  // Right
+  |GON_SCISSOR
+    animate(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_000, 19, 38)
+
+  // Q
+  |GON_MAX_POWER
+    let new_pos = self.pos
+    // let self = self <= thing(die = true)
+    let self = new_thing <= thing(fun=gon_fun, pid=self.pid) // Gon
+    let self = self <= thing(pos = new_pos)
+    self
+
+  // Space
+  | GON_INTENSIFICATION
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
+
+  // E
+  | GON_TAUNT
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
+
+
+  else self
+
+gon_t_paper_fun(self: Thing) : Thing
+  animate_die(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_PROJETIL_000, 8, 16)

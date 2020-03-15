@@ -1,0 +1,126 @@
+import TaelinArena.Game
+
+enum
+| GRIMER_IDLE
+| GRIMER_EARTH_BALL
+| GRIMER_INVINCIBLE_MUD
+| GRIMER_MUD_SHIELD
+| GRIMER_MUD_TSUNAMI
+| GRIMER_EXTRA
+| GRIMER_TAUNT
+
+grimer_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2.5, mhp = 24)
+
+  case self |thing switch self.act
+
+  |GRIMER_IDLE
+    if is_walking(self)
+    then animate(self, 1, GRIMER_WALK_000, 7, 14)
+    else animate(self, 1, GRIMER_IDLE_000, 7, 14)
+
+  // Left 
+  |GRIMER_EARTH_BALL
+    let self = animate(self, 1, GRIMER_EARTH_BALL_CAST_000, 11, 22)
+    let ball = new_thing <= thing(
+      fun = earth_ball_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 8, [ball])
+    self 
+
+  // Middle
+  |GRIMER_INVINCIBLE_MUD
+    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 38)
+    self
+
+  // Right
+  |GRIMER_MUD_SHIELD
+    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 60)
+    self
+
+  // Q
+  |GRIMER_MUD_TSUNAMI
+    let self = animate(self, 1, GRIMER_MUD_TSUNAMI_000, 17, 34)
+    self
+
+  // Space
+  | GRIMER_EXTRA
+    let self = new_thing <= thing(fun=muk_fun, pid=self.pid, pos=self.pos) // Muk
+    self
+
+  // E
+  | GRIMER_TAUNT
+    animate(self, 0, GRIMER_TAUNT_000, 15, 30)
+
+
+  else self
+
+
+// Effects
+earth_ball_fun(self: Thing) : Thing 
+  animate_die(self, 1, GRIMER_EARTH_BALL_EFFECT_000, 7, 14)
+
+
+
+// MUK
+// ---- 
+
+enum
+| MUK_IDLE
+| MUK_EARTH_BALL
+| MUK_INVINCIBLE_MUD
+| MUK_MUD_SHIELD
+| MUK_MUD_TSUNAMI
+| MUK_EXTRA
+| MUK_TAUNT
+
+muk_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2, mhp = 24)
+
+  case self |thing switch self.act
+
+  |MUK_IDLE
+    if is_walking(self)
+    then animate(self, 1, MUK_WALK_000, 8, 24)
+    else animate(self, 1, MUK_IDLE_000, 8, 24)
+
+  // Left 
+  |MUK_EARTH_BALL
+    let self = animate(self, 1, MUK_EARTH_BALL_CAST_000, 12, 24)
+    let ball = new_thing <= thing(
+      fun = earth_ball_fun,
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 8, [ball])
+    self 
+
+  // Middle
+  |MUK_INVINCIBLE_MUD
+    let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 52)
+    self
+
+  // Right
+  |MUK_MUD_SHIELD
+    let self = animate(self, 0, MUK_MUD_SHIELD_000, 24, 48)
+    self
+
+  // Q
+  |MUK_MUD_TSUNAMI
+    let self = animate(self, 1, MUK_MUD_TSUNAMI_000, 19, 38)
+    self
+
+  // Space
+  | MUK_EXTRA
+    animate(self, 1, MUK_IDLE_000, 8, 16)
+
+  // E
+  | MUK_TAUNT
+    animate(self, 0, MUK_TAUNT_000, 18, 36)
+
+
+  else self

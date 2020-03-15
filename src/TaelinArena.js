@@ -494,9 +494,13 @@ function GameRunner(gid, things) {
 var heroes = [
   "Benfix",
   "Bleskape",
+  "Dilma",
   "Dorime",
   "Finn",
   "Gastly",
+  "Gon",
+  "Grimer",
+  "Jinx",
   "Kakashi",
   "Kenko",
   "Konan",
