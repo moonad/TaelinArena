@@ -54,14 +54,14 @@ kakashi_fun(self: Thing) : Thing
     let self = spawn(self, 5, [fire])
     self
 
-  // Space
+  // Q
   |KAKASHI_RAIKIRI
     let self = animate(self, 1, KAKASHI_RAIKIRI_000, 25, 50)
     let hits0 = [hit([damage(4)], at_dist(self, 45), self.dir, cbox(10))]
     let hits1 = [hit([damage(6)], at_dist(self, 90), self.dir, cbox(15))]
     let self = cast(self, 35, hits0)
     let self = cast(self, 42, hits1)
-    let self = blink(self, 49, at_dist(self, 80))
+    let self = blink(self, 49, at_dist(self, 90))
     self
 
   // Space
