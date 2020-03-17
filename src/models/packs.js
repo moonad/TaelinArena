@@ -40,127 +40,135 @@ module.exports = {
     "til": 1326
   },
   "grimer": {
-    "from": 1326,
-    "til": 1455
+    "from": 1173,
+    "til": 1302
   },
   "haunter": {
-    "from": 1455,
-    "til": 1541
+    "from": 1302,
+    "til": 1388
   },
   "jinx": {
-    "from": 1541,
-    "til": 1660
+    "from": 1388,
+    "til": 1507
   },
   "kakashi": {
-    "from": 1660,
-    "til": 1791
+    "from": 1507,
+    "til": 1638
   },
   "kenko": {
-    "from": 1791,
-    "til": 1964
+    "from": 1638,
+    "til": 1811
   },
   "konan": {
-    "from": 1964,
-    "til": 2076
+    "from": 1811,
+    "til": 1923
+  },
+  "link": {
+    "from": 1923,
+    "til": 2069
   },
   "luffy": {
-    "from": 2076,
-    "til": 2177
+    "from": 2069,
+    "til": 2170
   },
   "mando": {
-    "from": 2177,
-    "til": 2345
+    "from": 2170,
+    "til": 2338
   },
   "mechwarrior": {
-    "from": 2345,
-    "til": 2452
+    "from": 2338,
+    "til": 2445
   },
   "mikegator": {
-    "from": 2452,
-    "til": 2524
+    "from": 2445,
+    "til": 2517
   },
   "min": {
-    "from": 2524,
-    "til": 2596
+    "from": 2517,
+    "til": 2589
   },
   "muk": {
-    "from": 2596,
-    "til": 2721
+    "from": 2589,
+    "til": 2714
   },
   "pichu": {
-    "from": 2721,
-    "til": 2824
+    "from": 2714,
+    "til": 2817
   },
   "pikachu": {
-    "from": 2824,
-    "til": 2929
+    "from": 2817,
+    "til": 2922
   },
   "poste": {
-    "from": 2929,
-    "til": 2930
+    "from": 2922,
+    "til": 2923
   },
   "ppg": {
-    "from": 2930,
-    "til": 3092
+    "from": 2923,
+    "til": 3085
   },
   "punchingbag": {
-    "from": 3092,
-    "til": 3116
+    "from": 3085,
+    "til": 3109
   },
   "raichu": {
-    "from": 3116,
-    "til": 3219
+    "from": 3109,
+    "til": 3212
   },
   "ray": {
-    "from": 3219,
-    "til": 3293
+    "from": 3212,
+    "til": 3286
+  },
+  "ryu": {
+    "from": 3286,
+    "til": 3449
   },
   "shao": {
-    "from": 3293,
-    "til": 3400
+    "from": 3449,
+    "til": 3556
   },
   "squirtle": {
-    "from": 3400,
-    "til": 3532
+    "from": 3556,
+    "til": 3688
   },
   "sr_madruga": {
-    "from": 3532,
-    "til": 3654
+    "from": 3688,
+    "til": 3810
   },
   "steve": {
-    "from": 3654,
-    "til": 3786
+    "from": 3810,
+    "til": 3942
   },
   "teichi": {
-    "from": 3786,
-    "til": 3916
+    "from": 3942,
+    "til": 4072
   },
   "tophoro": {
-    "from": 3916,
-    "til": 4037
+    "from": 4072,
+    "til": 4193
   },
   "tupitree": {
-    "from": 4037,
-    "til": 4191
+    "from": 4193,
+    "til": 4347
   },
   "wall": {
-    "from": 4191,
-    "til": 4192
+    "from": 4347,
+    "til": 4348
   },
   "wartortle": {
-    "from": 4192,
-    "til": 4330
+    "from": 4348,
+    "til": 4486
   },
   "young_link": {
-    "from": 4330,
-    "til": 4359
+    "from": 4486,
+    "til": 4515
   },
   "zagatur": {
-    "from": 4359,
-    "til": 4447
+    "from": 4515,
+    "til": 4603
   },
   "zoio": {
-    "from": 4447,
-    "til": 4546
+    "from": 4603,
+    "til": 4702
   }
 }

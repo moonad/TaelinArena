@@ -36,7 +36,7 @@ gon_fun(self: Thing) : Thing
     let fire = new_thing <= thing(
       fun = gon_paper_fun,
       pos = self.pos,
-      dir = self.dir,
+      dir = targ_dir(self),
       vel = scale_v3(10, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 25, [fire])
@@ -97,7 +97,7 @@ gon_transformed_fun(self: Thing) : Thing
     let fire = new_thing <= thing(
       fun = gon_t_paper_fun,
       pos = self.pos,
-      dir = self.dir,
+      dir = targ_dir(self),
       vel = scale_v3(10, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 8, [fire])

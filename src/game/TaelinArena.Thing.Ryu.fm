@@ -1,0 +1,77 @@
+import TaelinArena.Game
+
+enum
+| RYU_IDLE
+| RYU_SHORYUUKEN
+| RYU_RATETSURUGI
+| RYU_HADOUKEN
+| RYU_MEGA_HADOUKEN
+| RYU_ASHURA_SENKU
+| RYU_TAUNT
+
+ryu_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 20)
+
+  case self |thing switch self.act
+
+  | RYU_IDLE
+    if is_walking(self)
+    then animate(self, 1, RYU_WALK_000, 6, 12)
+    else animate(self, 1, RYU_IDLE_000, 7, 14)
+
+  // Left 
+  | RYU_SHORYUUKEN
+    let self = animate(self, 0, RYU_SHORYUUKEN_000, 26, 52)
+    let self = blink(self, 51, at_dist(self, 40))
+    self
+
+  // Middle
+  | RYU_RATETSURUGI
+    let self = animate(self, 0, RYU_RATETSURUGI_000, 28, 56)
+    self
+
+  // Right
+  | RYU_HADOUKEN
+    let self = animate(self, 0, RYU_HADOUKEN_CAST_000, 14, 28)
+    let effect = new_thing <= thing(
+      sid = self.sid,
+      fun = ryu_hadouken_fun,
+      vel = scale_v3(10, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 14, [effect])
+    self
+
+  // Q
+  | RYU_MEGA_HADOUKEN
+    let self = animate(self, 0, RYU_MEGA_HADOUKEN_CAST_000, 23, 46)
+    let char_dir = self.dir
+    let effect = new_thing <= thing(
+      sid = self.sid,
+      fun = ryu_mega_hadouken_fun,
+      vel = scale_v3(8, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = at_dist(self, 70),
+      box = nbox)
+    let self = spawn(self, 16, [effect])
+    let self = spawn(self, 30, [effect])
+    self
+
+  // Space
+  | RYU_ASHURA_SENKU
+    let self = animate(self, 1, RYU_ASHURA_SENKU_000, 15, 30)
+    let self = blink(self, 29, at_dist(self, 78))
+    self
+
+  // E
+  | RYU_TAUNT
+    animate(self, 0, RYU_TAUNT_000, 30, 60)
+
+  else self
+
+ryu_hadouken_fun(self: Thing) : Thing
+  let self = animate_die(self, 0, RYU_HADOUKEN_EFFECT_000, 4, 8)
+  self
+
+ryu_mega_hadouken_fun(self: Thing) : Thing
+  animate_die(self, 0, RYU_MEGA_HADOUKEN_EFFECT_000, 6, 12)
