@@ -35,6 +35,10 @@ module.exports = {
     "from": 927,
     "til": 1173
   },
+  "greninja": {
+    "from": 1173,
+    "til": 1326
+  },
   "grimer": {
     "from": 1173,
     "til": 1302
