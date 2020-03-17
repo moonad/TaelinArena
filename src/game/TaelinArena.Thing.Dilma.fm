@@ -33,9 +33,9 @@ dilma_fun(self: Thing) : Thing
 
   // Middle
   |DILMA_CONFUSION
-    let self = animate(self, 0, DILMA_CONFUSION_CASTING_000, 19, 38)
+    let self = animate(self, 0, DILMA_CONFUSION_CASTING_000, 19, 57)
     let speech = new_thing <= thing(fun=dilma_confusion_fun, dir=targ_dir(self))
-    let self = spawn(self, 25, [move(speech, at_max_dist(self, 80))])
+    let self = spawn(self, 25, [move(speech, at_max_dist(self, 100))])
     self
 
   // Right
@@ -49,7 +49,7 @@ dilma_fun(self: Thing) : Thing
     let wind = new_thing <= thing(
       fun = dilma_stocking_wind_fun,
       pos = self.pos,
-      dir = self.dir,
+      dir = targ_dir(self),
       vel = scale_v3(6, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 8, [wind])
@@ -67,7 +67,7 @@ dilma_fun(self: Thing) : Thing
 
 
 dilma_confusion_fun(self: Thing) : Thing
-  animate_die(self, 0, DILMA_CONFUSION_ANIM_000, 4, 16)
+  animate_die(self, 0, DILMA_CONFUSION_ANIM_000, 4, 20)
 
 dilma_stocking_wind_fun(self: Thing) : Thing
   animate_die(self, 0, DILMA_STOCKING_WIND_ANIM_000, 3, 15)

@@ -47,8 +47,8 @@ kakashi_fun(self: Thing) : Thing
     let self = cast(self, 16, hits1)
     let fire = new_thing <= thing(
       fun = kakashi_fire_ball_effect,
-      pos = at_dist(self, 35), // probably we will have to change this
-      dir = self.dir,
+      pos = at_dist(self, 35),
+      dir = targ_dir(self),
       vel = scale_v3(4, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 5, [fire])
