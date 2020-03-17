@@ -1,8 +1,6 @@
 Taelin Arena
 ============
 
-![Twitch Status](https://img.shields.io/twitch/status/maiavictor)
-
 Taelin Arena is an Multiplayer Online Battle Arena
 (MOBA) developed by [Sunshine
 Cybernetics](http://sunshinecybernetics.com/).
@@ -48,10 +46,17 @@ game aspects to be formally verified for correctness, making
 serious bugs and errors scarse. In other words, it achieves
 the highest score of code quality humanly possible.
 
-### Follow the updates!
-- [Twitter](https://twitter.com/maiavictr)
-- [YouTube](https://www.youtube.com/channel/UCWTVZkEGM3Mux8P4TtIeiEg/featured)
-- [Facebook](https://www.facebook.com/MaiaVictorDev/)
-- [Twitch - streams in Portuguese](https://www.twitch.tv/maiavictor/)
+### Usage
+1. You must have [Formality](https://github.com/moonad/formality), [NodeJS](https://nodejs.org) and [NPM](http://npmjs.com) installed
+2. Clone this repo
+3. Run `npm i`
+4. On the root directory, run `node src/server/server.js`
+4. Run `npm run build_models` to build the voxels models
+5. Run `npm run build` to build the project
+6. Access `localhost` on Brave, Chrome or similar browsers
 
-### [FAQ](FAQ.md)
+### Follow the updates!
+- [Twitter - Victor Maia](https://twitter.com/maiavictr)
+- [Twitter - TaelinArena](https://twitter.com/taelinarena)
+- [Facebook - TaelinArena](https://www.facebook.com/TaelinArena/)
+- [Discord channel](discord.gg/wYFeYvG)
