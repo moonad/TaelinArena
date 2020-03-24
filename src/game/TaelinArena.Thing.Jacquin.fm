@@ -1,0 +1,117 @@
+import TaelinArena.Game
+
+enum
+| JACQUIN_IDLE
+| JACQUIN_SHAME_OF_THE_PROFESSION
+| JACQUIN_TURN_OFF_THE_NIGHT_FREEZER
+| JACQUIN_SHUT_YOUR_MOUTH
+| JACQUIN_JACQUIN_WRATH
+| JACQUIN_DASH
+| JACQUIN_TAUNT
+
+
+short_dist : Number
+  100
+
+jacquin_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  // let self = self <= thing(stt = decrease_ult_timer(stt))
+
+  case self |thing switch self.act
+
+  | JACQUIN_IDLE
+    if is_walking(self)
+    then animate(self, 1, ERIC_JACQUIN_WALK_000, 7, 14)
+    else animate(self, 1, ERIC_JACQUIN_IDLE_000, 14, 14)
+
+  // Left 
+  | JACQUIN_SHAME_OF_THE_PROFESSION
+    let self = animate(self, 0, ERIC_JACQUIN_SHAME_OF_THE_PROFESSION_CASTING_000, 22, 22)
+    let shame = new_thing <= thing(
+      fun = jacquin_shame_of_the_profession_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 10, [shame])
+    self
+
+  // Middle
+  | JACQUIN_TURN_OFF_THE_NIGHT_FREEZER
+    let self = animate(self, 1, ERIC_JACQUIN_TURN_OFF_THE_NIGHT_FREEZER_CASTING_000, 29, 29)
+    let freezer = new_thing <= thing(
+      fun = jacquin_freezer_fun,
+      pos = at_dist(self, 140),
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 28, [freezer])
+    self
+
+  // Right
+  | JACQUIN_SHUT_YOUR_MOUTH
+    let self = animate(self, 0, ERIC_JACQUIN_SHUT_YOUR_MOUTH_CASTING_000, 30, 60)
+    self
+
+  // Q
+  | JACQUIN_JACQUIN_WRATH
+    // let new_pos = self.pos
+    let self = animate_between(self, 0, ERIC_JACQUIN_JACQUIN_WRATH_CASTING_ONE_000, 30, 0, 30)
+    let self = animate_between(self, 0, ERIC_JACQUIN_JACQUIN_WRATH_CASTING_TWO_000, 28, 30, 58)
+    let self = reset(self, 57)
+    let self = create_at(self, 57, giant_jacquin_fun)
+    self
+
+  // Space
+  | JACQUIN_DASH
+    let self = animate(self, 0, ERIC_JACQUIN_DASH_000, 18, 18)
+    let self = dash(self, 4, 0, 17)
+    self
+
+  // E
+  | JACQUIN_TAUNT
+    animate(self, 0, ERIC_JACQUIN_TAUNT_000, 8, 16)
+
+  else self
+
+jacquin_shame_of_the_profession_fun(self: Thing) : Thing
+  animate_die(self, 0, ERIC_JACQUIN_SHAME_OF_THE_PROFESSION_EFFECT_000, 5, 10)
+
+jacquin_freezer_fun(self: Thing) : Thing
+  animate_die(self, 0, ERIC_JACQUIN_TURN_OFF_THE_NIGHT_FREEZER_EFFECT_000, 3, 18)
+
+
+
+// Giant Jacquin
+enum
+| GIANT_JACQUIN_IDLE
+
+giant_jacquin_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 1.5)
+
+  case self |thing 
+
+    if is_walking(self)
+      then 
+        let self = animate(self, 1, ERIC_JACQUIN_JACQUIN_WRATH_WALK_000, 8, 16)
+        // let self = end_ult(self)
+        self
+      else 
+        let self = animate(self, 1, ERIC_JACQUIN_JACQUIN_WRATH_IDLE_000, 14, 28)
+        // let self = end_ult(self)
+        self
+
+// end_character(self: Thing) : Thing
+//   case self |thing 
+//   if self.tik > 25
+//   then  // Comes back to normal Jacquin
+//     let self = new_thing <= thing(fun=jacquin_fun, pid=self.pid)
+//     let self = self <= thing(pos = self.pos)
+//     self
+//   else
+//     self
+
+
+
+
