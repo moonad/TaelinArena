@@ -379,3 +379,22 @@ create_at(
     self <= thing(fun=new_thing, pid=self.pid, pos=self.pos)
   else 
     self
+
+// Ends an animation/transformation/thing after some ticks
+// - self: thing that will end after a while
+// - tx: the new animation to use when it ends
+// - after_tiks: numbers of ticks passed until the end
+// - stt_key: the key in the stt map
+end_thing(self: Thing, tx: TxFunction, after_tiks: Number, stt_key: Bits) : Thing
+  case self |thing
+    let current_tik = lookup(_ stt_key, self.stt)
+    let empty_stt = insert(_ stt_key, after_tiks, self.stt)
+    case current_tik
+    | none => self <= thing(stt = empty_stt) // insert a new key
+    | some =>
+      if current_tik.value === 0 
+      then
+        self <= thing(fun=tx, pid=self.pid, pos=self.pos, stt=empty_stt)
+      else 
+        let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
+        self <= thing(stt = new_stt)
