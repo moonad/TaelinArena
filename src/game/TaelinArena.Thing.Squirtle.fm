@@ -7,7 +7,19 @@ enum
 | SQUIRTLE_SKULL_BASH
 | SQUIRTLE_HYDRO_PUMP
 | SQUIRTLE_EVOLVE
+| SQUIRTLE_RAPID_SPIN
 | SQUIRTLE_TAUNT
+
+
+short_dist : Number
+  100
+
+medium_dist : Number
+  200
+
+long_dist : Number
+  300
+
 
 squirtle_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3, mhp = 24)
@@ -21,36 +33,80 @@ squirtle_fun(self: Thing) : Thing
 
   // Left 
   | SQUIRTLE_WATER_GUN
-    animate(self, 0, SQUIRTLE_WATER_GUN_000, 12, 12)
+    let self = animate(self, 0, SQUIRTLE_WATER_GUN_000, 12, 24)
+    let effs = [damage(5)]
+    let radius = 10
+    let h1 = [
+      hit(effs, at_dist(self,20),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,40),  self.dir, cbox(radius))
+    ]
+    let h2 = [
+      hit(effs, at_dist(self,60),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,80),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,100), self.dir, cbox(radius))
+    ]
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h2)
+    self 
 
   // Middle
   |SQUIRTLE_BUBBLE_BEAM
-    animate(self, 0, SQUIRTLE_BUBBLE_BEAM_000, 16, 16)
+    let self = animate(self, 0, SQUIRTLE_BUBBLE_BEAM_000, 16, 20)
+    let effs = [damage(10)]
+    let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(7))]
+    let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(14))]
+    let h3   = [hit(effs, at_dist(self, 60),  self.dir,  cbox(21))]
+    let self = cast(self, 6,  h1)
+    let self = cast(self, 12, h2)
+    let self = cast(self, 18, h3)
+    self 
+
 
   // Right
   |SQUIRTLE_SKULL_BASH
     let self = animate(self, 1, SQUIRTLE_SKULL_BASH_000, 16, 32)
-    let dash = dash(self, 4, 8, 32)
+    let self = dash(self, 4, 16, 28)
+    let effs = [damage(1), repulse(4)]
+    let hits = [hit(effs, at_dist(self, 1.8), self.dir, cbox(13.8))]
+    let self = cast(self, 16, hits)
+    let self = cast(self, 24, hits)
+    let self = cast(self, 28, hits)
     self
 
   // Q
   |SQUIRTLE_HYDRO_PUMP
-    animate(self, 1, SQUIRTLE_HYDRO_PUMP_000, 23, 46)
+    let self = animate(self, 1, SQUIRTLE_HYDRO_PUMP_000, 23, 46)
+    let effs = [damage(5)]
+    let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
+    let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
+    let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h1)
+    let self = cast(self, 20, h2)
+    let self = cast(self, 25, h2)
+    let self = cast(self, 30, h3)
+    self 
+
 
   // Space
   | SQUIRTLE_EVOLVE
     let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
-    let npos = self.pos
+    let evolved = create_at(self, 9, wartortle_fun)
+    let evolved = set_thing_nam(evolved, "Wartortle")
     let self = self <= thing(die = true)
-    let self = new_thing <= thing(fun=wartortle_fun) // evolve to Wartortle
-    let self = self <= thing(pos = npos)
-    self
+    evolved 
+
+  | SQUIRTLE_RAPID_SPIN
+    animate(set_thing_dmg(self, 0), 0, SQUIRTLE_RAPID_SPIN_000, 15, 30)
 
   // E
   | SQUIRTLE_TAUNT
     animate(self, 0, SQUIRTLE_TAUNT_000, 23, 32)
 
   else self
+
+
+
 
 enum
 | WARTORTLE_IDLE
@@ -59,10 +115,11 @@ enum
 | WARTORTLE_SKULL_BASH
 | WARTORTLE_HYDRO_PUMP
 | WARTORTLE_EVOLVE
+| WARTORTLE_RAPID_SPIN
 | WARTORTLE_TAUNT
 
 wartortle_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3)
+  let self = self <= thing(mov = 3, mhp = 24)
 
   case self |thing switch self.act
 
@@ -73,31 +130,70 @@ wartortle_fun(self: Thing) : Thing
 
   // Left 
   | WARTORTLE_WATER_GUN
-    animate(self, 0, WARTORTLE_WATER_GUN_000, 14, 14)
+    let self = animate(self, 0, WARTORTLE_WATER_GUN_000, 14, 20)
+    let effs = [damage(10)]
+    let radius = 10
+    let h1 = [
+      hit(effs, at_dist(self,20),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,40),  self.dir, cbox(radius))
+    ]
+    let h2 = [
+      hit(effs, at_dist(self,60),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,80),  self.dir, cbox(radius)),
+      hit(effs, at_dist(self,100), self.dir, cbox(radius))
+    ]
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h2)
+    self 
 
   // Middle
   |WARTORTLE_BUBBLE_BEAM
-    animate(self, 1, WARTORTLE_BUBBLE_BEAM_000, 16, 26)
+    let self = animate(self, 0, WARTORTLE_BUBBLE_BEAM_000, 16, 20)
+    let effs = [damage(15)]
+    let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(10))]
+    let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(15))]
+    let h3   = [hit(effs, at_dist(self, 70),  self.dir,  cbox(25))]
+    let self = cast(self, 6,  h1)
+    let self = cast(self, 12, h2)
+    let self = cast(self, 18, h3)
+    self 
 
   // Right
   |WARTORTLE_SKULL_BASH
     let self = animate(self, 1, WARTORTLE_SKULL_BASH_000, 15, 30)
-    let dash = dash(self, 4, 8, 30)
+    let self = dash(self, 4, 8, 30)  
+    let effs = [damage(1), repulse(4)]
+    let hits = [hit(effs, at_dist(self, 1.8), self.dir, cbox(13.8))]
+    let self = cast(self, 16, hits)
+    let self = cast(self, 24, hits)
+    let self = cast(self, 28, hits)
     self
 
   // Q
   |WARTORTLE_HYDRO_PUMP
-    animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
+    let self = animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
+    let effs = [damage(10)]
+    let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
+    let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
+    let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h1)
+    let self = cast(self, 20, h2)
+    let self = cast(self, 25, h2)
+    let self = cast(self, 30, h3)
+    self 
 
   // Space
   | WARTORTLE_EVOLVE
-    let self = animate(self, 0, WARTORTLE_EVOLVE_000, 8, 16)
-    let npos = self.pos
+    let self = animate(self, 1, WARTORTLE_EVOLVE_000, 8, 16)
+    let evolved = create_at(self, 15, blastoise_fun)
+    let evolved = set_thing_nam(evolved, "Blastoise")
     let self = self <= thing(die = true)
-    let self = new_thing <= thing(fun = blastoise_fun) // evolve to Blastoise
-    let self = self <= thing(pos = npos)
-    self
+    evolved 
   
+  | WARTORTLE_RAPID_SPIN
+    animate(self, 0, WARTORTLE_RAPID_SPIN_000, 20, 40)
+
   // E
   | WARTORTLE_TAUNT
     animate(self, 0, WARTORTLE_TAUNT_000, 23, 32)
@@ -111,6 +207,7 @@ enum
 | BLASTOISE_SKULL_BASH
 | BLASTOISE_HYDRO_PUMP
 | BLASTOISE_EVOLVE
+| BLASTOISE_RAPID_SPIN
 | BLASTOISE_TAUNT
 
 blastoise_fun(self: Thing) : Thing
@@ -125,25 +222,111 @@ blastoise_fun(self: Thing) : Thing
 
   // Left 
   | BLASTOISE_WATER_GUN
-    animate(self, 0, BLASTOISE_WATER_GUN_000, 13, 26)
+    let self   = animate(self, 0, BLASTOISE_WATER_GUN_000, 13, 26)
+    let effs   = [damage(10)]
+    
+    let dir1   = targ_dir(self)
+    let dir2   = rotate_v3( 30, dir1, self.pos)
+    let dir3   = rotate_v3(-30, dir1, self.pos)
+    
+    let pos1_1 = at_dist(self, 20)
+    let pos1_2 = at_dist(self, 40)
+    let pos1_3 = at_dist(self, 60)
+    let pos1_4 = at_dist(self, 80)
+    let pos1_5 = at_dist(self,100)
+    
+    let pos2_1 = rotate_v3(30, pos1_1, self.pos)
+    let pos2_2 = rotate_v3(30, pos1_2, self.pos)
+    let pos2_3 = rotate_v3(30, pos1_3, self.pos)
+    let pos2_4 = rotate_v3(30, pos1_4, self.pos)
+    let pos2_5 = rotate_v3(30, pos1_5, self.pos)
+
+    let pos3_1 = rotate_v3(-30, pos1_1, self.pos)
+    let pos3_2 = rotate_v3(-30, pos1_2, self.pos)
+    let pos3_3 = rotate_v3(-30, pos1_3, self.pos)
+    let pos3_4 = rotate_v3(-30, pos1_4, self.pos)
+    let pos3_5 = rotate_v3(-30, pos1_5, self.pos)
+
+    let radius = 10
+
+    let h1 = [
+      hit(effs, pos1_1, dir1, cbox(6)),
+      hit(effs, pos2_1, dir2, cbox(6)),
+      hit(effs, pos3_1, dir3, cbox(6)),
+      
+      hit(effs, pos1_2, dir1, cbox(radius)),
+      hit(effs, pos2_2, dir2, cbox(radius)),
+      hit(effs, pos3_2, dir3, cbox(radius)),
+    ]
+
+    let h2 = [
+      hit(effs, pos1_3, dir1, cbox(radius)),
+      hit(effs, pos2_3, dir2, cbox(radius)),
+      hit(effs, pos3_3, dir3, cbox(radius)),
+
+      hit(effs, pos1_4, dir1, cbox(radius)),
+      hit(effs, pos2_4, dir2, cbox(radius)),
+      hit(effs, pos3_4, dir3, cbox(radius)),
+
+      hit(effs, pos1_5, dir1, cbox(radius)),
+      hit(effs, pos2_5, dir2, cbox(radius)),
+      hit(effs, pos3_5, dir3, cbox(radius)),
+    ]
+
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h2)
+    self 
 
   // Middle
   |BLASTOISE_BUBBLE_BEAM
-    animate(self, 0, BLASTOISE_BUBBLE_BEAM_000, 16, 26)
+    let self = animate(self, 0, BLASTOISE_BUBBLE_BEAM_000, 17, 24)
+    let effs = [damage(20)]
+    let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(10))]
+    let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(15))]
+    let h3   = [hit(effs, at_dist(self, 70),  self.dir,  cbox(25))]
+    let self = cast(self, 6,  h1)
+    let self = cast(self, 12, h2)
+    let self = cast(self, 18, h3)
+    self
 
   // Right
   |BLASTOISE_SKULL_BASH
     let self = animate(self, 1, BLASTOISE_SKULL_BASH_000, 21, 42)
-    let dash = dash(self, 4, 10, 42)
+    let self = dash(self, 4, 10, 42)  
+    let effs = [damage(5), repulse(4)]
+    let hits = [hit(effs, at_dist(self, 1.8), self.dir, cbox(15))]
+    // let hits = [hit(effs, self.pos, self.dir, cbox(32))]
+    let self = cast(self, 16, hits)
+    let self = cast(self, 24, hits)
+    // let self = cast(self, 28, hits)
+    let self = cast(self, 32, hits)
     self
 
   // Q
   |BLASTOISE_HYDRO_PUMP
-    animate(self, 1, BLASTOISE_HYDRO_PUMP_000, 28, 56)
+    let self = animate(self, 1, BLASTOISE_HYDRO_PUMP_000, 28, 56)
+    let effs = [damage(15)]
+    let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
+    let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
+    let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
+    let h4   = [hit(effs, self.pos,  self.dir,  cbox(60))]
+    let self = cast(self, 10, h1)
+    let self = cast(self, 15, h1)
+    let self = cast(self, 20, h1)
+    let self = cast(self, 25, h2)
+    let self = cast(self, 30, h2)
+    let self = cast(self, 35, h2)
+    let self = cast(self, 40, h3)
+    let self = cast(self, 45, h3)
+    let self = cast(self, 50, h3)
+    self 
 
     // Space
   | BLASTOISE_EVOLVE
-    animate(self, 0, BLASTOISE_IDLE_000, 12, 24)
+    animate(self, 0, BLASTOISE_IDLE_000, 12, 12)
+
+  | BLASTOISE_RAPID_SPIN
+    animate(self, 0, BLASTOISE_RAPID_SPIN_000, 21, 42)
 
   // E
   | BLASTOISE_TAUNT
