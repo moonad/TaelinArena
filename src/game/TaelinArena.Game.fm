@@ -399,7 +399,12 @@ end_thing(self: Thing, tx: TxFunction, after_tiks: Number, stt_key: Bits) : Thin
         let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
         self <= thing(stt = new_stt)
 
-
+// Blocks a thing during an animation
+// - self : the thing to apply block on
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
 block(
   self: Thing, 
   boost: Number,
@@ -412,6 +417,7 @@ block(
   if is_between(from, til, self.tik) 
   then self <= thing(
     dmg = 0,
+    bst = boost,
     mid = 
       let duration = til - from
       let curr_tik = tik - from
@@ -419,4 +425,5 @@ block(
       model + (floor(curr_tim * count) % count)
     )
   else 
-    self 
+    reset(self, til + 1) 
+
