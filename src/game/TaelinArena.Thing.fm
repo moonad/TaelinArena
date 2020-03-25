@@ -2,6 +2,7 @@ import TaelinArena.Game
 import TaelinArena.ModelIds
 import TaelinArena.Thing.Benfix
 import TaelinArena.Thing.Bleskape 
+import TaelinArena.Thing.DarthVader
 import TaelinArena.Thing.Dilma
 import TaelinArena.Thing.Dorime
 import TaelinArena.Thing.Finn

@@ -77,6 +77,10 @@ T Input
 T Command
 | command(pid: PlayerId, inp: Input)
 
+// 1 second has 24 tiks
+ONE_SEC : Number
+  24
+
 // Creates a new default thing
 new_thing : Thing
   thing(
@@ -421,3 +425,10 @@ update_buff(self: Thing, stt_key: Bits) : Thing
 will_set_buff(self: Thing, for_tiks: Number, stt_key: Bits) : Thing
   case self |thing
     self <= thing(stt = insert(_ stt_key, for_tiks, self.stt)) // insert a new key
+
+is_using_buff(self: Thing, stt_key: Bits) : Bool
+  case self |thing
+    let current_tik = lookup(_ stt_key, self.stt)
+    case current_tik
+    | none => false
+    | some => if current_tik.value === 0 then false else true
