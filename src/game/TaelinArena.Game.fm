@@ -399,17 +399,25 @@ end_thing(self: Thing, tx: TxFunction, after_tiks: Number, stt_key: Bits) : Thin
         let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
         self <= thing(stt = new_stt)
 
-use_buff(self: Thing, for_tiks: Number, stt_key: Bits) : Thing
+// Update a stt_key until the value associated to it ends. Used along with will_set_buff
+// - self: thing with stt (usually character)
+// - stt_key: the key in the stt map
+update_buff(self: Thing, stt_key: Bits) : Thing
   case self |thing
     let current_tik = lookup(_ stt_key, self.stt)
-    let stt_false = insert(_ stt_key, 0, self.stt)
-    let stt_true = insert(_ stt_key, for_tiks, self.stt)
     case current_tik
-    | none => self <= thing(stt = stt_true) // insert a new key
-    | some =>
-      if current_tik.value === 0 
-      then
-        self <= thing(stt=stt_false)
+    | none => self
+    | some => 
+      if current_tik.value === 0
+      then self <= thing(stt=insert(_ stt_key, 0, self.stt))
       else 
         let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
         self <= thing(stt = new_stt)
+
+// Set a new key to stay valid for some ticks.
+// - self: thing with stt (usually character)
+// - for_tiks: numbers of ticks where the key will be valid
+// - stt_key: the key in the stt map
+will_set_buff(self: Thing, for_tiks: Number, stt_key: Bits) : Thing
+  case self |thing
+    self <= thing(stt = insert(_ stt_key, for_tiks, self.stt)) // insert a new key
