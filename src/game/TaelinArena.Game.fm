@@ -398,3 +398,25 @@ end_thing(self: Thing, tx: TxFunction, after_tiks: Number, stt_key: Bits) : Thin
       else 
         let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
         self <= thing(stt = new_stt)
+
+
+block(
+  self: Thing, 
+  boost: Number,
+  model: Number,
+  count: Number,
+  from: Number,
+  til: Number
+) : Thing 
+  case self |thing 
+  if is_between(from, til, self.tik) 
+  then self <= thing(
+    dmg = 0,
+    mid = 
+      let duration = til - from
+      let curr_tik = tik - from
+      let curr_tim = curr_tik \ duration
+      model + (floor(curr_tim * count) % count)
+    )
+  else 
+    self 

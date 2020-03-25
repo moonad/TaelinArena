@@ -192,7 +192,7 @@ wartortle_fun(self: Thing) : Thing
     evolved 
   
   | WARTORTLE_RAPID_SPIN
-    animate(self, 0, WARTORTLE_RAPID_SPIN_000, 20, 40)
+    animate(set_thing_dmg(self, 0), 0, WARTORTLE_RAPID_SPIN_000, 20, 40)
 
   // E
   | WARTORTLE_TAUNT
@@ -295,10 +295,8 @@ blastoise_fun(self: Thing) : Thing
     let self = dash(self, 4, 10, 42)  
     let effs = [damage(5), repulse(4)]
     let hits = [hit(effs, at_dist(self, 1.8), self.dir, cbox(15))]
-    // let hits = [hit(effs, self.pos, self.dir, cbox(32))]
     let self = cast(self, 16, hits)
     let self = cast(self, 24, hits)
-    // let self = cast(self, 28, hits)
     let self = cast(self, 32, hits)
     self
 
@@ -326,10 +324,12 @@ blastoise_fun(self: Thing) : Thing
     animate(self, 0, BLASTOISE_IDLE_000, 12, 12)
 
   | BLASTOISE_RAPID_SPIN
-    animate(self, 0, BLASTOISE_RAPID_SPIN_000, 21, 42)
+    animate(set_thing_dmg(self, 0), 0, BLASTOISE_RAPID_SPIN_000, 21, 42)
+
 
   // E
   | BLASTOISE_TAUNT
     animate(self, 0, BLASTOISE_TAUNT_000, 16, 32)
 
   else self
+ 
