@@ -187,7 +187,8 @@ die(
 // - boost: speed multiplier (0 = no move, 1 = normal spd)
 // - model: id of the first model of the animation
 // - count: total count of models on the animation
-// - durat: duration of the animation
+// - from: frame to start animating
+// - til: last frame to animate
 animate_between(
   self  : Thing,
   boost : Number,
@@ -249,6 +250,29 @@ animate_die(
   let self = animate_between(self,boost,model,count,0,durat)
   let self = die(self, durat - 1)
   self
+
+// Avoid problems with "ghost frame after blink"
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model_atk: id of the main model of the animation
+// - model_idle: idle000 of the character
+// - count: total count of models on the animation
+// - from: frame to start animating
+// - til: last frame to animate
+animate_with_blink(
+  self       : Thing,
+  boost      : Number,
+  model_atk  : Number,
+  model_idle : Number,
+  count      : Number,
+  from       : Number,
+  til        : Number
+  ) : Thing
+  case self | thing
+    let self = animate_between(self, boost, model_atk, count, from, til)
+    let self = animate_between(self, boost, model_idle, 1, til, til + 1)
+    let self = reset(self, til)
+    self
 
 // Performs a dash between certain frames
 // - self: thing that will dash
@@ -389,7 +413,12 @@ create_at(
 // - tx: the new animation to use when it ends
 // - after_tiks: numbers of ticks passed until the end
 // - stt_key: the key in the stt map
-end_thing(self: Thing, tx: TxFunction, after_tiks: Number, stt_key: Bits) : Thing
+end_thing(
+  self: Thing, 
+  tx: TxFunction, 
+  after_tiks: Number, 
+  stt_key: Bits
+  ) : Thing
   case self |thing
     let current_tik = lookup(_ stt_key, self.stt)
     let empty_stt = insert(_ stt_key, after_tiks, self.stt)
