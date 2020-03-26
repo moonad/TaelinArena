@@ -526,7 +526,7 @@ class Main extends Component {
         "height": (ch + 2) + "px",
         "border-top": "1px solid #000000",
         "border-bottom": "1px solid #000000",
-        "background": "#FCFCFC",
+        "background": "#d5e3bc",
       }});
 
     // Bottom panel: chat box

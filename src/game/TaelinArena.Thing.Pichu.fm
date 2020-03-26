@@ -48,7 +48,8 @@ pichu_fun(self: Thing) : Thing
   // Q
   | PICHU_EVOLVE
     let self = animate(self, 0, PICHU_IDLE_000, 1, 2)
-    let self = create_at(self, 0, pikachu_fun) // evolve to Pikachu
+    let self = create_at(self, 0, pikachu_fun)
+    let evolved = set_thing_nam(self, "Pikachu")
     self
 
   // Space
@@ -132,7 +133,8 @@ pikachu_fun(self: Thing) : Thing
   // Q
   | PIKACHU_EVOLVE
     let self = animate(self, 0, PICHU_IDLE_000, 1, 2)
-    let self = create_at(self, 0, raichu_fun) // evolve to Raichu
+    let self = create_at(self, 0, raichu_fun)
+    let evolved = set_thing_nam(self, "Raichu")
     self
 
   // Space

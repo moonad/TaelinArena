@@ -29,11 +29,11 @@ jacquin_fun(self: Thing) : Thing
     let self = animate(self, 0, ERIC_JACQUIN_SHAME_OF_THE_PROFESSION_CASTING_000, 22, 22)
     let shame = new_thing <= thing(
       fun = jacquin_shame_of_the_profession_fun,
-      pos = self.pos,
+      pos = at_dist(self, 30),
       dir = targ_dir(self),
       vel = scale_v3(10, targ_dir(self)),
       box = nbox)
-    let self = spawn(self, 10, [shame])
+    let self = spawn(self, 16, [shame])
     self
 
   // Middle

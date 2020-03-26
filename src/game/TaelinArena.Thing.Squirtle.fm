@@ -7,7 +7,7 @@ enum
 | SQUIRTLE_SKULL_BASH
 | SQUIRTLE_HYDRO_PUMP
 | SQUIRTLE_EVOLVE
-| SQUIRTLE_RAPID_SPIN
+// | SQUIRTLE_RAPID_SPIN
 | SQUIRTLE_TAUNT
 
 
@@ -102,12 +102,12 @@ squirtle_fun(self: Thing) : Thing
     let self = animate(self, 0, SQUIRTLE_EVOLVE_000, 5, 10)
     let evolved = create_at(self, 9, wartortle_fun)
     let evolved = set_thing_nam(evolved, "Wartortle")
-    let self = self <= thing(die = true)
     evolved 
 
-  | SQUIRTLE_RAPID_SPIN
-    block(self, 0, SQUIRTLE_RAPID_SPIN_000, 15, 0, 15)
-    // animate(set_thing_dmg(self, 0), 0, SQUIRTLE_RAPID_SPIN_000, 15, 30)
+  // TODO: uncomment when they can evolve automatically
+  // | SQUIRTLE_RAPID_SPIN
+  //   block(self, 0, SQUIRTLE_RAPID_SPIN_000, 15, 0, 15)
+  //   // animate(set_thing_dmg(self, 0), 0, SQUIRTLE_RAPID_SPIN_000, 15, 30)
 
   // E
   | SQUIRTLE_TAUNT
@@ -125,7 +125,7 @@ enum
 | WARTORTLE_SKULL_BASH
 | WARTORTLE_HYDRO_PUMP
 | WARTORTLE_EVOLVE
-| WARTORTLE_RAPID_SPIN
+// | WARTORTLE_RAPID_SPIN
 | WARTORTLE_TAUNT
 
 wartortle_fun(self: Thing) : Thing
@@ -198,12 +198,12 @@ wartortle_fun(self: Thing) : Thing
     let self = animate(self, 1, WARTORTLE_EVOLVE_000, 8, 16)
     let evolved = create_at(self, 15, blastoise_fun)
     let evolved = set_thing_nam(evolved, "Blastoise")
-    let self = self <= thing(die = true)
     evolved 
   
-  | WARTORTLE_RAPID_SPIN
-    block(self, 0, WARTORTLE_RAPID_SPIN_000, 20, 0, 20)
-    // animate(set_thing_dmg(self, 0), 0, WARTORTLE_RAPID_SPIN_000, 20, 40)
+  // TODO: uncomment when they can evolve automatically
+  // | WARTORTLE_RAPID_SPIN
+  //   block(self, 0, WARTORTLE_RAPID_SPIN_000, 20, 0, 20)
+  //   // animate(set_thing_dmg(self, 0), 0, WARTORTLE_RAPID_SPIN_000, 20, 40)
 
   // E
   | WARTORTLE_TAUNT
@@ -218,7 +218,7 @@ enum
 | BLASTOISE_SKULL_BASH
 | BLASTOISE_HYDRO_PUMP
 | BLASTOISE_EVOLVE
-| BLASTOISE_RAPID_SPIN
+// | BLASTOISE_RAPID_SPIN
 | BLASTOISE_TAUNT
 
 blastoise_fun(self: Thing) : Thing
@@ -334,9 +334,10 @@ blastoise_fun(self: Thing) : Thing
   | BLASTOISE_EVOLVE
     animate(self, 0, BLASTOISE_IDLE_000, 12, 12)
 
-  | BLASTOISE_RAPID_SPIN
-    block(self, 0, BLASTOISE_RAPID_SPIN_000, 21, 0, 21)
-    // animate(set_thing_dmg(self, 0), 0, BLASTOISE_RAPID_SPIN_000, 21, 42)
+  // TODO: uncomment when they get able to evolve automatically
+  // | BLASTOISE_RAPID_SPIN
+  //   block(self, 0, BLASTOISE_RAPID_SPIN_000, 21, 0, 21)
+  //   // animate(set_thing_dmg(self, 0), 0, BLASTOISE_RAPID_SPIN_000, 21, 42)
 
 
   // E

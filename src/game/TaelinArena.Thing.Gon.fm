@@ -38,9 +38,9 @@ gon_fun(self: Thing) : Thing
       fun = gon_paper_fun,
       pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(10, targ_dir(self)),
+      vel = scale_v3(12, targ_dir(self)),
       box = nbox)
-    let self = spawn(self, 14, [fire])
+    let self = spawn(self, 12, [fire])
     self
 
   // Right
@@ -82,7 +82,7 @@ gon_transformed_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
 
   // Back to normal Gon after 30 seconds
-  let self = end_thing(self, gon_tired_fun, ONE_SEC * 10, GON_ULT_TIME)
+  let self = end_thing(self, gon_tired_fun, ONE_SEC * 30, GON_ULT_TIME)
 
   case self |thing switch self.act
 
@@ -105,9 +105,9 @@ gon_transformed_fun(self: Thing) : Thing
       fun = gon_t_paper_fun,
       pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(10, targ_dir(self)),
+      vel = scale_v3(12, targ_dir(self)),
       box = nbox)
-    let self = spawn(self, 30, [fire])
+    let self = spawn(self, 28, [fire])
     self
 
   // Right
