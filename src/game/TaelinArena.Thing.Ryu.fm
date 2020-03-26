@@ -21,8 +21,10 @@ ryu_fun(self: Thing) : Thing
 
   // Left 
   | RYU_SHORYUUKEN
-    let self = animate(self, 0, RYU_SHORYUUKEN_000, 26, 52)
-    let self = blink(self, 51, at_dist(self, 40))
+    let self = animate_between(self, 0, RYU_SHORYUUKEN_000, 26, 0, 52)
+    let self = animate_between(self, 0, RYU_IDLE_000, 1, 52, 53)
+    let self = reset(self, 52)
+    let self = blink(self, 52, at_dist(self, 38))
     self
 
   // Middle
@@ -59,8 +61,8 @@ ryu_fun(self: Thing) : Thing
 
   // Space
   | RYU_ASHURA_SENKU
-    let self = animate(self, 1, RYU_ASHURA_SENKU_000, 15, 30)
-    let self = blink(self, 29, at_dist(self, 78))
+    let self = animate_with_blink(self, 0, RYU_ASHURA_SENKU_000, RYU_IDLE_000, 15, 0, 30)
+    let self = blink(self, 30, at_dist(self, 78))
     self
 
   // E

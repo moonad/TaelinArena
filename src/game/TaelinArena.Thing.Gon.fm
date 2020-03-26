@@ -93,8 +93,7 @@ gon_transformed_fun(self: Thing) : Thing
 
   // Left 
   |GON_STONE
-    let self = animate_between(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, 17, 0, 34)
-    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_IDLE_000, 1, 34, 35)
+    let self = animate_with_blink(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, GON_FREECS_TRANFORMED_IDLE_000, 17, 0, 34)
     let self = reset(self, 34)
     let self = blink(self, 34, at_max_dist(self, 78))
     self

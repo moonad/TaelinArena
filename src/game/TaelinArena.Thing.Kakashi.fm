@@ -60,8 +60,7 @@ kakashi_fun(self: Thing) : Thing
 
   // Q
   |KAKASHI_RAIKIRI
-    let self = animate_between(self, 0, KAKASHI_RAIKIRI_000,24, 0, 48)
-    let self = animate_between(self, 0, KAKASHI_IDLE_000,1, 48, 49)
+    let self = animate_with_blink(self, 0, KAKASHI_RAIKIRI_000, KAKASHI_IDLE_000, 24, 0, 48)
     let self = reset(self, 48)
     let hits0 = [hit([damage(2)], at_dist(self, 90 * (1 \ 12)), self.dir, cbox(10))]
     let hits1 = [hit([damage(2)], at_dist(self, 90 * (3 \ 12)), self.dir, cbox(10))]

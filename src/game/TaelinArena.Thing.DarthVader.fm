@@ -69,8 +69,7 @@ darthvader_fun(self: Thing) : Thing
 
   // Space
   |DARTH_VADER_ROGUE_ONE
-    let self = animate_between(self, 0, DARTH_VADER_ROGUE_ONE_000, 10, 0, 20)
-    let self = animate_between(self, 0, DARTH_VADER_IDLE_000, 1, 20, 21)
+    let self = animate_with_blink(self, 0, DARTH_VADER_ROGUE_ONE_000, DARTH_VADER_IDLE_000, 10, 0, 20)
     let self = reset(self, 20)
     let self = blink(self, 20, at_dist(self, 75))
     self

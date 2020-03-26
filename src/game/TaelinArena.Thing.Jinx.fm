@@ -39,7 +39,9 @@ jinx_fun(self: Thing) : Thing
   // Middle
   // TODO: Adjust time to throw the trap. Use animate_between
   |JINX_FLAMING_BITE
-    let self = animate(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 6, 24)
+    let self = animate_between(self, 0, JINX_FLAMING_BITE_CAST_ANIMATION_000, 6, 0, 10)
+    let self = animate_between(self, 0, JINX_IDLE_000, 4, 10, 24)
+    let self = reset(self, 23)
     let trap0 = new_thing <= thing(
       fun = jinx_flaming_bite_fun,
       pos = at_dist(self, 60),
@@ -79,7 +81,6 @@ jinx_fun(self: Thing) : Thing
     self
 
   // Q
-  // TOOD: ajust position that the missile is being throw
   |JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH
     let self = animate(self, 0, JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_CAST_ANIMATION_000, 12, 36)
     let proj = new_thing <= thing(
