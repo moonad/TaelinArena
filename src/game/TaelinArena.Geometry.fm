@@ -97,6 +97,28 @@ sqrdist_v3(a: V3, b: V3) : Number
 dist_v3(a: V3, b: V3) : Number
   sqrdist_v3(a, b) ** 0.5
 
+// Rotates a vector around an arbitrary point
+// - theta : the angle (in degrees) to rotate, 
+//           positive values rotate clockwise,
+//           while negative rotate counterclockwise
+//
+// - v    : the vector you want to rotate
+//
+// - piv   : pivot to be used, if piv = v3(0,0,0) 
+//         it rotates a vector around the origin
+//         center of the screen 
+rotate_v3(theta: Number, v: V3, piv: V3) : V3 
+  case v  |v3
+  case piv|v3  
+  let rad = theta * (pi\180)  
+  let s   = sin(rad)
+  let c   = cos(rad)
+  let x   = piv.x + ((v.x - piv.x) * c) - ((v.y - piv.y) * s)
+  let y   = piv.y + ((v.x - piv.x) * s) + ((v.y - piv.y) * c) 
+  let z   = 0
+  v3(x, y, z)  
+
+
 // A finite line segment between two points
 T Segment
 | segment(a: V3, b: V3)
