@@ -20,6 +20,15 @@ medium_dist : Number
 long_dist : Number
   300
 
+base_water_gun_dmg : Number 
+  1
+
+base_bubble_beam_dmg : Number 
+  2
+
+base_hydro_pump_dmg : Number
+  1
+
 
 squirtle_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3, mhp = 24)
@@ -34,7 +43,7 @@ squirtle_fun(self: Thing) : Thing
   // Left 
   | SQUIRTLE_WATER_GUN
     let self = animate(self, 0, SQUIRTLE_WATER_GUN_000, 12, 24)
-    let effs = [damage(5)]
+    let effs = [damage(base_water_gun_dmg)]
     let radius = 10
     let h1 = [
       hit(effs, at_dist(self,20),  self.dir, cbox(radius)),
@@ -52,7 +61,7 @@ squirtle_fun(self: Thing) : Thing
   // Middle
   |SQUIRTLE_BUBBLE_BEAM
     let self = animate(self, 0, SQUIRTLE_BUBBLE_BEAM_000, 16, 20)
-    let effs = [damage(10)]
+    let effs = [damage(base_bubble_beam_dmg)]
     let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(7))]
     let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(14))]
     let h3   = [hit(effs, at_dist(self, 60),  self.dir,  cbox(21))]
@@ -76,7 +85,7 @@ squirtle_fun(self: Thing) : Thing
   // Q
   |SQUIRTLE_HYDRO_PUMP
     let self = animate(self, 1, SQUIRTLE_HYDRO_PUMP_000, 23, 46)
-    let effs = [damage(5)]
+    let effs = [damage(base_hydro_pump_dmg)]
     let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
     let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
     let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
@@ -132,7 +141,7 @@ wartortle_fun(self: Thing) : Thing
   // Left 
   | WARTORTLE_WATER_GUN
     let self = animate(self, 0, WARTORTLE_WATER_GUN_000, 14, 20)
-    let effs = [damage(10)]
+    let effs = [damage(base_water_gun_dmg + 1)]
     let radius = 10
     let h1 = [
       hit(effs, at_dist(self,20),  self.dir, cbox(radius)),
@@ -150,7 +159,7 @@ wartortle_fun(self: Thing) : Thing
   // Middle
   |WARTORTLE_BUBBLE_BEAM
     let self = animate(self, 0, WARTORTLE_BUBBLE_BEAM_000, 16, 20)
-    let effs = [damage(15)]
+    let effs = [damage(base_bubble_beam_dmg + 1)]
     let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(10))]
     let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(15))]
     let h3   = [hit(effs, at_dist(self, 70),  self.dir,  cbox(25))]
@@ -173,7 +182,7 @@ wartortle_fun(self: Thing) : Thing
   // Q
   |WARTORTLE_HYDRO_PUMP
     let self = animate(self, 1, WARTORTLE_HYDRO_PUMP_000, 23, 46)
-    let effs = [damage(10)]
+    let effs = [damage(base_hydro_pump_dmg + 1)]
     let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
     let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
     let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
@@ -225,7 +234,7 @@ blastoise_fun(self: Thing) : Thing
   // Left 
   | BLASTOISE_WATER_GUN
     let self   = animate(self, 0, BLASTOISE_WATER_GUN_000, 13, 26)
-    let effs   = [damage(10)]
+    let effs   = [damage(base_water_gun_dmg + 2)]
     
     let dir1   = targ_dir(self)
     let dir2   = rotate_v3( 30, dir1, self.pos)
@@ -282,7 +291,7 @@ blastoise_fun(self: Thing) : Thing
   // Middle
   |BLASTOISE_BUBBLE_BEAM
     let self = animate(self, 0, BLASTOISE_BUBBLE_BEAM_000, 17, 24)
-    let effs = [damage(20)]
+    let effs = [damage(base_water_gun_dmg + 2)]
     let h1   = [hit(effs, at_dist(self, 18),  self.dir,  cbox(10))]
     let h2   = [hit(effs, at_dist(self, 34),  self.dir,  cbox(15))]
     let h3   = [hit(effs, at_dist(self, 70),  self.dir,  cbox(25))]
@@ -305,7 +314,7 @@ blastoise_fun(self: Thing) : Thing
   // Q
   |BLASTOISE_HYDRO_PUMP
     let self = animate(self, 1, BLASTOISE_HYDRO_PUMP_000, 28, 56)
-    let effs = [damage(15)]
+    let effs = [damage(base_hydro_pump_dmg + 2)]
     let h1   = [hit(effs, self.pos,  self.dir,  cbox(30))]
     let h2   = [hit(effs, self.pos,  self.dir,  cbox(40))]
     let h3   = [hit(effs, self.pos,  self.dir,  cbox(50))]
