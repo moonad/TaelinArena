@@ -1595,6 +1595,7 @@ module.exports = [
   ()=>import("./../../models/gon_freecs/jajanken_stone/020.json"),
   ()=>import("./../../models/gon_freecs/jajanken_stone/021.json"),
   ()=>import("./../../models/gon_freecs/jajanken_stone/022.json"),
+  ()=>import("./../../models/gon_freecs/taunt_text/000.json"),
   ()=>import("./../../models/gon_freecs/taunt/000.json"),
   ()=>import("./../../models/gon_freecs/taunt/001.json"),
   ()=>import("./../../models/gon_freecs/taunt/002.json"),

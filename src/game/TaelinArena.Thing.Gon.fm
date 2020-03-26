@@ -9,10 +9,12 @@ enum
 | GON_INTENSIFICATION
 | GON_TAUNT
 
-medium_dist : Number
-  200
-long_dist : Number
-  300
+// Key on stt
+GON_ULT_TIME : Bits
+  000b
+
+GON_AFTER_ULT : Bits
+  001b
 
 gon_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
@@ -27,38 +29,32 @@ gon_fun(self: Thing) : Thing
   // Left 
   |GON_STONE
     let self = animate(self, 0, GON_FREECS_JAJANKEN_STONE_000, 23, 46)
-    let self = blink(self, 43, at_max_dist(self, 55))
     self
 
   // Middle
   |GON_PAPER
-    let self = animate(self, 0, GON_FREECS_JAJANKEN_PAPER_CASTING_000, 17, 34)
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_PAPER_CASTING_000, 17, 17)
     let fire = new_thing <= thing(
       fun = gon_paper_fun,
-      pos = self.pos,
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
       vel = scale_v3(10, targ_dir(self)),
       box = nbox)
-    let self = spawn(self, 25, [fire])
+    let self = spawn(self, 14, [fire])
     self
 
   // Right
   |GON_SCISSOR
-    animate(self, 0, GON_FREECS_JAJANKEN_SCISSORS_000, 18, 36)
+    let self = animate_between(self, 0, GON_FREECS_JAJANKEN_SCISSORS_000, 12, 0, 12)
+    let self = animate_between(self, 0, GON_FREECS_JAJANKEN_SCISSORS_012, 5, 12, 22)
+    let self = reset(self, 21)
+    self
 
   // Q
   |GON_MAX_POWER
-    let new_pos = self.pos
     let self = animate(self, 0, GON_FREECS_ULTIMATE_TRANSFORMATION_000, 16, 32)
-    // TODO: check why this function isn't working
-    // let self = create_at(self, 30, gon_transformed_fun)
-    // self
-    if self.tik === 30 then
-      let self = new_thing <= thing(fun=gon_transformed_fun, pid=self.pid) // Gon transformed
-      let self = self <= thing(pos = new_pos)
-      self
-    else 
-      self
+    let self = create_at(self, 31, gon_transformed_fun)
+    self
 
   // Space
   | GON_INTENSIFICATION
@@ -66,17 +62,27 @@ gon_fun(self: Thing) : Thing
 
   // E
   | GON_TAUNT
-    animate(self, 0, GON_FREECS_TAUNT_000, 17, 34)
+    let self = animate(self, 0, GON_FREECS_TAUNT_000, 16, 32)
+    let text = new_thing <= thing(fun=gon_taunt_text_fun, sid = self.sid)
+    let self = spawn(self, 20, [move(text, self.pos)])
+    self
 
   else self
 
 gon_paper_fun(self: Thing) : Thing 
   animate_die(self, 0, GON_FREECS_JAJANKEN_PAPER_PROJECTILE_000, 8, 16)
 
+gon_taunt_text_fun(self: Thing) : Thing
+  animate_die(self, 0, GON_FREECS_TAUNT_TEXT_000, 1, 10)
+
 // Transformed Gon
 // ---------------
+
 gon_transformed_fun(self: Thing) : Thing
-    let self = self <= thing(mov = 1.5)
+  let self = self <= thing(mov = 3)
+
+  // Back to normal Gon after 30 seconds
+  let self = end_thing(self, gon_tired_fun, ONE_SEC * 10, GON_ULT_TIME)
 
   case self |thing switch self.act
 
@@ -87,40 +93,41 @@ gon_transformed_fun(self: Thing) : Thing
 
   // Left 
   |GON_STONE
-    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, 17, 34)
-    let self = blink(self, 33, at_max_dist(self, 60))
+    let self = animate_between(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, 17, 0, 34)
+    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_IDLE_000, 1, 34, 35)
+    let self = reset(self, 34)
+    let self = blink(self, 34, at_max_dist(self, 78))
     self
 
   // Middle
   |GON_PAPER
-    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_010, 16, 32)
+    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_000, 17, 34)
     let fire = new_thing <= thing(
       fun = gon_t_paper_fun,
-      pos = self.pos,
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
       vel = scale_v3(10, targ_dir(self)),
       box = nbox)
-    let self = spawn(self, 8, [fire])
+    let self = spawn(self, 30, [fire])
     self
 
   // Right
   |GON_SCISSOR
-    animate(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_000, 19, 38)
+    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_000, 12, 0, 13)
+    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_012, 7, 13, 26)
+    let self = reset(self, 25)
+    self
 
   // Q
   |GON_MAX_POWER
-    let new_pos = self.pos
-    // let self = self <= thing(die = true)
-    let self = new_thing <= thing(fun=gon_fun, pid=self.pid) // Gon
-    let self = self <= thing(pos = new_pos)
-    self
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 27)
 
   // Space
-  | GON_INTENSIFICATION
+  |GON_INTENSIFICATION
     animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
 
   // E
-  | GON_TAUNT
+  |GON_TAUNT
     animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
 
 
@@ -128,3 +135,21 @@ gon_transformed_fun(self: Thing) : Thing
 
 gon_t_paper_fun(self: Thing) : Thing
   animate_die(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_PROJETIL_000, 8, 16)
+
+
+
+// Tired Gon
+// ---------
+// After using his ultimate, Gon gets tired. He can't use any skill and have the mov reduced
+gon_tired_fun(self: Thing) : Thing 
+  let self = self <= thing(mov = 2)
+  // Back to normal Gon after 5secs ticks
+  let self = end_thing(self, gon_fun, ONE_SEC * 5, GON_AFTER_ULT)
+
+  // TODO: Add tired energy to follow him
+  case self |thing 
+    if is_walking(self)
+      then 
+        animate(self, 1, GON_FREECS_AFTER_ULTIMATE_WALK_000, 12, 24)
+      else 
+        animate(self, 1, GON_FREECS_AFTER_ULTIMATE_IDLE_000, 8, 16)
