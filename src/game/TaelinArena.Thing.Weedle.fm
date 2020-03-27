@@ -120,7 +120,7 @@ TWINEEDLE_KEY : Bits
   00101010111b
 
 beedrill_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3.5)
+  let self = self <= thing(mov = 4)
 
   case self |thing switch self.act
 
