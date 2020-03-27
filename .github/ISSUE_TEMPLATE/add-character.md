@@ -34,7 +34,7 @@ assignees: ''
 *Describe how you imagine the attack animation and cast.*  
 *You can add sketches, references and later on add gifs you did on MagicaVoxel*
 
-## [LEFT] *attack_name*
+## [RIGHT] *attack_name*
 *Describe how you imagine the attack animation and cast.*  
 *You can add sketches, references and later on add gifs you did on MagicaVoxel*
 
@@ -52,7 +52,6 @@ assignees: ''
 ### Tasks
  - [ ] Idle
  - [ ] Walk
- - [ ] Hurt
  - [ ] [LEFT] *add skill name*
  - [ ] [MIDDLE] *add skill name*
  - [ ] [RIGHT] *add skill name*

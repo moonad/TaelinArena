@@ -1,162 +1,206 @@
 module.exports = {
-  "benfix": {
+  "beedrill": {
     "from": 0,
-    "til": 111
+    "til": 78
+  },
+  "benfix": {
+    "from": 78,
+    "til": 189
   },
   "blastoise": {
-    "from": 111,
-    "til": 275
+    "from": 189,
+    "til": 353
   },
   "bleskape": {
-    "from": 275,
-    "til": 377
+    "from": 353,
+    "til": 455
+  },
+  "darth_vader": {
+    "from": 455,
+    "til": 559
   },
   "dilma": {
-    "from": 377,
-    "til": 463
+    "from": 559,
+    "til": 645
   },
   "dorime": {
-    "from": 463,
-    "til": 641
+    "from": 645,
+    "til": 823
+  },
+  "dr_strange": {
+    "from": 823,
+    "til": 963
+  },
+  "eric_jacquin": {
+    "from": 963,
+    "til": 1180
   },
   "finn": {
-    "from": 641,
-    "til": 751
+    "from": 1180,
+    "til": 1290
   },
   "gastly": {
-    "from": 751,
-    "til": 851
+    "from": 1290,
+    "til": 1390
   },
   "gengar": {
-    "from": 851,
-    "til": 927
+    "from": 1390,
+    "til": 1466
   },
   "gon_freecs": {
-    "from": 927,
-    "til": 1173
+    "from": 1466,
+    "til": 1713
+  },
+  "greninja": {
+    "from": 1713,
+    "til": 1866
   },
   "grimer": {
-    "from": 1173,
-    "til": 1302
+    "from": 1866,
+    "til": 1995
   },
   "haunter": {
-    "from": 1302,
-    "til": 1388
+    "from": 1995,
+    "til": 2081
   },
   "jinx": {
-    "from": 1388,
-    "til": 1507
+    "from": 2081,
+    "til": 2200
   },
   "kakashi": {
-    "from": 1507,
-    "til": 1638
+    "from": 2200,
+    "til": 2330
+  },
+  "kakuna": {
+    "from": 2330,
+    "til": 2361
   },
   "kenko": {
-    "from": 1638,
-    "til": 1811
+    "from": 2361,
+    "til": 2534
   },
   "konan": {
-    "from": 1811,
-    "til": 1923
+    "from": 2534,
+    "til": 2646
+  },
+  "lina_inverse": {
+    "from": 2646,
+    "til": 2747
+  },
+  "link": {
+    "from": 2747,
+    "til": 2893
   },
   "luffy": {
-    "from": 1923,
-    "til": 2024
+    "from": 2893,
+    "til": 2994
   },
   "mando": {
-    "from": 2024,
-    "til": 2192
+    "from": 2994,
+    "til": 3162
   },
   "mechwarrior": {
-    "from": 2192,
-    "til": 2299
+    "from": 3162,
+    "til": 3269
   },
   "mikegator": {
-    "from": 2299,
-    "til": 2371
+    "from": 3269,
+    "til": 3341
   },
   "min": {
-    "from": 2371,
-    "til": 2443
+    "from": 3341,
+    "til": 3413
   },
   "muk": {
-    "from": 2443,
-    "til": 2568
+    "from": 3413,
+    "til": 3538
   },
   "pichu": {
-    "from": 2568,
-    "til": 2671
+    "from": 3538,
+    "til": 3641
   },
   "pikachu": {
-    "from": 2671,
-    "til": 2776
+    "from": 3641,
+    "til": 3746
   },
   "poste": {
-    "from": 2776,
-    "til": 2777
+    "from": 3746,
+    "til": 3747
   },
   "ppg": {
-    "from": 2777,
-    "til": 2939
+    "from": 3747,
+    "til": 3909
   },
   "punchingbag": {
-    "from": 2939,
-    "til": 2963
+    "from": 3909,
+    "til": 3933
   },
   "raichu": {
-    "from": 2963,
-    "til": 3066
+    "from": 3933,
+    "til": 4036
   },
   "ray": {
-    "from": 3066,
-    "til": 3140
+    "from": 4036,
+    "til": 4110
+  },
+  "ryu": {
+    "from": 4110,
+    "til": 4273
   },
   "shao": {
-    "from": 3140,
-    "til": 3247
+    "from": 4273,
+    "til": 4380
   },
   "squirtle": {
-    "from": 3247,
-    "til": 3379
+    "from": 4380,
+    "til": 4512
   },
   "sr_madruga": {
-    "from": 3379,
-    "til": 3501
+    "from": 4512,
+    "til": 4634
   },
   "steve": {
-    "from": 3501,
-    "til": 3633
+    "from": 4634,
+    "til": 4766
   },
   "teichi": {
-    "from": 3633,
-    "til": 3763
+    "from": 4766,
+    "til": 4896
   },
   "tophoro": {
-    "from": 3763,
-    "til": 3884
+    "from": 4896,
+    "til": 5017
   },
   "tupitree": {
-    "from": 3884,
-    "til": 4038
+    "from": 5017,
+    "til": 5171
   },
   "wall": {
-    "from": 4038,
-    "til": 4039
+    "from": 5171,
+    "til": 5172
   },
   "wartortle": {
-    "from": 4039,
-    "til": 4177
+    "from": 5172,
+    "til": 5310
+  },
+  "weedle": {
+    "from": 5310,
+    "til": 5365
+  },
+  "xululu_child": {
+    "from": 5365,
+    "til": 5517
   },
   "young_link": {
-    "from": 4177,
-    "til": 4206
+    "from": 5517,
+    "til": 5546
   },
   "zagatur": {
-    "from": 4206,
-    "til": 4294
+    "from": 5546,
+    "til": 5634
   },
   "zoio": {
-    "from": 4294,
-    "til": 4393
+    "from": 5634,
+    "til": 5733
   }
 }

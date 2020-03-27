@@ -20,29 +20,37 @@ zagatur_fun(self: Thing) : Thing
   // Left
   |ZAGATUR_CARNIVOROUS_BITE_CAST
     let self = animate(self, 0, ZAGATUR_CARNIVOROUS_BITE_CAST_000, 10, 20)
-    let bite = new_thing <= thing(fun=zagatur_carnivorous_bite_anim)
-    let self = spawn(self, 10, [move(bite, self.trg)])
+    let bite = new_thing <= thing(fun=zagatur_carnivorous_bite_anim, dir = targ_dir(self))
+    let self = spawn(self, 10, [move(bite, at_max_dist(self, 150))])
     self
 
   // Middle
   |ZAGATUR_CLONE
-    let self = animate(self, 1, ZAGATUR_IDLE_000, 4, 16)
+    let self = animate(self, 0, ZAGATUR_IDLE_000, 4, 16)
     let make = new_thing <= thing(fun=zagatur_clone_anim)
     let self = spawn(self, 10, [move(make, self.trg)])
     self
 
-  // Left
+  // Right
   |ZAGATUR_PROTECT
     let self = animate(self, 0, ZAGATUR_PROTECT_CAST_000, 12, 24)
     let make = new_thing <= thing(fun=zagatur_protect_anim)
-    let self = spawn(self, 10, [move(make, self.trg)])
+    let self = spawn(self, 10, [move(make, at_max_dist(self, 150))])
     self
 
   // Ultimate
   |ZAGATUR_SACRIFICE
-    let self = animate(self, 0.5, ZAGATUR_SACRIFICE_CAST_000, 17, 51)
-    let ball = new_thing <= thing(fun=zagatur_sacrifice_anim)
-    let self = spawn(self, 40, [move(ball, self.trg)])
+    let self = animate(self, 0, ZAGATUR_SACRIFICE_CAST_000, 17, 51)
+    // let self = animate_between(self, 0, ZAGATUR_SACRIFICE_CAST_000, 14, 0, 40)
+    // let self = animate_between(self, 0, ZAGATUR_SACRIFICE_CAST_013, 16, 14, 60)
+    // let self = reset(60)
+    let ball = new_thing <= thing(
+      fun = zagatur_sacrifice_anim,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(6, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 34, [ball])
     self
 
   // Space
@@ -51,7 +59,7 @@ zagatur_fun(self: Thing) : Thing
 
   // E
   |ZAGATUR_TAUNT
-    animate(self, 1, ZAGATUR_TAUNT_000, 13, 39)
+    animate(self, 0, ZAGATUR_TAUNT_000, 13, 39)
 
   else self
 

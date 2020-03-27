@@ -12,7 +12,10 @@ enum
 
 
 dorime_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 3, mhp = 24)
+  let self = self <= thing(
+    mov = 2.2,
+    box = cbox(8),
+    mhp = 32)
 
   case self |thing switch self.act
 

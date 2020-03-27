@@ -26,9 +26,13 @@ kakashi_fun(self: Thing) : Thing
   // Left 
   |KAKASHI_PAKKUN_ATTACK
     let self = animate(self, 0, KAKASHI_PAKKUN_ATTACK_000, 26, 52)
-    let effs = [damage(5)]
-    let hits = [hit(effs, at_dist(self, 85), self.dir, cbox(15))]
-    let self = cast(self, 40, hits)
+    let max_dist = 90
+    let hits0 = [hit([damage(2)], at_dist(self, max_dist * 0.5), self.dir, cbox(10))]
+    let hits1 = [hit([damage(2)], at_dist(self, max_dist * 0.7), self.dir, cbox(10))]
+    let hits2 = [hit([damage(4)], at_dist(self, max_dist), self.dir, cbox(15))]
+    let self = cast(self, 36, hits0)
+    let self = cast(self, 40, hits1)
+    let self = cast(self, 42, hits2)
     self
 
   // Middle
@@ -47,26 +51,37 @@ kakashi_fun(self: Thing) : Thing
     let self = cast(self, 16, hits1)
     let fire = new_thing <= thing(
       fun = kakashi_fire_ball_effect,
-      pos = at_dist(self, 35), // probably we will have to change this
-      dir = self.dir,
+      pos = at_dist(self, 35),
+      dir = targ_dir(self),
       vel = scale_v3(4, targ_dir(self)),
       box = nbox)
     let self = spawn(self, 5, [fire])
     self
 
-  // Space
+  // Q
   |KAKASHI_RAIKIRI
-    let self = animate(self, 1, KAKASHI_RAIKIRI_000, 25, 50)
-    let hits0 = [hit([damage(4)], at_dist(self, 45), self.dir, cbox(10))]
-    let hits1 = [hit([damage(6)], at_dist(self, 90), self.dir, cbox(15))]
-    let self = cast(self, 35, hits0)
-    let self = cast(self, 42, hits1)
-    let self = blink(self, 49, at_dist(self, 80))
+    let self = animate_with_blink(self, 0, KAKASHI_RAIKIRI_000, KAKASHI_IDLE_000, 24, 0, 48)
+    let self = reset(self, 48)
+    let hits0 = [hit([damage(2)], at_dist(self, 90 * (1 \ 12)), self.dir, cbox(10))]
+    let hits1 = [hit([damage(2)], at_dist(self, 90 * (3 \ 12)), self.dir, cbox(10))]
+    let hits2 = [hit([damage(2)], at_dist(self, 90 * (5 \ 12)), self.dir, cbox(10))]
+    let hits3 = [hit([damage(2)], at_dist(self, 90 * (7 \ 12)), self.dir, cbox(10))]
+    let hits4 = [hit([damage(2)], at_dist(self, 90 * (9 \ 12)), self.dir, cbox(10))]
+    let hits5 = [hit([damage(2)], at_dist(self, 90 * (11 \ 12)), self.dir, cbox(10))]
+    let hits6 = [hit([damage(6)], at_dist(self, 100), self.dir, cbox(15))]
+    let self = cast(self, 34, hits0)
+    let self = cast(self, 35, hits1)
+    let self = cast(self, 36, hits2)
+    let self = cast(self, 37, hits3)
+    let self = cast(self, 38, hits4)
+    let self = cast(self, 39, hits5)
+    let self = cast(self, 40, hits6)
+    let self = blink(self, 48, at_dist(self, 90))
     self
 
   // Space
   | KAKASHI_BLOCK
-    animate(self, 1, KAKASHI_BLOCK_000, 15, 30)
+    animate(self, 0, KAKASHI_BLOCK_000, 15, 30)
 
   // E
   | KAKASHI_TAUNT

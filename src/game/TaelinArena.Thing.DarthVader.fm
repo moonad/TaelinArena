@@ -1,0 +1,88 @@
+import TaelinArena.Game
+
+enum
+| DARTH_VADER_IDLE
+| DARTH_VADER_THE_FORCE_AWAKENS
+| DARTH_VADER_THE_EMPIRE_STRICKES_BACK
+| DARTH_VADER_THE_RISE_OF_SKYWALKER
+| DARTH_VADER_THE_PHANTOM_MENACE
+| DARTH_VADER_ROGUE_ONE
+| DARTH_VADER_EXTRA
+
+USING_FORCE : Bits
+  001b
+
+
+
+darthvader_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  let self = update_buff(self, USING_FORCE)
+
+  case self |thing switch self.act
+
+  |DARTH_VADER_IDLE
+    if is_walking(self)
+    then 
+      case is_using_buff(self, USING_FORCE) as force
+      | true => animate(self, 1.6, DARTH_VADER_WALK_CYCLE_000, 8, 16)
+      | false => animate(self, 1, DARTH_VADER_WALK_CYCLE_000, 8, 16)
+    else animate(self, 1, DARTH_VADER_IDLE_000, 5, 10)
+
+  // Left 
+  |DARTH_VADER_THE_FORCE_AWAKENS
+    let self = animate(self, 0, DARTH_VADER_THE_FORCE_AWAKENS_VAR_1_000, 8, 24)
+    let self = dash(self, 2, 0, 20)
+    self
+
+  // TODO: Still need to add the force on his position
+  // Middle
+  |DARTH_VADER_THE_EMPIRE_STRICKES_BACK
+    let self = will_set_buff(self, ONE_SEC * 5, USING_FORCE)
+    let self = animate(self, 1, DARTH_VADER_IDLE_000, 5, 10)
+    self
+
+  // Right
+  |DARTH_VADER_THE_RISE_OF_SKYWALKER
+    let self = animate_between(self, 0, DARTH_VADER_THE_RISE_OF_SKYWALKER_CAST_ANIMATION_000, 3, 0, 12)
+    let self = animate_between(self, 0, DARTH_VADER_THE_RISE_OF_SKYWALKER_CAST_ANIMATION_002, 1, 12, 18)
+    let self = reset(self, 17)
+    let force = new_thing <= thing(fun = darth_vader_rise_skywalker_fun, sid = self.sid)
+    let self = spawn(self, 10, [move(force, at_max_dist(self, 150))])
+    self
+
+  // Q
+  // TODO: Add movement to make a curve trajectory
+  |DARTH_VADER_THE_PHANTOM_MENACE
+    let self = animate_between(self, 0, DARTH_VADER_THE_PHANTOM_MENACE_CAST_ANIMATION_000, 4, 0, 12)
+    let self = animate_between(self, 0, DARTH_VADER_THE_PHANTOM_MENACE_CAST_ANIMATION_004, 1, 12, 18)
+    let self = reset(self, 17)
+    let saber = new_thing <= thing(
+      sid = self.sid,
+      fun = darth_vader_phanton_menace_twisting_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 14, [saber])
+    self
+
+  // Space
+  |DARTH_VADER_ROGUE_ONE
+    let self = animate_with_blink(self, 0, DARTH_VADER_ROGUE_ONE_000, DARTH_VADER_IDLE_000, 10, 0, 20)
+    let self = reset(self, 20)
+    let self = blink(self, 20, at_dist(self, 75))
+    self
+
+  // E
+  |DARTH_VADER_EXTRA
+    animate(self, 1, DARTH_VADER_IDLE_000, 5, 10)
+
+  else self
+
+darth_vader_rise_skywalker_fun(self: Thing) : Thing
+  animate_die(self, 0, DARTH_VADER_THE_RISE_OF_SKYWALKER_EFFECT_ANIMATION_000, 4, 12)
+
+darth_vader_phanton_menace_twisting_fun(self: Thing) : Thing
+  animate_die(self, 0, DARTH_VADER_THE_PHANTOM_MENACE_SABER_TWISTING_000, 5, 30)
+

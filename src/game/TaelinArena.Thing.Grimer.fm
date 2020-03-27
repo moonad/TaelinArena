@@ -48,7 +48,9 @@ grimer_fun(self: Thing) : Thing
 
   // Space
   | GRIMER_EXTRA
-    let self = new_thing <= thing(fun=muk_fun, pid=self.pid, pos=self.pos) // Muk
+    let self = animate(self, 1, GRIMER_TRANSFORMATION_000, 13, 26)
+    let self = create_at(self, 25, muk_fun)
+    let evolved = set_thing_nam(self, "Muk")
     self
 
   // E

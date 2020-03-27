@@ -94,6 +94,12 @@ interact_with(this:Thing, that:Thing): Thing
             else
               this
           | damage =>
+            // TODO: hit shields on thing.buf before hitting hp
+            // use a fold with a pair (remaining_damage, remaining_buffs)
+            // for each shield, decrease from remaining_damage
+            // remove shields and/or reduce their amounts correctly
+            // in the end, add the remaining_damage to the player's damage
+            // and update its buf list (with the removed shields)
             if this.sid === that.sid then
               this
             else
@@ -111,6 +117,8 @@ interact_with(this:Thing, that:Thing): Thing
             else
               let vec = scale_v3(eff.mag, eff.dir)
               this <= thing(knk = vec)
+          // TODO: add the new Effects (slow, haste, etc.l)
+          // ex: the "slow" effect adds a "slowed" to the character list
         fold(Effect; Thing; this, apply_eff, hit.eff)
     fold(Hit; Thing; this, apply_hit, that.hit)
   this
@@ -158,14 +166,19 @@ exec_turn(gm: Game) : Game
     // Integrates position with dash velocity
     let this = this <= thing(pos = add_v3(pos,vel))
 
+    // TODO: multiply vel by speed_multiplier_of(this)
     // Integrates position with walk vector
     let this = this <= thing(pos = add_v3(pos,scale_v3(mov*bst,pad)))
+
+    // TODO: decrease duration of all buffs, remove from list if dur=0
 
     // Integrates position with knockback
     let this = this <= thing(
       pos = add_v3(pos, knk),
       knk = if len_v3(knk) > 0
-        then scale_v3(max(len_v3(knk)-1,0), norm_v3(knk))
+        then
+          let force = max(len_v3(knk) - this.wei, 0)
+          scale_v3(force, norm_v3(knk))
         else knk)
 
     // Calls the transaction function
