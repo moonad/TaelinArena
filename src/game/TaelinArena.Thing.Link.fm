@@ -1,0 +1,83 @@
+import TaelinArena.Game
+
+enum
+| LINK_IDLE
+| LINK_TRIPLE_ATTACK
+| LINK_PERFECT_EXTHENGE
+| LINK_STORM
+| LINK_SELECTION_MASK
+| LINK_BLOCK
+| LINK_TAUNT
+
+
+link_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  | LINK_IDLE
+    if is_walking(self)
+    then animate(self, 1, LINK_WALK_CYCLE_000, 7, 14)
+    else animate(self, 1, LINK_IDLE_000, 7, 14)
+
+  // Left 
+  | LINK_TRIPLE_ATTACK
+    let self = animate(self, 1, LINK_TRIPLE_ATTACK_000, 11, 22)
+    self
+
+  // Middle
+  | LINK_PERFECT_EXTHENGE
+    let self = animate(self, 0, LINK_PERFECT_EXTHENGE_CASTING_000, 29, 29)
+    let arrow = new_thing <= thing(
+      sid = self.sid,
+      fun = link_perfect_fun,
+      vel = scale_v3(16, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 22, [arrow])
+    self
+
+  // Right
+  | LINK_STORM
+    let self = animate(self, 1, LINK_STORM_000, 23, 46)
+    self
+
+  // Q
+  | LINK_SELECTION_MASK
+    let self = animate(self, 0, LINK_SELECTION_MASK_000, 23, 46)
+    self
+
+  // SPACE
+  | LINK_BLOCK
+    let self = animate(self, 1, LINK_BLOCK_000, 11, 22)
+    self
+
+  // E
+  | LINK_TAUNT
+    let self = animate(self, 0, LINK_TAUNT_000, 22, 44)
+    self
+
+  else self
+
+  link_perfect_fun(self: Thing) : Thing
+    case self |thing
+    let self = animate_die(self, 0, LINK_PERFECT_EXTHENGE_PROJECT_000, 1, 16)
+    let self = self <= thing(box = nbox)
+    let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
+    let self = cast(self, 0, hits)
+    let self = cast(self, 1, hits)
+    let self = cast(self, 2, hits)
+    let self = cast(self, 3, hits)
+    let self = cast(self, 4, hits)
+    let self = cast(self, 5, hits)
+    let self = cast(self, 6, hits)
+    let self = cast(self, 7, hits)
+    let self = cast(self, 8, hits)
+    let self = cast(self, 9, hits)
+    let self = cast(self, 10, hits)
+    let self = cast(self, 11, hits)
+    let self = cast(self, 12, hits)
+    let self = cast(self, 13, hits)
+    let self = cast(self, 14, hits)
+    let self = cast(self, 15, hits)
+    self

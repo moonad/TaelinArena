@@ -1,0 +1,80 @@
+import TaelinArena.Game
+
+enum
+| GRENINJA_IDLE
+| GRENINJA_WATER_SHURIKEN
+| GRENINJA_DOUBLE_TEAM
+| GRENINJA_FROZEN_KUNAI
+| GRENINJA_FLUID_TWIST
+| GRENINJA_KUNAI_SHOT 
+| GRENINJA_TAUNT
+
+medium_dist : Number
+  200
+long_dist : Number
+  300
+
+greninja_fun(self: Thing) : Thing
+  //TODO fix mov speed
+  let self = self <= thing(mov = 3, mhp=24)
+
+  case self |thing switch self.act
+
+  | GRENINJA_IDLE
+    if is_walking(self)
+    then animate(self, 1, GRENINJA_WALK_000, 12, 24)
+    else animate(self, 1, GRENINJA_IDLE_000, 11, 22)
+
+  // left  
+  |GRENINJA_WATER_SHURIKEN
+    animate(self, 0, GRENINJA_WATER_SHURIKEN_000, 16, 28)
+
+  // middle 
+  // TODO 
+  // - change where the clones are spawned 
+  |GRENINJA_DOUBLE_TEAM
+    let self = animate(self, 0, GRENINJA_DOUBLE_TEAM_CAST_000, 18, 24)
+    let clone1 = new_thing <= thing(
+      fun = greninja_double_team_effect,
+      dir = self.dir 
+    )
+    let clone2 = new_thing <= thing(
+      fun = greninja_double_team_effect,
+      dir = self.dir 
+    )
+    let self = spawn(
+      self,
+      18,
+      [ move(clone1, add_v3(self.trg, v3(1,1,0)))
+      , move(clone2, add_v3(self.trg, v3(-1,1,0)))
+      ]
+    )
+    self 
+
+  // right 
+  |GRENINJA_FROZEN_KUNAI
+    animate(self, 0, GRENINJA_FROZEN_KUNAI_000, 18, 28)
+
+  // Q 
+  |GRENINJA_FLUID_TWIST
+    let self = animate(self, 0, GRENINJA_FLUID_TWIST_000, 29, 60) 
+    let self = dash(self, 7, 40, 58)
+    self
+
+  // SPACE
+  |GRENINJA_KUNAI_SHOT
+    animate(self, 0, GRENINJA_KUNAI_SHOT_CAST_000, 11, 22) 
+
+  // E 
+  |GRENINJA_TAUNT
+    animate(self, 0, GRENINJA_TAUNT_000, 21, 42)
+
+
+  else self
+
+
+
+
+greninja_double_team_effect(self: Thing) : Thing 
+  let self = animate_die(self, 0, GRENINJA_DOUBLE_TEAM_EFFECT_000, 9, 20)
+  self 

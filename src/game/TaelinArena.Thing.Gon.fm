@@ -1,0 +1,154 @@
+import TaelinArena.Game
+
+enum
+| GON_IDLE
+| GON_STONE
+| GON_PAPER
+| GON_SCISSOR
+| GON_MAX_POWER
+| GON_INTENSIFICATION
+| GON_TAUNT
+
+// Key on stt
+GON_ULT_TIME : Bits
+  000b
+
+GON_AFTER_ULT : Bits
+  001b
+
+gon_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |GON_IDLE
+    if is_walking(self)
+    then animate(self, 1, GON_FREECS_WALK_000, 6, 12)
+    else animate(self, 1, GON_FREECS_IDLE_000, 16, 32)
+
+  // Left 
+  |GON_STONE
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_STONE_000, 23, 46)
+    self
+
+  // Middle
+  |GON_PAPER
+    let self = animate(self, 0, GON_FREECS_JAJANKEN_PAPER_CASTING_000, 17, 17)
+    let fire = new_thing <= thing(
+      fun = gon_paper_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      vel = scale_v3(12, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 12, [fire])
+    self
+
+  // Right
+  |GON_SCISSOR
+    let self = animate_between(self, 0, GON_FREECS_JAJANKEN_SCISSORS_000, 12, 0, 12)
+    let self = animate_between(self, 0, GON_FREECS_JAJANKEN_SCISSORS_012, 5, 12, 22)
+    let self = reset(self, 21)
+    self
+
+  // Q
+  |GON_MAX_POWER
+    let self = animate(self, 0, GON_FREECS_ULTIMATE_TRANSFORMATION_000, 16, 32)
+    let self = create_at(self, 31, gon_transformed_fun)
+    self
+
+  // Space
+  | GON_INTENSIFICATION
+    animate(self, 1, GON_FREECS_INTENSIFICATION_000, 10, 30)
+
+  // E
+  | GON_TAUNT
+    let self = animate(self, 0, GON_FREECS_TAUNT_000, 16, 32)
+    let text = new_thing <= thing(fun=gon_taunt_text_fun, sid = self.sid)
+    let self = spawn(self, 20, [move(text, self.pos)])
+    self
+
+  else self
+
+gon_paper_fun(self: Thing) : Thing 
+  animate_die(self, 0, GON_FREECS_JAJANKEN_PAPER_PROJECTILE_000, 8, 16)
+
+gon_taunt_text_fun(self: Thing) : Thing
+  animate_die(self, 0, GON_FREECS_TAUNT_TEXT_000, 1, 10)
+
+// Transformed Gon
+// ---------------
+
+gon_transformed_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  // Back to normal Gon after 30 seconds
+  let self = end_thing(self, gon_tired_fun, ONE_SEC * 30, GON_ULT_TIME)
+
+  case self |thing switch self.act
+
+  |GON_IDLE
+    if is_walking(self)
+    then animate(self, 1, GON_FREECS_TRANSFORMED_WALK_000, 8, 16)
+    else animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 27)
+
+  // Left 
+  |GON_STONE
+    let self = animate_with_blink(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000, GON_FREECS_TRANFORMED_IDLE_000, 17, 0, 34)
+    let self = reset(self, 34)
+    let self = blink(self, 34, at_max_dist(self, 78))
+    self
+
+  // Middle
+  |GON_PAPER
+    let self = animate(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_000, 17, 34)
+    let fire = new_thing <= thing(
+      fun = gon_t_paper_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      vel = scale_v3(12, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 28, [fire])
+    self
+
+  // Right
+  |GON_SCISSOR
+    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_000, 12, 0, 13)
+    let self = animate_between(self, 0, GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_012, 7, 13, 26)
+    let self = reset(self, 25)
+    self
+
+  // Q
+  |GON_MAX_POWER
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 27)
+
+  // Space
+  |GON_INTENSIFICATION
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
+
+  // E
+  |GON_TAUNT
+    animate(self, 1, GON_FREECS_TRANFORMED_IDLE_000, 9, 18)
+
+
+  else self
+
+gon_t_paper_fun(self: Thing) : Thing
+  animate_die(self, 0, GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_PROJETIL_000, 8, 16)
+
+
+
+// Tired Gon
+// ---------
+// After using his ultimate, Gon gets tired. He can't use any skill and have the mov reduced
+gon_tired_fun(self: Thing) : Thing 
+  let self = self <= thing(mov = 2)
+  // Back to normal Gon after 5secs ticks
+  let self = end_thing(self, gon_fun, ONE_SEC * 5, GON_AFTER_ULT)
+
+  // TODO: Add tired energy to follow him
+  case self |thing 
+    if is_walking(self)
+      then 
+        animate(self, 1, GON_FREECS_AFTER_ULTIMATE_WALK_000, 12, 24)
+      else 
+        animate(self, 1, GON_FREECS_AFTER_ULTIMATE_IDLE_000, 8, 16)

@@ -38,12 +38,9 @@ gastly_fun(self: Thing) : Thing
   // Space
   | GASTLY_EVOLVE
     let self = animate(self, 1, GASTLY_EVOLUTION_000, 11, 22)
-    let new_pos = self.pos
-    let self = self <= thing(die = true)
-    let self = new_thing <= thing(fun=haunter_fun, pid=self.pid) // evolve to Haunter
-    let self = self <= thing(pos = new_pos)
+    let self = create_at(self, 21, haunter_fun) // evolve to Haunter
     self
-
+    
   // E
   | GASTLY_TAUNT
     animate(self, 1, GASTLY_TAUNT_000, 18, 36)
@@ -91,10 +88,7 @@ haunter_fun(self: Thing) : Thing
   // Space
   | HAUNTER_EVOLVE
     let self = animate(self, 1, HAUNTER_EVOLUTION_000, 13, 26)
-    let new_pos = self.pos
-    let self = self <= thing(die = true)
-    let self = new_thing <= thing(fun=gengar_fun, pid=self.pid) // evolve to Gengar
-    let self = self <= thing(pos = new_pos)
+    let self = create_at(self, 25, gengar_fun) // evolve to Haunter
     self
     
   // E

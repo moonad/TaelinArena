@@ -78,6 +78,10 @@ T Input
 T Command
 | command(pid: PlayerId, inp: Input)
 
+// 1 second has 24 tiks
+ONE_SEC : Number
+  24
+
 // Creates a new default thing
 new_thing : Thing
   thing(
@@ -185,7 +189,8 @@ die(
 // - boost: speed multiplier (0 = no move, 1 = normal spd)
 // - model: id of the first model of the animation
 // - count: total count of models on the animation
-// - durat: duration of the animation
+// - from: frame to start animating
+// - til: last frame to animate
 animate_between(
   self  : Thing,
   boost : Number,
@@ -247,6 +252,29 @@ animate_die(
   let self = animate_between(self,boost,model,count,0,durat)
   let self = die(self, durat - 1)
   self
+
+// Avoid problems with "ghost frame after blink"
+// - self: thing to be animated
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model_atk: id of the main model of the animation
+// - model_idle: idle000 of the character
+// - count: total count of models on the animation
+// - from: frame to start animating
+// - til: last frame to animate
+animate_with_blink(
+  self       : Thing,
+  boost      : Number,
+  model_atk  : Number,
+  model_idle : Number,
+  count      : Number,
+  from       : Number,
+  til        : Number
+  ) : Thing
+  case self | thing
+    let self = animate_between(self, boost, model_atk, count, from, til)
+    let self = animate_between(self, boost, model_idle, 1, til, til + 1)
+    let self = reset(self, til)
+    self
 
 // Performs a dash between certain frames
 // - self: thing that will dash
@@ -366,3 +394,104 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 is_walking(this: Thing) : Number
   case this |thing
   len_v3(this.pad) > 0
+
+// Spawns another thing
+// - self: thing that will create another thing
+// - at_tik: number of the tik when thing will be created
+// - at_pos: position on which thing will be created
+// - thing: thing that will be created
+create_at(
+  self   : Thing,
+  at_tik : Number
+  new_thing: TxFunction)
+  case self |thing
+  if self.tik === at_tik then
+    self <= thing(fun=new_thing, pid=self.pid, pos=self.pos)
+  else 
+    self
+
+// Ends an animation/transformation/thing after some ticks
+// - self: thing that will end after a while
+// - tx: the new animation to use when it ends
+// - after_tiks: numbers of ticks passed until the end
+// - stt_key: the key in the stt map
+end_thing(
+  self: Thing, 
+  tx: TxFunction, 
+  after_tiks: Number, 
+  stt_key: Bits
+  ) : Thing
+  case self |thing
+    let current_tik = lookup(_ stt_key, self.stt)
+    let empty_stt = insert(_ stt_key, after_tiks, self.stt)
+    case current_tik
+    | none => self <= thing(stt = empty_stt) // insert a new key
+    | some =>
+      if current_tik.value === 0 
+      then
+        self <= thing(fun=tx, pid=self.pid, pos=self.pos, stt=empty_stt)
+      else 
+        let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
+        self <= thing(stt = new_stt)
+
+
+// Blocks a thing during an animation
+// - self : the thing to apply block on
+// - boost: speed multiplier (0 = no move, 1 = normal spd)
+// - model: id of the first model of the animation
+// - count: total count of models on the animation
+// - durat: duration of the animation
+block(
+  self: Thing, 
+  boost: Number,
+  model: Number,
+  count: Number,
+  from: Number,
+  til: Number
+) : Thing 
+  case self |thing 
+  if is_between(from, til, self.tik) 
+  then self <= thing(
+    dmg = 0,
+    bst = boost,
+    mid = 
+      let duration = til - from
+      let curr_tik = tik - from
+      let curr_tim = curr_tik \ duration
+      model + (floor(curr_tim * count) % count)
+    )
+  else 
+    reset(self, til + 1) 
+
+// Update a stt_key until the value associated to it ends. Used along with will_set_buff
+// - self: thing with stt (usually character)
+// - stt_key: the key in the stt map
+update_buff(self: Thing, stt_key: Bits) : Thing
+  case self |thing
+    let current_tik = lookup(_ stt_key, self.stt)
+    case current_tik
+    | none => self
+    | some => 
+      if current_tik.value === 0
+      then self <= thing(stt=insert(_ stt_key, 0, self.stt))
+      else 
+        let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
+        self <= thing(stt = new_stt)
+
+// Set a new key to stay valid for some ticks.
+// - self: thing with stt (usually character)
+// - for_tiks: numbers of ticks where the key will be valid
+// - stt_key: the key in the stt map
+will_set_buff(self: Thing, for_tiks: Number, stt_key: Bits) : Thing
+  case self |thing
+    self <= thing(stt = insert(_ stt_key, for_tiks, self.stt)) // insert a new key
+
+// Check if a buff is being used
+// - self: thing with stt (usually character)
+// - stt_key: the key in the stt map
+is_using_buff(self: Thing, stt_key: Bits) : Bool
+  case self |thing
+    let current_tik = lookup(_ stt_key, self.stt)
+    case current_tik
+    | none => false
+    | some => if current_tik.value === 0 then false else true
