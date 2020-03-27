@@ -35,5 +35,6 @@ import TaelinArena.Thing.Teichi
 import TaelinArena.Thing.Tophoro
 import TaelinArena.Thing.Tupitree
 import TaelinArena.Thing.Wall
+import TaelinArena.Thing.Weedle
 import TaelinArena.Thing.Zagatur
 import TaelinArena.Thing.Zoio

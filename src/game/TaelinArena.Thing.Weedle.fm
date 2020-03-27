@@ -1,0 +1,171 @@
+import TaelinArena.Game
+
+enum
+| WEEDLE_IDLE
+| WEEDLE_POISON_STING
+| WEEDLE_STRING_SHOT
+| WEEDLE_RIGHT
+| WEEDLE_EVOLVE
+ 
+weedle_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |WEEDLE_IDLE
+    if is_walking(self)
+    then animate(self, 1, WEEDLE_WALK_000, 8, 16)
+    else animate(self, 1, WEEDLE_IDLE_000, 12, 24)
+
+  // Left 
+  |WEEDLE_POISON_STING
+    let self = animate(self, 0, WEEDLE_POISON_STING_000, 10, 20)
+    let self = dash(self, 5, 10, 20)
+    self
+
+  // Middle
+  |WEEDLE_STRING_SHOT
+    let self = animate(self, 0, WEEDLE_STRING_SHOT_000, 4, 16)
+    let shot = new_thing <= thing(
+      sid = self.sid,
+      fun = weedle_string_shot_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 0, [shot])
+    self
+  
+  // RIGHT
+  | WEEDLE_RIGHT
+    animate(self, 1, WEEDLE_IDLE_000, 12, 24)
+
+  // Q
+  | WEEDLE_EVOLVE
+    let self = animate(self, 1, WEEDLE_EVOLUTION_000, 9, 18)
+    let self = create_at(self, 17, kakuna_fun)
+    let self = set_thing_nam(self, "Kakuna")
+    self
+
+  else animate(self, 1, WEEDLE_IDLE_000, 12, 24)
+
+weedle_string_shot_fun(self: Thing) : Thing
+  animate_die(self, 0, WEEDLE_STRING_PROJECTILE_000, 1, 10)
+
+
+
+// Kakuna
+// ------
+
+enum
+| KAKUNA_IDLE
+| KAKUNA_STRING_ATTACH
+| KAKUNA_HARDEN
+| KAKUNA_RIGHT
+| KAKUNA_EVOLVE
+
+kakuna_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 0)
+
+  case self |thing switch self.act
+
+  |WEEDLE_IDLE
+    animate(self, 0, KAKUNA_IDLE_000, 8, 16)
+
+  // Left 
+  |KAKUNA_STRING_ATTACH
+    let self = animate(self, 0, KAKUNA_IDLE_000, 8, 16)
+    let shot = new_thing <= thing(
+      sid = self.sid,
+      fun = weedle_string_shot_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 0, [shot])
+    self
+
+  // Middle
+  |KAKUNA_HARDEN
+    let self = animate_between(self, 0, KAKUNA_HARDEN_000, 12, 0, 24)
+    let self = animate_between(self, 0, KAKUNA_HARDEN_012, 2, 24, 44)
+    let self = reset(self, 44)
+    self
+    
+  // RIGHT
+  |KAKUNA_RIGHT
+    animate(self, 0, KAKUNA_IDLE_000, 8, 16)
+
+  // Q
+  |KAKUNA_EVOLVE
+    let self = animate(self, 0, KAKUNA_EVOLUTION_000, 9, 18)
+    let self = create_at(self, 17, beedrill_fun)
+    let self = set_thing_nam(self, "Beedrill")
+    self
+
+  else animate(self, 0, KAKUNA_IDLE_000, 8, 16)
+
+
+// Beedril
+// -------
+
+enum
+| BEEDRILL_IDLE
+| BEEDRILL_TWINEEDLE
+| BEEDRILL_RAGE
+| BEEDRILL_PIN_MISSILE
+| BEEDRIL_FINAL_DRILL
+
+TWINEEDLE_KEY : Bits 
+  00101010111b
+
+beedrill_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3.5)
+
+  case self |thing switch self.act
+
+  |BEEDRILL_IDLE
+    if is_walking(self)
+    then animate(self, 1, BEEDRILL_WALK_000, 6, 12)
+    else animate(self, 1, BEEDRILL_IDLE_000, 8, 16)
+
+  // LEFT
+  |BEEDRILL_TWINEEDLE
+    let self = if self.tik === 0
+      then map_stt_key(self, TWINEEDLE_KEY, (x) => 1 - x)
+      else self
+    let self =
+      if get_stt_value(self, TWINEEDLE_KEY) === 0
+      then animate(self, 1, BEEDRILL_TWINEEDLE_000, 5, 10)
+      else animate(self, 1, BEEDRILL_TWINEEDLE_2_000, 5, 10)
+    self
+
+  // Middle
+  |BEEDRILL_RAGE
+    animate(self, 0, BEEDRILL_RAGE_000, 12, 24)
+  
+  // RIGHT
+  | BEEDRILL_PIN_MISSILE
+    let self = animate(self, 1, BEEDRILL_PIN_MISSILE_000, 14, 28)
+    let pin = new_thing <= thing(
+      sid = self.sid,
+      fun = beedrill_pin_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 14, [pin])
+    self
+
+  // Q
+  | BEEDRIL_FINAL_DRILL
+    let self = animate(self, 1, BEEDRILL_FINAL_DRILL_000, 8, 16)
+    let self = dash(self, 10, 8, 16)
+    self
+
+  else animate(self, 1, BEEDRILL_IDLE_000, 8, 16)
+
+beedrill_pin_fun(self: Thing) : Thing
+  case self |thing
+    let self = animate_die(self, 0, BEEDRILL_PIN_PROJECTILE_000, 1, 10)
+    self
