@@ -486,13 +486,25 @@ update_buff(self: Thing, stt_key: Bits) : Thing
         let new_stt = insert(_ stt_key, if current_tik.value > 0 then current_tik.value - 1 else 0, self.stt)
         self <= thing(stt = new_stt)
 
-// Set a new key to stay valid for some ticks.
-// - self: thing with stt (usually character)
-// - for_tiks: numbers of ticks where the key will be valid
+// Set a new key
+// - self: thing 
 // - stt_key: the key in the stt map
-will_set_buff(self: Thing, for_tiks: Number, stt_key: Bits) : Thing
-  case self |thing
-    self <= thing(stt = insert(_ stt_key, for_tiks, self.stt)) // insert a new key
+// - func: a function with the value to be setted
+map_stt_key(self: Thing, stt_key: Bits, func: Number -> Number) : Thing
+  self <= thing(stt = 
+    case lookup(_ stt_key, stt) as result
+    | none => insert(_ stt_key, 0, stt)
+    | some => insert(_ stt_key, func(result.value), stt))
+
+//  Get a value associated with a key
+// - self: thing 
+// - stt_key: the key in the stt map
+get_stt_value(self: Thing, stt_key: Bits) : Number 
+  case self |thing 
+    let result = lookup(_ stt_key, self.stt)
+    case result 
+    | none => 0
+    | some => result.value
 
 // Check if a buff is being used
 // - self: thing with stt (usually character)
