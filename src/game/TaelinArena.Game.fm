@@ -19,11 +19,17 @@ T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
+// TODO: add shield, slow, haste effects
 T Effect
 | heal(lif: Number)
 | damage(dmg: Number)
 | repulse(mag: Number)
 | impulse(mag: Number, dir: V3)
+
+T Buff
+| shielded(dur: Number, val: Number) // shields are hit before hp
+| slowed(dur: Number, val: Number) // slow down
+| hasted(dur: Number, val: Number) // speed up
 
 T Hit
 | hit(eff: List(Effect), pos: V3, dir: V3, box: Hitbox)
@@ -57,6 +63,7 @@ T Thing
   mhp : Number,      // max health points
   dmg : Number,      // damage taken
   knk : V3,          // launch direction and intensity
+  buf : List(Buff),  // buffs and nerfs (status effects) applied
   chi : List(Thing), // child thing to create on next tick
   hit : List(Hit),   // hits done by this
   rst : Bool,        // should this reset to idle
@@ -106,6 +113,7 @@ new_thing : Thing
     24,         // mhp
     0,          // dmg
     v3(0,0,0),  // knk
+    nil(_),     // buf
     nil(_),     // chi
     nil(_),     // hit
     false,      // rst
@@ -495,3 +503,8 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
     case current_tik
     | none => false
     | some => if current_tik.value === 0 then false else true
+
+// Returns the current speed multiplier by checking all buffs, considering
+// sloweds and hasteds
+speed_multiplier_of(self: Thing) : Number
+  0 // TODO
