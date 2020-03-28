@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | GON_IDLE
@@ -8,13 +9,6 @@ enum
 | GON_MAX_POWER
 | GON_INTENSIFICATION
 | GON_TAUNT
-
-// Key on stt
-GON_ULT_TIME : Bits
-  000b
-
-GON_AFTER_ULT : Bits
-  001b
 
 gon_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
