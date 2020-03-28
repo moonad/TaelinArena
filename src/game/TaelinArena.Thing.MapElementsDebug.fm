@@ -1,0 +1,77 @@
+import TaelinArena.Game
+
+punchingbag_fun(self: Thing) : Thing
+  let smhp = 32
+  let self = self <= thing(mhp = smhp)
+  let self = self <= thing(dir = v3(0.707,-0.707,0))
+  let self = self <= thing(dmg = dmg - (2 \ 24))
+  let self = self <= thing(mid =
+    let pow = max(0, min(1, dmg \ smhp))
+    let ang = ((sin(tik \ 6) * 12 * pow) + 24 + 0.5) % 24
+    PUNCHINGBAG_IDLE_000 + floor(ang))
+  self
+
+poste_fun(self: Thing) : Thing
+  let self = self <= thing(pos = v3(0,0,0))
+  let self = self <= thing(mid = POSTE_IDLE_000)
+  case self |thing
+  let lpos = case self.pos|v3 v3(self.pos.x,self.pos.y,52)
+  let lrng = 32.0
+  let lrad = 12.0
+  let lsub = v3(0.0, 0.0, 0.0)
+  let ladd = v3(0.72, 0.60, 0.24)
+  let lght = light(lpos,lrad,lrng,lsub,ladd)
+  let self = illumine(self, 0, 2147483648, [lght])
+  self
+
+
+wall_fun(self: Thing) : Thing
+  let self = self <= thing(pos = v3(-64,64,0))
+  let self = self <= thing(dir = v3(0.7071,0.7071,0))
+  let self = self <= thing(mid = WALL_IDLE_000)
+  let boxw = 60
+  let boxh = 7
+  let self = self <= thing(box = pbox([
+    v3(boxw * -1, boxh * -1, 0),
+    v3(boxw * -1, boxh *  1, 0),
+    v3(boxw *  1, boxh *  1, 0),
+    v3(boxw *  1, boxh * -1, 0)
+  ]))
+  self
+
+puddledmg_fun(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(pos = v3(100,-100,0))
+  let self = self <= thing(dir = v3(0.7071,0.7071,0))
+  let self = self <= thing(box = nbox)
+  let self = self <= thing(mid = DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000)
+  let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 87)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(48))]
+  let self = cast(self, 10, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 18, hits)
+  let self = cast(self, 22, hits)
+  let self = cast(self, 26, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 34, hits)
+  let self = cast(self, 38, hits)
+  self
+
+
+puddleheal_fun(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(pos = v3(130,80,0))
+  let self = self <= thing(dir = v3(0.7071,0.7071,0))
+  let self = self <= thing(box = nbox)
+  let self = self <= thing(mid = DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_015)
+  let self = animate(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_015, 9, 36)
+  let hits = [hit([heal(1)], self.pos, self.dir, cbox(48))]
+  let self = cast(self, 10, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 18, hits)
+  let self = cast(self, 22, hits)
+  let self = cast(self, 26, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 34, hits)
+  let self = cast(self, 38, hits)
+  self

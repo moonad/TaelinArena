@@ -180,6 +180,14 @@ class Main extends Component {
           pos:{x:-64,y:-64,z:0},
           nam:"Wall",
         }]);
+        things.push(["puddledmg", {
+          pos:{x:100,y:-100,z:0},
+          nam:"Damage",
+        }]);
+        things.push(["puddleheal", {
+          pos:{x:-100,y:-100,z:0},
+          nam:"Heal",
+        }]);
       } else {
         things = this.game_list[gid].players.split(",");
         things = things.map(TA.parse_player);
