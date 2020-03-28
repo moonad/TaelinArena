@@ -498,6 +498,7 @@ var heroes = [
   "DarthVader",
   "Dilma",
   "Dorime",
+  "DrStrange",
   "Finn",
   "Gastly",
   "Gon",
