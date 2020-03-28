@@ -89,10 +89,14 @@ interact_with(this:Thing, that:Thing): Thing
         let apply_eff = (eff, this) =>
           case eff
           | heal =>
+            // IMPORTANT: use commented code. 
+            // I inverted this so the puddle on debug mode could heal 
             if this.sid === that.sid then
-              this <= thing(dmg = dmg - eff.lif)
-            else
               this
+              // this <= thing(dmg = dmg - eff.lif)
+            else
+              // this
+              this <= thing(dmg = dmg - eff.lif)
           | damage =>
             // TODO: hit shields on thing.buf before hitting hp
             // use a fold with a pair (remaining_damage, remaining_buffs)
