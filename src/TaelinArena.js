@@ -526,6 +526,7 @@ var heroes = [
   "Tophoro",
   "Tupitree",
   "Weedle",
+  "XululuChild",
   "Zagatur",
   "Zoio",
 ];

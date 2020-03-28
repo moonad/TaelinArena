@@ -36,7 +36,7 @@ class Main extends Component {
     this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
-    this.pick_hero("Weedle");
+    this.pick_hero("XululuChild");
     this.login();
   }
 
