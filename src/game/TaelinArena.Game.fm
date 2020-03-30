@@ -25,6 +25,9 @@ T Effect
 | damage(dmg: Number)
 | repulse(mag: Number)
 | impulse(mag: Number, dir: V3)
+| slow(dur: Number, val: Number)
+| haste(dur: Number, val: Number)
+| shield(dur: Number, val: Number)
 
 T Buff
 | shielded(dur: Number, val: Number) // shields are hit before hp
@@ -516,7 +519,16 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
     | none => false
     | some => if current_tik.value === 0 then false else true
 
+
+combine_mov_buffs(b: Buff, i: Number) : Number
+  case b 
+  | shielded => i 
+  | slowed   => i - b.val 
+  | hasted   => i + b.val 
+
+
 // Returns the current speed multiplier by checking all buffs, considering
 // sloweds and hasteds
 speed_multiplier_of(self: Thing) : Number
-  0 // TODO
+  case self |thing 
+  fold(Buff; Number; self.bst, combine_mov_buffs, self.buf)
