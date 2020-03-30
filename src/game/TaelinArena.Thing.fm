@@ -5,6 +5,7 @@ import TaelinArena.Thing.Bleskape
 import TaelinArena.Thing.DarthVader
 import TaelinArena.Thing.Dilma
 import TaelinArena.Thing.Dorime
+import TaelinArena.Thing.DrStrange
 import TaelinArena.Thing.Finn
 import TaelinArena.Thing.Gastly
 import TaelinArena.Thing.Gon
@@ -23,8 +24,7 @@ import TaelinArena.Thing.Mikegator
 import TaelinArena.Thing.Min
 import TaelinArena.Thing.PPG
 import TaelinArena.Thing.Pichu
-import TaelinArena.Thing.Poste
-import TaelinArena.Thing.PunchingBag
+import TaelinArena.Thing.MapElementsDebug
 import TaelinArena.Thing.Ray
 import TaelinArena.Thing.Ryu
 import TaelinArena.Thing.Shao
@@ -34,6 +34,7 @@ import TaelinArena.Thing.Steve
 import TaelinArena.Thing.Teichi
 import TaelinArena.Thing.Tophoro
 import TaelinArena.Thing.Tupitree
-import TaelinArena.Thing.Wall
+import TaelinArena.Thing.Weedle
+import TaelinArena.Thing.XululuChild
 import TaelinArena.Thing.Zagatur
 import TaelinArena.Thing.Zoio

@@ -1,0 +1,61 @@
+import TaelinArena.Game
+import TaelinArena.Constants
+
+enum
+| DR_STRANGE_IDLE
+| DR_STRANGE_MYSTIC_BEAM
+| DR_STRANGE_TIME_STONE_POWER
+| DR_STRANGE_PORTAL
+| DR_STRANGE_CHRONOSTASIS
+
+drstrange_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |DR_STRANGE_IDLE
+    if is_walking(self)
+    then animate(self, 1, DR_STRANGE_WALK_000, 4, 16)
+    else animate(self, 1, DR_STRANGE_IDLE_000, 5, 15)
+
+  // Left 
+  |DR_STRANGE_MYSTIC_BEAM
+    let self = animate(self, 0, DR_STRANGE_MYSTIC_BEAM_CAST_000, 10, 30)
+    let portal = new_thing <= thing(fun=drstrange_mystic_beam_fun, sid = self.sid, dir=self.dir)
+    let self = spawn(self, 16, [move(portal, at_max_dist(self, 100))])
+    self
+
+  // Middle
+  |DR_STRANGE_TIME_STONE_POWER
+    let self = animate(self, 0, DR_STRANGE_TIME_STONE_POWER_CAST_000, 9, 18)
+    let portal = new_thing <= thing(fun=drstrange_time_stone_power_fun, sid = self.sid)
+    let self = spawn(self, 11, [move(portal, at_max_dist(self, 150))])
+    self
+
+  // Right
+  |DR_STRANGE_PORTAL
+    let self = animate(self, 0, DR_STRANGE_PORTAL_CAST_000, 6, 24)
+    let portal = new_thing <= thing(fun = drstrange_portal_fun, sid = self.sid)
+    let self = spawn(self, 10, [move(portal, at_max_dist(self, 150))])
+    self
+
+  // Q
+  |DR_STRANGE_CHRONOSTASIS
+    let self = animate(self, 0, DR_STRANGE_CHRONOSTASIS_CAST_000, 10, 30)
+    let portal = new_thing <= thing(fun = drstrange_chronostasis_fun, sid = self.sid)
+    let self = spawn(self, 20, [move(portal, at_max_dist(self, 150))])
+    self
+
+  else animate(self, 1, DR_STRANGE_IDLE_000, 5, 15)
+
+drstrange_mystic_beam_fun(self: Thing) : Thing 
+  animate_die(self, 0, DR_STRANGE_MYSTIC_BEAM_EFFECT_000, 9, 18)
+
+drstrange_portal_fun(self: Thing) : Thing 
+  animate_die(self, 0, DR_STRANGE_PORTAL_EFFECT_000, 31, 31)
+
+drstrange_time_stone_power_fun(self: Thing) : Thing 
+  animate_die(self, 0, DR_STRANGE_TIME_STONE_POWER_EFFECT_000, 29, 58)
+
+drstrange_chronostasis_fun(self: Thing) : Thing 
+  animate_die(self, 0, DR_STRANGE_CHRONOSTASIS_EFFECT_000, 26, 52)

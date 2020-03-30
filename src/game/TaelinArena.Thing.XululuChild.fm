@@ -1,0 +1,69 @@
+import TaelinArena.Game
+import TaelinArena.Constants
+
+enum
+| XULULU_CHILD_IDLE
+| XULULU_CHILD_TENTACLE_STRIKE
+| XULULU_CHILD_SOUL_SUMMON
+| XULULU_CHILD_TENTACLE_TRAP
+| XULULU_CHILD_STICKY_HUG_HOOK
+| XULULU_CHILD_SPOT_DODGE
+| XULULU_CHILD_TAUNT
+
+xululuchild_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |XULULU_CHILD_IDLE
+    if is_walking(self)
+    then animate(self, 1, XULULU_CHILD_WALK_000, 4, 16)
+    else animate(self, 1, XULULU_CHILD_IDLE_000, 4, 16)
+
+  // Left 
+  |XULULU_CHILD_TENTACLE_STRIKE
+    animate(self, 0, XULULU_CHILD_TENTACLE_STRIKE_000, 9, 18)
+
+  // Middle
+  |XULULU_CHILD_SOUL_SUMMON
+    let self = animate(self, 1, XULULU_CHILD_SOUL_SUMMON_CAST_000, 11, 22)
+    let souls = new_thing <= thing(fun=xululu_soul_summon_fun, sid = self.sid)
+    let self = spawn(self, 11, [move(souls, at_dist(self, 100))])
+    self
+
+  // Right
+  |XULULU_CHILD_TENTACLE_TRAP
+    let self = animate(self, 0, XULULU_CHILD_TENTACLE_TRAP_CAST_000, 4, 12)
+    let force = new_thing <= thing(fun = xululu_tentacle_trap_fun, sid = self.sid)
+    let self = spawn(self, 10, [move(force, at_max_dist(self, 150))])
+    self
+
+  // Q
+  |XULULU_CHILD_STICKY_HUG_HOOK
+    animate(self, 0, XULULU_CHILD_STICKY_HUG_HOOK_000, 21, 41)
+
+  // Space
+  |XULULU_CHILD_SPOT_DODGE
+    animate(self, 0, XULULU_CHILD_SPOT_DODGE_000, 18, 36)
+
+  // E
+  |XULULU_CHILD_TAUNT
+    animate(self, 0, XULULU_CHILD_TAUNT_000, 16, 32)
+
+  else animate(self, 1, XULULU_CHILD_IDLE_000, 4, 16)
+
+xululu_soul_summon_fun(self: Thing) : Thing
+  let self = animate_between(self, 1, XULULU_CHILD_SOUL_SUMMON_A_EFFECT_000, 4, 0, 8)
+  let self = animate_between(self, 1, XULULU_CHILD_SOUL_SUMMON_B_EFFECT_000, 4, 8, 16)
+  let self = animate_between(self, 1, XULULU_CHILD_SOUL_SUMMON_C_EFFECT_000, 4, 24, 32)
+  let self = animate_between(self, 1, XULULU_CHILD_SOUL_SUMMON_D_EFFECT_000, 4, 32, 40)
+  let self = animate_between(self, 1, XULULU_CHILD_SOUL_SUMMON_E_EFFECT_000, 4, 40, 48)
+  let self = die(self, 48)
+  self
+
+xululu_tentacle_trap_fun(self: Thing) : Thing
+  let self = animate_between(self, 0, XULULU_CHILD_TENTACLE_TRAP_SPAW_EFFECT_000, 6, 0, 12)
+  let self = animate_between(self, 0, XULULU_CHILD_TENTACLE_TRAP_EFFECT_000, 6, 12, 24)
+  let self = animate_between(self, 0, XULULU_CHILD_TENTACLE_TRAP_EFFECT_000, 6, 24, 36)
+  let self = die(self, 36)
+  self

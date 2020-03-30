@@ -36,7 +36,7 @@ class Main extends Component {
     this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
-    this.pick_hero("Gon");
+    this.pick_hero("DrStrange");
     this.login();
   }
 
@@ -179,6 +179,14 @@ class Main extends Component {
         things.push(["Wall", {
           pos:{x:-64,y:-64,z:0},
           nam:"Wall",
+        }]);
+        things.push(["puddledmg", {
+          pos:{x:100,y:-100,z:0},
+          nam:"Damage",
+        }]);
+        things.push(["puddleheal", {
+          pos:{x:-100,y:-100,z:0},
+          nam:"Heal",
         }]);
       } else {
         things = this.game_list[gid].players.split(",");

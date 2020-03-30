@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | JACQUIN_IDLE
@@ -14,8 +15,6 @@ short_dist : Number
 
 jacquin_fun(self: Thing) : Thing
   let self = self <= thing(mov = 2)
-
-  // let self = self <= thing(stt = decrease_ult_timer(stt))
 
   case self |thing switch self.act
 
@@ -84,10 +83,6 @@ jacquin_freezer_fun(self: Thing) : Thing
 
 // Giant Jacquin
 // -------------
-
-// Key on stt
-JACQUIN_ULT_TIME : Bits
-  101b
 
 giant_jacquin_fun(self: Thing) : Thing
   let self = self <= thing(mov = 1.5)

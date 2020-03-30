@@ -498,6 +498,7 @@ var heroes = [
   "DarthVader",
   "Dilma",
   "Dorime",
+  "DrStrange",
   "Finn",
   "Gastly",
   "Gon",
@@ -525,6 +526,8 @@ var heroes = [
   "Teichi",
   "Tophoro",
   "Tupitree",
+  "Weedle",
+  "XululuChild",
   "Zagatur",
   "Zoio",
 ];

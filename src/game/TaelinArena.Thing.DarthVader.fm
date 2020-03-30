@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | DARTH_VADER_IDLE
@@ -9,36 +10,39 @@ enum
 | DARTH_VADER_ROGUE_ONE
 | DARTH_VADER_EXTRA
 
-USING_FORCE : Bits
-  001b
-
-
-
 darthvader_fun(self: Thing) : Thing
   let self = self <= thing(mov = 2)
 
-  let self = update_buff(self, USING_FORCE)
+  let self = update_buff(self, DARTHVADER_USING_FORCE)
 
   case self |thing switch self.act
 
   |DARTH_VADER_IDLE
     if is_walking(self)
     then 
-      case is_using_buff(self, USING_FORCE) as force
+      case is_using_buff(self, DARTHVADER_USING_FORCE) as force
       | true => animate(self, 1.6, DARTH_VADER_WALK_CYCLE_000, 8, 16)
       | false => animate(self, 1, DARTH_VADER_WALK_CYCLE_000, 8, 16)
     else animate(self, 1, DARTH_VADER_IDLE_000, 5, 10)
 
   // Left 
   |DARTH_VADER_THE_FORCE_AWAKENS
-    let self = animate(self, 0, DARTH_VADER_THE_FORCE_AWAKENS_VAR_1_000, 8, 24)
+    let value = get_stt_value(self, DARTHVADER_FORCE_AWAKENS_KEY)
+    let self = if self.tik === 0
+      then map_stt_key(self, DARTHVADER_FORCE_AWAKENS_KEY, (x) => x + 1)
+      else self
+    let self =
+      when
+      | (value % 2) === 0 => animate(self, 0, DARTH_VADER_THE_FORCE_AWAKENS_VAR_1_000, 8, 24)
+      | (value % 3) === 0 => animate(self, 0, DARTH_VADER_THE_FORCE_AWAKENS_VAR_2_000, 8, 24)
+      else animate(self, 0, DARTH_VADER_THE_FORCE_AWAKENS_VAR_3_000, 8, 24)
     let self = dash(self, 2, 0, 20)
     self
 
   // TODO: Still need to add the force on his position
   // Middle
   |DARTH_VADER_THE_EMPIRE_STRICKES_BACK
-    let self = will_set_buff(self, ONE_SEC * 5, USING_FORCE)
+    let self = map_stt_key(self, DARTHVADER_USING_FORCE, () => ONE_SEC * 5 )
     let self = animate(self, 1, DARTH_VADER_IDLE_000, 5, 10)
     self
 
