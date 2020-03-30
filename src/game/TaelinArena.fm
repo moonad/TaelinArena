@@ -104,10 +104,25 @@ interact_with(this:Thing, that:Thing): Thing
             // remove shields and/or reduce their amounts correctly
             // in the end, add the remaining_damage to the player's damage
             // and update its buf list (with the removed shields)
+            let handle_shields = (acc, buff) =>
+              case buff 
+              | shielded => pair(acc.fst - buff.val, acc.snd)
+              | slowed   => pair(acc.fst, cons(_ buff, acc.snd)) 
+              | hasted   => pair(acc.fst, cons(_ buff, acc.snd)) 
+
+            let res = fold(List(Buff); Pair(Number, List(Buff));
+              pair(this.dmg, []),
+              handle_shields,
+              this.buf
+            )
+
             if this.sid === that.sid then
               this
             else
-              this <= thing(dmg = dmg + eff.dmg)
+              this <= thing(
+                dmg = if gte(res.fst, 0) then res.fst else 0,
+                buf = res.snd 
+              )
           | repulse =>
             if this.sid === that.sid then
               this
@@ -121,6 +136,24 @@ interact_with(this:Thing, that:Thing): Thing
             else
               let vec = scale_v3(eff.mag, eff.dir)
               this <= thing(knk = vec)
+          | slow => 
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ slowed(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs)
+          | haste =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ hasted(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | shield =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ shielded(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs) 
           // TODO: add the new Effects (slow, haste, etc.l)
           // ex: the "slow" effect adds a "slowed" to the character list
         fold(Effect; Thing; this, apply_eff, hit.eff)
@@ -142,6 +175,8 @@ fold_with_context(A; B;
     let ys2  = (x) => ys(cons(_ xs.head, x))
     let rest = fold_with_context(A; B; i, f, xs.tail, ys2)
     f(xs.head, ys(xs.tail), rest)
+
+
 
 // Game's main loop
 exec_turn(gm: Game) : Game
