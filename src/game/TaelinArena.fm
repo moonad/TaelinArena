@@ -108,13 +108,6 @@ interact_with(this:Thing, that:Thing): Thing
               this
             else
               handle_shields(this)
-              // let res = handle_shields(this)
-              // let new_dmg = pair_fst(res)
-              // let new_buf = pair_snd(res)              
-              // this <= thing(
-              //   dmg = if gte(new_dmg, 0) then new_dmg else 0,
-              //   buf = new_buf
-              // )
           | repulse =>
             if this.sid === that.sid then
               this
