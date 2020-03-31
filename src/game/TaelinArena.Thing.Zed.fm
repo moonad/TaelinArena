@@ -10,27 +10,18 @@ enum
 | ZED_TAUNT
 
 zed_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2, mhp  = 24)
+  // let self = self <= thing(mov = 2, mhp  = 24)
   
-
-  // Let Zed knows is there is an active shadow
-  // let self = map_stt_key(self, ZED_CLONE_ACTIVE, 
-  //   (x) => 
-  //   let result = (x - 1) 
-  //   if result > 0 then result else 0)
-
+  // Let Zed knows if there is an active shadow
+  // 0 or the current value
+  let self = map_stt_key(self, ZED_CLONE_ACTIVE, (x) => if (x - 1) > 0 then (x - 1) else 0)
+  
+  // Key has value 0
   case self |thing 
-  // let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, 0, self.stt)
-
-    let self = 
-    case is_using_buff(self, ZED_CLONE_ACTIVE) as has_clone
-    | true  => 
-      map_stt_key(self, ZED_CLONE_ACTIVE, 
-      (x) => 
-        let result = (x - 1) 
-        if result > 1 then result else 0)
-    | false => 
-      self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, 0, self.stt))
+  let self = 
+    if get_stt_value(self, ZED_CLONE_ACTIVE) === 0 
+    then self <= thing(mov = 8, mhp  = 24)
+    else self <= thing(mov = 2, mhp  = 24)
 
   switch self.act
 
@@ -53,11 +44,9 @@ zed_fun(self: Thing) : Thing
   // Right
   | ZED_COMPTENT_FOR_THE_WEAK
     let self = animate(self, 0, ZED_COMPTENT_FOR_THE_WEAK_CAST_000, 3, 6)
-    
-    let effect = new_thing <= thing(fun=zed_comptent_shadow_fun, dir=self.dir)
-    // let self = 
-    //   if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
-    //   then 
+    if self.tik === 5 then
+      if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
+      then 
         let shadow = new_thing <= thing(
           fun=zed_shadow_fun, 
           pos=at_dist(self, 120), 
@@ -66,16 +55,15 @@ zed_fun(self: Thing) : Thing
           stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
           )
         let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, ONE_SEC * 5, self.stt))
-        let self = spawn(self, 3, [move(effect, self.pos)])
         let self = spawn(self, 5, [shadow])
         self
-        
-        // animate(self, 0, ZED_DEATH_MARK_CAST_000, 6, 12)
-      // else // There is an active shadow
-      //   animate(self, 1, ZED_IDLE_000, 3, 18)
+      else // There is an active shadow
+        animate(self, 1, ZED_IDLE_000, 3, 18)
+    else 
+      let effect = new_thing <= thing(fun=zed_comptent_shadow_fun, dir=self.dir)
+      let self = spawn(self, 3, [move(effect, self.pos)])
+      self
 
-    // self
-    
   // Q Shift Living shadow
   | ZED_SHIFT_LIVING_SHADOW
     let self = animate(self, 0, ZED_DEATH_MARK_CAST_000, 6, 12)
@@ -83,22 +71,30 @@ zed_fun(self: Thing) : Thing
     let self = spawn(self, 6, [move(shadow, at_max_dist(self, 200))])
     // let self = create_at(self, 6, shadow)
     self
-    
 
   // Space
   | ZED_DEATH_MARK
     let self = animate_between(self, 0, ZED_LIVING_SHADOW_CAST_000, 6, 0, 12)
     let self = animate_between(self, 0, ZED_LIVING_SHADOW_CAST_006, 2, 12, 22)
     let self = reset(self, 22)
-    let shadow = new_thing <= thing(
-      fun=zed_shadow_fun, 
-      pos=at_dist(self, 98), 
-      dir=self.dir,
-      pid=self.pid,
-      stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
-      )
-    let self = spawn(self, 22, [shadow])
-    self
+
+    if self.tik === 22 then
+      if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
+      then 
+        let shadow = new_thing <= thing(
+          fun=zed_shadow_fun, 
+          pos=at_dist(self, 98), 
+          dir=self.dir,
+          pid=self.pid,
+          stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
+          )
+        let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, ONE_SEC * 5, self.stt))
+        let self = spawn(self, 22, [shadow])
+        self
+      else 
+       animate(self, 1, ZED_IDLE_000, 3, 18)
+    else 
+      self
 
   // E
   | ZED_TAUNT
@@ -119,20 +115,19 @@ zed_death_mark_fun(self: Thing) : Thing
 // Shadow
 
 zed_shadow_fun(self: Thing) : Thing 
-  let self = self <= thing(mov = 2)
-  let self = animate(self, 1, ZED_LIVING_SHADOW_IDLE_000, 3, 15)
+  let self = self <= thing(mov = 0)
   let self = map_stt_key(self, ZED_SHADOW_KEY, (x) => x - 1)
   
   let self =
-  if get_stt_value(self, ZED_SHADOW_KEY) === 0 
-  then 
-    let self = animate(self, 0, ZED_LIVING_SHADOW_DESPAWN_000, 6, 12)
-    let self = self <= thing(die=true)
-    self
+  if get_stt_value(self, ZED_SHADOW_KEY) === 5
+  then animate(self, 0, ZED_LIVING_SHADOW_DESPAWN_000, 6, 6)
   else 
+    if get_stt_value(self, ZED_SHADOW_KEY) === 0
+    then self <= thing(die=true)
+    else
     case self | thing switch self.act
     | ZED_IDLE
-      animate(self, 1, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
+      animate(self, 0, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
 
     // Left
     | ZED_SHADOW_SLASH
