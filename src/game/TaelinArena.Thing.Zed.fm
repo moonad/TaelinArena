@@ -10,18 +10,13 @@ enum
 | ZED_TAUNT
 
 zed_fun(self: Thing) : Thing
-  // let self = self <= thing(mov = 2, mhp  = 24)
+  let self = self <= thing(mov = 2, mhp  = 24)
   
   // Let Zed knows if there is an active shadow
-  // 0 or the current value
   let self = map_stt_key(self, ZED_CLONE_ACTIVE, (x) => if (x - 1) > 0 then (x - 1) else 0)
   
   // Key has value 0
   case self |thing 
-  let self = 
-    if get_stt_value(self, ZED_CLONE_ACTIVE) === 0 
-    then self <= thing(mov = 8, mhp  = 24)
-    else self <= thing(mov = 2, mhp  = 24)
 
   switch self.act
 
@@ -43,6 +38,7 @@ zed_fun(self: Thing) : Thing
 
   // Right
   | ZED_COMPTENT_FOR_THE_WEAK
+  
     let self = animate(self, 0, ZED_COMPTENT_FOR_THE_WEAK_CAST_000, 3, 6)
     if self.tik === 5 then
       if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
@@ -69,7 +65,6 @@ zed_fun(self: Thing) : Thing
     let self = animate(self, 0, ZED_DEATH_MARK_CAST_000, 6, 12)
     let shadow = new_thing <= thing(fun=zed_death_mark_fun)
     let self = spawn(self, 6, [move(shadow, at_max_dist(self, 200))])
-    // let self = create_at(self, 6, shadow)
     self
 
   // Space
@@ -78,7 +73,7 @@ zed_fun(self: Thing) : Thing
     let self = animate_between(self, 0, ZED_LIVING_SHADOW_CAST_006, 2, 12, 22)
     let self = reset(self, 22)
 
-    if self.tik === 22 then
+    if self.tik === 21 then
       if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
       then 
         let shadow = new_thing <= thing(
@@ -89,10 +84,13 @@ zed_fun(self: Thing) : Thing
           stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
           )
         let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, ONE_SEC * 5, self.stt))
-        let self = spawn(self, 22, [shadow])
+        // TODO: how do I get the right position where the clone was?
+        let self = set_stt_value_v3(self, at_dist(self, 98))
+        let self = spawn(self, 21, [shadow])
         self
       else 
-       animate(self, 1, ZED_IDLE_000, 3, 18)
+        blink(self, self.tik, get_stt_value_v3(self))
+        // self
     else 
       self
 
@@ -149,7 +147,7 @@ zed_shadow_fun(self: Thing) : Thing
       let self = animate(self, 0, ZED_LIVING_SHADOW_DESPAWN_000, 6, 12)
       let self = self <= thing(die=true)
       self
-    else self
+    else animate(self, 0, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
 
   self
 
