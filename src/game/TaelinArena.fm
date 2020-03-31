@@ -104,25 +104,17 @@ interact_with(this:Thing, that:Thing): Thing
             // remove shields and/or reduce their amounts correctly
             // in the end, add the remaining_damage to the player's damage
             // and update its buf list (with the removed shields)
-            let handle_shields = (acc, buff) =>
-              case buff 
-              | shielded => pair(acc.fst - buff.val, acc.snd)
-              | slowed   => pair(acc.fst, cons(_ buff, acc.snd)) 
-              | hasted   => pair(acc.fst, cons(_ buff, acc.snd)) 
-
-            let res = fold(List(Buff); Pair(Number, List(Buff));
-              pair(this.dmg, []),
-              handle_shields,
-              this.buf
-            )
-
             if this.sid === that.sid then
               this
             else
-              this <= thing(
-                dmg = if gte(res.fst, 0) then res.fst else 0,
-                buf = res.snd 
-              )
+              handle_shields(this)
+              // let res = handle_shields(this)
+              // let new_dmg = pair_fst(res)
+              // let new_buf = pair_snd(res)              
+              // this <= thing(
+              //   dmg = if gte(new_dmg, 0) then new_dmg else 0,
+              //   buf = new_buf
+              // )
           | repulse =>
             if this.sid === that.sid then
               this
@@ -136,6 +128,8 @@ interact_with(this:Thing, that:Thing): Thing
             else
               let vec = scale_v3(eff.mag, eff.dir)
               this <= thing(knk = vec)
+          // TODO: add the new Effects (slow, haste, etc.l)
+          // ex: the "slow" effect adds a "slowed" to the character list
           | slow => 
             if this.sid === that.sid then
               this 
@@ -154,8 +148,24 @@ interact_with(this:Thing, that:Thing): Thing
             else 
               let updated_buffs = cons(_ shielded(eff.dur, eff.val), this.buf)
               this <= thing(buf = updated_buffs) 
-          // TODO: add the new Effects (slow, haste, etc.l)
-          // ex: the "slow" effect adds a "slowed" to the character list
+          | silence => 
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ silenced(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | root =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ rooted(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | stun => 
+            if this.sid === that.sid then 
+              this 
+            else 
+              let updated_buffs = cons(_ stuned(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
         fold(Effect; Thing; this, apply_eff, hit.eff)
     fold(Hit; Thing; this, apply_hit, that.hit)
   this
@@ -205,11 +215,14 @@ exec_turn(gm: Game) : Game
     // Integrates position with dash velocity
     let this = this <= thing(pos = add_v3(pos,vel))
 
-    // TODO: multiply vel by speed_multiplier_of(this)
     // Integrates position with walk vector
-    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*bst,pad)))
+    let boost = speed_multiplier_of(this)
+    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*boost,pad)))
 
-    // TODO: decrease duration of all buffs, remove from list if dur=0
+    // Decreases duration of all buffs, removes from list if dur=0
+    let this = update_buff_dur(this) 
+
+
 
     // Integrates position with knockback
     let this = this <= thing(

@@ -28,11 +28,17 @@ T Effect
 | slow(dur: Number, val: Number)
 | haste(dur: Number, val: Number)
 | shield(dur: Number, val: Number)
+| silence(dur: Number)
+| root(dur: Number)
+| stun(dur: Number)
 
 T Buff
 | shielded(dur: Number, val: Number) // shields are hit before hp
 | slowed(dur: Number, val: Number) // slow down
 | hasted(dur: Number, val: Number) // speed up
+| silenced(dur: Number) 
+| rooted(dur: Number)
+| stuned(dur: Number)
 
 T Hit
 | hit(eff: List(Effect), pos: V3, dir: V3, box: Hitbox)
@@ -523,12 +529,101 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
 combine_mov_buffs(b: Buff, i: Number) : Number
   case b 
   | shielded => i 
-  | slowed   => i - b.val 
-  | hasted   => i + b.val 
-
+  | slowed   => i * b.val 
+  | hasted   => i * b.val
+  | silenced => i 
+  | rooted   => i * 0 
+  | stuned   => i * 0
 
 // Returns the current speed multiplier by checking all buffs, considering
 // sloweds and hasteds
 speed_multiplier_of(self: Thing) : Number
   case self |thing 
-  fold(Buff; Number; self.bst, combine_mov_buffs, self.buf)
+  fold(Buff; Number; 1, combine_mov_buffs, self.buf)
+
+
+T Ordering 
+| LT 
+| EQ 
+| GT 
+
+compare_numbers(a: Number, b: Number) : Ordering
+  if a === b then 
+    EQ 
+  else if a > b then 
+    GT 
+  else 
+    LT 
+
+aggregate_dmg(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff))
+  case acc |pair 
+  case buff
+  | shielded => 
+    if acc.fst === 0 then 
+      acc 
+    else 
+      case compare_numbers(acc.fst, buff.val) as res  
+      | LT => 
+        let remaining_shield_val = buff.val - acc.fst 
+        let remaining_buf = cons(_ shielded(buff.dur, remaining_shield_val), acc.snd)
+        pair(__ 0, remaining_buf)
+
+      | EQ => pair(__ 0, acc.snd)
+      | GT => 
+        let remaining_dmg = acc.fst - buff.val 
+        pair(__ remaining_dmg, acc.snd)
+
+  | slowed   => acc 
+  | hasted   => acc 
+  | silenced => acc
+  | rooted   => acc
+  | stuned   => acc
+
+handle_shields(self: Thing) : Thing 
+  case self |thing 
+  let init_value = pair(Number; List(Buff); self.dmg, [])
+  let res = fold(
+    Buff; 
+    Pair(Number, List(Buff)); 
+    init_value, 
+    aggregate_dmg, 
+    self.buf
+  )
+  let new_dmg = pair_fst(res)
+  let new_buf = pair_snd(res)
+  let self = self <= thing(dmg = new_dmg, buf = new_buf)  
+  self 
+
+
+
+update_buff_dur(self: Thing) : Thing 
+  case self |thing 
+  let fx = (buff: Buff, acc: List(Buff)) => 
+    case buff 
+    | shielded => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ shielded(buff.dur - 1, buff.val), acc)
+    | slowed => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ slowed(buff.dur - 1, buff.val), acc)
+    | hasted => 
+      if buff.dur === 0 then 
+        acc 
+    else cons(_ hasted(buff.dur - 1, buff.val), acc)
+    | silenced => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ silenced(buff.dur - 1), acc)
+    | rooted => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ rooted(buff.dur - 1), acc)
+    | stuned => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ stuned(buff.dur - 1), acc)
+
+    let new_buf = fold(Buff; List(Buff); [], fx, self.buf)
+    self <= thing(buf = new_buf)
