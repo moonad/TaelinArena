@@ -8,16 +8,33 @@ import TaelinArena.Thing
 exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
   let fn = (this: Thing) =>
-    case cmd.inp as inp
-    with this : Thing
-    | sdir => this <= thing(pad = inp.dir)
-    | key0 => init_act(this, 1, inp.pos)
-    | key1 => init_act(this, 2, inp.pos)
-    | key2 => init_act(this, 3, inp.pos)
-    | key3 => init_act(this, 4, inp.pos)
-    | key4 => init_act(this, 5, inp.pos)
-    | key5 => init_act(this, 6, inp.pos)
-    | cmsg => this
+    let silenced = is_silenced(this)
+    case silenced
+    | true => 
+      case cmd.inp as inp
+      with this : Thing
+      | sdir => this <= thing(pad = inp.dir)
+      | key0 => this
+      | key1 => this
+      | key2 => this
+      | key3 => this
+      | key4 => this
+      | key5 => this
+      | cmsg => this 
+      
+    | false => 
+      case cmd.inp as inp
+      with this : Thing
+      | sdir => this <= thing(pad = inp.dir)
+      | key0 => init_act(this, 1, inp.pos)
+      | key1 => init_act(this, 2, inp.pos)
+      | key2 => init_act(this, 3, inp.pos)
+      | key3 => init_act(this, 4, inp.pos)
+      | key4 => init_act(this, 5, inp.pos)
+      | key5 => init_act(this, 6, inp.pos)
+      | cmsg => this
+
+    
   with_thing(cmd.pid, fn, gm)
 
 // Checks if two boxes collide, returns outwards vector
@@ -98,16 +115,11 @@ interact_with(this:Thing, that:Thing): Thing
               // this
               this <= thing(dmg = dmg - eff.lif)
           | damage =>
-            // TODO: hit shields on thing.buf before hitting hp
-            // use a fold with a pair (remaining_damage, remaining_buffs)
-            // for each shield, decrease from remaining_damage
-            // remove shields and/or reduce their amounts correctly
-            // in the end, add the remaining_damage to the player's damage
-            // and update its buf list (with the removed shields)
             if this.sid === that.sid then
               this
             else
-              handle_shields(this)
+            // hit shields on thing.buf before hitting hp
+              handle_shields(eff.dmg, this)
           | repulse =>
             if this.sid === that.sid then
               this
@@ -121,8 +133,6 @@ interact_with(this:Thing, that:Thing): Thing
             else
               let vec = scale_v3(eff.mag, eff.dir)
               this <= thing(knk = vec)
-          // TODO: add the new Effects (slow, haste, etc.l)
-          // ex: the "slow" effect adds a "slowed" to the character list
           | slow => 
             if this.sid === that.sid then
               this 

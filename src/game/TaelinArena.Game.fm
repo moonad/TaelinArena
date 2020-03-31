@@ -176,6 +176,7 @@ set_thing_vel(thi:Thing, new_vel) thi<=thing(vel=new_vel)
 set_thing_box(thi:Thing, new_box) thi<=thing(box=new_box)
 set_thing_dmg(thi:Thing, new_dmg) thi<=thing(dmg=new_dmg)
 set_thing_knk(thi:Thing, new_knk) thi<=thing(knk=new_knk)
+set_thing_buf(thi:Thing, new_knk) thi<=thing(buf=new_buf)
 set_thing_chi(thi:Thing, new_chi) thi<=thing(chi=new_chi)
 set_thing_hit(thi:Thing, new_hit) thi<=thing(hit=new_hit)
 set_thing_rst(thi:Thing, new_rst) thi<=thing(rst=new_rst)
@@ -541,7 +542,21 @@ speed_multiplier_of(self: Thing) : Number
   case self |thing 
   fold(Buff; Number; 1, combine_mov_buffs, self.buf)
 
-
+is_silenced(self: Thing) : Bool 
+  case self |thing 
+  let is_silenced_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => true  
+    | rooted   => false 
+    | stuned   => false
+  case find(Buff; is_silenced_buff, self.buf) as res 
+  | none => false 
+  | some => true 
+  
+ 
 T Ordering 
 | LT 
 | EQ 
@@ -555,7 +570,7 @@ compare_numbers(a: Number, b: Number) : Ordering
   else 
     LT 
 
-aggregate_dmg(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff))
+use_shields(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff))
   case acc |pair 
   case buff
   | shielded => 
@@ -579,26 +594,20 @@ aggregate_dmg(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buf
   | rooted   => acc
   | stuned   => acc
 
-handle_shields(self: Thing) : Thing 
-  case self |thing 
-  let init_value = pair(Number; List(Buff); self.dmg, [])
-  let res = fold(
-    Buff; 
-    Pair(Number, List(Buff)); 
-    init_value, 
-    aggregate_dmg, 
-    self.buf
-  )
-  let new_dmg = pair_fst(res)
-  let new_buf = pair_snd(res)
-  let self = self <= thing(dmg = new_dmg, buf = new_buf)  
-  self 
 
+handle_shields(dmg: Number, self: Thing) : Thing 
+  case self |thing 
+  let init_dmg = dmg + self.dmg 
+  let init_val = pair(Number; List(Buff); init_dmg, nil(_))
+  let res      = fold(Buff; Pair(Number, List(Buff)); init_val, use_shields, self.buf) 
+  let new_dmg  = pair_fst(__ res)
+  let new_buf  = pair_snd(__ res)
+  self <= thing(dmg = new_dmg, buf = new_buf)  
 
 
 update_buff_dur(self: Thing) : Thing 
   case self |thing 
-  let fx = (buff: Buff, acc: List(Buff)) => 
+  let fn = (buff: Buff, acc: List(Buff)) => 
     case buff 
     | shielded => 
       if buff.dur === 0 then 
@@ -625,5 +634,7 @@ update_buff_dur(self: Thing) : Thing
         acc 
       else cons(_ stuned(buff.dur - 1), acc)
 
-    let new_buf = fold(Buff; List(Buff); [], fx, self.buf)
+    let new_buf = fold(Buff; List(Buff); [], fn, self.buf)
     self <= thing(buf = new_buf)
+
+
