@@ -520,3 +520,24 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
 // sloweds and hasteds
 speed_multiplier_of(self: Thing) : Number
   0 // TODO
+
+POS_X_KEY: Bits 
+  01011101b
+
+POS_Y_KEY: Bits 
+  01110101b
+
+set_stt_value_v3(self: Thing, v3: V3) : Thing
+  case self |thing
+  case v3 |v3
+  let self = self <= thing(stt=insert(_ POS_X_KEY, v3.x, self.stt))
+  let self = self <= thing(stt=insert(_ POS_Y_KEY, v3.y, self.stt))
+  // let self = self <= thing(stt=insert(_ POS_Z_KEY, v3.z, self.stt))
+  self
+
+get_stt_value_v3(self: Thing) : V3
+  case self |thing
+  let x = get_stt_value(self, POS_X_KEY)
+  let y = get_stt_value(self, POS_Y_KEY)
+  // let z = get_stt_value(self, POS_Z_KEY)
+  v3(x, y, 0)
