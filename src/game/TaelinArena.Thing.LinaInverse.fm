@@ -42,7 +42,9 @@ linainverse_fun(self: Thing) : Thing
 
   // Middle
   |LINA_INVERSE_LIGHT_STRIKE_ARRAY
-    let self = animate(self, 1, LINA_INVERSE_LIGHT_STRIKE_ARRAY_CAST_000, 9, 18)
+    let self = animate_between(self, 1, LINA_INVERSE_LIGHT_STRIKE_ARRAY_CAST_000, 6, 0, 10)
+    let self = animate_between(self, 1, LINA_INVERSE_LIGHT_STRIKE_ARRAY_CAST_006, 3, 10, 24)
+    let self = reset(self, 24)
     let effect = new_thing <= thing(fun=lina_light_strike_fun)
     let self = spawn(self, 10, [move(effect, at_max_dist(self, 150))])
     self
