@@ -1,0 +1,90 @@
+import TaelinArena.Game
+
+enum
+| LINA_INVERSE_IDLE
+| LINA_INVERSE_BURNING_HANDS
+| LINA_INVERSE_LIGHT_STRIKE_ARRAY
+| LINA_INVERSE_DRAGON_SLAVE
+| LINA_INVERSE_BURNING_SOUL
+| LINA_INVERSE_DASH
+| LINA_INVERSE_TAUNT
+
+linainverse_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  case self |thing switch self.act
+
+  |LINA_INVERSE_IDLE
+    if is_walking(self)
+    then animate(self, 1, LINA_INVERSE_WALK_000, 6, 12)
+    else animate(self, 1, LINA_INVERSE_IDLE_000, 9, 18)
+
+  // Left 
+  |LINA_INVERSE_BURNING_HANDS
+    let self = animate(self, 0, LINA_INVERSE_BURNING_HANDS_CAST_000, 11, 22)
+    let fire_a = new_thing <= thing(
+      sid = self.sid,
+      fun = lina_burning_hands_a_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(14, targ_dir(self)),
+      box = nbox)
+    let fire_b = new_thing <= thing(
+      sid = self.sid,
+      fun = lina_burning_hands_b_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(14, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 10, [fire_a])
+    let self = spawn(self, 20, [fire_b])
+    self
+
+  // Middle
+  |LINA_INVERSE_LIGHT_STRIKE_ARRAY
+    let self = animate(self, 1, LINA_INVERSE_LIGHT_STRIKE_ARRAY_CAST_000, 9, 18)
+    let effect = new_thing <= thing(fun=lina_light_strike_fun)
+    let self = spawn(self, 10, [move(effect, at_max_dist(self, 150))])
+    self
+
+  // Right
+  |LINA_INVERSE_DRAGON_SLAVE
+    let self = animate(self, 0, LINA_INVERSE_DRAGON_SLAVE_CAST_000, 9, 27)
+    let bird = new_thing <= thing(
+      sid = self.sid,
+      fun = lina_dragon_slave_fun,
+      pos = at_dist(self, 50),
+      dir = targ_dir(self),
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 20, [bird])
+    self
+
+  // Q
+  |LINA_INVERSE_BURNING_SOUL
+    animate(self, 0, LINA_INVERSE_BURNING_SOUL_000, 11, 33)
+
+  // Space
+  |LINA_INVERSE_DASH
+    let self = animate_with_blink(self, 0, LINA_INVERSE_ON_FIRE_000, LINA_INVERSE_IDLE_000, 11, 0, 22)
+    let self = reset(self, 22)
+    let self = blink(self, 22, at_dist(self, 105))
+    self
+
+  // E
+  |LINA_INVERSE_TAUNT
+    animate(self, 1, LINA_INVERSE_TAUNT_000, 15, 30)
+
+  else self
+
+lina_burning_hands_a_fun(self: Thing) : Thing
+  animate_die(self, 0, LINA_INVERSE_BURNING_HANDS_PROJECTILE_A_000, 6, 12)
+
+lina_burning_hands_b_fun(self: Thing) : Thing
+  animate_die(self, 0, LINA_INVERSE_BURNING_HANDS_PROJECTILE_B_000, 6, 12)
+
+lina_light_strike_fun(self: Thing) : Thing
+  animate_die(self, 0, LINA_INVERSE_LIGHT_STRIKE_ARRAY_EFFECT_000, 8, 16)
+
+lina_dragon_slave_fun(self: Thing) : Thing
+  animate_die(self, 0, LINA_INVERSE_DRAGON_SLAVE_PROJECTILE_000, 5, 10)
