@@ -30,7 +30,7 @@ function canvox() {
       var vx  = ((pos >>> 20) & 0x3FF) - 512;
       var vy  = ((pos >>> 10) & 0x3FF) - 512;
       var vz  = 0;
-      var col = 0xFFD8D8D8;
+      var col = 0xFF70887F; // Color in Hex: #7F8870
       var i   = Math.floor(cam.size.x*0.5 + vx);
       var j   = Math.floor(cam.size.y*0.5 - vy*cos - vz*cos);
       var k   = 0;
