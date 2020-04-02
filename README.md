@@ -47,7 +47,7 @@ serious bugs and errors scarse. In other words, it achieves
 the highest score of code quality humanly possible.
 
 ### Usage
-1. You must have [Formality](https://github.com/moonad/formality), [NodeJS](https://nodejs.org) and [NPM](http://npmjs.com) installed
+1. You must have [Formality](https://github.com/moonad/formality)(v0.1.252 or latest), [NodeJS](https://nodejs.org)(v.13.8.0 or latest) and [npm](http://npmjs.com)(v.6.14.1 or latest) installed
 2. Clone this repo
 3. Run `npm i`
 4. On the root directory, run `node src/server/server.js`

@@ -1,0 +1,164 @@
+import TaelinArena.Game
+
+enum
+| ZED_IDLE
+| ZED_SHADOW_SLASH
+| ZED_RAZOR_SHURIKEN
+| ZED_COMPTENT_FOR_THE_WEAK
+| ZED_SHIFT_LIVING_SHADOW
+| ZED_DEATH_MARK 
+| ZED_TAUNT
+
+zed_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2, mhp  = 24)
+  
+  // Let Zed knows if there is an active shadow
+  let self = map_stt_key(self, ZED_CLONE_ACTIVE, (x) => if (x - 1) > 0 then (x - 1) else 0)
+  
+  // Key has value 0
+  case self |thing 
+
+  switch self.act
+
+  | ZED_IDLE
+    if is_walking(self)
+    then animate(self, 1, ZED_WALK_000, 6, 18)
+    else animate(self, 1, ZED_IDLE_000, 3, 18)
+
+  // Left 
+  | ZED_SHADOW_SLASH
+    animate(self, 0, ZED_SHADOW_SLASH_CAST_000, 12, 24)
+
+  // Middle
+  | ZED_RAZOR_SHURIKEN 
+    let self = animate(self, 0, ZED_RAZOR_SHURIKEN_CAST_000, 5, 15)
+    let shuriken = new_thing <= thing(fun=zed_razor_shuriken_fun, dir=self.dir)
+    let self = spawn(self, 3, [move(shuriken, at_dist(self, 60))])
+    self
+
+  // Right
+  | ZED_COMPTENT_FOR_THE_WEAK
+  
+    let self = animate(self, 0, ZED_COMPTENT_FOR_THE_WEAK_CAST_000, 3, 6)
+    if self.tik === 5 then
+      if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
+      then 
+        let shadow = new_thing <= thing(
+          fun=zed_shadow_fun, 
+          pos=at_dist(self, 120), 
+          dir=self.dir,
+          pid=self.pid,
+          stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
+          )
+        let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, ONE_SEC * 5, self.stt))
+        let self = spawn(self, 5, [shadow])
+        self
+      else // There is an active shadow
+        animate(self, 1, ZED_IDLE_000, 3, 18)
+    else 
+      let effect = new_thing <= thing(fun=zed_comptent_shadow_fun, dir=self.dir)
+      let self = spawn(self, 3, [move(effect, self.pos)])
+      self
+
+  // Q Shift Living shadow
+  | ZED_SHIFT_LIVING_SHADOW
+    let self = animate(self, 0, ZED_DEATH_MARK_CAST_000, 6, 12)
+    let shadow = new_thing <= thing(fun=zed_death_mark_fun)
+    let self = spawn(self, 6, [move(shadow, at_max_dist(self, 200))])
+    self
+
+  // Space
+  | ZED_DEATH_MARK
+    let self = animate_between(self, 0, ZED_LIVING_SHADOW_CAST_000, 6, 0, 12)
+    let self = animate_between(self, 0, ZED_LIVING_SHADOW_CAST_006, 2, 12, 22)
+    let self = reset(self, 22)
+
+    if self.tik === 21 then
+      if get_stt_value(self, ZED_CLONE_ACTIVE) === 0
+      then 
+        let shadow = new_thing <= thing(
+          fun=zed_shadow_fun, 
+          pos=at_dist(self, 98), 
+          dir=self.dir,
+          pid=self.pid,
+          stt=insert(_ ZED_SHADOW_KEY, ONE_SEC * 5, self.stt)
+          )
+        let self = self <= thing(stt=insert(_ ZED_CLONE_ACTIVE, ONE_SEC * 5, self.stt))
+        // TODO: how do I get the right position where the clone was?
+        let self = set_stt_value_v3(self, at_dist(self, 98))
+        let self = spawn(self, 21, [shadow])
+        self
+      else 
+        blink(self, self.tik, get_stt_value_v3(self))
+        // self
+    else 
+      self
+
+  // E
+  | ZED_TAUNT
+    animate(self, 0, ZED_TAUNT_000, 17, 34)
+
+  else self
+
+
+zed_razor_shuriken_fun(self: Thing) : Thing
+  animate_die(self, 0, ZED_RAZOR_SHURIKEN_EFFECT_000, 5, 15)
+
+zed_comptent_shadow_fun(self: Thing) : Thing
+  animate_die(self, 0, ZED_COMPTENT_FOR_THE_WEAK_EFFECT_000, 7, 14)
+
+zed_death_mark_fun(self: Thing) : Thing 
+  animate_die(self, 0, ZED_DEATH_MARK_EFFECT_000, 13, 26)
+
+// Shadow
+
+zed_shadow_fun(self: Thing) : Thing 
+  let self = self <= thing(mov = 0)
+  let self = map_stt_key(self, ZED_SHADOW_KEY, (x) => x - 1)
+  
+  let self =
+  if get_stt_value(self, ZED_SHADOW_KEY) === 5
+  then animate(self, 0, ZED_LIVING_SHADOW_DESPAWN_000, 6, 6)
+  else 
+    if get_stt_value(self, ZED_SHADOW_KEY) === 0
+    then self <= thing(die=true)
+    else
+    case self | thing switch self.act
+    | ZED_IDLE
+      animate(self, 0, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
+
+    // Left
+    | ZED_SHADOW_SLASH
+      animate(self, 1, ZED_LIVING_SHADOW_IDLE_000, 3, 15)
+
+    // Midle
+    | ZED_RAZOR_SHURIKEN
+      let self = animate(self, 0, ZED_LIVING_SHADOW_RAZOR_SHURIKEN_CAST_000, 6, 12)
+      let shuriken = new_thing <= thing(fun=zed_shodow_razor_shuriken_fun, dir=self.dir)
+      let self = spawn(self, 3, [move(shuriken, at_dist(self, 60))])
+      self
+  
+    // Right
+    | ZED_COMPTENT_FOR_THE_WEAK
+      animate(self, 1, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
+
+    // Q
+    | ZED_SHIFT_LIVING_SHADOW
+      let self = animate(self, 0, ZED_LIVING_SHADOW_DESPAWN_000, 6, 12)
+      let self = self <= thing(die=true)
+      self
+    else animate(self, 0, ZED_LIVING_SHADOW_IDLE_000, 3, 18)
+
+  self
+
+ZED_SHADOW_KEY : Bits
+  010101111001b
+
+ZED_CLONE_ACTIVE : Bits
+  010101111111b
+
+zed_shodow_razor_shuriken_fun(self: Thing) : Thing
+  animate_die(self, 0, ZED_LIVING_SHADOW_RAZOR_SHURIKEN_EFFECT_000, 5, 15)
+
+
+

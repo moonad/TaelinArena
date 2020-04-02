@@ -529,6 +529,7 @@ var heroes = [
   "Weedle",
   "XululuChild",
   "Zagatur",
+  "Zed",
   "Zoio",
 ];
 

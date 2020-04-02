@@ -199,8 +199,12 @@ module.exports = {
     "from": 5546,
     "til": 5634
   },
-  "zoio": {
+  "zed": {
     "from": 5634,
-    "til": 5733
+    "til": 5769
+  },
+  "zoio": {
+    "from": 5769,
+    "til": 5868
   }
 }
