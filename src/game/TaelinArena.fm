@@ -225,8 +225,6 @@ exec_turn(gm: Game) : Game
     // Decreases duration of all buffs, removes from list if dur=0
     let this = update_buff_dur(this) 
 
-
-
     // Integrates position with knockback
     let this = this <= thing(
       pos = add_v3(pos, knk),

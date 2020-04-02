@@ -527,11 +527,11 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
     | some => if current_tik.value === 0 then false else true
 
 
-combine_mov_buffs(b: Buff, i: Number) : Number
-  case b 
+combine_mov_buffs(buff: Buff, i: Number) : Number
+  case buff 
   | shielded => i 
-  | slowed   => i * b.val 
-  | hasted   => i * b.val
+  | slowed   => i * (1 - (buff.val\100)) 
+  | hasted   => i * (1 + (buff.val\100))
   | silenced => i 
   | rooted   => i * 0 
   | stuned   => i * 0
@@ -542,6 +542,8 @@ speed_multiplier_of(self: Thing) : Number
   case self |thing 
   fold(Buff; Number; 1, combine_mov_buffs, self.buf)
 
+
+
 is_silenced(self: Thing) : Bool 
   case self |thing 
   let is_silenced_buff = (buff: Buff) => 
@@ -551,7 +553,7 @@ is_silenced(self: Thing) : Bool
     | hasted   => false 
     | silenced => true  
     | rooted   => false 
-    | stuned   => false
+    | stuned   => true  
   case find(Buff; is_silenced_buff, self.buf) as res 
   | none => false 
   | some => true 
@@ -588,21 +590,20 @@ use_shields(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff)
         let remaining_dmg = acc.fst - buff.val 
         pair(__ remaining_dmg, acc.snd)
 
-  | slowed   => acc 
-  | hasted   => acc 
-  | silenced => acc
-  | rooted   => acc
-  | stuned   => acc
+  | slowed   => pair(__ acc.fst, cons(_ buff, acc.snd)) 
+  | hasted   => pair(__ acc.fst, cons(_ buff, acc.snd)) 
+  | silenced => pair(__ acc.fst, cons(_ buff, acc.snd))
+  | rooted   => pair(__ acc.fst, cons(_ buff, acc.snd))
+  | stuned   => pair(__ acc.fst, cons(_ buff, acc.snd))
 
 
-handle_shields(dmg: Number, self: Thing) : Thing 
+handle_shields(hit_dmg: Number, self: Thing) : Thing 
   case self |thing 
-  let init_dmg = dmg + self.dmg 
-  let init_val = pair(Number; List(Buff); init_dmg, nil(_))
-  let res      = fold(Buff; Pair(Number, List(Buff)); init_val, use_shields, self.buf) 
-  let new_dmg  = pair_fst(__ res)
-  let new_buf  = pair_snd(__ res)
-  self <= thing(dmg = new_dmg, buf = new_buf)  
+  let init_val      = pair(__ hit_dmg, nil(_))
+  let res           = fold(__ init_val, use_shields, self.buf) 
+  let remaining_dmg = pair_fst(__ res) + self.dmg 
+  let remaining_buf = pair_snd(__ res)
+  self <= thing(dmg = remaining_dmg, buf = remaining_buf)  
 
 
 update_buff_dur(self: Thing) : Thing 
@@ -620,7 +621,7 @@ update_buff_dur(self: Thing) : Thing
     | hasted => 
       if buff.dur === 0 then 
         acc 
-    else cons(_ hasted(buff.dur - 1, buff.val), acc)
+      else cons(_ hasted(buff.dur - 1, buff.val), acc)
     | silenced => 
       if buff.dur === 0 then 
         acc 
