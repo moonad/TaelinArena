@@ -18,6 +18,7 @@ import TaelinArena.Thing.Kenko
 import TaelinArena.Thing.Konan
 import TaelinArena.Thing.Link
 import TaelinArena.Thing.Luffy
+import TaelinArena.Thing.Magnamite
 import TaelinArena.Thing.Mando
 import TaelinArena.Thing.Mechwarrior
 import TaelinArena.Thing.Mikegator

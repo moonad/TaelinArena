@@ -511,6 +511,7 @@ var heroes = [
   "Konan",
   "Link",
   "Luffy",
+  "Magnamite",
   "Mando",
   "Mechwarrior",
   "Mikegator",
