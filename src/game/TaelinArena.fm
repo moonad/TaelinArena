@@ -8,16 +8,49 @@ import TaelinArena.Thing
 exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
   let fn = (this: Thing) =>
-    case cmd.inp as inp
-    with this : Thing
-    | sdir => this <= thing(pad = inp.dir)
-    | key0 => init_act(this, 1, inp.pos)
-    | key1 => init_act(this, 2, inp.pos)
-    | key2 => init_act(this, 3, inp.pos)
-    | key3 => init_act(this, 4, inp.pos)
-    | key4 => init_act(this, 5, inp.pos)
-    | key5 => init_act(this, 6, inp.pos)
-    | cmsg => this
+    let silenced = is_silenced(this)
+    let stunned  = is_stunned(this)
+    case stunned 
+    with this : Thing 
+    | true => 
+      case cmd.inp as inp
+      with this : Thing
+      | sdir => init_act(this, 0, inp.dir)
+      | key0 => this
+      | key1 => this
+      | key2 => this
+      | key3 => this
+      | key4 => this
+      | key5 => this
+      | cmsg => this 
+    
+    | false => 
+      case silenced
+      | true => 
+        case cmd.inp as inp
+        with this : Thing
+        | sdir => this <= thing(pad = inp.dir)
+        | key0 => this
+        | key1 => this
+        | key2 => this
+        | key3 => this
+        | key4 => this
+        | key5 => this
+        | cmsg => this 
+        
+      | false => 
+        case cmd.inp as inp
+        with this : Thing
+        | sdir => this <= thing(pad = inp.dir)
+        | key0 => init_act(this, 1, inp.pos)
+        | key1 => init_act(this, 2, inp.pos)
+        | key2 => init_act(this, 3, inp.pos)
+        | key3 => init_act(this, 4, inp.pos)
+        | key4 => init_act(this, 5, inp.pos)
+        | key5 => init_act(this, 6, inp.pos)
+        | cmsg => this
+
+    
   with_thing(cmd.pid, fn, gm)
 
 // Checks if two boxes collide, returns outwards vector
@@ -98,16 +131,11 @@ interact_with(this:Thing, that:Thing): Thing
               // this
               this <= thing(dmg = dmg - eff.lif)
           | damage =>
-            // TODO: hit shields on thing.buf before hitting hp
-            // use a fold with a pair (remaining_damage, remaining_buffs)
-            // for each shield, decrease from remaining_damage
-            // remove shields and/or reduce their amounts correctly
-            // in the end, add the remaining_damage to the player's damage
-            // and update its buf list (with the removed shields)
             if this.sid === that.sid then
               this
             else
-              this <= thing(dmg = dmg + eff.dmg)
+            // hit shields on thing.buf before hitting hp
+              handle_shields(eff.dmg, this)
           | repulse =>
             if this.sid === that.sid then
               this
@@ -121,8 +149,42 @@ interact_with(this:Thing, that:Thing): Thing
             else
               let vec = scale_v3(eff.mag, eff.dir)
               this <= thing(knk = vec)
-          // TODO: add the new Effects (slow, haste, etc.l)
-          // ex: the "slow" effect adds a "slowed" to the character list
+          | slow => 
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ slowed(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs)
+          | haste =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ hasted(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | shield =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ shielded(eff.dur, eff.val), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | silence => 
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ silenced(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | root =>
+            if this.sid === that.sid then
+              this 
+            else 
+              let updated_buffs = cons(_ rooted(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
+          | stun => 
+            if this.sid === that.sid then 
+              this 
+            else 
+              let updated_buffs = cons(_ stuned(eff.dur), this.buf)
+              this <= thing(buf = updated_buffs) 
         fold(Effect; Thing; this, apply_eff, hit.eff)
     fold(Hit; Thing; this, apply_hit, that.hit)
   this
@@ -142,6 +204,8 @@ fold_with_context(A; B;
     let ys2  = (x) => ys(cons(_ xs.head, x))
     let rest = fold_with_context(A; B; i, f, xs.tail, ys2)
     f(xs.head, ys(xs.tail), rest)
+
+
 
 // Game's main loop
 exec_turn(gm: Game) : Game
@@ -170,11 +234,12 @@ exec_turn(gm: Game) : Game
     // Integrates position with dash velocity
     let this = this <= thing(pos = add_v3(pos,vel))
 
-    // TODO: multiply vel by speed_multiplier_of(this)
     // Integrates position with walk vector
-    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*bst,pad)))
+    let boost = speed_multiplier_of(this)
+    let this = this <= thing(pos = add_v3(pos,scale_v3(mov*boost,pad)))
 
-    // TODO: decrease duration of all buffs, remove from list if dur=0
+    // Decreases duration of all buffs, removes from list if dur=0
+    let this = update_buff_dur(this) 
 
     // Integrates position with knockback
     let this = this <= thing(

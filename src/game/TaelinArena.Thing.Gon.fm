@@ -76,7 +76,7 @@ gon_transformed_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
 
   // Back to normal Gon after 30 seconds
-  let self = end_thing(self, gon_tired_fun, ONE_SEC * 30, GON_ULT_TIME)
+  let self = end_thing(self, gon_tired_fun, ONE_SEC * 30, ULT_TIME)
 
   case self |thing switch self.act
 
