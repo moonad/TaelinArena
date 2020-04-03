@@ -9,11 +9,13 @@ exec_command(cmd: Command, gm: Game) : Game
   case cmd |command
   let fn = (this: Thing) =>
     let silenced = is_silenced(this)
-    case silenced
+    let stunned  = is_stunned(this)
+    case stunned 
+    with this : Thing 
     | true => 
       case cmd.inp as inp
       with this : Thing
-      | sdir => this <= thing(pad = inp.dir)
+      | sdir => init_act(this, 0, inp.dir)
       | key0 => this
       | key1 => this
       | key2 => this
@@ -21,21 +23,66 @@ exec_command(cmd: Command, gm: Game) : Game
       | key4 => this
       | key5 => this
       | cmsg => this 
-      
+    
     | false => 
-      case cmd.inp as inp
-      with this : Thing
-      | sdir => this <= thing(pad = inp.dir)
-      | key0 => init_act(this, 1, inp.pos)
-      | key1 => init_act(this, 2, inp.pos)
-      | key2 => init_act(this, 3, inp.pos)
-      | key3 => init_act(this, 4, inp.pos)
-      | key4 => init_act(this, 5, inp.pos)
-      | key5 => init_act(this, 6, inp.pos)
-      | cmsg => this
+      case silenced
+      | true => 
+        case cmd.inp as inp
+        with this : Thing
+        | sdir => this <= thing(pad = inp.dir)
+        | key0 => this
+        | key1 => this
+        | key2 => this
+        | key3 => this
+        | key4 => this
+        | key5 => this
+        | cmsg => this 
+        
+      | false => 
+        case cmd.inp as inp
+        with this : Thing
+        | sdir => this <= thing(pad = inp.dir)
+        | key0 => init_act(this, 1, inp.pos)
+        | key1 => init_act(this, 2, inp.pos)
+        | key2 => init_act(this, 3, inp.pos)
+        | key3 => init_act(this, 4, inp.pos)
+        | key4 => init_act(this, 5, inp.pos)
+        | key5 => init_act(this, 6, inp.pos)
+        | cmsg => this
 
     
   with_thing(cmd.pid, fn, gm)
+// exec_command(cmd: Command, gm: Game) : Game
+//   case cmd |command
+//   let fn = (this: Thing) =>
+//     let silenced = is_silenced(this)
+//     case silenced
+//     | true => 
+//       case cmd.inp as inp
+//       with this : Thing
+//       | sdir => this <= thing(pad = inp.dir)
+//       | key0 => this
+//       | key1 => this
+//       | key2 => this
+//       | key3 => this
+//       | key4 => this
+//       | key5 => this
+//       | cmsg => this 
+      
+//     | false => 
+//       case cmd.inp as inp
+//       with this : Thing
+//       | sdir => this <= thing(pad = inp.dir)
+//       | key0 => init_act(this, 1, inp.pos)
+//       | key1 => init_act(this, 2, inp.pos)
+//       | key2 => init_act(this, 3, inp.pos)
+//       | key3 => init_act(this, 4, inp.pos)
+//       | key4 => init_act(this, 5, inp.pos)
+//       | key5 => init_act(this, 6, inp.pos)
+//       | cmsg => this
+
+    
+//   with_thing(cmd.pid, fn, gm)
 
 // Checks if two boxes collide, returns outwards vector
 collide_with(

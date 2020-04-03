@@ -49,10 +49,10 @@ puddledmg_fun(self: Thing) : Thing
   let hits = [
     hit([
       damage(1), 
-      stun(3*ONE_SEC)
+      stun(4*ONE_SEC)
       // silence(5*ONE_SEC)
       // slow(3*ONE_SEC, 0.2)
-      // root(3*ONE_SEC)
+      // root(4*ONE_SEC)
     ], 
       self.pos, 
       self.dir, 
@@ -79,8 +79,8 @@ puddleheal_fun(self: Thing) : Thing
   let self = animate(self, 0, DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_015, 9, 36)
   let hits = [
     hit([
-      heal(1),
-      // shield(10*ONE_SEC, 24)
+      heal(2),
+      shield(10*ONE_SEC, 24)
     ], 
     self.pos, 
     self.dir, 

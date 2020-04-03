@@ -19,7 +19,6 @@ T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
-// TODO: add shield, slow, haste effects
 T Effect
 | heal(lif: Number)
 | damage(dmg: Number)
@@ -299,16 +298,20 @@ animate_with_blink(
 // - speed: dash speed in voxels/frame
 // - from_tik: number of the tik it will start the dash
 // - til_tik: number of the tik it will stop the dash
-dash(
+ dash(
   self     : Thing,
   speed    : Number,
   from_tik : Number,
   til_tik  : Number)
-  self <= thing(vel =
-    if is_between(from_tik, til_tik, tik) then 
-      scale_v3(speed, lookat_v3(pos, trg, dir))
-    else
-      v3(0,0,0))
+  case self |thing 
+  let  rooted = is_rooted(self)
+  case rooted 
+  | true =>  self  
+  | false => self <= thing(vel =
+      if is_between(from_tik, til_tik, tik) then 
+        scale_v3(speed, lookat_v3(pos, trg, dir))
+      else
+        v3(0,0,0))
 
 // Sets the position
 move(self: Thing, to_pos: V3)
@@ -322,7 +325,11 @@ blink(
   self   : Thing,
   at_tik : Number,
   to_pos : V3)
-  self <= thing(
+  case self |thing 
+  let rooted = is_rooted(self)
+  case rooted 
+  | true => self 
+  | false => self <= thing(
     pos = if tik === at_tik then to_pos else pos)
 
 // Creates a hit box that damages and knockbacks
@@ -411,7 +418,7 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 // Is this thing walking?
 is_walking(this: Thing) : Number
   case this |thing
-  len_v3(this.pad) > 0
+  len_v3(this.pad) > 0 
 
 // Spawns another thing
 // - self: thing that will create another thing
@@ -558,7 +565,38 @@ is_silenced(self: Thing) : Bool
   | none => false 
   | some => true 
   
- 
+
+is_stunned(self: Thing) : Bool 
+  case self |thing 
+  let is_stunned_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => false  
+    | rooted   => false 
+    | stuned   => true  
+  case find(Buff; is_stunned_buff, self.buf) as res 
+  | none => false 
+  | some => true
+
+
+is_rooted(self: Thing) : Bool 
+  case self |thing 
+  let is_rooted_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => false  
+    | rooted   => true 
+    | stuned   => true  
+  case find(Buff; is_rooted_buff, self.buf) as res 
+  | none => false 
+  | some => true
+
+
+
 T Ordering 
 | LT 
 | EQ 
