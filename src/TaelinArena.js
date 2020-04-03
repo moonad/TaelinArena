@@ -516,6 +516,7 @@ var heroes = [
   "Mechwarrior",
   "Mikegator",
   "Min",
+  "Monica",
   "PPG",
   "Pichu",
   "Ray",

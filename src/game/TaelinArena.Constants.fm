@@ -15,3 +15,7 @@ GON_AFTER_ULT : Bits
 // Jacquin
 JACQUIN_ULT_TIME : Bits
   10110101111001b
+
+// 
+ULT_TIME : Bits 
+  1001010110b

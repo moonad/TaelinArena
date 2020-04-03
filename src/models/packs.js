@@ -111,100 +111,108 @@ module.exports = {
     "from": 3347,
     "til": 3419
   },
-  "muk": {
+  "monica": {
     "from": 3419,
-    "til": 3544
+    "til": 3534
+  },
+  "muk": {
+    "from": 3534,
+    "til": 3659
   },
   "pichu": {
-    "from": 3544,
-    "til": 3647
+    "from": 3659,
+    "til": 3762
   },
   "pikachu": {
-    "from": 3647,
-    "til": 3752
+    "from": 3762,
+    "til": 3867
   },
   "poste": {
-    "from": 3752,
-    "til": 3753
+    "from": 3867,
+    "til": 3868
   },
   "ppg": {
-    "from": 3753,
-    "til": 3915
+    "from": 3868,
+    "til": 4030
   },
   "punchingbag": {
-    "from": 3915,
-    "til": 3939
+    "from": 4030,
+    "til": 4054
   },
   "raichu": {
-    "from": 3939,
-    "til": 4042
+    "from": 4054,
+    "til": 4157
   },
   "ray": {
-    "from": 4042,
-    "til": 4116
+    "from": 4157,
+    "til": 4231
   },
   "ryu": {
-    "from": 4116,
-    "til": 4279
+    "from": 4231,
+    "til": 4394
+  },
+  "samson_armor": {
+    "from": 4394,
+    "til": 4487
   },
   "shao": {
-    "from": 4279,
-    "til": 4386
+    "from": 4487,
+    "til": 4594
   },
   "squirtle": {
-    "from": 4386,
-    "til": 4518
+    "from": 4594,
+    "til": 4726
   },
   "sr_madruga": {
-    "from": 4518,
-    "til": 4640
+    "from": 4726,
+    "til": 4848
   },
   "steve": {
-    "from": 4640,
-    "til": 4772
+    "from": 4848,
+    "til": 4980
   },
   "teichi": {
-    "from": 4772,
-    "til": 4902
+    "from": 4980,
+    "til": 5110
   },
   "tophoro": {
-    "from": 4902,
-    "til": 5023
+    "from": 5110,
+    "til": 5231
   },
   "tupitree": {
-    "from": 5023,
-    "til": 5177
+    "from": 5231,
+    "til": 5385
   },
   "wall": {
-    "from": 5177,
-    "til": 5178
+    "from": 5385,
+    "til": 5386
   },
   "wartortle": {
-    "from": 5178,
-    "til": 5316
+    "from": 5386,
+    "til": 5524
   },
   "weedle": {
-    "from": 5316,
-    "til": 5371
+    "from": 5524,
+    "til": 5579
   },
   "xululu_child": {
-    "from": 5371,
-    "til": 5523
+    "from": 5579,
+    "til": 5731
   },
   "young_link": {
-    "from": 5523,
-    "til": 5552
+    "from": 5731,
+    "til": 5760
   },
   "zagatur": {
-    "from": 5552,
-    "til": 5640
+    "from": 5760,
+    "til": 5848
   },
   "zed": {
-    "from": 5640,
-    "til": 5775
+    "from": 5848,
+    "til": 5983
   },
   "zoio": {
-    "from": 5775,
-    "til": 5874
+    "from": 5983,
+    "til": 6082
   }
 }
