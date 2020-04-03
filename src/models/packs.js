@@ -95,116 +95,124 @@ module.exports = {
     "from": 2893,
     "til": 2994
   },
-  "mando": {
+  "magnamite": {
     "from": 2994,
-    "til": 3162
+    "til": 3103
+  },
+  "magneton": {
+    "from": 3103,
+    "til": 3225
+  },
+  "mando": {
+    "from": 3225,
+    "til": 3393
   },
   "mechwarrior": {
-    "from": 3162,
-    "til": 3269
+    "from": 3393,
+    "til": 3500
   },
   "mikegator": {
-    "from": 3269,
-    "til": 3341
+    "from": 3500,
+    "til": 3572
   },
   "min": {
-    "from": 3341,
-    "til": 3413
+    "from": 3572,
+    "til": 3644
   },
   "muk": {
-    "from": 3413,
-    "til": 3538
+    "from": 3644,
+    "til": 3769
   },
   "pichu": {
-    "from": 3538,
-    "til": 3641
+    "from": 3769,
+    "til": 3872
   },
   "pikachu": {
-    "from": 3641,
-    "til": 3746
+    "from": 3872,
+    "til": 3977
   },
   "poste": {
-    "from": 3746,
-    "til": 3747
+    "from": 3977,
+    "til": 3978
   },
   "ppg": {
-    "from": 3747,
-    "til": 3909
+    "from": 3978,
+    "til": 4140
   },
   "punchingbag": {
-    "from": 3909,
-    "til": 3933
+    "from": 4140,
+    "til": 4164
   },
   "raichu": {
-    "from": 3933,
-    "til": 4036
+    "from": 4164,
+    "til": 4267
   },
   "ray": {
-    "from": 4036,
-    "til": 4110
+    "from": 4267,
+    "til": 4341
   },
   "ryu": {
-    "from": 4110,
-    "til": 4273
+    "from": 4341,
+    "til": 4504
   },
   "shao": {
-    "from": 4273,
-    "til": 4380
+    "from": 4504,
+    "til": 4611
   },
   "squirtle": {
-    "from": 4380,
-    "til": 4512
+    "from": 4611,
+    "til": 4743
   },
   "sr_madruga": {
-    "from": 4512,
-    "til": 4634
+    "from": 4743,
+    "til": 4865
   },
   "steve": {
-    "from": 4634,
-    "til": 4766
+    "from": 4865,
+    "til": 4997
   },
   "teichi": {
-    "from": 4766,
-    "til": 4896
+    "from": 4997,
+    "til": 5127
   },
   "tophoro": {
-    "from": 4896,
-    "til": 5017
+    "from": 5127,
+    "til": 5248
   },
   "tupitree": {
-    "from": 5017,
-    "til": 5171
+    "from": 5248,
+    "til": 5402
   },
   "wall": {
-    "from": 5171,
-    "til": 5172
+    "from": 5402,
+    "til": 5403
   },
   "wartortle": {
-    "from": 5172,
-    "til": 5310
+    "from": 5403,
+    "til": 5541
   },
   "weedle": {
-    "from": 5310,
-    "til": 5365
+    "from": 5541,
+    "til": 5596
   },
   "xululu_child": {
-    "from": 5365,
-    "til": 5517
+    "from": 5596,
+    "til": 5748
   },
   "young_link": {
-    "from": 5517,
-    "til": 5546
+    "from": 5748,
+    "til": 5777
   },
   "zagatur": {
-    "from": 5546,
-    "til": 5634
+    "from": 5777,
+    "til": 5865
   },
   "zed": {
-    "from": 5634,
-    "til": 5769
+    "from": 5865,
+    "til": 6000
   },
   "zoio": {
-    "from": 5769,
-    "til": 5868
+    "from": 6000,
+    "til": 6099
   }
 }
