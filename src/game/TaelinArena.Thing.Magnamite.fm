@@ -1,0 +1,291 @@
+import TaelinArena.Game
+
+enum
+| MAGNAMITE_IDLE
+| MAGNAMITE_THUNDER_SHOCK
+| MAGNAMITE_THUNDER_WAVE
+| MAGNAMITE_SONIC_BOOM
+| MAGNAMITE_FLASH_CANNON
+| MAGNAMITE_EVOLVE
+| MAGNAMITE_TAUNT
+
+magnamite_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  | MAGNAMITE_IDLE
+    if is_walking(self)
+    then animate(self, 1, MAGNAMITE_WALK_000, 6, 12)
+    else animate(self, 1, MAGNAMITE_IDLE_000, 6, 12)
+
+  // Left
+  | MAGNAMITE_THUNDER_SHOCK
+   // animate(self, 0, MAGNAMITE_THUNDER_SHOCK_CAST_000, 13, 26)
+    let self = animate(self, 0, MAGNAMITE_THUNDER_SHOCK_CAST_000, 13, 26)
+    let hit = new_thing <= thing(
+      sid = self.sid,
+      fun = magnamite_thunder_shock)
+    let self = spawn(self, 9, [move(hit, at_dist(self, 26))])
+    self
+
+  // Middle 
+  | MAGNAMITE_THUNDER_WAVE
+    animate(self, 0, MAGNAMITE_THUNDER_WAVE_CAST_000, 14, 28)
+
+  // Right
+  | MAGNAMITE_SONIC_BOOM
+//    animate(self, 0, MAGNAMITE_SONIC_BOOM_CAST_000, 10, 20)
+    let self = animate(self, 0, MAGNAMITE_SONIC_BOOM_CAST_000, 10, 20)
+    let fire = new_thing <= thing(
+      sid = self.sid,
+      fun = magnamite_sonic_boom,
+      vel = scale_v3(10, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 14, [fire])
+    self
+
+  // Q
+  | MAGNAMITE_FLASH_CANNON
+    let self = animate(self, 0, MAGNAMITE_FLASH_CANNON_CAST_000, 11, 22)
+    let fire = new_thing <= thing(
+      sid = self.sid,
+      fun = magnamite_flash_cannon_fun,
+      vel = scale_v3(10, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 18, [fire])
+    self
+
+  // Space
+  | MAGNAMITE_EVOLVE
+    let self = animate(self, 1, MAGNAMITE_EVOLUTION_000, 10, 20)
+    let self = create_at(self, 19, magneton_fun) 
+    self
+  
+  // E
+  | MAGNAMITE_TAUNT
+    let self = animate(self, 0, MAGNAMITE_LIGHT_SCREEN_000, 14, 48)
+    self
+
+  else self
+
+
+magnamite_thunder_shock(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(35))])
+  let self = die(self, 11)
+  self
+
+magnamite_sonic_boom(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MAGNAMITE_SONIC_BOOM_PROJECT_000, 1, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(20))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+magnamite_flash_cannon_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MAGNAMITE_FLASH_CANNON_PROJECT_000, 2, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(2.5)], self.pos, self.dir, cbox(12))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+// MAGNETON
+
+enum
+| MAGNETON_IDLE
+| MAGNETON_THUNDER_SHOCK
+| MAGNETON_THUNDER_WAVE
+| MAGNETON_SONIC_BOOM
+| MAGNETON_FLASH_CANNON
+| MAGNETON_EVOLVE
+| MAGNETON_TAUNT
+
+magneton_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, box = cbox(4))
+
+  case self |thing switch self.act
+
+  | MAGNETON_IDLE
+    if is_walking(self)
+    then animate(self, 1, MAGNETON_WALK_000, 8, 24)
+    else animate(self, 1, MAGNETON_IDLE_000, 7, 21)
+
+  // Left
+  | MAGNETON_THUNDER_SHOCK
+    let self = animate(self, 0, MAGNETON_THUNDER_SHOCK_CAST_000, 17, 34)
+    let hits0 = [hit([damage(3)], at_dist(self, 45), self.dir, cbox(15))]
+    let self = cast(self, 12, hits0)
+    let self = animate(self, 0, MAGNETON_THUNDER_SHOCK_CAST_000, 17, 34)
+    let shock0 = new_thing <= thing(
+      fun = magneton_thunder_shock_effect0_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let shock1 = new_thing <= thing(
+      fun = magneton_thunder_shock_effect1_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 5, [move(shock0, at_dist(self, 60))])
+    let self = spawn(self, 10, [move(shock1, at_dist(self, 125))])
+    self
+
+  // Middle 
+  | MAGNETON_THUNDER_WAVE
+    let self = animate(self, 0, MAGNETON_THUNDER_WAVE_CAST_000, 14, 28)
+    let wave = new_thing <= thing(
+      sid = self.sid,
+      fun = magneton_thunder_wave_fun,
+      vel = scale_v3(5, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = at_dist(self, 20))
+    let self = spawn(self, 20, [wave])
+    self
+
+  // Right
+  | MAGNETON_SONIC_BOOM
+    let self = animate(self, 0, MAGNETON_SONIC_BOOM_CAST_000, 10, 20)
+    let effect = new_thing <= thing(
+      sid = self.sid,
+      fun = magneton_sonic_boom_fun,
+      vel = scale_v3(10, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 14, [effect])
+    self
+
+  // Q
+  | MAGNETON_FLASH_CANNON
+    let self = animate(self, 0, MAGNETON_FLASH_CANNON_CAST_000, 16, 32)
+    let effect = new_thing <= thing(
+      sid = self.sid,
+      fun = magneton_flash_cannon_fun,
+      vel = scale_v3(10, targ_dir(self)),
+      dir = targ_dir(self),
+      pos = self.pos)
+    let self = spawn(self, 28, [effect])
+    self
+
+  // Space
+  | MAGNETON_EVOLVE
+    animate(self, 0, MAGNETON_IDLE_000, 7, 21)  
+
+  // E
+  | MAGNETON_TAUNT
+    animate(self, 0, MAGNETON_LIGHT_SCREEN_000, 10, 40)
+    
+
+  else self
+
+magneton_sonic_boom_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MAGNETON_SONIC_BOOM_PROJECT_000, 1, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(36))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+magneton_thunder_wave_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MAGNETON_THUNDER_WAVE_PROJECT_000, 1, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(36))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+magneton_flash_cannon_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MAGNETON_FLASH_CANNON_PROJECT_000, 3, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(3)], self.pos, self.dir, cbox(15))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+magneton_thunder_shock_effect0_fun(self: Thing) : Thing
+  animate_die(self, 0, MAGNETON_THUNDER_SHOCK_PROJECT_000, 6, 12)
+
+magneton_thunder_shock_effect1_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 1, MAGNETON_THUNDER_SHOCK_EFFECT_000, 7, 12)
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 0, [hit([damage(2)], self.pos, self.dir, cbox(20))])
+  self

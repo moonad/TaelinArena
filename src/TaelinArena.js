@@ -512,6 +512,7 @@ var heroes = [
   "LinaInverse",
   "Link",
   "Luffy",
+  "Magnamite",
   "Mando",
   "Mechwarrior",
   "Mikegator",
