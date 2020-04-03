@@ -537,8 +537,8 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
 combine_mov_buffs(buff: Buff, i: Number) : Number
   case buff 
   | shielded => i 
-  | slowed   => i * (1 - (buff.val\100)) 
-  | hasted   => i * (1 + (buff.val\100))
+  | slowed   => i * buff.val
+  | hasted   => i * buff.val
   | silenced => i 
   | rooted   => i * 0 
   | stuned   => i * 0
