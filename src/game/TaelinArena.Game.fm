@@ -19,17 +19,25 @@ T Hitbox
 | cbox(rad: Number)
 | pbox(pts: List(V3))
 
-// TODO: add shield, slow, haste effects
 T Effect
 | heal(lif: Number)
 | damage(dmg: Number)
 | repulse(mag: Number)
 | impulse(mag: Number, dir: V3)
+| slow(dur: Number, val: Number)
+| haste(dur: Number, val: Number)
+| shield(dur: Number, val: Number)
+| silence(dur: Number)
+| root(dur: Number)
+| stun(dur: Number)
 
 T Buff
 | shielded(dur: Number, val: Number) // shields are hit before hp
 | slowed(dur: Number, val: Number) // slow down
 | hasted(dur: Number, val: Number) // speed up
+| silenced(dur: Number) 
+| rooted(dur: Number)
+| stuned(dur: Number)
 
 T Hit
 | hit(eff: List(Effect), pos: V3, dir: V3, box: Hitbox)
@@ -167,6 +175,7 @@ set_thing_vel(thi:Thing, new_vel) thi<=thing(vel=new_vel)
 set_thing_box(thi:Thing, new_box) thi<=thing(box=new_box)
 set_thing_dmg(thi:Thing, new_dmg) thi<=thing(dmg=new_dmg)
 set_thing_knk(thi:Thing, new_knk) thi<=thing(knk=new_knk)
+set_thing_buf(thi:Thing, new_buf) thi<=thing(buf=new_buf)
 set_thing_chi(thi:Thing, new_chi) thi<=thing(chi=new_chi)
 set_thing_hit(thi:Thing, new_hit) thi<=thing(hit=new_hit)
 set_thing_rst(thi:Thing, new_rst) thi<=thing(rst=new_rst)
@@ -289,16 +298,20 @@ animate_with_blink(
 // - speed: dash speed in voxels/frame
 // - from_tik: number of the tik it will start the dash
 // - til_tik: number of the tik it will stop the dash
-dash(
+ dash(
   self     : Thing,
   speed    : Number,
   from_tik : Number,
   til_tik  : Number)
-  self <= thing(vel =
-    if is_between(from_tik, til_tik, tik) then 
-      scale_v3(speed, lookat_v3(pos, trg, dir))
-    else
-      v3(0,0,0))
+  case self |thing 
+  let  rooted = is_rooted(self)
+  case rooted 
+  | true =>  self  
+  | false => self <= thing(vel =
+      if is_between(from_tik, til_tik, tik) then 
+        scale_v3(speed, lookat_v3(pos, trg, dir))
+      else
+        v3(0,0,0))
 
 // Sets the position
 move(self: Thing, to_pos: V3)
@@ -312,7 +325,11 @@ blink(
   self   : Thing,
   at_tik : Number,
   to_pos : V3)
-  self <= thing(
+  case self |thing 
+  let rooted = is_rooted(self)
+  case rooted 
+  | true => self 
+  | false => self <= thing(
     pos = if tik === at_tik then to_pos else pos)
 
 // Creates a hit box that damages and knockbacks
@@ -401,7 +418,7 @@ init_act(this: Thing, new_act: Number, new_trg: V3) : Thing
 // Is this thing walking?
 is_walking(this: Thing) : Number
   case this |thing
-  len_v3(this.pad) > 0
+  len_v3(this.pad) > 0 
 
 // Spawns another thing
 // - self: thing that will create another thing
@@ -516,10 +533,148 @@ is_using_buff(self: Thing, stt_key: Bits) : Bool
     | none => false
     | some => if current_tik.value === 0 then false else true
 
+
+combine_mov_buffs(buff: Buff, i: Number) : Number
+  case buff 
+  | shielded => i 
+  | slowed   => i * (1 - (buff.val\100)) 
+  | hasted   => i * (1 + (buff.val\100))
+  | silenced => i 
+  | rooted   => i * 0 
+  | stuned   => i * 0
+
 // Returns the current speed multiplier by checking all buffs, considering
 // sloweds and hasteds
 speed_multiplier_of(self: Thing) : Number
-  0 // TODO
+  case self |thing 
+  fold(Buff; Number; 1, combine_mov_buffs, self.buf)
+
+
+
+is_silenced(self: Thing) : Bool 
+  case self |thing 
+  let is_silenced_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => true  
+    | rooted   => false 
+    | stuned   => true  
+  case find(Buff; is_silenced_buff, self.buf) as res 
+  | none => false 
+  | some => true 
+  
+
+is_stunned(self: Thing) : Bool 
+  case self |thing 
+  let is_stunned_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => false  
+    | rooted   => false 
+    | stuned   => true  
+  case find(Buff; is_stunned_buff, self.buf) as res 
+  | none => false 
+  | some => true
+
+
+is_rooted(self: Thing) : Bool 
+  case self |thing 
+  let is_rooted_buff = (buff: Buff) => 
+    case buff 
+    | shielded => false  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => false  
+    | rooted   => true 
+    | stuned   => true  
+  case find(Buff; is_rooted_buff, self.buf) as res 
+  | none => false 
+  | some => true
+
+
+
+T Ordering 
+| LT 
+| EQ 
+| GT 
+
+compare_numbers(a: Number, b: Number) : Ordering
+  if a === b then 
+    EQ 
+  else if a > b then 
+    GT 
+  else 
+    LT 
+
+use_shields(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff))
+  case acc |pair 
+  case buff
+  | shielded => 
+    if acc.fst === 0 then 
+      acc 
+    else 
+      case compare_numbers(acc.fst, buff.val) as res  
+      | LT => 
+        let remaining_shield_val = buff.val - acc.fst 
+        let remaining_buf = cons(_ shielded(buff.dur, remaining_shield_val), acc.snd)
+        pair(__ 0, remaining_buf)
+
+      | EQ => pair(__ 0, acc.snd)
+      | GT => 
+        let remaining_dmg = acc.fst - buff.val 
+        pair(__ remaining_dmg, acc.snd)
+
+  | slowed   => pair(__ acc.fst, cons(_ buff, acc.snd)) 
+  | hasted   => pair(__ acc.fst, cons(_ buff, acc.snd)) 
+  | silenced => pair(__ acc.fst, cons(_ buff, acc.snd))
+  | rooted   => pair(__ acc.fst, cons(_ buff, acc.snd))
+  | stuned   => pair(__ acc.fst, cons(_ buff, acc.snd))
+
+
+handle_shields(hit_dmg: Number, self: Thing) : Thing 
+  case self |thing 
+  let init_val      = pair(__ hit_dmg, nil(_))
+  let res           = fold(__ init_val, use_shields, self.buf) 
+  let remaining_dmg = pair_fst(__ res) + self.dmg 
+  let remaining_buf = pair_snd(__ res)
+  self <= thing(dmg = remaining_dmg, buf = remaining_buf)  
+
+
+update_buff_dur(self: Thing) : Thing 
+  case self |thing 
+  let fn = (buff: Buff, acc: List(Buff)) => 
+    case buff 
+    | shielded => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ shielded(buff.dur - 1, buff.val), acc)
+    | slowed => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ slowed(buff.dur - 1, buff.val), acc)
+    | hasted => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ hasted(buff.dur - 1, buff.val), acc)
+    | silenced => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ silenced(buff.dur - 1), acc)
+    | rooted => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ rooted(buff.dur - 1), acc)
+    | stuned => 
+      if buff.dur === 0 then 
+        acc 
+      else cons(_ stuned(buff.dur - 1), acc)
+
+    let new_buf = fold(Buff; List(Buff); [], fn, self.buf)
+    self <= thing(buf = new_buf)
 
 POS_X_KEY: Bits 
   01011101b
