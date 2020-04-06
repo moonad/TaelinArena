@@ -14,6 +14,7 @@ const post = (func, body) => {
 const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
+const CharSelection = require("./CharSelection.js");
 
 const Controls = require("./Controls.js");
 
@@ -36,7 +37,8 @@ class Main extends Component {
     this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
-    this.pick_hero("Monica");
+    this.char_selection = false;
+    this.pick_hero("KingDedede");
     this.login();
   }
 
@@ -395,6 +397,7 @@ class Main extends Component {
 
   // Selects a hero
   pick_hero(hero) {
+    console.log("Main.js, hero: "+hero);
     hero = hero.toLowerCase();
     if (TA.hero_name[hero]) {
       this.picked_hero = TA.hero_name[hero];
@@ -404,6 +407,12 @@ class Main extends Component {
       }
       this.post("!" + this.picked_hero);
     }
+  }
+
+  hero_selection(hero_name){
+    this.pick_hero(hero_name); 
+    this.char_selection = false
+    this.forceUpdate()
   }
 
   // Login procedure
@@ -583,15 +592,10 @@ class Main extends Component {
     }, [
       this.render_mode
     ]);
-    var picked_hero = h("span", {
+    var picked_hero =
+    h("span", {
       "onclick": () => {
-        var message = "Pick a hero. Options: " + TA.heroes.join(", ");
-        var picked_hero = prompt(message); 
-        if (picked_hero) {
-          this.pick_hero(picked_hero);
-        } else {
-          alert("Invalid hero.");
-        }
+        this.char_selection = true
       },
       "style": {
         "text-decoration": "underline",
@@ -600,6 +604,13 @@ class Main extends Component {
     }, [
       this.picked_hero
     ]);
+
+    var char_selection_view = h(CharSelection, {
+      characters: TA.heroes,
+      on_pick_hero: hero_name => this.hero_selection(hero_name),
+      on_dismiss: () => this.char_selection = false
+    })
+
     var current_game = h("span", {
       "onclick": () => {
         var gid = prompt("Enter game (or empty for offline):");
@@ -656,8 +667,7 @@ class Main extends Component {
       },
     }, [chat_box, room_box, info_box]);
 
-    // Main App
-    return h("div", {
+    var main_app = h("div", {
       style: {
         "position": "fixed",
         "display": "flex",
@@ -673,6 +683,9 @@ class Main extends Component {
       game_screen,
       bottom_panel,
     ])
+
+    // Main App
+    return this.char_selection ? char_selection_view : main_app
   }
 };
 
