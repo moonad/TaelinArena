@@ -40,8 +40,7 @@ grimer_fun(self: Thing) : Thing
 
   // Middle
   |GRIMER_INVINCIBLE_MUD
-    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 38)
-    self
+    block(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 0, 19)
 
   // Right
   |GRIMER_MUD_SHIELD
