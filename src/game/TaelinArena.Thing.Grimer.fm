@@ -50,8 +50,7 @@ grimer_fun(self: Thing) : Thing
 
   // Q
   |GRIMER_MUD_TSUNAMI
-    let self = animate(self, 1, GRIMER_MUD_TSUNAMI_000, 17, 34)
-    self
+    grimer_mud_tsunami_fun(self)
 
   // Space
   | GRIMER_EXTRA
@@ -82,6 +81,16 @@ grimer_earth_ball_fun(self: Thing) : Thing
   let self = cast(self, 16, hits)
   let self = cast(self, 20, hits) 
   self
+
+grimer_mud_tsunami_fun(self: Thing) : Thing 
+  case self |thing 
+  let self = animate(self, 1, GRIMER_MUD_TSUNAMI_000, 17, 34)
+  let effs = [damage(base_mud_tsunami_dmg)]
+  let h1   = [hit(effs, self.pos, self.dir, cbox(30))] 
+  let h2   = [hit(effs, self.pos, self.dir, cbox(40))] 
+  let self = cast(self, 10, h1)
+  let self = cast(self, 20, h2)
+  self 
 
 
 
