@@ -47,7 +47,16 @@ grimer_fun(self: Thing) : Thing
 
   // Right
   |GRIMER_MUD_SHIELD
-    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 60)
+    let shield_buff = shielded(30, 1000)
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+    let shield_length = 45
+    let shield_width = 12
+    let shield_box = pbox([ v3(0,0,0),  v3(25,45,0), v3(25,-45,0) ])
+    let self = set_thing_box(self, shield_box)
+    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 30) 
+    //requires reset to set cbox(12)
+    // let self = set_thing_box(self, cbox(12))
+    // let self = reset(self, 31)
     self
 
   // Q
@@ -136,7 +145,7 @@ muk_fun(self: Thing) : Thing
     let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
     let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 26)
     self 
-    
+
   // Right
   |MUK_MUD_SHIELD
     let self = animate(self, 0, MUK_MUD_SHIELD_000, 24, 48)
