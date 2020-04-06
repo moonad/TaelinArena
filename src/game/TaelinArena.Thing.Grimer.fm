@@ -140,8 +140,7 @@ muk_fun(self: Thing) : Thing
 
   // Q
   |MUK_MUD_TSUNAMI
-    let self = animate(self, 1, MUK_MUD_TSUNAMI_000, 19, 38)
-    self
+    muk_mud_tsunami_fun(self)
 
   // Space
   | MUK_EXTRA
@@ -168,3 +167,14 @@ muk_earth_ball_fun(self: Thing) : Thing
   let self = cast(self, 16, hits)
   let self = cast(self, 20, hits) 
   self 
+
+
+muk_mud_tsunami_fun(self: Thing) : Thing 
+  case self |thing 
+  let self = animate(self, 1, MUK_MUD_TSUNAMI_000, 19, 38)
+  let effs = [damage(base_mud_tsunami_dmg * 2)]
+  let h1   = [hit(effs, self.pos, self.dir, cbox(30))] 
+  let h2   = [hit(effs, self.pos, self.dir, cbox(60))] 
+  let self = cast(self, 10, h1)
+  let self = cast(self, 20, h2)
+  self
