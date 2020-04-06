@@ -1,0 +1,66 @@
+import TaelinArena.Game
+
+enum
+| DEDEDE_IDLE
+| DEDEDE_JET_HARMMER
+| DEDEDE_GORDO_THROW
+| DEDEDE_FORWARD_SMASH
+| DEDEDE_GROUND_POUND
+| DEDEDE_EVADE
+| DEDEDE_TAUNT
+
+kingdedede_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |DEDEDE_IDLE
+    if is_walking(self)
+    then animate(self, 1, KING_DEDEDE_WALK_000, 8, 16)
+    else animate(self, 1, KING_DEDEDE_IDLE_000, 4, 16)
+
+  // Left 
+  |DEDEDE_JET_HARMMER
+    animate(self, 1, KING_DEDEDE_HAMMER_SPIN_000, 30, 30)
+
+  // Middle
+  |DEDEDE_GORDO_THROW
+    let self = animate(self, 0, KING_DEDEDE_GORDO_THROW_000, 10, 20)
+    let gordo = new_thing <= thing(
+      fun = kingdedede_gordo_throw_fun,
+      pos = at_dist(self, 30),
+      dir = self.dir,
+      vel = scale_v3(10, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 15, [gordo])
+    self
+
+  // Right
+  |DEDEDE_FORWARD_SMASH
+    animate(self, 0, KING_DEDEDE_FORWARD_SMASH_000, 15, 30)
+
+
+  // Q
+  |DEDEDE_GROUND_POUND
+    let self = animate_between(self, 1, KING_DEDEDE_ULTIMATE_000, 22, 0, 22)
+    let self = animate_between(self, 1, KING_DEDEDE_ULTIMATE_000, 22, 22, 43)
+    let self = animate_between(self, 1, KING_DEDEDE_ULTIMATE_000, 22, 43, 64)
+    let self = animate_between(self, 1, KING_DEDEDE_ULTIMATE_000, 22, 64, 85)
+    let self = reset(self, 85)
+    self
+
+  // Space
+  |DEDEDE_EVADE
+    animate(self, 1, KING_DEDEDE_IDLE_000, 4, 16)
+
+  // E
+  |DEDEDE_TAUNT
+    animate(self, 0, KING_DEDEDE_TAUNT_000, 22, 2e2)
+
+
+  else self
+
+
+// Effects
+kingdedede_gordo_throw_fun(self: Thing) : Thing
+  animate_die(self, 0, KING_DEDEDE_GORDO_000, 15, 15)
