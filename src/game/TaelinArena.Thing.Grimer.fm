@@ -111,7 +111,7 @@ muk_fun(self: Thing) : Thing
   |MUK_EARTH_BALL
     let self = animate(self, 1, MUK_EARTH_BALL_CAST_000, 12, 24)
     let ball = new_thing <= thing(
-      fun = grimer_earth_ball_fun,
+      fun = muk_earth_ball_fun,
       pos = self.pos,
       dir = self.dir,
       vel = scale_v3(10, targ_dir(self)),
@@ -144,3 +144,18 @@ muk_fun(self: Thing) : Thing
 
 
   else self
+
+// Effects
+muk_earth_ball_fun(self: Thing) : Thing 
+  case self |thing
+  let self   = animate_die(self, 0, MUK_EARTH_BALL_EFFECT_000, 7, 14)
+  let self   = self <= thing(box = nbox)
+  let radius = 20
+  let effs   = [damage(base_earth_ball_dmg * 2)]
+  let hits   = [hit(effs, self.pos, self.dir, cbox(radius))]
+  let self = cast(self,  4, hits)
+  let self = cast(self,  8, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 16, hits)
+  let self = cast(self, 20, hits) 
+  self 
