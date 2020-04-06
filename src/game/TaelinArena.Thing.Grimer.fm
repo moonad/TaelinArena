@@ -9,6 +9,12 @@ enum
 | GRIMER_EXTRA
 | GRIMER_TAUNT
 
+base_earth_ball_dmg : Number 
+  1 
+
+base_mud_tsunami_dmg : Number 
+  3
+
 grimer_fun(self: Thing) : Thing
   let self = self <= thing(mov = 2.5, mhp = 24)
 
@@ -23,11 +29,12 @@ grimer_fun(self: Thing) : Thing
   |GRIMER_EARTH_BALL
     let self = animate(self, 1, GRIMER_EARTH_BALL_CAST_000, 11, 22)
     let ball = new_thing <= thing(
-      fun = earth_ball_fun,
+      fun = grimer_earth_ball_fun,
       pos = self.pos,
       dir = self.dir,
       vel = scale_v3(10, targ_dir(self)),
-      box = nbox)
+      box = nbox,
+    )
     let self = spawn(self, 8, [ball])
     self 
 
@@ -62,8 +69,19 @@ grimer_fun(self: Thing) : Thing
 
 
 // Effects
-earth_ball_fun(self: Thing) : Thing 
-  animate_die(self, 1, GRIMER_EARTH_BALL_EFFECT_000, 7, 14)
+grimer_earth_ball_fun(self: Thing) : Thing 
+  case self |thing
+  let self   = animate_die(self, 0, GRIMER_EARTH_BALL_EFFECT_000, 10, 20)
+  let self   = self <= thing(box = nbox)
+  let radius = 20
+  let effs   = [damage(base_earth_ball_dmg)]
+  let hits   = [hit(effs, self.pos, self.dir, cbox(radius))]
+  let self = cast(self,  4, hits)
+  let self = cast(self,  8, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 16, hits)
+  let self = cast(self, 20, hits) 
+  self
 
 
 
@@ -93,7 +111,7 @@ muk_fun(self: Thing) : Thing
   |MUK_EARTH_BALL
     let self = animate(self, 1, MUK_EARTH_BALL_CAST_000, 12, 24)
     let ball = new_thing <= thing(
-      fun = earth_ball_fun,
+      fun = grimer_earth_ball_fun,
       pos = self.pos,
       dir = self.dir,
       vel = scale_v3(10, targ_dir(self)),
