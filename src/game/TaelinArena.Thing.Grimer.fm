@@ -40,7 +40,10 @@ grimer_fun(self: Thing) : Thing
 
   // Middle
   |GRIMER_INVINCIBLE_MUD
-    block(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 0, 19)
+    let shield_buff = shielded(19, 1000) //an ignorant amount 
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 19)
+    self 
 
   // Right
   |GRIMER_MUD_SHIELD
@@ -129,8 +132,11 @@ muk_fun(self: Thing) : Thing
 
   // Middle
   |MUK_INVINCIBLE_MUD
-     block(self, 0, MUK_INVINCIBLE_MUD_000, 26, 0, 26)
-
+    let shield_buff = shielded(26, 1000) //an ignorant amount 
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+    let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 26)
+    self 
+    
   // Right
   |MUK_MUD_SHIELD
     let self = animate(self, 0, MUK_MUD_SHIELD_000, 24, 48)
