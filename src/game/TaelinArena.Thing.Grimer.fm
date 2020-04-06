@@ -129,8 +129,7 @@ muk_fun(self: Thing) : Thing
 
   // Middle
   |MUK_INVINCIBLE_MUD
-    let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 52)
-    self
+     block(self, 0, MUK_INVINCIBLE_MUD_000, 26, 0, 26)
 
   // Right
   |MUK_MUD_SHIELD
