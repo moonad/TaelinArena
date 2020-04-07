@@ -2,7 +2,7 @@ const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const TA = require("../TaelinArena.js");
 
-// const CharInfoHelper = require("../assets/CharInfoHelper.js");
+var data = require('../assets/char-info');
 // const logo = require('../assets/taelinarena-icon.png');
 
 // List of characters
@@ -48,6 +48,7 @@ class CharCell extends Component {
   }
 
   char_image(hero_name){
+    // console.log(logo);
     return h("img", {style: {"height": "50px","width": "50px" },
       src: '9bc30c93bb44dea5a7a83626263e287b.png', //image name on docs
       alt: hero_name + "_img"
@@ -55,10 +56,16 @@ class CharCell extends Component {
   }
 
   char_name(hero_name){
-    return h("span", { style:{"flex": "1", "text-align": "center", "padding-top": "5px"}}, hero_name)
+    return h("p", { style:{"flex": "1", "text-align": "center", "padding-top": "5px"}}, hero_name)
   }
 
-  // TODO: remove hover? It's too slow
+  char_attack(attack){
+    const style = {"flex": "1", "text-align": "center", "padding-top": "5px", "font-size": "10px"}
+    return attack ? 
+    h("p", { style:{...style, "color": "#36e33f"}}, "attack") :
+    h("p", { style:{...style, "color": "#bfbe62"}}, "animation")
+  }
+
   render_char_cell(hero_name){
     const normal = {
       "id": "char_cell",
@@ -75,9 +82,12 @@ class CharCell extends Component {
       "background": "#202020"
     }
     const on_focus = {...normal, "background": "#b8b0a5"}
+    const char_info = data.filter(char => char.name === hero_name)
+    const attack_info = char_info[0] !== undefined ? (char_info[0].attack === "1" ? true : false) : false
 
     return h("div", {
-        style: this.highlighted === hero_name ? on_focus : normal,
+        // style: this.highlighted === hero_name ? on_focus : normal,
+        style: normal,
         onClick: () => this.props.on_pick_hero(hero_name),
         onMouseEnter: () => {this.highlighted = hero_name;},
         onMouseLeave: () => {this.highlighted = null;}
@@ -87,7 +97,7 @@ class CharCell extends Component {
         "flex-direction": "column", 
         "justify-content": "center",
         "align-items": "center"}
-        },[this.char_image(hero_name), this.char_name(hero_name)] 
+        }, [this.char_name(hero_name), this.char_attack(attack_info)]
       )
     )
   }

@@ -411,8 +411,8 @@ class Main extends Component {
 
   hero_selection(hero_name){
     this.pick_hero(hero_name); 
-    this.char_selection = false
-    this.forceUpdate()
+    this.char_selection = false;
+    this.forceUpdate();
   }
 
   // Login procedure
@@ -595,7 +595,14 @@ class Main extends Component {
     var picked_hero =
     h("span", {
       "onclick": () => {
-        this.char_selection = true
+        this.char_selection = false;
+        var message = "Pick a hero. Options: " + TA.heroes.join(", ");
+        var picked_hero = prompt(message); 
+        if (picked_hero) {
+          this.pick_hero(picked_hero);
+        } else {
+          alert("Invalid hero.");
+        }
       },
       "style": {
         "text-decoration": "underline",
@@ -604,13 +611,21 @@ class Main extends Component {
     }, [
       this.picked_hero
     ]);
-
-    var char_selection_view = h(CharSelection, {
+    var hero_details =
+    h("span", {
+      "onclick": () => {
+        this.char_selection = true;
+      },
+      "style": {
+        "text-decoration": "underline",
+        "cursor": "pointer",
+      }
+    }, "selection screen");
+    var selection_screen = h(CharSelection, {
       characters: TA.heroes,
       on_pick_hero: hero_name => this.hero_selection(hero_name),
       on_dismiss: () => this.char_selection = false
-    })
-
+    });
     var current_game = h("span", {
       "onclick": () => {
         var gid = prompt("Enter game (or empty for offline):");
@@ -646,7 +661,7 @@ class Main extends Component {
       h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
       h("div", {}, ["FPS  : " + (this.fps_numb||0)]),
       h("div", {}, ["Mode : ", render_mode]),
-      h("div", {}, ["Hero : ", picked_hero]),
+      h("div", {}, ["Hero : ", picked_hero, " or ", hero_details]),
       h("div", {}, ["Room : ",
         (this.room_players
           ? this.room_players.split(",").length
@@ -681,6 +696,23 @@ class Main extends Component {
     }, [
       top_menu,
       game_screen,
+      bottom_panel,
+    ])
+
+    var char_selection_view = h("div", {
+      style: {
+        "position": "fixed",
+        "display": "flex",
+        "flex-flow": "column nowrap",
+        "justify-content": "flex-start",
+        "align-items": "center",
+        "width": "100%",
+        "height": "100%",
+        "font-family": "monaco, monospace",
+      },
+    }, [
+      top_menu,
+      selection_screen,
       bottom_panel,
     ])
 
