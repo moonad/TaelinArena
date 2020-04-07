@@ -49,14 +49,13 @@ grimer_fun(self: Thing) : Thing
   |GRIMER_MUD_SHIELD
     let shield_buff = shielded(30, 1000)
     let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
-    let shield_length = 45
-    let shield_width = 12
-    let shield_box = pbox([ v3(0,0,0),  v3(25,45,0), v3(25,-45,0) ])
+    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 60) 
+    let shield_box = pbox([ 
+      v3(0,0,0),v3(15,45,0),v3(25,45,0),v3(25,-45,0),v3(15,-45,0),   
+    ])
     let self = set_thing_box(self, shield_box)
-    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 30) 
     //requires reset to set cbox(12)
-    // let self = set_thing_box(self, cbox(12))
-    // let self = reset(self, 31)
+    let self = reset(self, 60)
     self
 
   // Q
@@ -68,7 +67,7 @@ grimer_fun(self: Thing) : Thing
     let self = animate(self, 1, GRIMER_TRANSFORMATION_000, 13, 26)
     let self = create_at(self, 25, muk_fun)
     let evolved = set_thing_nam(self, "Muk")
-    self
+    evolved
 
   // E
   | GRIMER_TAUNT
@@ -143,13 +142,20 @@ muk_fun(self: Thing) : Thing
   |MUK_INVINCIBLE_MUD
     let shield_buff = shielded(26, 1000) //an ignorant amount 
     let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
-    let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 26)
+    let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 52)
     self 
 
   // Right
   |MUK_MUD_SHIELD
+    let shield_buff = shielded(30, 1000)
     let self = animate(self, 0, MUK_MUD_SHIELD_000, 24, 48)
+    let shield_box = pbox([ 
+      v3(0,0,0),v3(15,45,0),v3(25,45,0),v3(25,-45,0),v3(15,-45,0),   
+    ])
+    let self = set_thing_box(self, shield_box)
+    let self = reset(self, 60)
     self
+
 
   // Q
   |MUK_MUD_TSUNAMI
