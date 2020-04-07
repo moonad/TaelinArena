@@ -623,6 +623,7 @@ class Main extends Component {
     }, "selection screen");
     var selection_screen = h(CharSelection, {
       characters: TA.heroes,
+      characters_images: TA.hero_image,
       on_pick_hero: hero_name => this.hero_selection(hero_name),
       on_dismiss: () => this.char_selection = false
     });
@@ -717,7 +718,8 @@ class Main extends Component {
     ])
 
     // Main App
-    return this.char_selection ? char_selection_view : main_app
+    // return this.char_selection ? char_selection_view : main_app
+    return char_selection_view
   }
 };
 

@@ -542,6 +542,15 @@ for (var i = 0; i < heroes.length; ++i) {
   hero_name[heroes[i].toLowerCase()] = heroes[i];
 }
 
+// hero_image : {[HeroName]: Maybe(URL)}
+// where HeroName and URL are Strings
+var hero_image = {};
+(async function fetch_image() {
+  hero_image["benfix"] = (await import("./assets/taelinarena-icon.png")).default;
+  hero_image["kenko"] = (await import("./assets/taelinarena-icon.png")).default;
+  hero_image["dilma"] = (await import("./assets/taelinarena-icon.png")).default;
+})();
+
 module.exports = {
   ...TA,
   slist_to_array,
@@ -562,4 +571,5 @@ module.exports = {
   GameRunner,
   heroes,
   hero_name,
+  hero_image,
 };

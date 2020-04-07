@@ -32,12 +32,29 @@ class CharSelection extends Component {
         "color": "#D0D0D0",
         "font-family": "monaco, monospace"
       }
-    }, [title, h(CharCell, {on_pick_hero: this.props.on_pick_hero, characters: this.props.characters})]
+    }, [title, h(CharCell, {
+      on_pick_hero: this.props.on_pick_hero, 
+      characters: this.props.characters,
+      characters_images: this.props.characters_images})]
     )
     return view;
   }
 };
 
+// // String -> Maybe(String)
+// var got_hero_image = {};
+// function get_hero_image(hero_name){
+//   var got_image = got_hero_image[hero_name];
+//   if (got_image) {
+//     return got_image;
+//   } else {
+//     (async function fetch_image() {
+//       var image = await import("../assets/taelinarena-icon.png");
+//       got_hero_image[hero_name] = image;
+//     })();
+//     return null;
+//   }
+// }
 
 
 class CharCell extends Component {
@@ -45,12 +62,15 @@ class CharCell extends Component {
   constructor(props) {
     super(props);
     this.highlighted = null; // String. Name of the character on focus
+    this.got_hero_image = {};
   }
 
-  char_image(hero_name){
-    // console.log(logo);
+  char_image(hero_name, image){
+    console.log(">> char_image function: "+ image);
+
     return h("img", {style: {"height": "50px","width": "50px" },
-      src: '9bc30c93bb44dea5a7a83626263e287b.png', //image name on docs
+      // src: "9bc30c93bb44dea5a7a83626263e287b.png",
+      src: image ? image : "9bc30c93bb44dea5a7a83626263e287b.png", // TaelinArena logo
       alt: hero_name + "_img"
     })
   }
@@ -84,6 +104,7 @@ class CharCell extends Component {
     const on_focus = {...normal, "background": "#b8b0a5"}
     const char_info = data.filter(char => char.name === hero_name)
     const attack_info = char_info[0] !== undefined ? (char_info[0].attack === "1" ? true : false) : false
+    // const image = this.props.hero_image();
 
     return h("div", {
         // style: this.highlighted === hero_name ? on_focus : normal,
@@ -115,6 +136,5 @@ class CharCell extends Component {
     }, this.props.characters.map(char_name => this.render_char_cell(char_name)))
   }
 }
-
 
 module.exports = CharSelection;
