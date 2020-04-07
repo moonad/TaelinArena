@@ -46,7 +46,15 @@ luffy_fun(self: Thing) : Thing
 
   // Right
   |LUFFY_GATLING_GUN
-    animate(self, 0, LUFFY_GATLING_GUN_000, 16, 32)
+    let effs = [damage(1)]
+    let hits = [hit(effs, at_dist(self, 30), self.dir, cbox(20))]
+    let self = animate(self, 0, LUFFY_GATLING_GUN_000, 16, 32)
+    let self = cast(self,  6, hits)
+    let self = cast(self, 12, hits)
+    let self = cast(self, 18, hits)
+    let self = cast(self, 24, hits)
+    let self = cast(self, 30, hits)
+    self 
 
   // Q Ultimate
   |LUFFY_GIANT_ARM
