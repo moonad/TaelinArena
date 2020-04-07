@@ -23,7 +23,10 @@ luffy_fun(self: Thing) : Thing
   // Left
   |LUFFY_BASIC_ATTACK
     let effs = [damage(1)]
-    let hits = [hit(effs, at_dist(self, 30), self.dir, cbox(12))]
+    let hits = [
+      hit(effs, at_dist(self, 20), self.dir, cbox(10)),
+      hit(effs, at_dist(self, 40), self.dir, cbox(10))
+    ]
     let self = animate(self, 0, LUFFY_BASIC_ATTACK_1_000, 10, 20)
     let self = cast(self, 5, hits)
     let self = cast(self, 15, hits)
