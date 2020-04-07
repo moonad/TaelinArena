@@ -31,7 +31,11 @@ ppg_fun(self: Thing) : Thing
 
   // Right
   |PPG_LASER_BURST
-    animate(self, 0, PPG_LASER_BURST_000, 26, 35)
+    let effs = [damage(2)]
+    let hits = [hit(effs, at_dist(self, 70), self.dir, cbox(15))]
+    let self = animate(self, 0, PPG_LASER_BURST_000, 26, 35)
+    let self = cast(self, 25, hits)  
+    self 
 
   // Ultimate Q
   |PPG_COSMIC_ICE_BALL_CASTING
