@@ -60,12 +60,15 @@ luffy_fun(self: Thing) : Thing
   |LUFFY_GIANT_ARM
     let self = animate(self, 0, LUFFY_GIANT_ARM_000, 23, 46)
     let arm = new_thing <= thing(fun=luffy_giant_arm_effect)
-    let self = spawn(self, 36, [move(arm, self.trg)])
+    let self = spawn(self, 36, [move(arm, at_dist(self, 80))]) //[move(arm, self.trg)])
     self
 
   // Space
   |LUFFY_BLOCK
-    animate(self, 0, LUFFY_BLOCK_000, 1, 6)
+    let buff = shielded(6, 1000)
+    let self = set_thing_buf(self, cons(_ buff, self.buf))
+    let self = animate(self, 0, LUFFY_BLOCK_000, 1, 6)
+    self 
 
   // E
   |LUFFY_TAUNT
@@ -74,5 +77,9 @@ luffy_fun(self: Thing) : Thing
   else self
 
 luffy_giant_arm_effect(self: Thing) : Thing
+  case self |thing
+  let effs = [damage(5), stun(3*ONE_SEC)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(30))]
+  let self = cast(self, 6, hits)
   let self = animate_die(self, 0, LUFFY_GIANT_ARM_IMPACT_SMOKE_000, 6, 12)
   self
