@@ -21,13 +21,18 @@ ppg_fun(self: Thing) : Thing
 
   // Left 
   |PPG_COLORFUL_MAGIC
-    animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
+    let self = animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
+    let h0   = [hit([root(2*ONE_SEC)], at_dist(self, 70), self.dir, cbox(15))]
+    let h1   = [hit([damage(2)],       at_dist(self, 70), self.dir, cbox(15))]
+    let h2   = [hit([damage(3)],       at_dist(self, 70), self.dir, cbox(15))]
+    let self = cast(self, 20, h0)
+    let self = cast(self, 25, h1)
+    let self = cast(self, 50, h2)
+    self 
 
   // Middle
   |PPG_DASH
-    let self = animate(self, 1, PPG_DASH_000, 9, 18)
-    let self = dash(self, 4, 0, 18)
-    self
+    animate(self, 1, PPG_DASH_000, 9, 18)
 
   // Right
   |PPG_LASER_BURST
@@ -42,12 +47,14 @@ ppg_fun(self: Thing) : Thing
   |PPG_COSMIC_ICE_BALL_CASTING
     let self = animate(self, 0, PPG_COSMIC_ICE_BALL_CAST_000, 23, 50)
     let ice = new_thing <= thing(fun=ppg_ice_ball_effect)
-    let self = spawn(self, 23, [move(ice, self.trg)])
+    let self = spawn(self, 23, [move(ice, at_max_dist(self, 75))])
     self
 
   // Space
   | PPG_BLOCK
-     animate(self, 0, PPG_BLOCK_000, 18, 18)
+    let self = set_thing_buf(self, cons(_ shielded(18, 1000), self.buf))
+    let self = animate(self, 0, PPG_BLOCK_000, 18, 18)
+    self 
 
   // E
   | PPG_TAUNT
