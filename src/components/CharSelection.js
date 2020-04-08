@@ -29,7 +29,10 @@ class CharSelection extends Component {
         "font-size": "14px",
         "background": "#202020",
         "color": "#D0D0D0",
-        "font-family": "monaco, monospace"
+        // "border-top": "1px solid #787777",
+        "border-bottom": "1px solid #383838",
+        "font-family": "monaco, monospace",
+        "overflow": "scroll"
       }
     }, [title, h(CharCell, {
         on_pick_hero: this.props.on_pick_hero, 
@@ -130,7 +133,8 @@ class CharCell extends Component {
         "flex-grow": "1",
         "flex-direction": "row",
         "flex-wrap": "wrap",
-        "font-family": "monaco, monospace"
+        "font-family": "monaco, monospace",
+        "overflow": "scroll"
       }
     }, this.props.heroes_name.map(char_name => this.render_char_cell(char_name)))
   }
