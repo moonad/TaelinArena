@@ -45,7 +45,7 @@ class CharCell extends Component {
     this.highlighted = null; // String. Name of the character on focus
   }
 
-  char_image(hero_name, image){
+  char_image(hero_name, image, updated){
     const image_frame =  h("img", {style: {
       "height": "50px",
       "width": "50px",
@@ -55,15 +55,16 @@ class CharCell extends Component {
       src: image ? image : "9bc30c93bb44dea5a7a83626263e287b.png", // TaelinArena logo
       alt: hero_name + "_img"
     })
-    return h("div", {style: {
+    const normal_border = {
       "height": "54px",
       "width": "54px",
       "display": "flex",
       "align-items": "center",
       "justify-content": "center",
-      "outline": "1px solid rgba(255,255,255,0.2)",
-      }}, image_frame
-    )
+      "outline": "1px solid rgba(255,255,255,0.2)"
+    }
+    const updated_border = {...normal_border, "outline": "1px solid #36e33f"}
+    return h("div", {style: updated ? updated_border : normal_border}, image_frame)
   }
 
   char_name(hero_name){
@@ -97,6 +98,7 @@ class CharCell extends Component {
     const images = this.props.heroes_image;
     const hero_image = images.has(hero_name.toLowerCase()) ? 
       images.get(hero_name.toLowerCase()) : null;
+    const updated_hero = hero_info[0] !== undefined ? (hero_info[0].recently_updated === "1" ? true : false) : false
 
     return h("div", {
         style: this.highlighted === hero_name ? on_focus : normal,
@@ -110,7 +112,7 @@ class CharCell extends Component {
         "flex-direction": "column", 
         "justify-content": "center",
         "align-items": "center"}
-        }, [this.char_image(hero_name, hero_image), this.char_name(hero_name), this.char_attack(attack_info)]
+        }, [this.char_image(hero_name, hero_image, updated_hero), this.char_name(hero_name), this.char_attack(attack_info)]
       )
     )
   }
