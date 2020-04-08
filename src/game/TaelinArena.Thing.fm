@@ -30,6 +30,7 @@ import TaelinArena.Thing.PPG
 import TaelinArena.Thing.Pichu
 import TaelinArena.Thing.Ray
 import TaelinArena.Thing.Ryu
+import TaelinArena.Thing.Scorpion
 import TaelinArena.Thing.Shao
 import TaelinArena.Thing.Squirtle
 import TaelinArena.Thing.SrMadruga

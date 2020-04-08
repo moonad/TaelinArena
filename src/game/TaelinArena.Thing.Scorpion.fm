@@ -33,6 +33,7 @@ scorpion_fun(self: Thing) : Thing
   |SCORPION_INFERNAL_LUNGS
     let self = animate_with_blink(self, 1, SCORPION_INFERNAL_LUNGS_CAST_ANIMATION_000, SCORPION_IDLE_000, 19, 0, 38)
     let self = reset(self, 38)
+    let self = dash(self, 2, 20, 38)
     let self = blink(self, 38, at_max_dist(self, 40))
     self
 
