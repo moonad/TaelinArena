@@ -32,7 +32,8 @@ ppg_fun(self: Thing) : Thing
   // Right
   |PPG_LASER_BURST
     let effs = [damage(2)]
-    let hits = [hit(effs, at_dist(self, 70), self.dir, cbox(15))]
+    let hits = [hit(effs, at_dist(self, 75), self.dir, cbox(15))]
+    // separate cast from effect?
     let self = animate(self, 0, PPG_LASER_BURST_000, 26, 35)
     let self = cast(self, 28, hits)  
     self 
@@ -55,5 +56,5 @@ ppg_fun(self: Thing) : Thing
   else self
 
 ppg_ice_ball_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
-  self
+  animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
+
