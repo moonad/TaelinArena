@@ -577,6 +577,7 @@ var heroes_image = new Map(Object.entries({}));
   heroes_image.set("pichu", (await import("./assets/pichu.png")).default);
   heroes_image.set("ray", (await import("./assets/ray.png")).default);
   heroes_image.set("ryu", (await import("./assets/ryu.png")).default);
+  heroes_image.set("scorpion", (await import("./assets/scorpion.png")).default);
   heroes_image.set("shao", (await import("./assets/shao.png")).default);
   heroes_image.set("squirtle", (await import("./assets/squirtle.png")).default);
   heroes_image.set("srmadruga", (await import("./assets/SrMadruga.png")).default);
