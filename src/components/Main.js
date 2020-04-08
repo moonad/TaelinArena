@@ -622,8 +622,9 @@ class Main extends Component {
       }
     }, "selection screen");
     var selection_screen = h(CharSelection, {
-      characters: TA.heroes,
-      characters_images: TA.hero_image,
+      heroes_name: TA.heroes,
+      heroes_image: TA.heroes_image,
+      heroes_info: TA.heroes_info,
       on_pick_hero: hero_name => this.hero_selection(hero_name),
       on_dismiss: () => this.char_selection = false
     });

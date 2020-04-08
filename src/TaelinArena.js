@@ -1,5 +1,6 @@
 if (typeof window !== "undefined") {
   var TA = require("./game/TaelinArena.fm");
+  var heroes_info = require('./assets/char-info.json');
 
   // Loads all models
   var models = require("./models/models.js");
@@ -542,14 +543,17 @@ for (var i = 0; i < heroes.length; ++i) {
   hero_name[heroes[i].toLowerCase()] = heroes[i];
 }
 
-// hero_image : {[HeroName]: Maybe(URL)}
+// hero_image : Map{[HeroName]: Maybe(URL)}
 // where HeroName and URL are Strings
-var hero_image = {};
+var heroes_image = new Map(Object.entries({}));
 (async function fetch_image() {
-  hero_image["benfix"] = (await import("./assets/taelinarena-icon.png")).default;
-  hero_image["kenko"] = (await import("./assets/taelinarena-icon.png")).default;
-  hero_image["dilma"] = (await import("./assets/taelinarena-icon.png")).default;
+  heroes_image.set("benfix", (await import("./assets/benfix.png")).default);
+  heroes_image.set("bleskape", (await import("./assets/bleskape.png")).default);
+  heroes_image.set("dilma", (await import("./assets/dilma.png")).default);
 })();
+
+var heroes_info = require("./assets/char-info.json");
+
 
 module.exports = {
   ...TA,
@@ -571,5 +575,6 @@ module.exports = {
   GameRunner,
   heroes,
   hero_name,
-  hero_image,
+  heroes_image,
+  heroes_info
 };

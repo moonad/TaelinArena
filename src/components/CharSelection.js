@@ -2,7 +2,7 @@ const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const TA = require("../TaelinArena.js");
 
-var data = require('../assets/char-info');
+
 // const logo = require('../assets/taelinarena-icon.png');
 
 // List of characters
@@ -16,8 +16,8 @@ class CharSelection extends Component {
   }
 
   render() {
+    console.log("Heroes info Char Selection: ", this.props.heroes_info);
     var title = h("div", {style: {"font-size": "20px", "padding": "10px 0px 20px 0px"}}, "Choose your hero:");
-
     var view =
     h("div", {
       style: {
@@ -33,43 +33,26 @@ class CharSelection extends Component {
         "font-family": "monaco, monospace"
       }
     }, [title, h(CharCell, {
-      on_pick_hero: this.props.on_pick_hero, 
-      characters: this.props.characters,
-      characters_images: this.props.characters_images})]
+        on_pick_hero: this.props.on_pick_hero, 
+        heroes_name: this.props.heroes_name,
+        heroes_image: this.props.heroes_image,
+        heroes_info: this.props.heroes_info
+        })
+      ]
     )
     return view;
   }
 };
-
-// // String -> Maybe(String)
-// var got_hero_image = {};
-// function get_hero_image(hero_name){
-//   var got_image = got_hero_image[hero_name];
-//   if (got_image) {
-//     return got_image;
-//   } else {
-//     (async function fetch_image() {
-//       var image = await import("../assets/taelinarena-icon.png");
-//       got_hero_image[hero_name] = image;
-//     })();
-//     return null;
-//   }
-// }
-
 
 class CharCell extends Component {
 
   constructor(props) {
     super(props);
     this.highlighted = null; // String. Name of the character on focus
-    this.got_hero_image = {};
   }
 
   char_image(hero_name, image){
-    console.log(">> char_image function: "+ image);
-
     return h("img", {style: {"height": "50px","width": "50px" },
-      // src: "9bc30c93bb44dea5a7a83626263e287b.png",
       src: image ? image : "9bc30c93bb44dea5a7a83626263e287b.png", // TaelinArena logo
       alt: hero_name + "_img"
     })
@@ -102,9 +85,16 @@ class CharCell extends Component {
       "background": "#202020"
     }
     const on_focus = {...normal, "background": "#b8b0a5"}
-    const char_info = data.filter(char => char.name === hero_name)
-    const attack_info = char_info[0] !== undefined ? (char_info[0].attack === "1" ? true : false) : false
-    // const image = this.props.hero_image();
+    // const char_info = data.filter(char => char.name === hero_name)
+    // const attack_info = char_info[0] !== undefined ? (char_info[0].attack === "1" ? true : false) : false
+    const hero_info = this.props.heroes_info.filter(hero => hero.name === hero_name);
+    const attack_info = hero_info[0] !== undefined ? (hero_info[0].attack === "1" ? true : false) : false
+    const images = this.props.heroes_image;
+    const hero_image = images.has(hero_name.toLowerCase()) ? 
+      images.get(hero_name.toLowerCase()) : null;
+
+    console.log("image: ", this.props.heroes_image);
+    // console.log("hero image: ", hero_image);
 
     return h("div", {
         // style: this.highlighted === hero_name ? on_focus : normal,
@@ -118,7 +108,7 @@ class CharCell extends Component {
         "flex-direction": "column", 
         "justify-content": "center",
         "align-items": "center"}
-        }, [this.char_name(hero_name), this.char_attack(attack_info)]
+        }, [this.char_image(hero_name, hero_image), this.char_name(hero_name), this.char_attack(attack_info)]
       )
     )
   }
@@ -133,7 +123,7 @@ class CharCell extends Component {
         "flex-wrap": "wrap",
         "font-family": "monaco, monospace"
       }
-    }, this.props.characters.map(char_name => this.render_char_cell(char_name)))
+    }, this.props.heroes_name.map(char_name => this.render_char_cell(char_name)))
   }
 }
 
