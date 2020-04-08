@@ -51,7 +51,7 @@ puddledmg_fun(self: Thing) : Thing
       damage(1), 
       // stun(4*ONE_SEC)
       // silence(5*ONE_SEC)
-      slow(3*ONE_SEC, 0.2)
+      // slow(3*ONE_SEC, 0.7)
       // root(4*ONE_SEC)
     ], 
       self.pos, 
@@ -59,13 +59,14 @@ puddledmg_fun(self: Thing) : Thing
       cbox(48)
     )
   ]
-  let self = cast(self, 10, hits)
-  // let self = cast(self, 18, hits)
-  // let self = cast(self, 26, hits)
-  // let self = cast(self, 30, hits)
-  // let self = cast(self, 38, hits)
-  // let self = cast(self, 44, hits)
-  // let self = cast(self, 52, hits)
+  let slow = [hit([slow(3*ONE_SEC, 0.7)], self.pos, self.dir, cbox(48))]
+  let self = cast(self, 10, slow)
+  let self = cast(self, 18, hits)
+  let self = cast(self, 26, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 38, hits)
+  let self = cast(self, 44, hits)
+  let self = cast(self, 52, hits)
   self
 
 
