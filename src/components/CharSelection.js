@@ -2,14 +2,7 @@ const {Component, render} = require("inferno");
 const h = require("inferno-hyperscript").h;
 const TA = require("../TaelinArena.js");
 
-
-// const logo = require('../assets/taelinarena-icon.png');
-
-// List of characters
-// props:
-// - characters: list of the names of characters available
-// - on_pick_hero: function to select a hero (parent)
-// - on_dismiss: function to dismiss CharSelection view (parent)
+// List of characters available to play
 class CharSelection extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +22,6 @@ class CharSelection extends Component {
         "font-size": "14px",
         "background": "#202020",
         "color": "#D0D0D0",
-        // "border-top": "1px solid #787777",
         "border-bottom": "1px solid #383838",
         "font-family": "monaco, monospace",
         "overflow": "scroll"
@@ -70,7 +62,6 @@ class CharCell extends Component {
       "align-items": "center",
       "justify-content": "center",
       "outline": "1px solid rgba(255,255,255,0.2)",
-      // "box-shadow": " 0px 0px 15px 0px rgba(255,255,255,0.2)"
       }}, image_frame
     )
   }
@@ -98,7 +89,6 @@ class CharCell extends Component {
       "justify-content": "center",
       "align-items": "center",
       "display": "flex",
-      // "border": '1px solid #D0D0D0',
       "background": "#202020"
     }
     const on_focus = {...normal, "background": "#2b2b2b"}
