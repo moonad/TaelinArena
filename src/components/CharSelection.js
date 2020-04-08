@@ -16,8 +16,7 @@ class CharSelection extends Component {
   }
 
   render() {
-    console.log("Heroes info Char Selection: ", this.props.heroes_info);
-    var title = h("div", {style: {"font-size": "20px", "padding": "10px 0px 20px 0px"}}, "Choose your hero:");
+    var title = h("div", {style: {"font-size": "20px", "padding": "20px"}}, "Choose your hero:");
     var view =
     h("div", {
       style: {
@@ -52,10 +51,25 @@ class CharCell extends Component {
   }
 
   char_image(hero_name, image){
-    return h("img", {style: {"height": "50px","width": "50px" },
+    const image_frame =  h("img", {style: {
+      "height": "50px",
+      "width": "50px",
+      "outline": "2px solid rgba(255,255,255,0.2) ",
+      "outline-offset": "-1px"
+    },
       src: image ? image : "9bc30c93bb44dea5a7a83626263e287b.png", // TaelinArena logo
       alt: hero_name + "_img"
     })
+    return h("div", {style: {
+      "height": "54px",
+      "width": "54px",
+      "display": "flex",
+      "align-items": "center",
+      "justify-content": "center",
+      "outline": "1px solid rgba(255,255,255,0.2)",
+      // "box-shadow": " 0px 0px 15px 0px rgba(255,255,255,0.2)"
+      }}, image_frame
+    )
   }
 
   char_name(hero_name){
@@ -63,7 +77,7 @@ class CharCell extends Component {
   }
 
   char_attack(attack){
-    const style = {"flex": "1", "text-align": "center", "padding-top": "5px", "font-size": "10px"}
+    const style = {"flex": "1", "text-align": "center", "padding-top": "2px", "font-size": "10px"}
     return attack ? 
     h("p", { style:{...style, "color": "#36e33f"}}, "attack") :
     h("p", { style:{...style, "color": "#bfbe62"}}, "animation")
@@ -81,24 +95,19 @@ class CharCell extends Component {
       "justify-content": "center",
       "align-items": "center",
       "display": "flex",
-      "border": '1px solid #D0D0D0',
+      // "border": '1px solid #D0D0D0',
       "background": "#202020"
     }
-    const on_focus = {...normal, "background": "#b8b0a5"}
-    // const char_info = data.filter(char => char.name === hero_name)
-    // const attack_info = char_info[0] !== undefined ? (char_info[0].attack === "1" ? true : false) : false
+    const on_focus = {...normal, "background": "#2b2b2b"}
     const hero_info = this.props.heroes_info.filter(hero => hero.name === hero_name);
     const attack_info = hero_info[0] !== undefined ? (hero_info[0].attack === "1" ? true : false) : false
     const images = this.props.heroes_image;
     const hero_image = images.has(hero_name.toLowerCase()) ? 
       images.get(hero_name.toLowerCase()) : null;
 
-    console.log("image: ", this.props.heroes_image);
-    // console.log("hero image: ", hero_image);
-
     return h("div", {
-        // style: this.highlighted === hero_name ? on_focus : normal,
-        style: normal,
+        style: this.highlighted === hero_name ? on_focus : normal,
+        // style: normal,
         onClick: () => this.props.on_pick_hero(hero_name),
         onMouseEnter: () => {this.highlighted = hero_name;},
         onMouseLeave: () => {this.highlighted = null;}
