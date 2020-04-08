@@ -22,26 +22,53 @@ luffy_fun(self: Thing) : Thing
 
   // Left
   |LUFFY_BASIC_ATTACK
-    animate(self, 0, LUFFY_BASIC_ATTACK_1_000, 5, 10)
+    let effs = [damage(1)]
+    let hits = [
+      hit(effs, at_dist(self, 20), self.dir, cbox(10)),
+      hit(effs, at_dist(self, 40), self.dir, cbox(10))
+    ]
+    let self = animate(self, 0, LUFFY_BASIC_ATTACK_1_000, 10, 20)
+    let self = cast(self, 5, hits)
+    let self = cast(self, 15, hits)
+    self 
 
   // Middle
   |LUFFY_BAZOOKA
-    animate(self, 0, LUFFY_BAZOOKA_000, 10, 20)
+    let effs = [damage(3), impulse(10, self.dir)]
+    let hits = [
+      hit(effs, at_dist(self, 20), self.dir, cbox(10)),
+      hit(effs, at_dist(self, 40), self.dir, cbox(10)),
+      hit(effs, at_dist(self, 60), self.dir, cbox(10)),
+    ]
+    let self = animate(self, 0, LUFFY_BAZOOKA_000, 10, 20)
+    let self = cast(self, 15, hits)
+    self 
 
   // Right
   |LUFFY_GATLING_GUN
-    animate(self, 0, LUFFY_GATLING_GUN_000, 16, 32)
+    let effs = [damage(1)]
+    let hits = [hit(effs, at_dist(self, 30), self.dir, cbox(20))]
+    let self = animate(self, 0, LUFFY_GATLING_GUN_000, 16, 32)
+    let self = cast(self,  6, hits)
+    let self = cast(self, 12, hits)
+    let self = cast(self, 18, hits)
+    let self = cast(self, 24, hits)
+    let self = cast(self, 30, hits)
+    self 
 
   // Q Ultimate
   |LUFFY_GIANT_ARM
     let self = animate(self, 0, LUFFY_GIANT_ARM_000, 23, 46)
     let arm = new_thing <= thing(fun=luffy_giant_arm_effect)
-    let self = spawn(self, 36, [move(arm, self.trg)])
+    let self = spawn(self, 36, [move(arm, at_dist(self, 80))]) //[move(arm, self.trg)])
     self
 
   // Space
   |LUFFY_BLOCK
-    animate(self, 0, LUFFY_BLOCK_000, 1, 6)
+    let buff = shielded(6, 1000)
+    let self = set_thing_buf(self, cons(_ buff, self.buf))
+    let self = animate(self, 0, LUFFY_BLOCK_000, 1, 6)
+    self 
 
   // E
   |LUFFY_TAUNT
@@ -50,5 +77,9 @@ luffy_fun(self: Thing) : Thing
   else self
 
 luffy_giant_arm_effect(self: Thing) : Thing
+  case self |thing
+  let effs = [damage(5), stun(3*ONE_SEC)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(30))]
+  let self = cast(self, 6, hits)
   let self = animate_die(self, 0, LUFFY_GIANT_ARM_IMPACT_SMOKE_000, 6, 12)
   self
