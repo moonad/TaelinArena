@@ -10,7 +10,7 @@ enum
 | GRIMER_TAUNT
 
 base_earth_ball_dmg : Number 
-  1 
+  2
 
 base_mud_tsunami_dmg : Number 
   3
@@ -40,9 +40,12 @@ grimer_fun(self: Thing) : Thing
 
   // Middle
   |GRIMER_INVINCIBLE_MUD
-    let shield_buff = shielded(19, 1000) //an ignorant amount 
+    let shield_buff = shielded(31, 1000) //an ignorant amount 
     let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
-    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 19)
+    let self = animate_between(self, 0, GRIMER_INVINCIBLE_MUD_000, 6, 0, 6)
+    let self = animate_between(self, 0, GRIMER_INVINCIBLE_MUD_006, 7, 6, 24)
+    let self = animate_between(self, 0, GRIMER_INVINCIBLE_MUD_012, 7, 24, 31)
+    let self = reset(self, 31)
     self 
 
   // Right
@@ -80,7 +83,7 @@ grimer_fun(self: Thing) : Thing
 // Effects
 grimer_earth_ball_fun(self: Thing) : Thing 
   case self |thing
-  let self   = animate_die(self, 0, GRIMER_EARTH_BALL_EFFECT_000, 10, 20)
+  let self   = animate_die(self, 0, GRIMER_EARTH_BALL_EFFECT_000, 7, 14)
   let self   = self <= thing(box = nbox)
   let radius = 20
   let effs   = [damage(base_earth_ball_dmg)]
