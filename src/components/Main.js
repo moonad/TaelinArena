@@ -14,6 +14,7 @@ const post = (func, body) => {
 const Register = require("./Register.js");
 const GameList = require("./GameList.js");
 const Chat = require("./Chat.js");
+const CharSelection = require("./CharSelection.js");
 
 const Controls = require("./Controls.js");
 
@@ -36,6 +37,7 @@ class Main extends Component {
     this.canhud = null;
     this.peer = null;
     //this.setup_canvox();
+    this.char_selection = false;
     this.pick_hero("Scorpion");
     this.login();
   }
@@ -395,6 +397,7 @@ class Main extends Component {
 
   // Selects a hero
   pick_hero(hero) {
+    console.log("Main.js, hero: "+hero);
     hero = hero.toLowerCase();
     if (TA.hero_name[hero]) {
       this.picked_hero = TA.hero_name[hero];
@@ -404,6 +407,12 @@ class Main extends Component {
       }
       this.post("!" + this.picked_hero);
     }
+  }
+
+  hero_selection(hero_name){
+    this.pick_hero(hero_name); 
+    this.char_selection = false;
+    this.forceUpdate();
   }
 
   // Login procedure
@@ -583,8 +592,10 @@ class Main extends Component {
     }, [
       this.render_mode
     ]);
-    var picked_hero = h("span", {
+    var picked_hero =
+    h("span", {
       "onclick": () => {
+        this.char_selection = false;
         var message = "Pick a hero. Options: " + TA.heroes.join(", ");
         var picked_hero = prompt(message); 
         if (picked_hero) {
@@ -600,6 +611,23 @@ class Main extends Component {
     }, [
       this.picked_hero
     ]);
+    var hero_details =
+    h("span", {
+      "onclick": () => {
+        this.char_selection = true;
+      },
+      "style": {
+        "text-decoration": "underline",
+        "cursor": "pointer",
+      }
+    }, "selection screen");
+    var selection_screen = h(CharSelection, {
+      heroes_name: TA.heroes,
+      heroes_image: TA.heroes_image,
+      heroes_info: TA.heroes_info,
+      on_pick_hero: hero_name => this.hero_selection(hero_name),
+      on_dismiss: () => this.char_selection = false
+    });
     var current_game = h("span", {
       "onclick": () => {
         var gid = prompt("Enter game (or empty for offline):");
@@ -628,14 +656,14 @@ class Main extends Component {
         "width": "25%",
         "height": "100%",
         "padding": "4px",
-        "font-family": "monospace",
+        "font-family": "monospace"
       }
     }, [
       h("div", {}, ["Game : ", current_game, " (join: ", join_mode, ")"]),
       h("div", {}, ["Turn : ", (this.game?this.game.turns.length:0)]),
       h("div", {}, ["FPS  : " + (this.fps_numb||0)]),
       h("div", {}, ["Mode : ", render_mode]),
-      h("div", {}, ["Hero : ", picked_hero]),
+      h("div", {}, ["Hero : ", picked_hero, " or ", hero_details]),
       h("div", {}, ["Room : ",
         (this.room_players
           ? this.room_players.split(",").length
@@ -656,8 +684,7 @@ class Main extends Component {
       },
     }, [chat_box, room_box, info_box]);
 
-    // Main App
-    return h("div", {
+    var main_app = h("div", {
       style: {
         "position": "fixed",
         "display": "flex",
@@ -673,6 +700,26 @@ class Main extends Component {
       game_screen,
       bottom_panel,
     ])
+
+    var char_selection_view = h("div", {
+      style: {
+        "position": "fixed",
+        "display": "flex",
+        "flex-flow": "column nowrap",
+        "justify-content": "flex-start",
+        "align-items": "center",
+        "width": "100%",
+        "height": "100%",
+        "font-family": "monaco, monospace",
+      },
+    }, [
+      top_menu,
+      selection_screen,
+      bottom_panel,
+    ])
+
+    // Main App
+    return this.char_selection ? char_selection_view : main_app
   }
 };
 
