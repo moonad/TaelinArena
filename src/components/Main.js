@@ -38,7 +38,7 @@ class Main extends Component {
     this.peer = null;
     //this.setup_canvox();
     this.char_selection = false;
-    this.pick_hero("KingDedede");
+    this.pick_hero("DarthVader");
     this.login();
   }
 

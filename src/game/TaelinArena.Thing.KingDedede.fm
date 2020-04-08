@@ -55,7 +55,7 @@ kingdedede_fun(self: Thing) : Thing
 
   // E
   |DEDEDE_TAUNT
-    animate(self, 0, KING_DEDEDE_TAUNT_000, 22, 2e2)
+    animate(self, 0, KING_DEDEDE_TAUNT_000, 22, 22)
 
 
   else self
