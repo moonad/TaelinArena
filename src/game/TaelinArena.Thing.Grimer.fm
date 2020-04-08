@@ -9,6 +9,12 @@ enum
 | GRIMER_EXTRA
 | GRIMER_TAUNT
 
+base_earth_ball_dmg : Number 
+  1 
+
+base_mud_tsunami_dmg : Number 
+  3
+
 grimer_fun(self: Thing) : Thing
   let self = self <= thing(mov = 2.5, mhp = 24)
 
@@ -23,35 +29,45 @@ grimer_fun(self: Thing) : Thing
   |GRIMER_EARTH_BALL
     let self = animate(self, 1, GRIMER_EARTH_BALL_CAST_000, 11, 22)
     let ball = new_thing <= thing(
-      fun = earth_ball_fun,
+      fun = grimer_earth_ball_fun,
       pos = self.pos,
       dir = self.dir,
       vel = scale_v3(10, targ_dir(self)),
-      box = nbox)
+      box = nbox,
+    )
     let self = spawn(self, 8, [ball])
     self 
 
   // Middle
   |GRIMER_INVINCIBLE_MUD
-    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 38)
-    self
+    let shield_buff = shielded(19, 1000) //an ignorant amount 
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+    let self = animate(self, 0, GRIMER_INVINCIBLE_MUD_000, 19, 19)
+    self 
 
   // Right
   |GRIMER_MUD_SHIELD
-    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 60)
+    let shield_buff = shielded(30, 1000)
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+    let self = animate(self, 0, GRIMER_MUD_SHIELD_000, 30, 60) 
+    let shield_box = pbox([ 
+      v3(0,0,0),v3(15,45,0),v3(25,45,0),v3(25,-45,0),v3(15,-45,0),   
+    ])
+    let self = set_thing_box(self, shield_box)
+    //requires reset to set cbox(12)
+    let self = reset(self, 60)
     self
 
   // Q
   |GRIMER_MUD_TSUNAMI
-    let self = animate(self, 1, GRIMER_MUD_TSUNAMI_000, 17, 34)
-    self
+    grimer_mud_tsunami_fun(self)
 
   // Space
   | GRIMER_EXTRA
     let self = animate(self, 1, GRIMER_TRANSFORMATION_000, 13, 26)
     let self = create_at(self, 25, muk_fun)
     let evolved = set_thing_nam(self, "Muk")
-    self
+    evolved
 
   // E
   | GRIMER_TAUNT
@@ -62,8 +78,29 @@ grimer_fun(self: Thing) : Thing
 
 
 // Effects
-earth_ball_fun(self: Thing) : Thing 
-  animate_die(self, 1, GRIMER_EARTH_BALL_EFFECT_000, 7, 14)
+grimer_earth_ball_fun(self: Thing) : Thing 
+  case self |thing
+  let self   = animate_die(self, 0, GRIMER_EARTH_BALL_EFFECT_000, 10, 20)
+  let self   = self <= thing(box = nbox)
+  let radius = 20
+  let effs   = [damage(base_earth_ball_dmg)]
+  let hits   = [hit(effs, self.pos, self.dir, cbox(radius))]
+  let self = cast(self,  4, hits)
+  let self = cast(self,  8, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 16, hits)
+  let self = cast(self, 20, hits) 
+  self
+
+grimer_mud_tsunami_fun(self: Thing) : Thing 
+  case self |thing 
+  let self = animate(self, 1, GRIMER_MUD_TSUNAMI_000, 17, 34)
+  let effs = [damage(base_mud_tsunami_dmg)]
+  let h1   = [hit(effs, self.pos, self.dir, cbox(30))] 
+  let h2   = [hit(effs, self.pos, self.dir, cbox(40))] 
+  let self = cast(self, 10, h1)
+  let self = cast(self, 20, h2)
+  self 
 
 
 
@@ -93,7 +130,7 @@ muk_fun(self: Thing) : Thing
   |MUK_EARTH_BALL
     let self = animate(self, 1, MUK_EARTH_BALL_CAST_000, 12, 24)
     let ball = new_thing <= thing(
-      fun = earth_ball_fun,
+      fun = muk_earth_ball_fun,
       pos = self.pos,
       dir = self.dir,
       vel = scale_v3(10, targ_dir(self)),
@@ -103,18 +140,26 @@ muk_fun(self: Thing) : Thing
 
   // Middle
   |MUK_INVINCIBLE_MUD
+    let shield_buff = shielded(26, 1000) //an ignorant amount 
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
     let self = animate(self, 0, MUK_INVINCIBLE_MUD_000, 26, 52)
-    self
+    self 
 
   // Right
   |MUK_MUD_SHIELD
+    let shield_buff = shielded(30, 1000)
     let self = animate(self, 0, MUK_MUD_SHIELD_000, 24, 48)
+    let shield_box = pbox([ 
+      v3(0,0,0),v3(15,45,0),v3(25,45,0),v3(25,-45,0),v3(15,-45,0),   
+    ])
+    let self = set_thing_box(self, shield_box)
+    let self = reset(self, 60)
     self
+
 
   // Q
   |MUK_MUD_TSUNAMI
-    let self = animate(self, 1, MUK_MUD_TSUNAMI_000, 19, 38)
-    self
+    muk_mud_tsunami_fun(self)
 
   // Space
   | MUK_EXTRA
@@ -126,3 +171,29 @@ muk_fun(self: Thing) : Thing
 
 
   else self
+
+// Effects
+muk_earth_ball_fun(self: Thing) : Thing 
+  case self |thing
+  let self   = animate_die(self, 0, MUK_EARTH_BALL_EFFECT_000, 7, 14)
+  let self   = self <= thing(box = nbox)
+  let radius = 20
+  let effs   = [damage(base_earth_ball_dmg * 2)]
+  let hits   = [hit(effs, self.pos, self.dir, cbox(radius))]
+  let self = cast(self,  4, hits)
+  let self = cast(self,  8, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 16, hits)
+  let self = cast(self, 20, hits) 
+  self 
+
+
+muk_mud_tsunami_fun(self: Thing) : Thing 
+  case self |thing 
+  let self = animate(self, 1, MUK_MUD_TSUNAMI_000, 19, 38)
+  let effs = [damage(base_mud_tsunami_dmg * 2)]
+  let h1   = [hit(effs, self.pos, self.dir, cbox(30))] 
+  let h2   = [hit(effs, self.pos, self.dir, cbox(60))] 
+  let self = cast(self, 10, h1)
+  let self = cast(self, 20, h2)
+  self
