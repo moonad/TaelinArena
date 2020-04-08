@@ -656,7 +656,7 @@ class Main extends Component {
         "width": "25%",
         "height": "100%",
         "padding": "4px",
-        "font-family": "monospace",
+        "font-family": "monospace"
       }
     }, [
       h("div", {}, ["Game : ", current_game, " (join: ", join_mode, ")"]),
@@ -719,8 +719,7 @@ class Main extends Component {
     ])
 
     // Main App
-    // return this.char_selection ? char_selection_view : main_app
-    return char_selection_view
+    return this.char_selection ? char_selection_view : main_app
   }
 };
 
