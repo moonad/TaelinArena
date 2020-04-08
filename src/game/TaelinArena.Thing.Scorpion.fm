@@ -1,0 +1,86 @@
+import TaelinArena.Game
+
+enum
+| SCORPION_WALK
+| SCORPION_FLAME_BACK_FLIP
+| SCORPION_INFERNAL_LUNGS
+| SCORPION_DEMON_WHIP
+| SCORPION_GET_IT_OVER_HERE
+| SCORPION_DASH
+| SCORPION_TAUNT
+
+scorpion_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |SCORPION_WALK
+    if is_walking(self)
+    then animate(self, 1, SCORPION_WALK_000, 7, 14)
+    else animate(self, 0, SCORPION_IDLE_000, 6, 12)
+
+  // Left 
+  |SCORPION_FLAME_BACK_FLIP
+//    animate(self, 1, SCORPION_FLAME_BACK_FLIP_CAST_ANIMATION_000, 7, 14)
+    let self = animate(self, 1, SCORPION_FLAME_BACK_FLIP_CAST_ANIMATION_000, 7, 14)
+    let flame = new_thing <= thing(
+      sid = self.sid,
+      fun = scorpion_black_flip_fun)
+    let self = spawn(self, 6, [move(flame, at_max_dist(self, 50))])
+    self
+
+  // Middle
+  |SCORPION_INFERNAL_LUNGS
+    let self = animate_with_blink(self, 1, SCORPION_INFERNAL_LUNGS_CAST_ANIMATION_000, SCORPION_IDLE_000, 19, 0, 38)
+    let self = reset(self, 38)
+    let self = blink(self, 38, at_max_dist(self, 40))
+    self
+
+
+  // Right
+  |SCORPION_DEMON_WHIP
+    animate(self, 1, SCORPION_DEMON_WHIP_CAST_ANIMATION_000, 12, 24)
+
+  // Q
+  |SCORPION_GET_IT_OVER_HERE
+    let self = animate(self, 0, SCORPION_GET_IT_OVER_HERE_CAST_ANIMATION_000, 12, 24) 
+    let hits0 = [hit([damage(2)], at_dist(self, 110), self.dir, cbox(16))]
+    let hits1 = [hit([damage(2), repulse(-15)], at_dist(self, 115), self.dir, cbox(13))]
+    let self = cast(self, 9, hits0)
+    let self = cast(self, 18, hits1)
+    let fire = new_thing <= thing(
+      fun = get_it_over_here_effect,
+      pos = at_dist(self, 0),
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 5, [fire])
+    self
+    
+  // Space
+  |SCORPION_DASH
+    let self = animate_with_blink(self, 0, SCORPION_MOLTEN_DASH_CAST_ANIMATION_000, SCORPION_IDLE_000, 10, 0, 20)
+    let self = reset(self, 20)
+    let self = blink(self, 20, at_max_dist(self, 90))
+    self  
+
+  // E
+  |SCORPION_TAUNT
+//    animate(self, 0, SCORPION_TAUNT_000, 8, 16)
+  let self = animate_between(self, 0, SCORPION_TAUNT_000, 8, 0, 16)
+  let self = animate_between(self, 0, SCORPION_TAUNT_000, 8, 16, 32)
+  let self = animate_between(self, 0, SCORPION_TAUNT_000, 8, 32, 48)
+  let self = reset(self, 48)
+  self
+
+  else self
+
+  get_it_over_here_effect(self: Thing) : Thing
+  animate_die(self, 0, SCORPION_GET_IT_OVER_HERE_CHAIN_000, 12, 24)
+
+  scorpion_black_flip_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, SCORPION_HIT_FIRE_EFFECTS_000, 9, 18)
+  let self = self <= thing(box = nbox)
+  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(15))])
+  self

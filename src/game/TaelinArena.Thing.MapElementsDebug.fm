@@ -49,9 +49,9 @@ puddledmg_fun(self: Thing) : Thing
   let hits = [
     hit([
       damage(1), 
-      stun(4*ONE_SEC)
+      // stun(4*ONE_SEC)
       // silence(5*ONE_SEC)
-      // slow(3*ONE_SEC, 0.2)
+      slow(3*ONE_SEC, 0.2)
       // root(4*ONE_SEC)
     ], 
       self.pos, 
