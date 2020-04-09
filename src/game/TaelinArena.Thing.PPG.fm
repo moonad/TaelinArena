@@ -32,7 +32,9 @@ ppg_fun(self: Thing) : Thing
 
   // Middle
   |PPG_DASH
-    animate(self, 1, PPG_DASH_000, 9, 18)
+    let self = animate_with_blink(self, 1, PPG_DASH_000, PPG_IDLE_000, 9, 0, 9) 
+    let self = blink(self, 9, at_dist(self, 100))
+    self 
 
   // Right
   |PPG_LASER_BURST
