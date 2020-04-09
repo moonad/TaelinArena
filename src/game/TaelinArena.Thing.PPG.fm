@@ -48,8 +48,8 @@ ppg_fun(self: Thing) : Thing
   // Ultimate Q
   |PPG_COSMIC_ICE_BALL_CASTING
     let self = animate(self, 0, PPG_COSMIC_ICE_BALL_CAST_000, 23, 50)
-    let ice = new_thing <= thing(fun=ppg_ice_ball_effect)
-    let self = spawn(self, 23, [move(ice, at_max_dist(self, 75))])
+    let ice = new_thing <= thing(fun=ppg_ice_ball_effect, box=nbox)
+    let self = spawn(self, 23, [move(ice, at_max_dist(self, 100))])
     self
 
   // Space
@@ -65,5 +65,28 @@ ppg_fun(self: Thing) : Thing
   else self
 
 ppg_ice_ball_effect(self: Thing) : Thing
-  animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
+  case self |thing 
+  let self = animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 60)
+  // TODO: add haste effect for allies
+  let effs = [damage(2.5), root(2.5*ONE_SEC)]
+  let big_circle_pos = add_v3(self.pos, v3(4,2,0))
+  let small_circle_1_pos = add_v3(v3( -3,-45, 0), big_circle_pos) 
+  let small_circle_2_pos = add_v3(v3(-41, 23, 0), big_circle_pos) 
+  let small_circle_3_pos = add_v3(v3( 41, 23, 0), big_circle_pos)
+  let hits = [
+    //big circle
+    hit(effs, big_circle_pos, self.dir, cbox(30)),
+    //smaller circle 1
+    hit(effs, small_circle_1_pos, self.dir, cbox(16)),
+    //smaller circle 2
+    hit(effs, small_circle_2_pos, self.dir, cbox(16)),
+    //smaller circle 3
+    hit(effs, small_circle_3_pos, self.dir, cbox(16)),
+  ]
+  let self = cast(self, 45, hits)
+  let self = cast(self, 55, hits)
+  self 
+  
+
+  
 
