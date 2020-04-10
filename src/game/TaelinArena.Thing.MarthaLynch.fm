@@ -1,0 +1,129 @@
+import TaelinArena.Game
+
+enum
+| MARTHA_LYNCH_WALK
+| MARTHA_LYNCH_MILITARY_TURRET
+| MARTHA_LYNCH_HEALING_TURRET
+| MARTHA_LYNCH_SLUGGISH_TURRET
+| MARTHA_LYNCH_MORTAR
+| MARTHA_LYNCH_SHIFT
+| MARTHA_LYNCH_TAUNT
+
+marthalynch_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |MARTHA_LYNCH_WALK
+    if is_walking(self)
+    then animate(self, 1, MARTHA_LYNCH_WALK_000, 6, 12)
+    else animate(self, 1, MARTHA_LYNCH_IDLE_000, 8, 16)
+
+  // Left 
+  |MARTHA_LYNCH_MILITARY_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let turret = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_military_turret_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 20, [turret])
+    self
+
+  // Middle
+  |MARTHA_LYNCH_HEALING_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let heal = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_healing_turret_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 20, [heal])
+    self
+
+  // Right
+  |MARTHA_LYNCH_SLUGGISH_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let fire = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_sluggish_turret_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 20, [fire])
+    self
+
+  // Q
+  |MARTHA_LYNCH_MORTAR
+    let self = animate(self, 0, MARTHA_LYNCH_ULTIMATE_CAST_000, 15, 30)
+    let ult = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_ultimate_active_fun,
+      pos = at_dist(self, 20),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 28, [ult])
+    self
+
+  // Space
+  |MARTHA_LYNCH_SHIFT
+    animate(self, 0, MARTHA_LYNCH_FIXING_000, 30, 60)
+    
+  // E
+  |MARTHA_LYNCH_TAUNT
+    animate(self, 0, MARTHA_LYNCH_TAUNT_000, 24, 48)
+
+  else  animate(self, 1, MARTHA_LYNCH_IDLE_000, 8, 16)
+
+martha_lynch_military_turret_fun(self: Thing) : Thing
+  case self |thing
+  if (self.tik < 83) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_SPAWN_000, 27, 0, 27)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 27, 35)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 35, 43)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 43, 51)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 51, 59)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 59, 67)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 67, 75)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 75, 83)
+    let self = reset(self, 83)
+    self
+  else 
+    self <= thing(die = true)
+
+martha_lynch_healing_turret_fun(self: Thing) : Thing
+  case self |thing
+  if (self.tik < 82) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_SPAWN_000, 26, 0, 26)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 26, 34)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 34, 42)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 42, 50)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 50, 58)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 58, 66)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 66, 74)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 74, 82)
+    let self = reset(self, 82)
+    self
+  else 
+    self <= thing(die = true)
+ 
+martha_lynch_sluggish_turret_fun(self: Thing) : Thing
+  case self |thing
+  if (self.tik < 82) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_SPAWN_000, 26, 0, 26)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 26, 34)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 34, 42)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 42, 50)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 50, 58)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 58, 66)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 66, 74)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 74, 82)
+    let self = reset(self, 82)
+    self
+  else 
+    self <= thing(die = true)
+
+martha_lynch_ultimate_active_fun(self: Thing) : Thing
+  animate_die(self, 0, MARTHA_LYNCH_ULTIMATE_ACTIVE_000, 30, 60)
