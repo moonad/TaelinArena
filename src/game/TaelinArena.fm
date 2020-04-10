@@ -225,6 +225,7 @@ exec_turn(gm: Game) : Game
       | true  => this <= thing(
         vel = v3(0,0,0),
         bst = 1,
+        box = cbox(12),
         act = 0,
         tik = 0,
         lit = nil(_),

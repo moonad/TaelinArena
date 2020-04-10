@@ -63,164 +63,200 @@ module.exports = {
     "from": 1995,
     "til": 2081
   },
-  "jinx": {
+  "iron_man": {
     "from": 2081,
-    "til": 2200
+    "til": 2189
+  },
+  "ivy_klaws": {
+    "from": 2189,
+    "til": 2417
+  },
+  "jinx": {
+    "from": 2417,
+    "til": 2536
   },
   "kakashi": {
-    "from": 2200,
-    "til": 2330
+    "from": 2536,
+    "til": 2666
   },
   "kakuna": {
-    "from": 2330,
-    "til": 2361
+    "from": 2666,
+    "til": 2697
   },
   "kenko": {
-    "from": 2361,
-    "til": 2534
+    "from": 2697,
+    "til": 2870
+  },
+  "king_dedede": {
+    "from": 2870,
+    "til": 3038
+  },
+  "kirby": {
+    "from": 3038,
+    "til": 3116
   },
   "konan": {
-    "from": 2534,
-    "til": 2646
+    "from": 3116,
+    "til": 3228
   },
   "lina_inverse": {
-    "from": 2646,
-    "til": 2753
+    "from": 3228,
+    "til": 3335
   },
   "link": {
-    "from": 2753,
-    "til": 2899
+    "from": 3335,
+    "til": 3481
+  },
+  "loki": {
+    "from": 3481,
+    "til": 3627
   },
   "luffy": {
-    "from": 2899,
-    "til": 3000
+    "from": 3627,
+    "til": 3728
   },
   "magnamite": {
-    "from": 3000,
-    "til": 3109
+    "from": 3728,
+    "til": 3837
   },
   "magneton": {
-    "from": 3109,
-    "til": 3231
+    "from": 3837,
+    "til": 3959
   },
   "mando": {
-    "from": 3231,
-    "til": 3399
+    "from": 3959,
+    "til": 4127
   },
   "mechwarrior": {
-    "from": 3399,
-    "til": 3506
+    "from": 4127,
+    "til": 4234
   },
   "mikegator": {
-    "from": 3506,
-    "til": 3578
+    "from": 4234,
+    "til": 4306
   },
   "min": {
-    "from": 3578,
-    "til": 3650
+    "from": 4306,
+    "til": 4378
   },
   "monica": {
-    "from": 3650,
-    "til": 3765
+    "from": 4378,
+    "til": 4493
   },
   "muk": {
-    "from": 3765,
-    "til": 3890
+    "from": 4493,
+    "til": 4618
   },
   "pichu": {
-    "from": 3890,
-    "til": 3993
+    "from": 4618,
+    "til": 4721
   },
   "pikachu": {
-    "from": 3993,
-    "til": 4098
+    "from": 4721,
+    "til": 4826
   },
   "poste": {
-    "from": 4098,
-    "til": 4099
+    "from": 4826,
+    "til": 4827
   },
   "ppg": {
-    "from": 4099,
-    "til": 4261
+    "from": 4827,
+    "til": 4989
   },
   "punchingbag": {
-    "from": 4261,
-    "til": 4285
+    "from": 4989,
+    "til": 5013
   },
   "raichu": {
-    "from": 4285,
-    "til": 4388
+    "from": 5013,
+    "til": 5116
   },
   "ray": {
-    "from": 4388,
-    "til": 4462
+    "from": 5116,
+    "til": 5190
   },
   "ryu": {
-    "from": 4462,
-    "til": 4625
+    "from": 5190,
+    "til": 5353
   },
   "samson_armor": {
-    "from": 4625,
-    "til": 4718
+    "from": 5353,
+    "til": 5446
+  },
+  "scorpion": {
+    "from": 5446,
+    "til": 5549
   },
   "shao": {
-    "from": 4718,
-    "til": 4825
+    "from": 5549,
+    "til": 5656
   },
   "squirtle": {
-    "from": 4825,
-    "til": 4957
+    "from": 5656,
+    "til": 5788
   },
   "sr_madruga": {
-    "from": 4957,
-    "til": 5079
+    "from": 5788,
+    "til": 5910
   },
   "steve": {
-    "from": 5079,
-    "til": 5211
+    "from": 5910,
+    "til": 6042
   },
   "teichi": {
-    "from": 5211,
-    "til": 5341
+    "from": 6042,
+    "til": 6172
+  },
+  "teresa": {
+    "from": 6172,
+    "til": 6293
+  },
+  "tony_stark": {
+    "from": 6293,
+    "til": 6392
   },
   "tophoro": {
-    "from": 5341,
-    "til": 5462
+    "from": 6392,
+    "til": 6513
   },
   "tupitree": {
-    "from": 5462,
-    "til": 5616
+    "from": 6513,
+    "til": 6667
+  },
+  "tvee": {
+    "from": 6667,
+    "til": 6763
   },
   "wall": {
-    "from": 5616,
-    "til": 5617
+    "from": 6763,
+    "til": 6764
   },
   "wartortle": {
-    "from": 5617,
-    "til": 5755
+    "from": 6764,
+    "til": 6902
   },
   "weedle": {
-    "from": 5755,
-    "til": 5810
+    "from": 6902,
+    "til": 6957
   },
   "xululu_child": {
-    "from": 5810,
-    "til": 5962
+    "from": 6957,
+    "til": 7109
   },
   "young_link": {
-    "from": 5962,
-    "til": 5991
+    "from": 7109,
+    "til": 7138
   },
   "zagatur": {
-    "from": 5991,
-    "til": 6079
+    "from": 7138,
+    "til": 7226
   },
   "zed": {
-    "from": 6079,
-    "til": 6214
+    "from": 7226,
+    "til": 7361
   },
   "zoio": {
-    "from": 6214,
-    "til": 6313
+    "from": 7361,
+    "til": 7460
   }
 }
