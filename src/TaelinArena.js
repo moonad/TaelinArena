@@ -524,7 +524,7 @@ var heroes = [
   "Pichu",
   "Ray",
   "Ryu",
-  "Scorpion",  
+  "Scorpion",
   "Shao",
   "Squirtle",
   "SrMadruga",

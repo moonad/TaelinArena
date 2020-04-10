@@ -21,28 +21,42 @@ ppg_fun(self: Thing) : Thing
 
   // Left 
   |PPG_COLORFUL_MAGIC
-    animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
+    let self = animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
+    let h0   = [hit([root(2*ONE_SEC)], at_dist(self, 70), self.dir, cbox(15))]
+    let h1   = [hit([damage(2)],       at_dist(self, 70), self.dir, cbox(15))]
+    let h2   = [hit([damage(3)],       at_dist(self, 70), self.dir, cbox(15))]
+    let self = cast(self, 20, h0)
+    let self = cast(self, 25, h1)
+    let self = cast(self, 50, h2)
+    self 
 
   // Middle
   |PPG_DASH
-    let self = animate(self, 1, PPG_DASH_000, 9, 18)
-    let self = dash(self, 4, 0, 18)
-    self
+    let self = animate_with_blink(self, 1, PPG_DASH_000, PPG_IDLE_000, 9, 0, 9) 
+    let self = blink(self, 9, at_dist(self, 100))
+    self 
 
   // Right
   |PPG_LASER_BURST
-    animate(self, 0, PPG_LASER_BURST_000, 26, 35)
+    let effs = [damage(2)]
+    let hits = [hit(effs, at_dist(self, 75), self.dir, cbox(15))]
+    // separate cast from effect?
+    let self = animate(self, 0, PPG_LASER_BURST_000, 26, 35)
+    let self = cast(self, 28, hits)  
+    self 
 
   // Ultimate Q
   |PPG_COSMIC_ICE_BALL_CASTING
     let self = animate(self, 0, PPG_COSMIC_ICE_BALL_CAST_000, 23, 50)
-    let ice = new_thing <= thing(fun=ppg_ice_ball_effect)
-    let self = spawn(self, 23, [move(ice, self.trg)])
+    let ice = new_thing <= thing(fun=ppg_ice_ball_effect, box=nbox)
+    let self = spawn(self, 23, [move(ice, at_max_dist(self, 100))])
     self
 
   // Space
   | PPG_BLOCK
-     animate(self, 0, PPG_BLOCK_000, 18, 18)
+    let self = set_thing_buf(self, cons(_ shielded(18, 1000), self.buf))
+    let self = animate(self, 0, PPG_BLOCK_000, 18, 18)
+    self 
 
   // E
   | PPG_TAUNT
@@ -51,5 +65,28 @@ ppg_fun(self: Thing) : Thing
   else self
 
 ppg_ice_ball_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 30)
-  self
+  case self |thing 
+  let self = animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 60)
+  // TODO: add haste effect for allies
+  let effs = [damage(2.5), root(2.5*ONE_SEC)]
+  let big_circle_pos = add_v3(self.pos, v3(4,2,0))
+  let small_circle_1_pos = add_v3(v3( -3,-45, 0), big_circle_pos) 
+  let small_circle_2_pos = add_v3(v3(-41, 23, 0), big_circle_pos) 
+  let small_circle_3_pos = add_v3(v3( 41, 23, 0), big_circle_pos)
+  let hits = [
+    //big circle
+    hit(effs, big_circle_pos, self.dir, cbox(30)),
+    //smaller circle 1
+    hit(effs, small_circle_1_pos, self.dir, cbox(16)),
+    //smaller circle 2
+    hit(effs, small_circle_2_pos, self.dir, cbox(16)),
+    //smaller circle 3
+    hit(effs, small_circle_3_pos, self.dir, cbox(16)),
+  ]
+  let self = cast(self, 45, hits)
+  let self = cast(self, 55, hits)
+  self 
+  
+
+  
+
