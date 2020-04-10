@@ -16,6 +16,7 @@ import TaelinArena.Thing.Jinx
 import TaelinArena.Thing.Kakashi 
 import TaelinArena.Thing.Kenko
 import TaelinArena.Thing.KingDedede
+import TaelinArena.Thing.Kirby
 import TaelinArena.Thing.Konan
 import TaelinArena.Thing.LinaInverse
 import TaelinArena.Thing.Link
