@@ -22,6 +22,7 @@ import TaelinArena.Thing.Link
 import TaelinArena.Thing.Luffy
 import TaelinArena.Thing.Magnamite
 import TaelinArena.Thing.Mando
+import TaelinArena.Thing.MarthaLynch
 import TaelinArena.Thing.MapElementsDebug
 import TaelinArena.Thing.Mechwarrior
 import TaelinArena.Thing.Mikegator

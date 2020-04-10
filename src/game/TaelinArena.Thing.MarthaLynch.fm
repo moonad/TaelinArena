@@ -1,0 +1,132 @@
+import TaelinArena.Game
+
+enum
+| MARTHA_LYNCH_WALK
+| MARTHA_LYNCH_MILITARY_TURRET
+| MARTHA_LYNCH_HEALING_TURRET
+| MARTHA_LYNCH_SLUGGISH_TURRET
+| MARTHA_LYNCH_MORTAR
+| MARTHA_LYNCH_SHIFT
+| MARTHA_LYNCH_TAUNT
+
+marthalynch_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |MARTHA_LYNCH_WALK
+    if is_walking(self)
+    then animate(self, 1, MARTHA_LYNCH_WALK_000, 6, 12)
+    else animate(self, 1, MARTHA_LYNCH_IDLE_000, 8, 16)
+
+  // Left 
+  |MARTHA_LYNCH_MILITARY_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let pot = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_military_turret_fun,
+      pos = at_dist(self, 5),
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 32, [pot])
+    self
+
+  // Middle
+  |MARTHA_LYNCH_HEALING_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let heal = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_healing_turret_fun,
+      pos = at_dist(self, 5),
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 32, [heal])
+    self
+
+  // Right
+  |MARTHA_LYNCH_SLUGGISH_TURRET
+    let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
+    let fire = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_sluggish_turret_fun,
+      pos = at_dist(self, 5),
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 32, [fire])
+    self
+
+  // Q
+  |MARTHA_LYNCH_MORTAR
+//    animate(self, 0, MARTHA_LYNCH_ULTIMATE_CAST_000, 15, 30)
+    let self = animate(self, 0, MARTHA_LYNCH_ULTIMATE_CAST_000, 15, 30)
+    let ult = new_thing <= thing(
+      sid = self.sid,
+      fun = martha_lynch_ultimate_active_fun,
+      pos = self.pos,
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 28, [ult])
+    self
+
+  // Space
+  |MARTHA_LYNCH_SHIFT
+    animate(self, 0, MARTHA_LYNCH_FIXING_000, 30, 60)
+    
+  // E
+  |MARTHA_LYNCH_TAUNT
+    animate(self, 0, MARTHA_LYNCH_TAUNT_000, 24, 48)
+
+  else self
+
+martha_lynch_military_turret_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MARTHA_LYNCH_MILITARY_TURRET_SPAWN_000, 27, 54)
+//  let self = self <= thing(box = cbox(10))
+  let turret = new_thing <= thing(
+    sid = self.sid,
+    fun = martha_lynch_military_turret_effect,
+    pos = self.pos)
+  let self = spawn(self, 53, [turret])
+  self
+
+martha_lynch_military_turret_effect(self: Thing) : Thing
+  case self |thing
+  let self = animate(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 4)
+  self
+
+martha_lynch_healing_turret_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MARTHA_LYNCH_HEALING_TURRET_SPAWN_000, 26, 52)
+//  let self = self <= thing(box = cbox(10))
+  let slug = new_thing <= thing(
+    sid = self.sid,
+    fun = martha_lynch_healing_turret_effect,
+    pos = self.pos)
+  let self = spawn(self, 51, [slug])
+  self
+
+martha_lynch_healing_turret_effect(self: Thing) : Thing
+  case self |thing
+  let self = animate(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 4)
+  self
+ 
+martha_lynch_sluggish_turret_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_SPAWN_000, 26, 52)
+//  let self = self <= thing(box = cbox(10))
+  let turret = new_thing <= thing(
+    sid = self.sid,
+    fun = martha_lynch_sluggish_turret_effect,
+    pos = self.pos)
+  let self = spawn(self, 51, [turret])
+  self
+
+martha_lynch_sluggish_turret_effect(self: Thing) : Thing
+  case self |thing
+  let self = animate(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 4)
+  self
+
+martha_lynch_ultimate_active_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, MARTHA_LYNCH_ULTIMATE_ACTIVE_000, 30, 60)
+  self
