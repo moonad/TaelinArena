@@ -54,8 +54,11 @@ ppg_fun(self: Thing) : Thing
 
   // Space
   | PPG_BLOCK
-    let self = set_thing_buf(self, cons(_ shielded(18, 1000), self.buf))
-    let self = animate(self, 0, PPG_BLOCK_000, 18, 18)
+    let self = set_thing_buf(self, cons(_ shielded(29, 1000), self.buf))
+    let self = animate_between(self, 0, PPG_BLOCK_000, 8, 0, 14)
+    let self = animate_between(self, 0, PPG_BLOCK_008, 1, 14, 20)
+    let self = animate_between(self, 0, PPG_BLOCK_009, 9, 20, 29)
+    let self = reset(self, 29)
     self 
 
   // E
