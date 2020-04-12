@@ -1,0 +1,126 @@
+import TaelinArena.Game
+import TaelinArena.Constants
+
+enum
+| MONICA_IDLE
+| MONICA_STRENTH_OF_SAMSON
+| MONICA_BOMBERBUNNY
+| MONICA_SAMSON_IMPACT
+| MONICA_SAMSON_ARMOR
+| MONICA_EXTRA
+| MONICA_TAUNT
+
+MONICA_STRENTH_OF_SAMSON_KEY : Bits
+  100111b
+
+monica_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2)
+
+  case self |thing switch self.act
+
+  |MONICA_IDLE
+    if is_walking(self)
+    then animate(self, 1, MONICA_WALK_000, 8, 16)
+    else animate(self, 1, MONICA_IDLE_000, 8, 16)
+
+  // Left 
+  |MONICA_STRENTH_OF_SAMSON
+    let self = if self.tik === 0
+      then map_stt_key(self, MONICA_STRENTH_OF_SAMSON_KEY, (x) => x + 1)
+      else self
+    let value = get_stt_value(self, MONICA_STRENTH_OF_SAMSON_KEY)
+    let self = if (value % 2) === 0 
+      then animate(self, 0, MONICA_STRENGTH_OF_SAMSON_VARIATION_1_000, 7, 14)
+      else animate(self, 0, MONICA_STRENGTH_OF_SAMSON_VARIATION_2_000, 7, 14) 
+    self
+
+  // Middle
+  |MONICA_BOMBERBUNNY
+    let self = animate(self, 0, MONICA_BOMBERBUNNY_CAST_000, 7, 14)
+    let bunny = new_thing <= thing(fun=monica_bomberbunny_fun)
+    let self = spawn(self, 5, [move(bunny, at_max_dist(self, 150))])
+    self
+
+  // Right
+  |MONICA_SAMSON_IMPACT
+    let self = animate_between(self, 0, MONICA_SAMSON_IMPACT_CAST_000, 7, 0, 14)
+    let self = animate_between(self, 0, MONICA_SAMSON_IMPACT_CAST_007, 1, 14, 24)
+    let self = reset(self, 24)
+    let bunny = new_thing <= thing(fun=monica_samson_impact_fun, dir=self.dir)
+    let self = spawn(self, 9, [move(bunny, at_max_dist(self, 150))])
+    self
+
+  // Q
+  |MONICA_SAMSON_ARMOR
+    let self = animate(self, 0, MONICA_SAMSON_ARMOR_TRANSFORMATION_000, 22, 22)
+    let self = create_at(self, 21, monica_samson_armor_transformed_fun)
+    self
+
+  // Space
+  |MONICA_EXTRA
+    animate(self, 1, MONICA_IDLE_000, 8, 16)
+
+  // E
+  |MONICA_TAUNT
+    animate(self, 0, MONICA_TAUNT_000, 10, 20)
+
+  else self
+
+monica_bomberbunny_fun(self: Thing) : Thing 
+  animate_die(self, 0, MONICA_BOMBERBUNNY_EFFECT_000, 22, 44)
+
+monica_samson_impact_fun(self: Thing) : Thing
+  animate_die(self, 0, MONICA_SAMSON_IMPACT_EFFECT_000, 12, 22)
+
+// Samson
+// ---------------
+
+monica_samson_armor_transformed_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
+
+  // Back to normal Monica after 10 seconds
+  let self = end_thing(self, monica_fun, ONE_SEC * 10, ULT_TIME)
+
+  case self |thing 
+  let timer = get_stt_value(self, ULT_TIME)
+  if timer < 14
+  then animate(self, 0, SAMSON_ARMOR_SAMSON_ARMOR_TRANSFORMATION_000, 13, 13)
+  else 
+    switch self.act
+    |MONICA_IDLE
+      if is_walking(self)
+      then animate(self, 1, SAMSON_ARMOR_WALK_000, 10, 20)
+      else animate(self, 1, SAMSON_ARMOR_IDLE_000, 9, 18)
+
+    // Left 
+    |MONICA_STRENTH_OF_SAMSON
+      animate(self, 0, SAMSON_ARMOR_STRENGTH_OF_SAMSON_000, 10, 20)
+
+    // Middle
+    |MONICA_BOMBERBUNNY
+      animate(self, 1, SAMSON_ARMOR_IDLE_000, 9, 18)
+
+    // Right
+    |MONICA_SAMSON_IMPACT
+      let self = animate_with_blink(self, 0, SAMSON_ARMOR_SAMSON_IMPACT_CAST_000, SAMSON_ARMOR_IDLE_000, 10, 0, 30)
+      let self = blink(self, 30, at_dist(self, 57))
+      let effect = new_thing <= thing(fun=samson_impact_fun)
+      let self = spawn(self, 8, [move(effect, at_dist(self, 57))])
+      self
+
+    // Q
+    |MONICA_SAMSON_ARMOR
+      animate(self, 1, SAMSON_ARMOR_IDLE_000, 9, 18)
+
+    // Space
+    |MONICA_EXTRA
+      animate(self, 1, SAMSON_ARMOR_IDLE_000, 9, 18)
+
+    // E
+    |MONICA_TAUNT
+      animate(self, 0, SAMSON_ARMOR_TAUNT_000, 29, 29)
+
+    else self
+
+samson_impact_fun(self: Thing) : Thing
+  animate_die(self, 0, SAMSON_ARMOR_SAMSON_IMPACT_EFFECT_000, 12, 24)

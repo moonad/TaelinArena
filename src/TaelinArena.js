@@ -1,5 +1,6 @@
 if (typeof window !== "undefined") {
   var TA = require("./game/TaelinArena.fm");
+  var heroes_info = require('./assets/char-info.json');
 
   // Loads all models
   var models = require("./models/models.js");
@@ -509,16 +510,21 @@ var heroes = [
   "Kakashi",
   "Kenko",
   "Konan",
+  "LinaInverse",
   "Link",
   "Luffy",
+  "Magnamite",
   "Mando",
+  "MarthaLynch",
   "Mechwarrior",
   "Mikegator",
   "Min",
+  "Monica",
   "PPG",
   "Pichu",
   "Ray",
   "Ryu",
+  "Scorpion",
   "Shao",
   "Squirtle",
   "SrMadruga",
@@ -537,6 +543,67 @@ var hero_name = {};
 for (var i = 0; i < heroes.length; ++i) {
   hero_name[heroes[i].toLowerCase()] = heroes[i];
 }
+
+// hero_image : Map{[HeroName]: Maybe(URL)}
+// where HeroName and URL are Strings
+var heroes_image = new Map(Object.entries({}));
+(async function fetch_image() {
+  heroes_image.set("benfix", (await import("./assets/benfix.png")).default);
+  heroes_image.set("bleskape", (await import("./assets/bleskape.png")).default);
+  heroes_image.set("darthvader", (await import("./assets/darthvader.png")).default);
+  heroes_image.set("dilma", (await import("./assets/dilma.png")).default);
+  heroes_image.set("dorime", (await import("./assets/dorime.png")).default);
+  heroes_image.set("drstrange", (await import("./assets/drstrange.png")).default);
+  heroes_image.set("finn", (await import("./assets/finn.png")).default);
+  heroes_image.set("gastly", (await import("./assets/gastly.png")).default);
+  heroes_image.set("gon", (await import("./assets/gon.png")).default);
+  heroes_image.set("greninja", (await import("./assets/greninja.png")).default);
+  heroes_image.set("grimer", (await import("./assets/grimer.png")).default);
+  heroes_image.set("jacquin", (await import("./assets/jacquin.png")).default);
+  heroes_image.set("jinx", (await import("./assets/jinx.png")).default);
+  heroes_image.set("ivyklaws", (await import("./assets/ivyklaws.png")).default);
+  heroes_image.set("kakashi", (await import("./assets/kakashi.png")).default);
+  heroes_image.set("kenko", (await import("./assets/kenko.png")).default);
+  heroes_image.set("kirby", (await import("./assets/kirby.png")).default);
+  heroes_image.set("kingdedede", (await import("./assets/kingdedede.png")).default);
+  heroes_image.set("konan", (await import("./assets/konan.png")).default);
+  heroes_image.set("linainverse", (await import("./assets/linainverse.png")).default);
+  heroes_image.set("link", (await import("./assets/link.png")).default);
+  heroes_image.set("loki", (await import("./assets/loki.png")).default);
+  heroes_image.set("luffy", (await import("./assets/luffy.png")).default);
+  heroes_image.set("magnamite", (await import("./assets/magnamite.png")).default);
+  heroes_image.set("mando", (await import("./assets/mando.png")).default);
+  heroes_image.set("marthalynch", (await import("./assets/marthalynch.png")).default);
+  heroes_image.set("mechwarrior", (await import("./assets/mechwarrior.png")).default);
+  heroes_image.set("mikegator", (await import("./assets/mikegator.png")).default);
+  heroes_image.set("min", (await import("./assets/min.png")).default);
+  heroes_image.set("monica", (await import("./assets/monica.png")).default);
+  heroes_image.set("ppg", (await import("./assets/ppg.png")).default);
+  heroes_image.set("pichu", (await import("./assets/pichu.png")).default);
+  heroes_image.set("ray", (await import("./assets/ray.png")).default);
+  heroes_image.set("ryu", (await import("./assets/ryu.png")).default);
+  heroes_image.set("scorpion", (await import("./assets/scorpion.png")).default);
+  heroes_image.set("shao", (await import("./assets/shao.png")).default);
+  heroes_image.set("squirtle", (await import("./assets/squirtle.png")).default);
+  heroes_image.set("srmadruga", (await import("./assets/srmadruga.png")).default);
+  heroes_image.set("steve", (await import("./assets/steve.png")).default);
+  heroes_image.set("teichi", (await import("./assets/teichi.png")).default);
+  heroes_image.set("teresa", (await import("./assets/teresa.png")).default);
+  heroes_image.set("tvee", (await import("./assets/tvee.png")).default);
+  heroes_image.set("tonystark", (await import("./assets/tonystark.png")).default);
+  heroes_image.set("tophoro", (await import("./assets/tophoro.png")).default);
+  heroes_image.set("tupitree", (await import("./assets/tupitree.png")).default);
+  heroes_image.set("weedle", (await import("./assets/weedle.png")).default);
+  heroes_image.set("xululuchild", (await import("./assets/xululuchild.png")).default);
+  heroes_image.set("yusuke", (await import("./assets/yusuke.png")).default);
+  heroes_image.set("zagatur", (await import("./assets/zagatur.png")).default);
+  heroes_image.set("zed", (await import("./assets/zed.png")).default);
+  heroes_image.set("zoio", (await import("./assets/zoio.png")).default);
+})();
+
+
+var heroes_info = require("./assets/char-info.json");
+
 
 module.exports = {
   ...TA,
@@ -558,4 +625,6 @@ module.exports = {
   GameRunner,
   heroes,
   hero_name,
+  heroes_image,
+  heroes_info
 };

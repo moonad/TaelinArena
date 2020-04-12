@@ -22,7 +22,7 @@ drstrange_fun(self: Thing) : Thing
   |DR_STRANGE_MYSTIC_BEAM
     let self = animate(self, 0, DR_STRANGE_MYSTIC_BEAM_CAST_000, 10, 30)
     let portal = new_thing <= thing(fun=drstrange_mystic_beam_fun, sid = self.sid, dir=self.dir)
-    let self = spawn(self, 16, [move(portal, at_max_dist(self, 100))])
+    let self = spawn(self, 16, [move(portal, at_dist(self, 100))])
     self
 
   // Middle
