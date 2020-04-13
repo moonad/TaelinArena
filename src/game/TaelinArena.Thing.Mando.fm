@@ -24,7 +24,7 @@ mando_fun(self: Thing) : Thing
   | MANDO_SHOTTING
     let weapon = get_stt_value(self, MANDO_WEAPON_KEY)   
     let self = mando_shooting_animation(self)
-    let dist = if weapon === 0 then 30 else 15
+    let dist = if weapon === 0 then 30 else 20
     let spawn_time = if weapon === 0 then 20 else 9
     let projectile = new_thing <= thing(
       fun = mando_shooting_effect_fun(self),
