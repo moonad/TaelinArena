@@ -204,10 +204,16 @@ goron_fun(self: Thing) : Thing
   
   // After using the skill 1x, he turns back to Link
   | GORON_JUMP
-    let self = animate_with_blink(self, 1, GORON_SKILL_000, LINK_IDLE_000, 18, 0, 36)
-    let self = blink(self, 16, at_dist(self, 70))
-    let self = blink(self, 36, at_dist(self, 5))
-    let self = create_at(self, 36, link_fun)
+    let self  = animate_with_blink(self, 1, GORON_SKILL_000, LINK_IDLE_000, 18, 0, 36)
+    let self = blink(self, 16, at_dist(self,30))
+    let self = blink(self, 31, at_dist(self,5))
+    let pos1 = at_dist(self, 20)
+    let pos2 = at_dist(self, 50)
+    let hits1 = [hit([damage(3)], pos1, self.dir, cbox(15))]
+    let hits2 = [hit([damage(6)], pos2, self.dir, cbox(15))]
+    let self  = cast(self, 15, hits1)
+    let self  = cast(self, 30, hits2)
+    let self  = create_at(self, 36, link_fun)
     self
 
   else animate(self, 1, GORON_IDLE_000, 5, 10)
