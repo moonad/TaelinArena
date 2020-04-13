@@ -540,16 +540,14 @@ combine_mov_buffs(buff: Buff, i: Number) : Number
   | slowed   => i * buff.val
   | hasted   => i * buff.val
   | silenced => i 
-  | rooted   => i * 0 
-  | stuned   => i * 0
+  | rooted   => 0 
+  | stuned   => 0
 
 // Returns the current speed multiplier by checking all buffs, considering
 // sloweds and hasteds
 speed_multiplier_of(self: Thing) : Number
   case self |thing 
-  fold(Buff; Number; 1, combine_mov_buffs, self.buf)
-
-
+  fold(Buff; Number; self.bst, combine_mov_buffs, self.buf)
 
 is_silenced(self: Thing) : Bool 
   case self |thing 

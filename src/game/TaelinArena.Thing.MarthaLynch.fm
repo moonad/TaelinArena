@@ -22,13 +22,13 @@ marthalynch_fun(self: Thing) : Thing
   // Left 
   |MARTHA_LYNCH_MILITARY_TURRET
     let self = animate(self, 0, MARTHA_LYNCH_BUILDING_000, 23, 46)
-    let pot = new_thing <= thing(
+    let turret = new_thing <= thing(
       sid = self.sid,
       fun = martha_lynch_military_turret_fun,
-      pos = at_dist(self, 5),
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(0, targ_dir(self)))
-    let self = spawn(self, 32, [pot])
+      box = nbox)
+    let self = spawn(self, 20, [turret])
     self
 
   // Middle
@@ -37,10 +37,10 @@ marthalynch_fun(self: Thing) : Thing
     let heal = new_thing <= thing(
       sid = self.sid,
       fun = martha_lynch_healing_turret_fun,
-      pos = at_dist(self, 5),
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(0, targ_dir(self)))
-    let self = spawn(self, 32, [heal])
+      box = nbox)
+    let self = spawn(self, 20, [heal])
     self
 
   // Right
@@ -49,22 +49,21 @@ marthalynch_fun(self: Thing) : Thing
     let fire = new_thing <= thing(
       sid = self.sid,
       fun = martha_lynch_sluggish_turret_fun,
-      pos = at_dist(self, 5),
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(0, targ_dir(self)))
-    let self = spawn(self, 32, [fire])
+      box = nbox)
+    let self = spawn(self, 20, [fire])
     self
 
   // Q
   |MARTHA_LYNCH_MORTAR
-//    animate(self, 0, MARTHA_LYNCH_ULTIMATE_CAST_000, 15, 30)
     let self = animate(self, 0, MARTHA_LYNCH_ULTIMATE_CAST_000, 15, 30)
     let ult = new_thing <= thing(
       sid = self.sid,
       fun = martha_lynch_ultimate_active_fun,
-      pos = self.pos,
+      pos = at_dist(self, 20),
       dir = targ_dir(self),
-      vel = scale_v3(0, targ_dir(self)))
+      box = nbox)
     let self = spawn(self, 28, [ult])
     self
 
@@ -76,57 +75,55 @@ marthalynch_fun(self: Thing) : Thing
   |MARTHA_LYNCH_TAUNT
     animate(self, 0, MARTHA_LYNCH_TAUNT_000, 24, 48)
 
-  else self
+  else  animate(self, 1, MARTHA_LYNCH_IDLE_000, 8, 16)
 
 martha_lynch_military_turret_fun(self: Thing) : Thing
   case self |thing
-  let self = animate_die(self, 0, MARTHA_LYNCH_MILITARY_TURRET_SPAWN_000, 27, 54)
-//  let self = self <= thing(box = cbox(10))
-  let turret = new_thing <= thing(
-    sid = self.sid,
-    fun = martha_lynch_military_turret_effect,
-    pos = self.pos)
-  let self = spawn(self, 53, [turret])
-  self
-
-martha_lynch_military_turret_effect(self: Thing) : Thing
-  case self |thing
-  let self = animate(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 4)
-  self
+  if (self.tik < 83) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_SPAWN_000, 27, 0, 27)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 27, 35)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 35, 43)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 43, 51)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 51, 59)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 59, 67)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 67, 75)
+    let self = animate_between(self, 0, MARTHA_LYNCH_MILITARY_TURRET_ACTIVE_000, 4, 75, 83)
+    let self = reset(self, 83)
+    self
+  else 
+    self <= thing(die = true)
 
 martha_lynch_healing_turret_fun(self: Thing) : Thing
   case self |thing
-  let self = animate_die(self, 0, MARTHA_LYNCH_HEALING_TURRET_SPAWN_000, 26, 52)
-//  let self = self <= thing(box = cbox(10))
-  let slug = new_thing <= thing(
-    sid = self.sid,
-    fun = martha_lynch_healing_turret_effect,
-    pos = self.pos)
-  let self = spawn(self, 51, [slug])
-  self
-
-martha_lynch_healing_turret_effect(self: Thing) : Thing
-  case self |thing
-  let self = animate(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 4)
-  self
+  if (self.tik < 82) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_SPAWN_000, 26, 0, 26)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 26, 34)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 34, 42)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 42, 50)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 50, 58)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 58, 66)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 66, 74)
+    let self = animate_between(self, 0, MARTHA_LYNCH_HEALING_TURRET_ACTIVE_000, 4, 74, 82)
+    let self = reset(self, 82)
+    self
+  else 
+    self <= thing(die = true)
  
 martha_lynch_sluggish_turret_fun(self: Thing) : Thing
   case self |thing
-  let self = animate_die(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_SPAWN_000, 26, 52)
-//  let self = self <= thing(box = cbox(10))
-  let turret = new_thing <= thing(
-    sid = self.sid,
-    fun = martha_lynch_sluggish_turret_effect,
-    pos = self.pos)
-  let self = spawn(self, 51, [turret])
-  self
-
-martha_lynch_sluggish_turret_effect(self: Thing) : Thing
-  case self |thing
-  let self = animate(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 4)
-  self
+  if (self.tik < 82) then
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_SPAWN_000, 26, 0, 26)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 26, 34)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 34, 42)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 42, 50)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 50, 58)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 58, 66)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 66, 74)
+    let self = animate_between(self, 0, MARTHA_LYNCH_SLUGGISH_TURRET_ACTIVE_000, 4, 74, 82)
+    let self = reset(self, 82)
+    self
+  else 
+    self <= thing(die = true)
 
 martha_lynch_ultimate_active_fun(self: Thing) : Thing
-  case self |thing
-  let self = animate_die(self, 0, MARTHA_LYNCH_ULTIMATE_ACTIVE_000, 30, 60)
-  self
+  animate_die(self, 0, MARTHA_LYNCH_ULTIMATE_ACTIVE_000, 30, 60)

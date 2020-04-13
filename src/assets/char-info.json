@@ -51,8 +51,13 @@
   },
   {
     "name": "Grimer",
-    "attack": "0",
+    "attack": "1",
     "recently_updated": "0"
+  },
+  {
+    "name": "IvyKlaws",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Jacquin",
@@ -80,6 +85,11 @@
     "recently_updated": "1"
   },
   {
+    "name": "Kirby",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Konan",
     "attack": "0",
     "recently_updated": "0"
@@ -95,8 +105,13 @@
     "recently_updated": "0"
   },
   {
-    "name": "Luffy",
+    "name": "Loki",
     "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "Luffy",
+    "attack": "1",
     "recently_updated": "0"
   },
   {
@@ -108,6 +123,11 @@
     "name": "Mando",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "MarthaLynch",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Mechwarrior",
@@ -131,8 +151,8 @@
   },
   {
     "name": "PPG",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Pichu",
@@ -146,6 +166,11 @@
   },
   {
     "name": "Ryu",
+    "attack": "0",
+    "recently_updated": "0"
+  },
+  {
+    "name": "Scorpion",
     "attack": "0",
     "recently_updated": "0"
   },
@@ -175,6 +200,21 @@
     "recently_updated": "0"
   },
   {
+    "name": "Teresa",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "TonyStark",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "Tvee",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Tophoro",
     "attack": "0",
     "recently_updated": "0"
@@ -193,6 +233,11 @@
     "name": "XululuChild",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Yusuke",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Zagatur",
