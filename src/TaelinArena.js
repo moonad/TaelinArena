@@ -532,6 +532,7 @@ var heroes = [
   "SrMadruga",
   "Steve",
   "Teichi",
+  "Teresa",
   "Tophoro",
   "Tupitree",
   "Weedle",
