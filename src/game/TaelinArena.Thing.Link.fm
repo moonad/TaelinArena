@@ -5,6 +5,7 @@ enum
 | LINK_TRIPLE_ATTACK
 | LINK_PERFECT_EXTHENGE
 | LINK_STORM
+| LINK_YONG_LINK
 | LINK_SELECTION_MASK
 | LINK_BLOCK
 | LINK_TAUNT
@@ -53,11 +54,18 @@ link_fun(self: Thing) : Thing
     self
 
   // Q
+  | LINK_YONG_LINK
+    let self = animate(self, 0, LINK_YONG_LINK_000, 9, 18)
+    let hits = [hit([repulse(-10)], at_dist(self, 60), self.dir, cbox(12))]
+    let self = cast(self, 9, hits)
+    self 
+
+  // SPACE
   | LINK_SELECTION_MASK
     let self = animate(self, 0, LINK_SELECTION_MASK_000, 23, 46)
     self
 
-  // SPACE
+  // E
   | LINK_BLOCK
     let shield_buff = shielded(22, 1000)
     let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
@@ -68,6 +76,8 @@ link_fun(self: Thing) : Thing
   | LINK_TAUNT
     let self = animate(self, 0, LINK_TAUNT_000, 22, 44)
     self
+
+  
 
   else self
 
@@ -93,3 +103,28 @@ link_fun(self: Thing) : Thing
     let self = cast(self, 14, hits)
     let self = cast(self, 15, hits)
     self
+
+// enum 
+// | ZORA_IDLE 
+// | ZORA_ATTACK
+
+// enum 
+// | GORON_IDLE
+// | GORON_ATTACK
+
+// enum 
+// | DEKU_IDLE
+// | DEKU_ATTACK
+
+// zora_fun(self: Thing) : Thing 
+//   let self = self <= thing(mov = 3, mhp = 24)
+  
+//   case self |thing switch self.act 
+
+//   | ZORA_IDLE
+//     if is_walking(self)
+//     then animate(self, 1, model_walk???, count???, dur???)
+//     else animate(self, 1, model_idle???, count???, dur???)
+
+//   | ZORA_ATTACK
+//     //
