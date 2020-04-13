@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | LINK_IDLE
@@ -62,7 +63,18 @@ link_fun(self: Thing) : Thing
 
   // SPACE
   | LINK_SELECTION_MASK
-    let self = animate(self, 0, LINK_SELECTION_MASK_000, 23, 46)
+    let self =
+      if (self.tik > 40) then 
+        case self.dir |v3
+        if self.dir.x > 0 // looking to the right
+        then 
+          create_at(self, 41, zora_fun)
+        else 
+          if self.dir.y > 0 // looking to the left/up
+          then create_at(self, 41, goron_fun)
+          else create_at(self, 41, deku_fun) // looking to the left/down
+      else 
+        animate(self, 0, LINK_SELECTION_MASK_000, 23, 46)
     self
 
   // E
@@ -81,50 +93,108 @@ link_fun(self: Thing) : Thing
 
   else self
 
-  link_perfect_fun(self: Thing) : Thing
-    case self |thing
-    let self = animate_die(self, 0, LINK_PERFECT_EXTHENGE_PROJECT_000, 1, 16)
-    let self = self <= thing(box = nbox)
-    let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
-    let self = cast(self, 0, hits)
-    let self = cast(self, 1, hits)
-    let self = cast(self, 2, hits)
-    let self = cast(self, 3, hits)
-    let self = cast(self, 4, hits)
-    let self = cast(self, 5, hits)
-    let self = cast(self, 6, hits)
-    let self = cast(self, 7, hits)
-    let self = cast(self, 8, hits)
-    let self = cast(self, 9, hits)
-    let self = cast(self, 10, hits)
-    let self = cast(self, 11, hits)
-    let self = cast(self, 12, hits)
-    let self = cast(self, 13, hits)
-    let self = cast(self, 14, hits)
-    let self = cast(self, 15, hits)
+link_perfect_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, LINK_PERFECT_EXTHENGE_PROJECT_000, 1, 16)
+  let self = self <= thing(box = nbox)
+  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
+  let self = cast(self, 0, hits)
+  let self = cast(self, 1, hits)
+  let self = cast(self, 2, hits)
+  let self = cast(self, 3, hits)
+  let self = cast(self, 4, hits)
+  let self = cast(self, 5, hits)
+  let self = cast(self, 6, hits)
+  let self = cast(self, 7, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 9, hits)
+  let self = cast(self, 10, hits)
+  let self = cast(self, 11, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 13, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 15, hits)
+  self
+
+
+// Zora transformation
+// ------------------
+enum
+| ZORA_IDLE
+| ZORA_DASH
+
+zora_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+  let self = end_thing(self, link_fun, ONE_SEC * 7, ULT_TIME)
+
+  case self |thing switch self.act
+
+  | ZORA_IDLE
+    if is_walking(self)
+    then animate(self, 1, ZORA_RUN_000, 5, 10)
+    else animate(self, 1, ZORA_IDLE_000, 5, 10)
+
+  // Left
+  // After using the skill 1x, he turns back to Link
+  | ZORA_DASH
+    let self = animate_with_blink(self, 1, ZORA_SKILL_000, ZORA_IDLE_000, 4, 0, 16)
+    let self = blink(self, 16, at_dist(self, 75))
+    let self = create_at(self, 16, link_fun)
     self
 
-// enum 
-// | ZORA_IDLE 
-// | ZORA_ATTACK
+  else animate(self, 1, ZORA_IDLE_000, 5, 10)
 
-// enum 
-// | GORON_IDLE
-// | GORON_ATTACK
+// Deku transformation
+// -------------------
+enum
+| DEKU_IDLE
+| DEKU_MUSIC
 
-// enum 
-// | DEKU_IDLE
-// | DEKU_ATTACK
+deku_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3)
 
-// zora_fun(self: Thing) : Thing 
-//   let self = self <= thing(mov = 3, mhp = 24)
+  let self = end_thing(self, link_fun, ONE_SEC * 5, ULT_TIME)
+
+  case self |thing switch self.act
+
+  | DEKU_IDLE
+    if is_walking(self)
+    then animate(self, 1, DEKU_RUN_000, 4, 16)
+    else animate(self, 1, DEKU_IDLE_000, 6, 12)
+
+  // Left
+  // After using the skill 1x, he turns back to Link
+  | DEKU_MUSIC
+    let self = animate(self, 1, DEKU_SKILL_000, 19, 19)
+    let self = create_at(self, 18, link_fun)
+    self
+    
+  else animate(self, 1, DEKU_IDLE_000, 6, 12)
+
+// Goron transformation
+// -------------------
+enum
+| GORON_IDLE
+| GORON_JUMP
+
+goron_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4)
+
+  let self = end_thing(self, link_fun, ONE_SEC * 5, ULT_TIME)
+
+  case self |thing switch self.act
+
+  | GORON_IDLE
+    if is_walking(self)
+    then animate(self, 1, GORON_RUN_000, 4, 16)
+    else animate(self, 1, GORON_IDLE_000, 5, 10)
   
-//   case self |thing switch self.act 
+  // After using the skill 1x, he turns back to Link
+  | GORON_JUMP
+    let self = animate_with_blink(self, 1, GORON_SKILL_000, LINK_IDLE_000, 18, 0, 36)
+    let self = blink(self, 16, at_dist(self, 70))
+    let self = blink(self, 36, at_dist(self, 5))
+    let self = create_at(self, 36, link_fun)
+    self
 
-//   | ZORA_IDLE
-//     if is_walking(self)
-//     then animate(self, 1, model_walk???, count???, dur???)
-//     else animate(self, 1, model_idle???, count???, dur???)
-
-//   | ZORA_ATTACK
-//     //
+  else animate(self, 1, GORON_IDLE_000, 5, 10)

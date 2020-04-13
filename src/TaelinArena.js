@@ -508,6 +508,8 @@ var heroes = [
   "Jacquin",
   "Jinx",
   "Kakashi",
+  "KingDedede",
+  "Kirby",
   "Kenko",
   "Konan",
   "LinaInverse",
