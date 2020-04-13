@@ -44,6 +44,12 @@ link_fun(self: Thing) : Thing
   // Right
   | LINK_STORM
     let self = animate(self, 1, LINK_STORM_000, 23, 46)
+    let storm_hits = [hit([damage(1)], self.pos, self.dir, cbox(25))]
+    let last_hits  = [hit([damage(1)], at_dist(self, 20), self.dir, cbox(12))]
+    let self = cast(self, 10, storm_hits)
+    let self = cast(self, 20, storm_hits)
+    let self = cast(self, 30, storm_hits)
+    let self = cast(self, 40, last_hits)
     self
 
   // Q
