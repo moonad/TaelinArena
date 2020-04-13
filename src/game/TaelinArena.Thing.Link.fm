@@ -23,6 +23,10 @@ link_fun(self: Thing) : Thing
   // Left 
   | LINK_TRIPLE_ATTACK
     let self = animate(self, 1, LINK_TRIPLE_ATTACK_000, 11, 22)
+    let hits = [hit([damage(2)], at_dist(self, 20), self.dir, cbox(12))]
+    let self = cast(self,  5, hits)
+    let self = cast(self, 10, hits)
+    let self = cast(self, 18, hits)
     self
 
   // Middle
