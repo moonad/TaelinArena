@@ -29,8 +29,8 @@ mando_fun(self: Thing) : Thing
   // Middle
   | MANDO_PARALYZING_ROPE
     let self = animate(self, 0, MANDO_PARALYZING_ROPE_CASTING_000, 6, 18)
-    let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect)
-    let self = spawn(self, 10, [move(rope, self.trg)])
+    let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect, box=nbox)
+    let self = spawn(self, 10, [move(rope, at_max_dist(self, 150))])
     self
 
   // Right
@@ -63,7 +63,11 @@ mando_shooting_effect(self: Thing) : Thing
   self
 
 mando_paralyzing_rope_effect(self: Thing) : Thing
+  case self |thing 
+  // TODO: fix pivot
   let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 10, 20)
+  let hits = [hit([root(2*ONE_SEC)], self.pos, self.dir, cbox(12))]
+  let self = cast(self, 10, hits)
   self
 
 mando_flamethrower_effect(self: Thing) : Thing
