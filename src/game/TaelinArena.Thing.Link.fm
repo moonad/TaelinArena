@@ -6,7 +6,7 @@ enum
 | LINK_TRIPLE_ATTACK
 | LINK_PERFECT_EXTHENGE
 | LINK_STORM
-| LINK_YONG_LINK
+| LINK_YOUNG_LINK
 | LINK_SELECTION_MASK
 | LINK_BLOCK
 | LINK_TAUNT
@@ -55,8 +55,8 @@ link_fun(self: Thing) : Thing
     self
 
   // Q
-  | LINK_YONG_LINK
-    let self = animate(self, 0, LINK_YONG_LINK_000, 9, 18)
+  | LINK_YOUNG_LINK
+    let self = animate(self, 0, LINK_YOUNG_LINK_000, 9, 18)
     let hits = [hit([repulse(-10)], at_dist(self, 60), self.dir, cbox(12))]
     let self = cast(self, 9, hits)
     self 
@@ -139,6 +139,12 @@ zora_fun(self: Thing) : Thing
   | ZORA_DASH
     let self = animate_with_blink(self, 1, ZORA_SKILL_000, ZORA_IDLE_000, 4, 0, 16)
     let self = blink(self, 16, at_dist(self, 75))
+    let hits1 = [hit([damage(2)], at_dist(self, 25), self.dir, cbox(12))]
+    let hits2 = [hit([damage(2)], at_dist(self, 50), self.dir, cbox(12))]
+    let hits3 = [hit([damage(2)], at_dist(self, 75), self.dir, cbox(12))]
+    let self = cast(self, 4, hits1)
+    let self = cast(self, 8, hits2)
+    let self = cast(self, 12, hits3)
     let self = create_at(self, 16, link_fun)
     self
 
