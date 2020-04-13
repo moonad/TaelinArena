@@ -45,9 +45,13 @@ mando_fun(self: Thing) : Thing
   // Right
   | MANDO_FLAMETHROWER
     let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 20)
-    let flame = new_thing <= thing(fun=mando_flamethrower_effect)
-    let flame = flame <= thing(dir = targ_dir(self))
-    let self = spawn(self, 5, [move(flame, self.trg)])
+    let flame = new_thing <= thing(
+      fun=mando_flamethrower_effect,
+      dir = targ_dir(self), 
+      pos = add_v3(at_dist(self, 65), v3(-10,-30,-60)), 
+      box = nbox
+    )
+    let self = spawn(self, 5, [flame])
     self
 
   // Q
@@ -95,16 +99,15 @@ mando_shooting_effect_fun(self: Thing) : TxFunction
 mando_sniper_rifle(self: Thing) : Thing 
   case self |thing 
   let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 18)
-  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
-  let self = cast(self,  2, hits)
-  let self = cast(self,  4, hits)
-  let self = cast(self,  6, hits)
-  let self = cast(self,  8, hits)
-  let self = cast(self, 10, hits)
-  let self = cast(self, 12, hits)
-  let self = cast(self, 14, hits)
-  let self = cast(self, 16, hits)
-  let self = cast(self, 18, hits)
+  let self = cast(self,  2, [hit([damage(2)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  4, [hit([damage(3)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  6, [hit([damage(4)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  8, [hit([damage(5)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 10, [hit([damage(6)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 12, [hit([damage(7)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 14, [hit([damage(8)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 16, [hit([damage(9)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 18, [hit([damage(10)], self.pos, self.dir, cbox(6))])
   self 
 
 mando_laser_gun(self: Thing) : Thing 
@@ -119,21 +122,6 @@ mando_laser_gun(self: Thing) : Thing
   let self = cast(self, 10, hits)
   self  
 
-mando_shooting_effect(self: Thing) : Thing
-  case self |thing 
-  // TODO: deal with weapon change 
-  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 18)
-  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
-  let self = cast(self,  2, hits)
-  let self = cast(self,  4, hits)
-  let self = cast(self,  6, hits)
-  let self = cast(self,  8, hits)
-  let self = cast(self, 10, hits)
-  let self = cast(self, 12, hits)
-  let self = cast(self, 14, hits)
-  let self = cast(self, 16, hits)
-  let self = cast(self, 18, hits)
-  self 
 
 mando_paralyzing_rope_effect(self: Thing) : Thing
   case self |thing 
