@@ -59,6 +59,8 @@ link_fun(self: Thing) : Thing
 
   // SPACE
   | LINK_BLOCK
+    let shield_buff = shielded(22, 1000)
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
     let self = animate(self, 1, LINK_BLOCK_000, 11, 22)
     self
 
