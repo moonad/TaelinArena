@@ -23,7 +23,7 @@ mando_fun(self: Thing) : Thing
   // Left 
   | MANDO_SHOTTING
     let weapon = get_stt_value(self, MANDO_WEAPON_KEY)   
-    let self = mando_shooting_animation(self)
+    let self = mando_shooting_animation(weapon, self)
     let dist = if weapon === 0 then 30 else 20
     let spawn_time = if weapon === 0 then 20 else 8
     let projectile = new_thing <= thing(
@@ -74,15 +74,15 @@ mando_fun(self: Thing) : Thing
   else self
 
 
-mando_shooting_animation(self: Thing) : Thing  
-  case self |thing 
-  let current_weapon = get_stt_value(self, MANDO_WEAPON_KEY)
-  let self = 
-    if current_weapon === 0 then 
+mando_shooting_animation(weapon: Number, self: Thing) : Thing  
+  // case self |thing 
+  // let current_weapon = get_stt_value(self, MANDO_WEAPON_KEY)
+  // let self = 
+    if weapon === 0 then 
       animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_CASTING_000, 9, 27)
     else 
       animate(self, 0, MANDO_ACCURATE_SHOT_BLASTER_CASTING_000, 9, 9)
-  self 
+  // self 
 
 
 mando_change_weapon(self: Thing) : Thing 
