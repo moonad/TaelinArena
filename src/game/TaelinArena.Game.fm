@@ -30,6 +30,7 @@ T Effect
 | silence(dur: Number)
 | root(dur: Number)
 | stun(dur: Number)
+| teleport(to_pos: V3, all: Number) // 1: can teleport everybody, 0: only team mates
 
 T Buff
 | shielded(dur: Number, val: Number) // shields are hit before hp
