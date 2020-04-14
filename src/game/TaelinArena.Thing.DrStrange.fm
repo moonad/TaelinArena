@@ -42,8 +42,8 @@ drstrange_fun(self: Thing) : Thing
   // Q
   |DR_STRANGE_CHRONOSTASIS
     let self = animate(self, 0, DR_STRANGE_CHRONOSTASIS_CAST_000, 10, 30)
-    let pos_p0 = at_dist(self, 100)// v3(50, 50, 0)
-    let pos_p1 = at_dist(self, -100)// v3(-50, -50, 0)
+    let pos_p0 = at_dist(self, 70)
+    let pos_p1 = at_dist(self, -120) //at_max_dist(self, 200)
 
     let portal_0 =
     case pos_p1 |v3
@@ -93,6 +93,7 @@ drstrange_chronostasis_p0_fun(self: Thing) : Thing
     let p1_pos = get_stt_value_v3(self)
     let telep = [hit([teleport(p1_pos, 0)], self.pos, self.dir, cbox(25))]
     let self = cast(self, 26, telep)
+    let self = cast(self, 50, telep)
     let self = cast(self, 70, telep)
     self
 
