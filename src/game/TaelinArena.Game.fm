@@ -684,8 +684,10 @@ POS_Y_KEY: Bits
 set_stt_value_v3(self: Thing, v3: V3) : Thing
   case self |thing
   case v3 |v3
-  let self = self <= thing(stt=insert(_ POS_X_KEY, v3.x, self.stt))
-  let self = self <= thing(stt=insert(_ POS_Y_KEY, v3.y, self.stt))
+  // let self = self <= thing(stt=insert(_ POS_X_KEY, v3.x, self.stt))
+  let self = set_thing_stt(self, insert(_ POS_X_KEY, v3.x, self.stt))
+  let self = set_thing_stt(self, insert(_ POS_X_KEY, v3.y, self.stt))
+  // let self = self <= thing(stt=insert(_ POS_Y_KEY, v3.y, self.stt))
   // let self = self <= thing(stt=insert(_ POS_Z_KEY, v3.z, self.stt))
   self
 
