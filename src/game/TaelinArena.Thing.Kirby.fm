@@ -1,0 +1,57 @@
+import TaelinArena.Game
+
+enum
+| KIRBY_WALK
+| KIRBY_HAMMER_ATTACK
+| KIRBY_SPINNER_KIRBY
+| KIRBY_SMACK_DOWN
+| KIRBY_DELIVERY
+| KIRBY_SHIFT
+| KIRBY_TAUNT
+
+kirby_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |KIRBY_WALK
+    if is_walking(self)
+    then animate(self, 1, KIRBY_WALKCYCLE_000, 6, 12)
+    else animate(self, 1, KIRBY_IDLE_000, 6, 12)
+
+  // Left 
+  |KIRBY_HAMMER_ATTACK
+    let self = animate_with_blink(self, 0, KIRBY_HAMMER_ATTACK_000, KIRBY_IDLE_000, 6, 0, 18)
+    let self = blink(self, 18, at_dist(self, 55))
+    self
+
+  // Middle
+  |KIRBY_SPINNER_KIRBY
+    animate(self, 0, KIRBY_SPINNER_KIRBY_000, 18, 36)
+
+  // Right
+  |KIRBY_SMACK_DOWN
+    let self = animate_between(self, 0, KIRBY_SMACK_DOWN_000, 23, 0, 46)
+    let self = animate_between(self, 0, KIRBY_SMACK_DOWN_RETURN_000, 3, 46, 52)
+    let self = reset(self, 52)
+    self
+
+  // Q
+  |KIRBY_DELIVERY
+    let self = animate_between(self, 0, KIRBY_DELIVERY_IN_000, 3, 0, 9)
+    let self = animate_between(self, 0, KIRBY_DELIVERY_OUT_000, 3, 9, 18)
+    let self = reset(self, 18)
+    let effect = new_thing <= thing(
+      sid = self.sid,
+      fun = kirby_delivery_fun,
+      pos = at_dist(self, 10),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 14, [effect])
+    self
+
+  else animate(self, 1, KIRBY_IDLE_000, 6, 12)
+
+
+kirby_delivery_fun(self: Thing) : Thing
+  animate_die(self, 0, KIRBY_DELIVERY_OUT_EFFECT_000, 4, 16)

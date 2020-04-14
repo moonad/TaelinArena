@@ -55,6 +55,11 @@
     "recently_updated": "0"
   },
   {
+    "name": "IvyKlaws",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Jacquin",
     "attack": "0",
     "recently_updated": "0"
@@ -80,6 +85,11 @@
     "recently_updated": "1"
   },
   {
+    "name": "Kirby",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Konan",
     "attack": "0",
     "recently_updated": "0"
@@ -93,6 +103,11 @@
     "name": "Link",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Loki",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Luffy",
@@ -185,6 +200,21 @@
     "recently_updated": "0"
   },
   {
+    "name": "Teresa",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "TonyStark",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "Tvee",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Tophoro",
     "attack": "0",
     "recently_updated": "0"
@@ -203,6 +233,11 @@
     "name": "XululuChild",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Yusuke",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Zagatur",
