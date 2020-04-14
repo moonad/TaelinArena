@@ -1,0 +1,68 @@
+import TaelinArena.Game
+
+enum
+| TERESA_CLAYMORE_WALK
+| TERESA_CLAYMORE_BLOWS
+| TERESA_CLAYMORE_COUNTER_STRIKE
+| TERESA_TERRIFYING_PRESENCE
+| TERESA_AWAKENING
+| TERESA_DASH
+| TERESA_TAUNT
+
+teresa_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |TERESA_CLAYMORE_WALK
+    if is_walking(self)
+    then animate(self, 1, TERESA_WALK_000, 8, 16)
+    else animate(self, 0, TERESA_IDLE_000, 8, 16)
+
+  // Left 
+  |TERESA_CLAYMORE_BLOWS
+    animate(self, 1, TERESA_CLAYMORE_BLOWS_000, 10, 20)
+
+  // Middle
+  |TERESA_CLAYMORE_COUNTER_STRIKE
+    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_CAST_000, 13, 0, 26)
+// if dano = true then  \/  else termina_animação_cast
+    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_GO_000, 4, 26, 34)
+    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_000, 11, 34, 56)
+    let self = reset(self, 56)
+    let self = blink(self, 56, at_dist(self, 28))
+    self
+
+  // Right
+  |TERESA_TERRIFYING_PRESENCE
+    let self = animate(self, 1, TERESA_TERRIFYING_PRESENCE_000, 13, 26)
+    let presence = new_thing <= thing(
+      fun = terrifying_presence_fun,
+      pos = at_dist(self, 0),
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 6, [presence])
+    self
+
+  // Q
+  |TERESA_AWAKENING
+  let self = animate_between(self, 1, TERESA_AWAKENING_START_000, 11, 0, 22)
+  let self = animate_between(self, 1, TERESA_AWAKENING_SLASH_000, 1, 22, 26)
+  let self = animate_between(self, 1, TERESA_AWAKENING_FINISHING_000, 7, 26, 40)
+  let self = reset(self, 40)
+  self
+
+  // Space
+  |TERESA_DASH
+    let self = animate(self, 0, TERESA_ANIME_DASH_GOING_000, 8, 16)
+    let self = blink(self, 8, self.trg)
+    self    
+
+  // E
+  |TERESA_TAUNT
+    animate(self, 0, TERESA_TAUNT_000, 20, 40)
+
+  else self
+
+terrifying_presence_fun(self: Thing) : Thing
+  animate_die(self, 0, TERESA_TERRIFYING_PRESENCE_ONLY_FACE_000, 1, 14)
