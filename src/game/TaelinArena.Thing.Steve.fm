@@ -21,7 +21,10 @@ steve_fun(self: Thing) : Thing
 
   // Left 
   | STEVE_DIAMON_SWORD
-    animate(self, 0, STEVE_DIAMOND_SWORD_000, 5, 10)
+    let self = animate(self, 1, STEVE_DIAMOND_SWORD_000, 5, 10)
+    let hits = [hit([damage(2)], at_dist(self, 15), self.dir, cbox(12))]
+    let self = cast(self, 8, hits)
+    self 
 
   // Middle
   | STEVE_TNT
