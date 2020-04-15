@@ -35,8 +35,8 @@ steve_fun(self: Thing) : Thing
 
   // Right
   | STEVE_ENDER_PEARL
-    let self = animate(self, 0, STEVE_ENDER_PEARL_000, 10, 20)
-    let self = blink(self, 20, self.trg)
+    let self = animate_with_blink(self, 0, STEVE_ENDER_PEARL_000, STEVE_IDLE_000, 10, 0, 20)
+    let self = blink(self, 20, at_dist(self, 100))
     self
 
   // Q
