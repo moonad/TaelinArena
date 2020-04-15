@@ -29,8 +29,8 @@ steve_fun(self: Thing) : Thing
   // Middle
   | STEVE_TNT
     let self = animate(self, 0, STEVE_TNT_CASTING_000, 3, 9)
-    let tnt = new_thing <= thing(fun=steve_tnt_effect)
-    let self = spawn(self, 5, [move(tnt, self.trg)])
+    let tnt = new_thing <= thing(fun=steve_tnt_effect, box=nbox)
+    let self = spawn(self, 5, [move(tnt, at_max_dist(self, 100))])
     self
 
   // Right
@@ -61,7 +61,10 @@ steve_fun(self: Thing) : Thing
   else self
 
 steve_tnt_effect(self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, STEVE_TNT_000, 18, 36)
+  let hits = [hit([damage(2)], self.pos, self.dir, cbox(30))]
+  let self = cast(self, 26, hits)
   self
 
 steve_ender_dragons_fury_effect(self: Thing) : Thing
