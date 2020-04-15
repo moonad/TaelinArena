@@ -131,7 +131,7 @@ mando_flamethrower_effect(gun_pos: V3, self: Thing) : Thing
   case self |thing 
   let self = animate_die(self, 0, MANDO_FLAMETHROWER_EFFECT_000, 23, 23)
   let box   = pbox([ v3(0,10,0), v3(70,45,0), v3(70,-35,0) ]) 
-  let hits  = [hit([damage(2)], gun_pos, self.dir, box)] //add_v3(self.pos, v3(-15,50,0))
+  let hits  = [hit([damage(2)], gun_pos, self.dir, box)] 
   let self  = cast(self, 5, hits)
   let self  = cast(self, 10, hits)
   let self  = cast(self, 15, hits)
