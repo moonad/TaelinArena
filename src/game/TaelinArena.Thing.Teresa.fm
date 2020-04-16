@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | TERESA_CLAYMORE_WALK
@@ -24,14 +25,26 @@ teresa_fun(self: Thing) : Thing
     animate(self, 1, TERESA_CLAYMORE_BLOWS_000, 10, 20)
 
   // Middle
-  |TERESA_CLAYMORE_COUNTER_STRIKE
-    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_CAST_000, 13, 0, 26)
-// if dano = true then  \/  else termina_animação_cast
-    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_GO_000, 4, 26, 34)
-    let self = animate_between(self, 1, TERESA_CLAYMORE_COUNTER_STRIKE_000, 11, 34, 56)
-    let self = reset(self, 56)
-    let self = blink(self, 56, at_dist(self, 28))
-    self
+  // TODO: look again this function. The effect of shields endings only work sometimes
+  |TERESA_CLAYMORE_COUNTER_STRIKE 
+    let self = 
+    if self.tik === 0
+    then 
+      let shield_buff = shielded(26, 3) //dur, val
+      let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
+      self
+    else self
+
+    let self = animate(self, 0, TERESA_CLAYMORE_COUNTER_STRIKE_CAST_000, 13, 26)
+    if self.tik === 25
+    then 
+      case has_shield(self) as shield // shield
+      |true => self
+      |false =>
+        // TODO: she must be ivulnerable (not able to receive damage)
+        // while casting this skills
+        create_at(self, 25, teresa_counter_strike_fun)
+    else self
 
   // Right
   |TERESA_TERRIFYING_PRESENCE
@@ -46,16 +59,17 @@ teresa_fun(self: Thing) : Thing
 
   // Q
   |TERESA_AWAKENING
-  let self = animate_between(self, 1, TERESA_AWAKENING_START_000, 11, 0, 22)
-  let self = animate_between(self, 1, TERESA_AWAKENING_SLASH_000, 1, 22, 26)
-  let self = animate_between(self, 1, TERESA_AWAKENING_FINISHING_000, 7, 26, 40)
-  let self = reset(self, 40)
-  self
+    let self = animate_between(self, 1, TERESA_AWAKENING_START_000, 11, 0, 22)
+    let self = animate_between(self, 1, TERESA_AWAKENING_SLASH_000, 1, 22, 26)
+    let self = animate_between(self, 1, TERESA_AWAKENING_FINISHING_000, 7, 26, 40)
+    let self = reset(self, 40)
+    let self = blink(self, 20, at_dist(self, 80))
+    self
 
   // Space
   |TERESA_DASH
     let self = animate(self, 0, TERESA_ANIME_DASH_GOING_000, 8, 16)
-    let self = blink(self, 8, self.trg)
+    let self = blink(self, 8, at_max_dist(self, 100))
     self    
 
   // E
@@ -66,3 +80,10 @@ teresa_fun(self: Thing) : Thing
 
 terrifying_presence_fun(self: Thing) : Thing
   animate_die(self, 0, TERESA_TERRIFYING_PRESENCE_ONLY_FACE_000, 1, 14)
+
+teresa_counter_strike_fun(self: Thing) : Thing
+  let self = end_thing(self, teresa_fun, 39, ULT_TIME)
+  let self = animate_between(self, 0, TERESA_CLAYMORE_COUNTER_STRIKE_GO_000, 4, 0, 16)
+  let self = animate_between(self, 0, TERESA_CLAYMORE_COUNTER_STRIKE_000, 11, 16, 40)
+  let self = reset(self, 40)
+  self
