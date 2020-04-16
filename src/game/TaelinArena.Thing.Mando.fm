@@ -122,7 +122,7 @@ mando_laser_gun(self: Thing) : Thing
 
 mando_paralyzing_rope_effect(self: Thing) : Thing
   case self |thing 
-  let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 14, 28)
+  let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 10, 20)
   let hits = [hit([root(2*ONE_SEC)], self.pos, self.dir, cbox(12))]
   let self = cast(self, 14, hits) 
   self
