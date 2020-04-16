@@ -7,6 +7,7 @@ enum
 | LINK_PERFECT_EXTHENGE
 | LINK_STORM
 | LINK_SELECTION_MASK
+| LINK_YOUNG_LINK
 | LINK_BLOCK
 | LINK_TAUNT
 
@@ -24,6 +25,10 @@ link_fun(self: Thing) : Thing
   // Left 
   | LINK_TRIPLE_ATTACK
     let self = animate(self, 1, LINK_TRIPLE_ATTACK_000, 11, 22)
+    let hits = [hit([damage(2)], at_dist(self, 20), self.dir, cbox(12))]
+    let self = cast(self,  5, hits)
+    let self = cast(self, 10, hits)
+    let self = cast(self, 18, hits)
     self
 
   // Middle
@@ -32,7 +37,7 @@ link_fun(self: Thing) : Thing
     let arrow = new_thing <= thing(
       sid = self.sid,
       fun = link_perfect_fun,
-      vel = scale_v3(16, targ_dir(self)),
+      vel = scale_v3(10, targ_dir(self)),
       dir = targ_dir(self),
       pos = self.pos)
     let self = spawn(self, 22, [arrow])
@@ -41,6 +46,12 @@ link_fun(self: Thing) : Thing
   // Right
   | LINK_STORM
     let self = animate(self, 1, LINK_STORM_000, 23, 46)
+    let storm_hits = [hit([damage(1)], self.pos, self.dir, cbox(25))]
+    let last_hits  = [hit([damage(1)], at_dist(self, 20), self.dir, cbox(12))]
+    let self = cast(self, 10, storm_hits)
+    let self = cast(self, 20, storm_hits)
+    let self = cast(self, 30, storm_hits)
+    let self = cast(self, 40, last_hits)
     self
 
   // Q
@@ -60,7 +71,16 @@ link_fun(self: Thing) : Thing
     self
 
   // SPACE
+  | LINK_YOUNG_LINK 
+    let self = animate(self, 0, LINK_YOUNG_LINK_000, 9, 18)
+    let hits = [hit([repulse(-10)], at_dist(self, 60), self.dir, cbox(12))]
+    let self = cast(self, 9, hits)
+    self 
+
+  // E
   | LINK_BLOCK
+    let shield_buff = shielded(22, 1000)
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
     let self = animate(self, 1, LINK_BLOCK_000, 11, 22)
     self
 
@@ -68,6 +88,8 @@ link_fun(self: Thing) : Thing
   | LINK_TAUNT
     let self = animate(self, 0, LINK_TAUNT_000, 22, 44)
     self
+
+  
 
   else self
 
@@ -117,6 +139,12 @@ zora_fun(self: Thing) : Thing
   | ZORA_DASH
     let self = animate_with_blink(self, 1, ZORA_SKILL_000, ZORA_IDLE_000, 4, 0, 16)
     let self = blink(self, 16, at_dist(self, 75))
+    let hits1 = [hit([damage(2)], at_dist(self, 25), self.dir, cbox(12))]
+    let hits2 = [hit([damage(2)], at_dist(self, 50), self.dir, cbox(12))]
+    let hits3 = [hit([damage(2)], at_dist(self, 75), self.dir, cbox(12))]
+    let self = cast(self, 4, hits1)
+    let self = cast(self, 8, hits2)
+    let self = cast(self, 12, hits3)
     let self = create_at(self, 16, link_fun)
     self
 
@@ -131,7 +159,7 @@ enum
 deku_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3)
 
-  let self = end_thing(self, link_fun, ONE_SEC * 5, ULT_TIME)
+  let self = end_thing(self, link_fun, ONE_SEC * 7, ULT_TIME)
 
   case self |thing switch self.act
 
@@ -143,8 +171,15 @@ deku_fun(self: Thing) : Thing
   // Left
   // After using the skill 1x, he turns back to Link
   | DEKU_MUSIC
-    let self = animate(self, 1, DEKU_SKILL_000, 19, 19)
-    let self = create_at(self, 18, link_fun)
+    let self  = animate(self, 1, DEKU_SKILL_000, 19, 38)
+    let box   = pbox([ v3(0,0,0), v3(70,45,0), v3(70,-45,0) ]) 
+    let hits  = [hit([damage(2)], self.pos, self.dir, box)]
+    let self  = cast(self, 10, hits)
+    let self  = cast(self, 15, hits)
+    let self  = cast(self, 20, hits)
+    let self  = cast(self, 25, hits)
+    let self  = cast(self, 30, hits)
+    let self  = create_at(self, 37, link_fun)
     self
     
   else animate(self, 1, DEKU_IDLE_000, 6, 12)
@@ -169,10 +204,16 @@ goron_fun(self: Thing) : Thing
   
   // After using the skill 1x, he turns back to Link
   | GORON_JUMP
-    let self = animate_with_blink(self, 1, GORON_SKILL_000, LINK_IDLE_000, 18, 0, 36)
-    let self = blink(self, 16, at_dist(self, 70))
-    let self = blink(self, 36, at_dist(self, 5))
-    let self = create_at(self, 36, link_fun)
+    let self  = animate_with_blink(self, 1, GORON_SKILL_000, LINK_IDLE_000, 18, 0, 36)
+    let self = blink(self, 16, at_dist(self,30))
+    let self = blink(self, 31, at_dist(self,5))
+    let pos1 = at_dist(self, 20)
+    let pos2 = at_dist(self, 50)
+    let hits1 = [hit([damage(3)], pos1, self.dir, cbox(15))]
+    let hits2 = [hit([damage(6)], pos2, self.dir, cbox(15))]
+    let self  = cast(self, 15, hits1)
+    let self  = cast(self, 30, hits2)
+    let self  = create_at(self, 36, link_fun)
     self
 
   else animate(self, 1, GORON_IDLE_000, 5, 10)

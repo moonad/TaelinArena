@@ -221,58 +221,58 @@ module.exports = {
   },
   "teresa": {
     "from": 6495,
-    "til": 6616
+    "til": 6620
   },
   "tony_stark": {
-    "from": 6616,
-    "til": 6715
+    "from": 6620,
+    "til": 6719
   },
   "tophoro": {
-    "from": 6715,
-    "til": 6836
+    "from": 6719,
+    "til": 6840
   },
   "tupitree": {
-    "from": 6836,
-    "til": 6990
+    "from": 6840,
+    "til": 6994
   },
   "tvee": {
-    "from": 6990,
-    "til": 7086
+    "from": 6994,
+    "til": 7090
   },
   "wall": {
-    "from": 7086,
-    "til": 7087
+    "from": 7090,
+    "til": 7091
   },
   "wartortle": {
-    "from": 7087,
-    "til": 7225
+    "from": 7091,
+    "til": 7229
   },
   "weedle": {
-    "from": 7225,
-    "til": 7280
+    "from": 7229,
+    "til": 7284
   },
   "xululu_child": {
-    "from": 7280,
-    "til": 7432
+    "from": 7284,
+    "til": 7436
   },
   "young_link": {
-    "from": 7432,
-    "til": 7461
+    "from": 7436,
+    "til": 7465
   },
   "zagatur": {
-    "from": 7461,
-    "til": 7549
+    "from": 7465,
+    "til": 7553
   },
   "zed": {
-    "from": 7549,
-    "til": 7684
+    "from": 7553,
+    "til": 7688
   },
   "zoio": {
-    "from": 7684,
-    "til": 7783
+    "from": 7688,
+    "til": 7787
   },
   "zora": {
-    "from": 7783,
-    "til": 7825
+    "from": 7787,
+    "til": 7829
   }
 }
