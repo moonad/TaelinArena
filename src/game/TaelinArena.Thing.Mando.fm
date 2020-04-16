@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | MANDO_IDLE
@@ -21,36 +22,50 @@ mando_fun(self: Thing) : Thing
 
   // Left 
   | MANDO_SHOTTING
-    let self = animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_CASTING_000, 9, 18)
-    let fire = new_thing <= thing(fun=mando_shooting_effect)
-    let self = spawn(self, 9, [move(fire, self.trg)])
+    let weapon = get_stt_value(self, MANDO_WEAPON_KEY)   
+    let self = mando_shooting_animation(weapon, self)
+    let dist = if weapon === 0 then 30 else 20
+    let spawn_time = if weapon === 0 then 20 else 8
+    let projectile = new_thing <= thing(
+      fun = mando_shooting_effect_fun(self),
+      pos = self.pos,
+      dir = self.dir,
+      vel = scale_v3(16, targ_dir(self)),
+      box = nbox
+    )
+    let self = spawn(self, spawn_time, [move(projectile, at_dist(self, dist))])
     self
 
   // Middle
   | MANDO_PARALYZING_ROPE
     let self = animate(self, 0, MANDO_PARALYZING_ROPE_CASTING_000, 6, 18)
-    let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect)
-    let self = spawn(self, 10, [move(rope, self.trg)])
+    let rope = new_thing <= thing(fun=mando_paralyzing_rope_effect, box=nbox)
+    let self = spawn(self, 10, [move(rope, at_max_dist(self, 150))])
     self
 
   // Right
   | MANDO_FLAMETHROWER
-    let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 20)
-    let flame = new_thing <= thing(fun=mando_flamethrower_effect)
-    let flame = flame <= thing(dir = targ_dir(self))
-    let self = spawn(self, 5, [move(flame, self.trg)])
+    let self = animate(self, 0, MANDO_FLAMETHROWER_CASTING_000, 5, 30)
+    let flame = new_thing <= thing(
+      fun=mando_flamethrower_effect(at_dist(self, 15)),
+      dir = targ_dir(self), 
+      pos = at_dist(self, 65), 
+      box = nbox
+    )
+    let self = spawn(self, 5, [flame])
     self
 
   // Q
   | MANDO_FORCE
     let self = animate(self, 0, MANDO_FORCE_CASTING_000, 8, 16)
-    let force = new_thing <= thing(fun=mando_force_effect)
-    let self = spawn(self, 14, [move(force, self.trg)])
+    let force = new_thing <= thing(fun=mando_force_effect, box=nbox)
+    let self = spawn(self, 14, [move(force, at_max_dist(self, 150))])
     self
 
   // Space
   | MANDO_EXTRA
-    animate(self, 1, MANDO_IDLE_000, 7, 14)
+    let self = mando_change_weapon(self)
+    animate(self, 1, MANDO_IDLE_000, 7, 1)
 
   // E
   | MANDO_TAUNT
@@ -58,18 +73,84 @@ mando_fun(self: Thing) : Thing
 
   else self
 
-mando_shooting_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 2)
-  self
+
+mando_shooting_animation(weapon: Number, self: Thing) : Thing  
+  if weapon === 0 then 
+    animate(self, 0, MANDO_ACCURATE_SHOT_SNIPER_CASTING_000, 9, 27)
+  else 
+    animate(self, 0, MANDO_ACCURATE_SHOT_BLASTER_CASTING_000, 9, 9)
+
+
+mando_change_weapon(self: Thing) : Thing 
+  map_stt_key(self, MANDO_WEAPON_KEY, (x) => ((x + 1) % 2))
+
+
+mando_shooting_effect_fun(self: Thing) : TxFunction  
+  case self |thing 
+  let current_weapon = get_stt_value(self, MANDO_WEAPON_KEY)
+  if current_weapon === 0 then 
+    mando_sniper_rifle
+  else 
+    mando_laser_gun
+
+mando_sniper_rifle(self: Thing) : Thing 
+  case self |thing 
+  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 18)
+  let self = cast(self,  2,  [hit([damage(1)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  4,  [hit([damage(2)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  6,  [hit([damage(3)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  8,  [hit([damage(4)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 10,  [hit([damage(5)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 12,  [hit([damage(6)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 14,  [hit([damage(7)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 16,  [hit([damage(8)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 18, [hit([damage(10)], self.pos, self.dir, cbox(6))])
+  self 
+
+mando_laser_gun(self: Thing) : Thing 
+  case self |thing 
+  // TODO: find a good duration
+  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_BLASTER_EFFECT_000, 1, 10) 
+  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
+  let self = cast(self,  2, hits)
+  let self = cast(self,  4, hits)
+  let self = cast(self,  6, hits)
+  let self = cast(self,  8, hits)
+  let self = cast(self, 10, hits)
+  self  
+
 
 mando_paralyzing_rope_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 10, 20)
+  case self |thing 
+  let self = animate_die(self, 0, MANDO_PARALYZING_ROPE_EFFECT_000, 14, 28)
+  let hits = [hit([root(2*ONE_SEC)], self.pos, self.dir, cbox(12))]
+  let self = cast(self, 14, hits) 
   self
 
-mando_flamethrower_effect(self: Thing) : Thing
+mando_flamethrower_effect(gun_pos: V3, self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, MANDO_FLAMETHROWER_EFFECT_000, 23, 23)
+  let box   = pbox([ v3(0,10,0), v3(70,45,0), v3(70,-35,0) ]) 
+  let hits  = [hit([damage(2)], gun_pos, self.dir, box)] 
+  let self  = cast(self, 5, hits)
+  let self  = cast(self, 10, hits)
+  let self  = cast(self, 15, hits)
+  let self  = cast(self, 20, hits)
   self
 
 mando_force_effect(self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, MANDO_FORCE_EFFECT_000, 28, 28)
+  let effs = [slow(4, 0.4), impulse(3, v3(0,0,1))]
+  let hits = [hit(effs, self.pos, self.dir, cbox(45))]
+  let fix  = [hit([impulse(10, v3(0,0,-1))], self.pos, self.dir, cbox(45))]
+  let self = cast(self, 4, hits)
+  let self = cast(self, 8, hits)
+  let self = cast(self, 12, hits)
+  let self = cast(self, 14, hits)
+  let self = cast(self, 16, hits)
+  let self = cast(self, 18, hits)
+  let self = cast(self, 20, fix)
+  let self = cast(self, 22, fix)
+  let self = cast(self, 24, fix)
   self
