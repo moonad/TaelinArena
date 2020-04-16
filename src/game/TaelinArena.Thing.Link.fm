@@ -6,8 +6,8 @@ enum
 | LINK_TRIPLE_ATTACK
 | LINK_PERFECT_EXTHENGE
 | LINK_STORM
-| LINK_YOUNG_LINK
 | LINK_SELECTION_MASK
+| LINK_YOUNG_LINK
 | LINK_BLOCK
 | LINK_TAUNT
 
@@ -37,7 +37,7 @@ link_fun(self: Thing) : Thing
     let arrow = new_thing <= thing(
       sid = self.sid,
       fun = link_perfect_fun,
-      vel = scale_v3(16, targ_dir(self)),
+      vel = scale_v3(10, targ_dir(self)),
       dir = targ_dir(self),
       pos = self.pos)
     let self = spawn(self, 22, [arrow])
@@ -55,13 +55,6 @@ link_fun(self: Thing) : Thing
     self
 
   // Q
-  | LINK_YOUNG_LINK
-    let self = animate(self, 0, LINK_YOUNG_LINK_000, 9, 18)
-    let hits = [hit([repulse(-10)], at_dist(self, 60), self.dir, cbox(12))]
-    let self = cast(self, 9, hits)
-    self 
-
-  // SPACE
   | LINK_SELECTION_MASK
     let self =
       if (self.tik > 40) then 
@@ -76,6 +69,13 @@ link_fun(self: Thing) : Thing
       else 
         animate(self, 0, LINK_SELECTION_MASK_000, 23, 46)
     self
+
+  // SPACE
+  | LINK_YOUNG_LINK 
+    let self = animate(self, 0, LINK_YOUNG_LINK_000, 9, 18)
+    let hits = [hit([repulse(-10)], at_dist(self, 60), self.dir, cbox(12))]
+    let self = cast(self, 9, hits)
+    self 
 
   // E
   | LINK_BLOCK
