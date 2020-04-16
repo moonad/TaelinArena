@@ -9,8 +9,13 @@ enum
 | STEVE_BLOCK
 | STEVE_TAUNT
 
+STEVE_BLOCK_TIMER : Bits 
+  1001010110b
+
 steve_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3, mhp = 24)
+
+  let self = update_buff(self, STEVE_BLOCK_TIMER)
 
   case self |thing switch self.act
 
@@ -27,13 +32,15 @@ steve_fun(self: Thing) : Thing
     self 
 
   // Middle
-  | STEVE_TNT
+  // !!! TODO !!! limit casting  
+  | STEVE_TNT 
     let self = animate(self, 0, STEVE_TNT_CASTING_000, 3, 9)
     let tnt = new_thing <= thing(fun=steve_tnt_effect, box=nbox)
     let self = spawn(self, 5, [move(tnt, at_max_dist(self, 100))])
     self
 
   // Right
+  // !! TODO !! speed up animation 
   | STEVE_ENDER_PEARL
     let self = animate_with_blink(self, 0, STEVE_ENDER_PEARL_000, STEVE_IDLE_000, 10, 0, 20)
     let self = blink(self, 20, at_dist(self, 100))
@@ -44,15 +51,37 @@ steve_fun(self: Thing) : Thing
     let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_CASTING_000, 16, 32)
     let effect = new_thing <= thing(fun=steve_ender_dragons_fury_effect)
     let effect = effect <= thing(dir = targ_dir(self))
+    // SET EFFECT POS AT_DIST(SELF, +/-100)
     let self = spawn(self, 16, [move(effect, self.trg)])
     self
 
   // Space
   | STEVE_BLOCK
-    let self = animate(self, 0, STEVE_BLOCK_000, 17, 17)
-    let block = new_thing <= thing(fun=steve_block_effect)
-    let self = spawn(self, 1, [move(block, self.trg)])
-    self
+    case is_using_buff(self, STEVE_BLOCK_TIMER) as on_cooldown 
+    | true => animate(self, 1, STEVE_IDLE_000, 1, 1)
+    | false => 
+      let self = animate(self, 0, STEVE_BLOCK_CASTING_000, 10, 20)
+      // let self = 
+      //   if self.tik === 0 then 
+      //     set_thing_stt(self, insert(_ STEVE_BLOCK_TIMER, 2, self.stt))
+      //   else 
+      //     self 
+      let block_width = 8
+      let block_length = 24
+      let block = new_thing <= thing(
+        fun=steve_block_effect, 
+        dir = targ_dir(self),
+        box = pbox([ 
+          v3(block_width * -1, block_length * -1, 0), 
+          v3(block_width * -1, block_length *  1, 0), 
+          v3(block_width *  1, block_length *  1, 0), 
+          v3(block_width *  1, block_length * -1, 0), 
+        ])
+      )
+      let self = spawn(self, 1, [move(block, at_max_dist(self, 100))])
+      // let self = map_stt_key(self, STEVE_BLOCK_TIMER, () => 12)
+      // let self = set_thing_stt(self, insert(_ STEVE_BLOCK_TIMER, 4 * ONE_SEC, self.stt))
+      self
 
   // E
   | STEVE_TAUNT
@@ -72,5 +101,6 @@ steve_ender_dragons_fury_effect(self: Thing) : Thing
   self
 
 steve_block_effect(self: Thing) : Thing
-  let self = animate_die(self, 0, STEVE_BLOCK_CASTING_000, 10, 100)
-  self
+  let self = animate_between(self, 0, STEVE_BLOCK_000, 11,  0, 11)
+  let self = animate_between(self, 0, STEVE_BLOCK_010,  7, 59, 66)
+  die(self,67)
