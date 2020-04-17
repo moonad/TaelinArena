@@ -1,0 +1,158 @@
+import TaelinArena.Game
+
+enum
+| TONY_STARK_IDLE
+| TONY_STARK_IRON_HAND
+| TONY_STARK_IRON_TRAP
+| TONY_STARK_THRUST_ATTACK
+| TONY_STARK_IRON_MAN
+| TONY_STARK_DASH
+| TONY_STARK_TAUNT
+
+tonystark_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2, mhp = 24)
+
+  case self |thing switch self.act
+
+  |TONY_STARK_IDLE
+    if is_walking(self)
+    then animate(self, 1, TONY_STARK_WALK_000, 8, 16)
+    else animate(self, 0, TONY_STARK_IDLE_000, 12, 24)
+
+  // Left 
+  |TONY_STARK_IRON_HAND
+    let self = animate(self, 0, TONY_STARK_IRON_HAND_CAST_000, 13, 26)
+//    let hits0 = [hit([damage(3)], at_dist(self, 55), self.dir, cbox(10))]
+//    let self = cast(self, 12, hits0)
+    let laser = new_thing <= thing(
+      fun = tonystark_iron_hand_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 12, [move(laser, at_dist(self, 39))])
+    self
+
+  // Middle
+  |TONY_STARK_IRON_TRAP
+    let self = animate(self, 0, TONY_STARK_IRON_TRAP_CAST_000, 12, 24)
+//    let hits0 = [hit([damage(3)], at_dist(self, 55), self.dir, cbox(10))]
+//    let self = cast(self, 12, hits0)
+    let trap = new_thing <= thing(
+      fun = tonystark_iron_trap_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 12, [move(trap, at_dist(self, 45))])
+    self
+
+  // Right
+  |TONY_STARK_THRUST_ATTACK
+    let self = animate(self, 1, TONY_STARK_THRUST_ATTACK_CAST_000, 7, 14)
+//    let hits0 = [hit([damage(3)], at_dist(self, 55), self.dir, cbox(10))]
+//    let self = cast(self, 12, hits0)
+    let laser = new_thing <= thing(
+      fun = tonystark_thrust_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 8, [move(laser, at_dist(self, 25))])
+    self
+
+
+  // Q
+  |TONY_STARK_IRON_MAN
+    let self = animate(self, 1, TONY_STARK_ULTIMATE_000, 16, 32)
+    let self = create_at(self, 31, ironman_fun) 
+    self
+    
+  // Space
+  |TONY_STARK_DASH
+    animate(self, 0, TONY_STARK_IDLE_000, 12, 24)
+
+  // E
+  |TONY_STARK_TAUNT
+   animate(self, 0, TONY_STARK_IDLE_000, 12, 24)
+
+  else self
+
+tonystark_iron_hand_fun(self: Thing) : Thing
+  animate_die(self, 0, TONY_STARK_IRON_HAND_EFFECT_000, 5, 5)
+
+tonystark_iron_trap_fun(self: Thing) : Thing
+  animate_die(self, 0, TONY_STARK_IRON_TRAP_EFFECT_000, 19, 38)
+
+tonystark_thrust_fun(self: Thing) : Thing
+
+  animate_die(self, 0, TONY_STARK_THRUST_ATTACK_EFFECT_000, 5, 10)
+
+
+  //IRON MAN
+
+  enum
+| IRON_MAN_IDLE
+| IRON_MAN_QUICK_ATTACK
+| IRON_MAN_ROCKET_RAIN
+| IRON_MAN_IMPACT_EXPLOSION
+| IRON_MAN_TONY_STARK
+| IRON_MAN_DASH
+| IRON_MAN_TAUNT
+
+ironman_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |IRON_MAN_IDLE
+    if is_walking(self)
+    then animate(self, 1, IRON_MAN_WALK_000, 8, 16)
+    else animate(self, 0, IRON_MAN_IDLE_000, 16, 32)
+
+  // Left 
+  |IRON_MAN_QUICK_ATTACK
+    let self = animate(self, 0, IRON_MAN_QUICK_ATTACK_CAST_000, 12, 24)
+//    let hits0 = [hit([damage(3)], at_dist(self, 55), self.dir, cbox(10))]
+//    let self = cast(self, 12, hits0)
+    let laser = new_thing <= thing(
+      fun = ironman_quick_attack_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 10, [move(laser, at_dist(self, 35))])
+    self
+
+  // Middle
+  |IRON_MAN_ROCKET_RAIN
+    let self = animate(self, 0, IRON_MAN_ROCKET_RAIN_CAST_000, 14, 28)
+//    let hits0 = [hit([damage(3)], at_dist(self, 55), self.dir, cbox(10))]
+//    let self = cast(self, 12, hits0)
+    let fire = new_thing <= thing(
+      fun = iron_man_rocket_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 12, [move(fire, at_max_dist(self, 100))])
+    self
+
+  // Right
+  |IRON_MAN_IMPACT_EXPLOSION
+    let self = animate(self, 1, IRON_MAN_IMPACT_AND_EXPLOSION_000, 16, 32)
+    self
+
+
+  // Q
+  |IRON_MAN_TONY_STARK
+    let self = animate(self, 1, IRON_MAN_ULTIMATE_000, 16, 32)
+    let self = create_at(self, 31, tonystark_fun)
+    self
+    
+  // Space
+  |IRON_MAN_DASH
+    animate(self, 0, IRON_MAN_IDLE_000, 16, 32)
+
+  // E
+  |IRON_MAN_TAUNT
+   animate(self, 0, IRON_MAN_IDLE_000, 16, 32)
+
+  else self
+
+ironman_quick_attack_fun(self: Thing) : Thing
+  animate_die(self, 0, IRON_MAN_QUICK_ATTACK_EFFECT_000, 9, 18)
+
+iron_man_rocket_fun(self: Thing) : Thing
+  animate_die(self, 0, IRON_MAN_ROCKET_RAIN_EFFECT_000, 16, 32)
+
