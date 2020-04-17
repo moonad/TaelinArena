@@ -40,32 +40,35 @@ steve_fun(self: Thing) : Thing
     self
 
   // Right
-  // !! TODO !! speed up animation 
   | STEVE_ENDER_PEARL
-    let self = animate_with_blink(self, 0, STEVE_ENDER_PEARL_000, STEVE_IDLE_000, 10, 0, 20)
-    let self = blink(self, 20, at_dist(self, 100))
+    let self = animate_with_blink(self, 0, STEVE_ENDER_PEARL_000, STEVE_IDLE_000, 10, 0, 10)
+    let self = blink(self, 10, at_dist(self, 100))
     self
 
   // Q
   | STEVE_ENDER_DRAGONS_FURY
     let self = animate(self, 0, STEVE_ENDER_DRAGONS_FURY_CASTING_000, 16, 32)
-    let effect = new_thing <= thing(fun=steve_ender_dragons_fury_effect)
-    let effect = effect <= thing(dir = targ_dir(self))
-    // SET EFFECT POS AT_DIST(SELF, +/-100)
-    let self = spawn(self, 16, [move(effect, self.trg)])
+    let effect = new_thing <= thing(
+      fun = steve_ender_dragons_fury_effect, 
+      dir = targ_dir(self),
+      box = nbox
+    )
+    // let effect = effect <= thing(dir = targ_dir(self))
+    let self = spawn(self, 16, [move(effect, at_dist(self, 150))])
     self
 
   // Space
+  // !! TODO !! add impulse eff near the head
   | STEVE_BLOCK
     case is_using_buff(self, STEVE_BLOCK_TIMER) as on_cooldown 
     | true => animate(self, 1, STEVE_IDLE_000, 1, 1)
     | false => 
       let self = animate(self, 0, STEVE_BLOCK_CASTING_000, 10, 20)
-      // let self = 
-      //   if self.tik === 0 then 
-      //     set_thing_stt(self, insert(_ STEVE_BLOCK_TIMER, 2, self.stt))
-      //   else 
-      //     self 
+      let self = 
+        // if self.tik === 0 then 
+          set_thing_stt(self, insert(_ STEVE_BLOCK_TIMER, 1, self.stt))
+        // else 
+          // self 
       let block_width = 8
       let block_length = 24
       let block = new_thing <= thing(
@@ -97,7 +100,18 @@ steve_tnt_effect(self: Thing) : Thing
   self
 
 steve_ender_dragons_fury_effect(self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, STEVE_ENDER_DRAGONS_FURY_000, 13, 26)
+  let dmg_hits = [
+    hit([damage(4)], self.pos, self.dir, cbox(12)),
+    // hit([damage(4)], at_dist(self, 24), self.dir, cbox(12)),
+    // hit([damage(4)], at_dist(self, 48), self.dir, cbox(12)),
+    // hit([damage(4)], at_dist(self, 72), self.dir, cbox(12)),
+  ] 
+  // !! TODO !! add impulse effs 
+  let self = cast(self, 1, dmg_hits)
+  let self = cast(self, 13, dmg_hits)
+  let self = cast(self, 26, dmg_hits)
   self
 
 steve_block_effect(self: Thing) : Thing
