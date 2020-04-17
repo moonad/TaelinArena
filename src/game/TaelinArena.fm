@@ -184,7 +184,15 @@ interact_with(this:Thing, that:Thing): Thing
               this 
             else 
               let updated_buffs = cons(_ stuned(eff.dur), this.buf)
-              this <= thing(buf = updated_buffs) 
+              this <= thing(buf = updated_buffs)
+          | teleport =>
+            if eff.all then
+              this <= thing(pos = eff.to_pos)
+            else 
+              if this.sid === that.sid then
+                this <= thing(pos = eff.to_pos)
+              else 
+                this
         fold(Effect; Thing; this, apply_eff, hit.eff)
     fold(Hit; Thing; this, apply_hit, that.hit)
   this

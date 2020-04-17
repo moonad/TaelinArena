@@ -9,7 +9,7 @@ enum
 | DR_STRANGE_CHRONOSTASIS
 
 drstrange_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2)
+  let self = self <= thing(mov = 4)
 
   case self |thing switch self.act
 
@@ -42,8 +42,34 @@ drstrange_fun(self: Thing) : Thing
   // Q
   |DR_STRANGE_CHRONOSTASIS
     let self = animate(self, 0, DR_STRANGE_CHRONOSTASIS_CAST_000, 10, 30)
-    let portal = new_thing <= thing(fun = drstrange_chronostasis_fun, sid = self.sid)
-    let self = spawn(self, 20, [move(portal, at_max_dist(self, 150))])
+    let pos_p0 = at_dist(self, 70)
+    let pos_p1 = at_dist(self, -120) //at_max_dist(self, 200)
+
+    let portal_0 =
+    case pos_p1 |v3
+    let portal_0 = new_thing <= thing(
+      fun=drstrange_chronostasis_p0_fun, 
+      sid=self.sid,
+      dir=self.dir,
+      box=nbox,
+      stt=insert(_ POS_X_KEY, pos_p1.x, self.stt)
+      )
+    case portal_0 |thing
+    set_thing_stt(portal_0, insert(_ POS_Y_KEY, pos_p1.y, portal_0.stt))
+
+    let portal_1 = 
+    case pos_p0 |v3
+    let portal_1 = new_thing <= thing(
+      fun=drstrange_chronostasis_p1_fun, 
+      sid=self.sid,
+      dir=self.dir,
+      box=nbox,
+      stt=insert(_ POS_X_KEY, pos_p0.x, self.stt))
+    case portal_1 |thing
+    set_thing_stt(portal_1, insert(_ POS_Y_KEY, pos_p0.y, portal_1.stt))
+
+    let self = spawn(self, 20, [move(portal_0, pos_p0)])
+    let self = spawn(self, 21, [move(portal_1, pos_p1)])
     self
 
   else animate(self, 1, DR_STRANGE_IDLE_000, 5, 15)
@@ -57,5 +83,29 @@ drstrange_portal_fun(self: Thing) : Thing
 drstrange_time_stone_power_fun(self: Thing) : Thing 
   animate_die(self, 0, DR_STRANGE_TIME_STONE_POWER_EFFECT_000, 29, 58)
 
-drstrange_chronostasis_fun(self: Thing) : Thing 
-  animate_die(self, 0, DR_STRANGE_CHRONOSTASIS_EFFECT_000, 26, 52)
+// Portal to p1
+drstrange_chronostasis_p0_fun(self: Thing) : Thing
+  let self = animate(self, 0, DR_STRANGE_CHRONOSTASIS_EFFECT_000, 26, 78)
+  case self |thing
+  if self.tik === 51
+  then self <= thing(die=true)
+  else
+    let p1_pos = get_stt_value_v3(self)
+    let telep = [hit([teleport(p1_pos, 0)], self.pos, self.dir, cbox(25))]
+    let self = cast(self, 26, telep)
+    let self = cast(self, 50, telep)
+    let self = cast(self, 70, telep)
+    self
+
+// Portal to p0
+drstrange_chronostasis_p1_fun(self: Thing) : Thing
+  let self = animate(self, 0, DR_STRANGE_CHRONOSTASIS_EFFECT_000, 26, 78)
+  case self |thing
+  if self.tik === 51
+  then self <= thing(die=true)
+  else
+    let p0_pos = get_stt_value_v3(self)
+    let telep = [hit([teleport(p0_pos, 0)], self.pos, self.dir, cbox(25))]
+    let self = cast(self, 15, telep)
+    let self = cast(self, 50, telep)
+    self
