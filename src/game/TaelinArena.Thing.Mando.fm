@@ -30,7 +30,7 @@ mando_fun(self: Thing) : Thing
       fun = mando_shooting_effect_fun(self),
       pos = self.pos,
       dir = self.dir,
-      vel = scale_v3(16, targ_dir(self)),
+      vel = scale_v3(14, targ_dir(self)),
       box = nbox
     )
     let self = spawn(self, spawn_time, [move(projectile, at_dist(self, dist))])
@@ -81,8 +81,11 @@ mando_shooting_animation(weapon: Number, self: Thing) : Thing
     animate(self, 0, MANDO_ACCURATE_SHOT_BLASTER_CASTING_000, 9, 9)
 
 
-mando_change_weapon(self: Thing) : Thing 
-  map_stt_key(self, MANDO_WEAPON_KEY, (x) => ((x + 1) % 2))
+mando_change_weapon(self: Thing) : Thing
+  case self |thing
+  case lookup(_ MANDO_WEAPON_KEY, self.stt) as exist
+  | none => self <= thing(stt=insert(_ MANDO_WEAPON_KEY, 1, self.stt))
+  | some => map_stt_key(self, MANDO_WEAPON_KEY, (x) => ((x + 1) % 2))
 
 
 mando_shooting_effect_fun(self: Thing) : TxFunction  
@@ -95,7 +98,11 @@ mando_shooting_effect_fun(self: Thing) : TxFunction
 
 mando_sniper_rifle(self: Thing) : Thing 
   case self |thing 
-  let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 18)
+  // let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 18)
+  let self = animate_between(self, 0, MANDO_ACCURATE_SHOT_SNIPER_EFFECT_000, 1, 0, 18)
+  let self = animate_between(self, 0, MANDO_ACCURATE_SHOT_EXPLOSION_000, 6, 18, 24)
+  let self = reset(self, 24)
+  let self = if self.tik === 23 then set_thing_die(self, true) else self
   let self = cast(self,  2,  [hit([damage(1)], self.pos, self.dir, cbox(6))])
   let self = cast(self,  4,  [hit([damage(2)], self.pos, self.dir, cbox(6))])
   let self = cast(self,  6,  [hit([damage(3)], self.pos, self.dir, cbox(6))])
