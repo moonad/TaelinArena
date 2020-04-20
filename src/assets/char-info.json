@@ -10,6 +10,11 @@
     "recently_updated": "0"
   },
   {
+    "name": "Chamusco",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "DarthVader",
     "attack": "0",
     "recently_updated": "0"
@@ -30,6 +35,11 @@
     "recently_updated": "0"
   },
   {
+    "name": "Escanor",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Finn",
     "attack": "1",
     "recently_updated": "0"
@@ -48,6 +58,11 @@
     "name": "Greninja",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Green Lantern",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Grimer",
@@ -121,8 +136,8 @@
   },
   {
     "name": "Mando",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "MarthaLynch",
@@ -150,14 +165,19 @@
     "recently_updated": "0"
   },
   {
-    "name": "PPG",
-    "attack": "1",
-    "recently_updated": "1"
-  },
-  {
     "name": "Pichu",
     "attack": "1",
     "recently_updated": "0"
+  },
+  {
+    "name": "Pingo",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
+    "name": "PPG",
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Ray",
@@ -178,6 +198,11 @@
     "name": "Shao",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Shonkie",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Squirtle",
