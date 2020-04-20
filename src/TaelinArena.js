@@ -536,6 +536,7 @@ var heroes = [
   "TonyStark",
   "Tophoro",
   "Tupitree",
+  "Tvee",
   "Weedle",
   "XululuChild",
   "Zagatur",
