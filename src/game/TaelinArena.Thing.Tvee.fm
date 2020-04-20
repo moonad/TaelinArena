@@ -35,10 +35,9 @@ tvee_fun(self: Thing) : Thing
 
   // Right
   |TVEE_NULL
-//    animate(self, 1, TVEE_NULL_IN_000, 4, 12)
     let self = animate_between(self, 1, TVEE_NULL_IN_000, 4, 0, 12)
     let self = animate_between(self, 1, TVEE_NULL_OUT_000, 4, 12, 24)
-    let self = blink(self, 12, self.trg)
+    let self = blink(self, 12, at_max_dist(self, 200))
     let self = reset(self, 24)
     self
 
@@ -54,11 +53,11 @@ tvee_fun(self: Thing) : Thing
 
   // Space
   |TVEE_DASH
-    animate(self, 1, TVEE_TAUNT_000, 28, 56)
+    animate(self, 0, TVEE_IDLE_000, 5, 10)
 
   // E
   |TVEE_TAUNT
-    animate(self, 1, TVEE_TAUNT_000, 28, 56)
+    animate(self, 0, TVEE_TAUNT_000, 28, 56)
 
   else self
 
