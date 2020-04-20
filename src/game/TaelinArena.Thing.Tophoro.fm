@@ -23,8 +23,10 @@ tophoro_fun(self: Thing) : Thing
   // Left 
   |TOPHORO_HIGHER_GROUND
     let self = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
-    // let self = spawn(self, 17, self.pos, new_thing <= thing(fun=tophoro_higher_ground_init_fun))
-    let self = spawn(self, 14, [move(new_thing <= thing(fun=tophoro_higher_ground_effect_fun), self.pos)])
+    let explosion = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_init_fun)
+    let arc = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun)
+    let self = spawn(self, 13, [move(explosion, self.pos)])
+    let self = spawn(self, 15, [move(arc, self.pos)])
     self
 
   // Middle
@@ -65,7 +67,26 @@ tophoro_higher_ground_init_fun(self: Thing) : Thing
   self
 
 tophoro_higher_ground_effect_fun(self: Thing) : Thing
-  let self = animate_die(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 30)
+  case self | thing 
+  let self = animate_die(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 90)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(40))]
+  let self = cast(self, 10, hits)
+  let self = cast(self, 15, hits)
+  let self = cast(self, 20, hits)
+  let self = cast(self, 25, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 35, hits)
+  let self = cast(self, 40, hits)
+  let self = cast(self, 45, hits)
+  let self = cast(self, 50, hits)
+  let self = cast(self, 55, hits)
+  let self = cast(self, 60, hits)
+  let self = cast(self, 65, hits)
+  let self = cast(self, 70, hits)
+  let self = cast(self, 75, hits)
+  let self = cast(self, 80, hits)
+  let self = cast(self, 85, hits)
+  let self = cast(self, 90, hits)
   self
 
 tophoro_earth_wall_fun(self: Thing) : Thing
