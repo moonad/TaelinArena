@@ -22,19 +22,30 @@ tophoro_fun(self: Thing) : Thing
 
   // Left 
   |TOPHORO_HIGHER_GROUND
-    let self = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
+    let self      = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
     let explosion = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_init_fun)
-    let arc = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun)
-    let self = spawn(self, 13, [move(explosion, self.pos)])
-    let self = spawn(self, 15, [move(arc, self.pos)])
+    let arc       = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun)
+    let self      = spawn(self, 13, [move(explosion, self.pos)])
+    let self      = spawn(self, 15, [move(arc, self.pos)])
     self
 
   // Middle
   |TOPHORO_EARTH_WALL
     let self = animate(self, 1, TOPHORO_EARTH_WALL_000, 6, 16)
-    let rock = new_thing <= thing(fun=tophoro_earth_wall_fun)
-    let rock = rock <= thing(dir = targ_dir(self))
-    let self = spawn(self, 10, [move(rock, self.trg)])
+    let wall_width = 8
+    let wall_length = 45
+    let wall_box = pbox([ 
+      v3(wall_width * -1, wall_length * -1, 0), 
+      v3(wall_width * -1, wall_length *  1, 0), 
+      v3(wall_width *  1, wall_length *  1, 0), 
+      v3(wall_width *  1, wall_length * -1, 0), 
+    ])
+    let wall = new_thing <= thing(
+      fun = tophoro_earth_wall_fun, 
+      box = wall_box,
+      dir = targ_dir(self)
+    )
+    let self = spawn(self, 10, [move(wall, at_max_dist(self, 150))])
     self
 
   // Right
@@ -89,9 +100,12 @@ tophoro_higher_ground_effect_fun(self: Thing) : Thing
   let self = cast(self, 90, hits)
   self
 
+// Earth Wall
 tophoro_earth_wall_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 9, 18)
-  self
+  let self = animate_between(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 5, 0,   5)
+  let self = animate_between(self, 0, TOPHORO_EARTH_WALL_BARRIER_005, 4, 53, 57)
+  die(self, 58)
+  // self 
 
 // Earth Rise
 tophoro_eath_rise_rock_formation_fun(self: Thing) : Thing
