@@ -18,6 +18,7 @@ STEVE_TNT_TIMER : Bits
 steve_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3, mhp = 24)
   let self = update_buff(self, STEVE_BLOCK_TIMER)
+  let self = update_buff(self, STEVE_TNT_TIMER)
 
   case self |thing switch self.act
 
@@ -34,12 +35,24 @@ steve_fun(self: Thing) : Thing
     self 
 
   // Middle
-  // !!! TODO !!! add cooldown  
   | STEVE_TNT 
-    let self = animate(self, 0, STEVE_TNT_CASTING_000, 3, 9)
-    let tnt = new_thing <= thing(fun=steve_tnt_effect, box=nbox)
-    let self = spawn(self, 5, [move(tnt, at_max_dist(self, 100))])
-    self
+    let self = animate_between(self, 1, STEVE_IDLE_000, 1, 0, 1)
+    let self = 
+      case is_using_buff(self, STEVE_TNT_TIMER) as on_cooldown
+      | true => // Continue on idle
+        let self = animate_between(self, 1, STEVE_IDLE_000, 1, 1, 2)
+        let self = reset(self, 2)
+        self 
+
+      | false => 
+        let self = animate_between(self, 0, STEVE_TNT_CASTING_000, 3, 1, 4)
+        let self = reset(self, 4)
+        let tnt = new_thing <= thing(fun=steve_tnt_effect, box=nbox)
+        let self = end_thing(self, steve_fun, ONE_SEC * 2, STEVE_TNT_TIMER)
+        let self = spawn(self, self.tik, [move(tnt, at_max_dist(self, 100))])
+        self 
+    self 
+
 
  // Right
   | STEVE_ENDER_PEARL
