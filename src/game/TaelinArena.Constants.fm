@@ -16,3 +16,8 @@ GON_AFTER_ULT : Bits
 // Mando & Baby Yoda
 MANDO_WEAPON_KEY : Bits 
   001101111010b
+
+enum 
+| LOW_ROOT 
+| MEDIUM_ROOT
+| HIGH_ROOT
