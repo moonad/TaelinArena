@@ -25,7 +25,7 @@ link_fun(self: Thing) : Thing
   // Left 
   | LINK_TRIPLE_ATTACK
     let self = animate(self, 1, LINK_TRIPLE_ATTACK_000, 11, 22)
-    let hits = [hit([damage(2)], at_dist(self, 20), self.dir, cbox(12))]
+    let hits = [hit([damage(DMG_LV_2)], at_dist(self, 20), self.dir, cbox(12))]
     let self = cast(self,  5, hits)
     let self = cast(self, 10, hits)
     let self = cast(self, 18, hits)
@@ -46,8 +46,8 @@ link_fun(self: Thing) : Thing
   // Right
   | LINK_STORM
     let self = animate(self, 1, LINK_STORM_000, 23, 46)
-    let storm_hits = [hit([damage(1)], self.pos, self.dir, cbox(25))]
-    let last_hits  = [hit([damage(1)], at_dist(self, 20), self.dir, cbox(12))]
+    let storm_hits = [hit([damage(DMG_LV_1)], self.pos, self.dir, cbox(25))]
+    let last_hits  = [hit([damage(DMG_LV_1)], at_dist(self, 20), self.dir, cbox(12))]
     let self = cast(self, 10, storm_hits)
     let self = cast(self, 20, storm_hits)
     let self = cast(self, 30, storm_hits)
@@ -97,7 +97,7 @@ link_perfect_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, LINK_PERFECT_EXTHENGE_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
+  let hits = [hit([damage(DMG_LV_2)], self.pos, self.dir, cbox(6))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
@@ -139,9 +139,9 @@ zora_fun(self: Thing) : Thing
   | ZORA_DASH
     let self = animate_with_blink(self, 1, ZORA_SKILL_000, ZORA_IDLE_000, 4, 0, 16)
     let self = blink(self, 16, at_dist(self, 75))
-    let hits1 = [hit([damage(2)], at_dist(self, 25), self.dir, cbox(12))]
-    let hits2 = [hit([damage(2)], at_dist(self, 50), self.dir, cbox(12))]
-    let hits3 = [hit([damage(2)], at_dist(self, 75), self.dir, cbox(12))]
+    let hits1 = [hit([damage(DMG_LV_2)], at_dist(self, 25), self.dir, cbox(12))]
+    let hits2 = [hit([damage(DMG_LV_2)], at_dist(self, 50), self.dir, cbox(12))]
+    let hits3 = [hit([damage(DMG_LV_2)], at_dist(self, 75), self.dir, cbox(12))]
     let self = cast(self, 4, hits1)
     let self = cast(self, 8, hits2)
     let self = cast(self, 12, hits3)
@@ -173,7 +173,7 @@ deku_fun(self: Thing) : Thing
   | DEKU_MUSIC
     let self  = animate(self, 1, DEKU_SKILL_000, 19, 38)
     let box   = pbox([ v3(0,0,0), v3(70,45,0), v3(70,-45,0) ]) 
-    let hits  = [hit([damage(2)], self.pos, self.dir, box)]
+    let hits  = [hit([damage(DMG_LV_2)], self.pos, self.dir, box)]
     let self  = cast(self, 10, hits)
     let self  = cast(self, 15, hits)
     let self  = cast(self, 20, hits)
@@ -209,8 +209,8 @@ goron_fun(self: Thing) : Thing
     let self = blink(self, 31, at_dist(self,5))
     let pos1 = at_dist(self, 20)
     let pos2 = at_dist(self, 50)
-    let hits1 = [hit([damage(3)], pos1, self.dir, cbox(15))]
-    let hits2 = [hit([damage(6)], pos2, self.dir, cbox(15))]
+    let hits1 = [hit([damage(DMG_LV_3)], pos1, self.dir, cbox(15))]
+    let hits2 = [hit([damage(DMG_LV_6)], pos2, self.dir, cbox(15))]
     let self  = cast(self, 15, hits1)
     let self  = cast(self, 30, hits2)
     let self  = create_at(self, 36, link_fun)

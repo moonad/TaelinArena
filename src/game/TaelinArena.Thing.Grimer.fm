@@ -10,10 +10,10 @@ enum
 | GRIMER_TAUNT
 
 base_earth_ball_dmg : Number 
-  2
+  DMG_LV_2
 
 base_mud_tsunami_dmg : Number 
-  3
+  DMG_LV_3
 
 grimer_fun(self: Thing) : Thing
   let self = self <= thing(mov = 2.5, mhp = 24)
