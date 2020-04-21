@@ -1,5 +1,4 @@
 import TaelinArena.Game
-// import TaelinArena.Thing.Dorime.Effects
 
 enum
 | DORIME_IDLE
@@ -91,23 +90,15 @@ dorime_blessing_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(4))]
+  let hits = [hit([damage(DMG_LV_1)], self.pos, self.dir, cbox(4))]
   let self = cast(self, 0, hits)
-  let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
-  let self = cast(self, 3, hits)
   let self = cast(self, 4, hits)
-  let self = cast(self, 5, hits)
   let self = cast(self, 6, hits)
-  let self = cast(self, 7, hits)
   let self = cast(self, 8, hits)
-  let self = cast(self, 9, hits)
   let self = cast(self, 10, hits)
-  let self = cast(self, 11, hits)
   let self = cast(self, 12, hits)
-  let self = cast(self, 13, hits)
   let self = cast(self, 14, hits)
-  let self = cast(self, 15, hits)
   self
 
 dorime_leptospirose_puddle_pot_fun(self: Thing) : Thing
@@ -126,7 +117,7 @@ dorime_leptospirose_puddle_fun(self: Thing) : Thing
   let self = self <= thing(box = nbox)
   let self = animate_between(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000, 10, 0,10)
   let self = animate_between(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 10,39)
-  let hits = [hit([damage(1)], self.pos, self.dir, cbox(48))]
+  let hits = [hit([damage(DMG_LV_1)], self.pos, self.dir, cbox(48))]
   let self = cast(self, 10, hits)
   let self = cast(self, 14, hits)
   let self = cast(self, 18, hits)
@@ -142,7 +133,7 @@ dorime_holy_flame_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, DORIME_HOLY_FLAME_PILLAR_000, 5, 15)
   let self = self <= thing(box = nbox)
-  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(20))])
+  let self = cast(self, 0, [hit([damage(DMG_LV_3)], self.pos, self.dir, cbox(20))])
   self
 
 dorime_gods_chamber_fun(self: Thing) : Thing
@@ -176,6 +167,6 @@ dorime_taunt_idle_fun(self: Thing) : Thing
 dorime_jesus_power(self: Thing) : Thing
   case self |thing
   let self = self <= thing(box = nbox)
-  let self = cast(self, 0, [hit([damage(5)], self.pos, self.dir, cbox(20))])
+  let self = cast(self, 0, [hit([damage(DMG_LV_5)], self.pos, self.dir, cbox(20))])
   let self = die(self, 6)
   self
