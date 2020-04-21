@@ -97,12 +97,12 @@
   {
     "name": "KingDedede",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Kirby",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Konan",
@@ -117,7 +117,7 @@
   {
     "name": "Link",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Loki",
@@ -137,12 +137,12 @@
   {
     "name": "Mando",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "MarthaLynch",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Mechwarrior",
@@ -166,7 +166,7 @@
   },
   {
     "name": "Pichu",
-    "attack": "1",
+    "attack": "0",
     "recently_updated": "0"
   },
   {
@@ -177,7 +177,7 @@
   {
     "name": "PPG",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Ray",
@@ -227,12 +227,12 @@
   {
     "name": "Teresa",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "TonyStark",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Tvee",
