@@ -80,17 +80,17 @@ steve_fun(self: Thing) : Thing
 
   // Space
   | STEVE_BLOCK 
-    let self = animate_between(self, 1, STEVE_IDLE_000, 1, 0, 1)
+    let self = animate_between(self, 0, STEVE_BLOCK_CASTING_000, 1, 0, 1)
     let self =
       case is_using_buff(self, STEVE_BLOCK_TIMER) as on_cooldown 
       | true => // Continue on idle
-        let self = animate_between(self, 1, STEVE_IDLE_000, 1, 1, 2)
-        let self = reset(self, 2)
+        let self = animate_between(self, 0, STEVE_BLOCK_CASTING_001, 9, 1, 10)
+        let self = reset(self, 10)
         self
-      | false => // In a minimun of 5 secs, will only be executed once, in a single tik
-        let self = animate_between(self, 0, STEVE_BLOCK_CASTING_000, 10, 1, 21)
-        let self = reset(self, 21)
 
+      | false => // In a minimun of 5 secs, will only be executed once, in a single tik
+        let self = animate_between(self, 0, STEVE_BLOCK_CASTING_001, 9, 1, 10)
+        let self = reset(self, 10)
         let block_width = 8
         let block_length = 24
         let block = new_thing <= thing(
@@ -103,7 +103,6 @@ steve_fun(self: Thing) : Thing
             v3(block_width *  1, block_length * -1, 0), 
           ]))
         let self = end_thing(self, steve_fun, ONE_SEC * 5, STEVE_BLOCK_TIMER)
-
         let self = spawn(self, self.tik, [move(block, at_max_dist(self, 100))])
         self
     self
