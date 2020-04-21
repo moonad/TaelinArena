@@ -23,31 +23,29 @@ shao_fun(self: Thing) : Thing
   // Left 
   |SHAO_HEAVY_WATER
     let self = animate(self, 0, SHAO_HEAVY_WATER_000, 14, 28)
-    let effs = [damage(3), root(MEDIUM_ROOT)]
-    let dmg = [hit(effs, at_dist(self,35),  self.dir, cbox(15))]
-    let self = cast(self, 20, dmg)
+    let c_hit = [damage(2), root(MEDIUM_ROOT)]
+    let h0 = [hit([damage(1)], at_dist(self, 30),  self.dir, cbox(15))]
+    let h1 = [hit([damage(1)], at_dist(self, 35),  self.dir, cbox(15))]
+    let h2 = [hit(c_hit, at_dist(self, 40),  self.dir, cbox(15))]
+    let self = cast(self, 18, h0)
+    let self = cast(self, 20, h1)
+    let self = cast(self, 22, h2)
     self
 
   // Middle
-  // TODO: why these hits only work here?
   |SHAO_BALUN
     let self = animate(self, 1, SHAO_BALUN_CAST_000, 6, 30)
-    let blun = new_thing <= thing(fun=shao_balun_fun, dir=targ_dir(self), box=cbox(15))
+    let blun = new_thing <= thing(fun=shao_balun_fun, dir=targ_dir(self), box=nbox)
     let hits = new_thing <= thing(fun=shao_balun_hit_fun) 
-    let self = spawn(self, 10, [move(hits, at_dist(self, 50))])
-    let self = spawn(self, 15, [move(hits, at_dist(self, 60))])
-    let self = spawn(self, 20, [move(hits, at_dist(self, 70))])
     let self = spawn(self, 29, [
       move(hits, at_dist(self, 90)),
       move(hits, at_dist(self, 100)),
       move(hits, at_dist(self, 110))])
+
     let slow_eff = [hit([slow(2, 0.8)], at_dist(self, 110), self.dir, cbox(15))]
     let self = cast(self, 29, slow_eff)
 
     let h_ef = new_thing <= thing(fun=shao_balun_heal_fun)
-    let self = spawn(self, 10, [move(h_ef, at_dist(self, 50))])
-    let self = spawn(self, 15, [move(h_ef, at_dist(self, 60))])
-    let self = spawn(self, 20, [move(h_ef, at_dist(self, 70))])
     let self = spawn(self, 29, [
       move(h_ef, at_dist(self, 90)),
       move(h_ef, at_dist(self, 100)),
@@ -57,24 +55,42 @@ shao_fun(self: Thing) : Thing
     self
 
   // Right
+  // TODO: he must self-heal
   |SHAO_WATER_TAIL
     let self = animate(self, 0, SHAO_WATER_TAIL_000, 14, 24)
-    // let hits = new_thing <= thing(fun=shao_water_tail_fun) 
-    // let self = spawn(self, 10, [move(hits, at_dist(self, 30))])
-    // let self = spawn(self, 15, [move(hits, at_dist(self, 50))])
-    // let self = spawn(self, 20, [move(hits, at_dist(self, 70))])
-    // let self = spawn(self, 29, [move(hits, at_dist(self, 90))])
+    let h0 = [hit([damage(2)], at_dist(self, 30), self.dir, cbox(15))]
+    let h1 = [hit([damage(3)], at_dist(self, 50), self.dir, cbox(20))]
+    let h2 = [hit([heal(3)], self.pos, self.dir, cbox(15))]
+    let self = cast(self, 10, h0)
+    let self = cast(self, 15, h1)
+    let self = cast(self, 16, h2)
     self
 
-  // Space
+  // Q
+  // TODO: add cooldown?
+  // TODO: adding the commented code always return true
   |SHAO_HURRICANE
     let self = animate(self, 0, SHAO_HURRICANE_CAST_000, 3, 24)
-    let self = spawn(self, 1, [move(new_thing <= thing(fun=shao_hurricane_fun), self.trg)])
+    // case  is_using_buff(self, SHAO_ULT) as ultimate
+    // | true  => self
+    // | false =>
+    let dist_trg = at_max_dist(self, 200)
+    let self = spawn(self, 1, [move(new_thing <= thing(fun=shao_hurricane_fun, box=nbox), dist_trg)])
+    let h0  = [hit([damage(1)], dist_trg, self.dir, cbox(25))]
+    let h1  = [hit([damage(1), slow(1, 0.5)], dist_trg, self.dir, cbox(25))]
+    let self = cast(self, 10, h0)
+    let self = cast(self, 12, h0)
+    let self = cast(self, 14, h0)
+    let self = cast(self, 16, h0)
+    let self = cast(self, 18, h0)
+    let self = cast(self, 20, h0)
+    let self = cast(self, 22, h1)
+    // let self = end_thing(self, (self: Thing) => self, ONE_SEC * 5, SHAO_ULT)
     self
    
   |SHAO_DASH
     let self = animate(self, 0, SHAO_DASH_000, 2, 6)
-    let self = dash(self, 10, 0, 4)
+    let self = dash(self, 15, 0, 5)
     self
 
   |SHAO_TAUNT
@@ -92,7 +108,6 @@ shao_balun_hit_fun(self: Thing) : Thing
   let dmg  = [damage(1)]
   let hits = [hit(dmg, self.pos, self.dir, cbox(15))]
   let self = cast(self, 0, hits)
-
   self
 
 shao_balun_heal_fun(self: Thing) : Thing
@@ -107,12 +122,10 @@ shao_balun_heal_fun(self: Thing) : Thing
 shao_water_tail_fun(self: Thing) : Thing
   case self |thing
   let self = self <= thing(box = nbox)
-  let dmg  = [damage(2)]
-  let hits = [hit(dmg, self.pos, self.dir, cbox(15))]
+  let hits = [hit([damage(2)], self.pos, self.dir, cbox(15))]
   let self = cast(self, 0, hits)
   let self = die(self, 0)
   self
 
 shao_hurricane_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, SHAO_HURRICANE_000, 26, 52)
-  self
+  animate_die(self, 0, SHAO_HURRICANE_000, 26, 52)
