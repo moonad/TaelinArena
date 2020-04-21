@@ -23,8 +23,8 @@ ppg_fun(self: Thing) : Thing
   |PPG_COLORFUL_MAGIC
     let self = animate(self, 0, PPG_COLORFUL_MAGIC_000, 30, 60)
     let h0   = [hit([root(2*ONE_SEC)], at_dist(self, 70), self.dir, cbox(15))]
-    let h1   = [hit([damage(2)],       at_dist(self, 70), self.dir, cbox(15))]
-    let h2   = [hit([damage(3)],       at_dist(self, 70), self.dir, cbox(15))]
+    let h1   = [hit([DMG_LV_2],       at_dist(self, 70), self.dir, cbox(15))]
+    let h2   = [hit([damage(DMG_LV_3)],       at_dist(self, 70), self.dir, cbox(15))]
     let self = cast(self, 20, h0)
     let self = cast(self, 25, h1)
     let self = cast(self, 50, h2)
@@ -38,7 +38,7 @@ ppg_fun(self: Thing) : Thing
 
   // Right
   |PPG_LASER_BURST
-    let effs = [damage(2)]
+    let effs = [damage(DMG_LV_2)]
     let hits = [hit(effs, at_dist(self, 75), self.dir, cbox(15))]
     // separate cast from effect?
     let self = animate(self, 0, PPG_LASER_BURST_000, 26, 35)
@@ -71,7 +71,7 @@ ppg_ice_ball_effect(self: Thing) : Thing
   case self |thing 
   let self = animate_die(self, 0, PPG_COSMIC_ICE_BALL_000, 30, 60)
   // TODO: add haste effect for allies
-  let effs = [damage(2.5), root(2.5*ONE_SEC)]
+  let effs = [damage(DMG_LV_3), root(2.5*ONE_SEC)]
   let big_circle_pos = add_v3(self.pos, v3(4,2,0))
   let small_circle_1_pos = add_v3(v3( -3,-45, 0), big_circle_pos) 
   let small_circle_2_pos = add_v3(v3(-41, 23, 0), big_circle_pos) 

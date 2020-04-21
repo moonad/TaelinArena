@@ -64,7 +64,7 @@ tupitree_fun(self: Thing) : Thing
   // Space
   |TUPITREE_BLOCK
     let self = animate(self, 0, TUPITREE_BLOCK_000, 13, 26)
-    let effs = [damage(1), repulse(6)]
+    let effs = [damage(DMG_LV_1), repulse(6)]
     let hits = [hit(effs, self.pos, self.dir, cbox(60))]
     let self = cast(self, 16, hits)
     self
@@ -78,7 +78,7 @@ tupitree_fun(self: Thing) : Thing
 tupitree_vine_whip_hit_fun(self: Thing) : Thing
   case self |thing
   let self = self <= thing(box = nbox)
-  let effs = [damage(1)]
+  let effs = [damage(DMG_LV_1)]
   let hits = [hit(effs, self.pos, self.dir, cbox(12))]
   let self = cast(self, 0, hits)
   let self = die(self, 0)
@@ -93,7 +93,7 @@ tupitree_natures_revenge_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, TUPITREE_NATURE_REVENGE_ALL_000, 6, 12)
   let self = self <= thing(box = nbox)
-  let effs = [damage(5)]
+  let effs = [damage(DMG_LV_5)]
   let hits = [hit(effs, self.pos, self.dir, cbox(60))]
   let self = cast(self, 6, hits)
   self

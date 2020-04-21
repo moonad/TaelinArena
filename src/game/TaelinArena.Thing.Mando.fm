@@ -103,22 +103,22 @@ mando_sniper_rifle(self: Thing) : Thing
   let self = animate_between(self, 0, MANDO_ACCURATE_SHOT_EXPLOSION_000, 6, 18, 24)
   let self = reset(self, 24)
   let self = if self.tik === 23 then set_thing_die(self, true) else self
-  let self = cast(self,  2,  [hit([damage(1)], self.pos, self.dir, cbox(6))])
-  let self = cast(self,  4,  [hit([damage(2)], self.pos, self.dir, cbox(6))])
-  let self = cast(self,  6,  [hit([damage(3)], self.pos, self.dir, cbox(6))])
-  let self = cast(self,  8,  [hit([damage(4)], self.pos, self.dir, cbox(6))])
-  let self = cast(self, 10,  [hit([damage(5)], self.pos, self.dir, cbox(6))])
-  let self = cast(self, 12,  [hit([damage(6)], self.pos, self.dir, cbox(6))])
-  let self = cast(self, 14,  [hit([damage(7)], self.pos, self.dir, cbox(6))])
-  let self = cast(self, 16,  [hit([damage(8)], self.pos, self.dir, cbox(6))])
-  let self = cast(self, 18, [hit([damage(10)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  2,  [hit([damage(DMG_LV_1)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  4,  [hit([damage(DMG_LV_2)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  6,  [hit([damage(DMG_LV_3)], self.pos, self.dir, cbox(6))])
+  let self = cast(self,  8,  [hit([damage(DMG_LV_4)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 10,  [hit([damage(DMG_LV_5)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 12,  [hit([damage(DMG_LV_6)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 14,  [hit([damage(DMG_LV_7)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 16,  [hit([damage(DMG_LV_8)], self.pos, self.dir, cbox(6))])
+  let self = cast(self, 18, [hit([damage(DMG_LV_10)], self.pos, self.dir, cbox(6))])
   self 
 
 mando_laser_gun(self: Thing) : Thing 
   case self |thing 
   // TODO: find a good duration
   let self = animate_die(self, 0, MANDO_ACCURATE_SHOT_BLASTER_EFFECT_000, 1, 10) 
-  let hits = [hit([damage(2)], self.pos, self.dir, cbox(6))]
+  let hits = [hit([damage(DMG_LV_2)], self.pos, self.dir, cbox(6))]
   let self = cast(self,  2, hits)
   let self = cast(self,  4, hits)
   let self = cast(self,  6, hits)
@@ -138,7 +138,7 @@ mando_flamethrower_effect(gun_pos: V3, self: Thing) : Thing
   case self |thing 
   let self = animate_die(self, 0, MANDO_FLAMETHROWER_EFFECT_000, 23, 23)
   let box   = pbox([ v3(0,10,0), v3(70,45,0), v3(70,-35,0) ]) 
-  let hits  = [hit([damage(2)], gun_pos, self.dir, box)] 
+  let hits  = [hit([damage(DMG_LV_2)], gun_pos, self.dir, box)] 
   let self  = cast(self, 5, hits)
   let self  = cast(self, 10, hits)
   let self  = cast(self, 15, hits)
