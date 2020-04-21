@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 enum
 | STEVE_IDLE
@@ -8,12 +9,6 @@ enum
 | STEVE_ENDER_DRAGONS_FURY
 | STEVE_BLOCK
 | STEVE_TAUNT
-
-STEVE_BLOCK_TIMER : Bits 
-  000b
-
-STEVE_TNT_TIMER : Bits
-  001b
 
 steve_fun(self: Thing) : Thing
   let self = self <= thing(mov = 3, mhp = 24)
