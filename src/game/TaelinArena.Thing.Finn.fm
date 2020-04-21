@@ -29,9 +29,9 @@ finn_fun(self: Thing) : Thing
   // Left 
   |FINN_TRIPLE_TAKE
     let self = animate(self, 1, FINN_TRIPLE_TAKE_000, 17, 34)
-    let effs = [damage(2)]
+    let effs = [damage(DMG_LV_2)]
     let hits = [hit(effs, at_dist(self, 35), self.dir, cbox(20))]
-    let crit = [hit([damage(4)], at_dist(self, 35), self.dir, cbox(20))]
+    let crit = [hit([damage(DMG_LV_4)], at_dist(self, 35), self.dir, cbox(20))]
     let self = cast(self, 0, hits)
     let self = cast(self, 10, hits)
     let self = cast(self, 30, crit)
@@ -40,7 +40,7 @@ finn_fun(self: Thing) : Thing
   // Middle
   |FINN_BMO_S_FLASH
     let self = animate(self, 0, FINN_BMO_S_FLASH_000, 13, 26)
-    let effs = [damage(2)]
+    let effs = [damage(DMG_LV_2)]
     let hits = [hit(effs, at_dist(self, 45), self.dir, cbox(25))]
     let self = cast(self,16, hits)
     self
@@ -48,7 +48,7 @@ finn_fun(self: Thing) : Thing
   // Right
   |FINN_BOW
     let self = animate(self, 0, FINN_BOW_CAST_ANIMATION_000, 7, 14)
-    let effs = [damage(3)]
+    let effs = [damage(DMG_LV_3)]
     let hits = [hit(effs, at_dist(self, 140), self.dir, cbox(10))]
     let proj = new_thing <= thing(
       fun = finn_arrow_fun,
@@ -65,11 +65,11 @@ finn_fun(self: Thing) : Thing
     let self = animate(self, 1, FINN_TAUNT_000, 17, 34)
     let jake = new_thing <= thing(fun=finn_jakes_fury_fun, dir=targ_dir(self))
     let self = spawn(self, 14, [move(jake, at_dist(self, 35))])
-    let effs = [damage(2)]
+    let effs = [damage(DMG_LV_2)]
     let hits0 = [hit(effs, at_dist(self, 35), self.dir, cbox(15))]
     let hits1 = [hit(effs, at_dist(self, 45), self.dir, cbox(15))]
     let hits2 = [hit(effs, at_dist(self, 60), self.dir, cbox(15))]
-    let crit = [damage(4), impulse(10, self.dir)]
+    let crit = [damage(DMG_LV_4), impulse(10, self.dir)]
     let hits_critical = [hit(crit, at_dist(self, 80), self.dir, cbox(15))]
     let self = cast(self, 15, hits0)
     let self = cast(self, 20, hits1)
@@ -99,7 +99,7 @@ finn_triple_take_effect(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, FINN_TRIPLE_TAKE_AUX_000, 1, 2)
   let self = self <= thing(box = nbox)
-  let effs = [damage(2)]
+  let effs = [damage(DMG_LV_2)]
   let hits = [hit(effs, self.pos, self.dir, cbox(20))]
   let self = cast(self, 0, hits)
   self
