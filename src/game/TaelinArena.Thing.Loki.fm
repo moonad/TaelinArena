@@ -1,0 +1,125 @@
+import TaelinArena.Game
+
+enum
+| LOKI_IDLE
+| LOKI_NORDIC_PULSE
+| LOKI_DODGER
+| LOKI_RUNIC_CURSE
+| LOKI_GIFT_FROM_THE_GODS
+| LOKI_DASH
+| LOKI_TAUNT
+
+loki_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 2, mhp = 24)
+
+  case self |thing switch self.act
+
+  |LOKI_IDLE
+    if is_walking(self)
+    then animate(self, 1, LOKI_WALK_000, 6, 12)
+    else animate(self, 0, LOKI_IDLE_000, 7, 14)
+
+  // Left 
+  |LOKI_NORDIC_PULSE
+    let self = animate(self, 0, LOKI_GOLDEN_PULSE_CASTING_000, 10, 20)
+    let pulse = new_thing <= thing(
+      fun = loki_nordic_pulse_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 12, [move(pulse, at_dist(self, 23))])
+    self
+
+  // Middle
+  |LOKI_DODGER
+    let self = animate(self, 0, LOKI_DODGER_CASTING_000, 11, 22) 
+    let shield = new_thing <= thing(
+      fun = loki_dodger_effect,
+      pos = at_dist(self, 0),
+      dir = targ_dir(self),
+      vel = scale_v3(0, targ_dir(self)),
+      box = nbox)
+    let self = spawn(self, 21, [shield])
+    self
+
+
+  // Right
+  |LOKI_RUNIC_CURSE
+    let self = animate(self, 1, LOKI_RUNIC_CURSE_CASTING_000, 6, 12)
+    let ball = new_thing <= thing(
+      sid = self.sid,
+      fun = loki_runic_curse_fun,
+      pos = at_dist(self, 120),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 10, [ball])
+    self
+
+  // Q
+  |LOKI_GIFT_FROM_THE_GODS
+    let self = animate(self, 1, LOKI_GIFT_FROM_THE_GODS_CASTING_000, 6, 12)
+    let ball = new_thing <= thing(
+      sid = self.sid,
+      fun = loki_gift_fun,
+      pos = at_dist(self, 120),
+      vel = scale_v3(0, targ_dir(self)))
+    let self = spawn(self, 10, [ball])
+    self
+
+
+    
+  // Space
+  |LOKI_DASH
+    let self = animate_between(self, 0, LOKI_TELEPORT_IN_000, 5, 0, 10)
+    let self = animate_between(self, 0, LOKI_TELEPORT_OUT_000, 3, 10, 19)
+    let self = blink(self, 10, self.trg)
+    let self = reset(self, 19)
+    self
+
+  // E
+  |LOKI_TAUNT
+    animate(self, 0, LOKI_TAUNT_000, 19, 50)
+
+  else self
+
+loki_nordic_pulse_fun(self: Thing) : Thing
+  animate_die(self, 0, LOKI_GOLDEN_PULSE_PROJECT_000, 13, 13)
+
+loki_dodger_effect(self: Thing) : Thing
+  animate_die(self, 0, LOKI_DODGER_CASTED_000, 8, 32)
+
+loki_runic_curse_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, LOKI_RUNIC_CURSE_CASTED_000, 12, 24)
+  let self = self <= thing(box = cbox(10))
+  let trap = new_thing <= thing(
+    sid = self.sid,
+    fun = loki_runic_curse_trap_fun,
+    pos = self.pos)
+  let self = spawn(self, 23, [trap])
+  self
+
+loki_runic_curse_trap_fun(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = animate_between(self, 0, LOKI_RUNIC_CURSE_TRAP_IDLE_000, 5, 0, 20)
+  let self = animate_between(self, 0, LOKI_RUNIC_CURSE_PRESSED_000, 11, 20, 42)
+  let self = die(self, 42)
+  self
+
+loki_gift_fun(self: Thing) : Thing
+  case self |thing
+  let self = animate_die(self, 0, LOKI_GIFT_FROM_THE_GODS_CASTED_000, 12, 24)
+  let self = self <= thing(box = cbox(10))
+  let trap2 = new_thing <= thing(
+    sid = self.sid,
+    fun = loki_gift_trap_fun,
+    pos = self.pos)
+  let self = spawn(self, 23, [trap2])
+  self
+
+loki_gift_trap_fun(self: Thing) : Thing
+  case self |thing
+  let self = self <= thing(box = nbox)
+  let self = animate_between(self, 0, LOKI_GIFT_FROM_THE_GODS_TRAP_IDLE_000, 5, 0, 20)
+  let self = animate_between(self, 0, LOKI_GIFT_FROM_THE_GODS_PRESSED_000, 10, 20, 40)
+  let self = die(self, 39)
+  self
