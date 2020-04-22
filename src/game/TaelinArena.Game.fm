@@ -1,6 +1,7 @@
 import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.ModelIds
+import TaelinArena.Constants
 
 PlayerId : Type
   Number

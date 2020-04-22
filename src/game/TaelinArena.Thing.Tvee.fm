@@ -1,0 +1,68 @@
+import TaelinArena.Game
+
+enum
+| TVEE_IDLE
+| TVEE_ESF
+| TVEE_SEVEN_DAYS
+| TVEE_NULL
+| TVEE_MARTYR
+| TVEE_DASH
+| TVEE_TAUNT
+
+tvee_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |TVEE_IDLE
+    if is_walking(self)
+    then animate(self, 1, TVEE_WALKCYCLE_000, 7, 14)
+    else animate(self, 0, TVEE_IDLE_000, 5, 10)
+
+  // Left 
+  |TVEE_ESF
+    let self = animate(self, 0, TVEE_IDLE_000, 5, 10)
+    let pulse = new_thing <= thing(
+      fun = tvee_esf_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 0, [move(pulse, at_dist(self, 0))])
+    self    
+
+  // Middle
+  |TVEE_SEVEN_DAYS
+    animate(self, 0, TVEE_SEVEN_DAYS_000, 14, 28)
+
+  // Right
+  |TVEE_NULL
+    let self = animate_between(self, 1, TVEE_NULL_IN_000, 4, 0, 12)
+    let self = animate_between(self, 1, TVEE_NULL_OUT_000, 4, 12, 24)
+    let self = blink(self, 12, at_max_dist(self, 200))
+    let self = reset(self, 24)
+    self
+
+  // Q
+  |TVEE_MARTYR
+    let self = animate(self, 1, TVEE_MARTYR_CAST_ANIMATION_000, 9, 18)
+    let sat = new_thing <= thing(
+      fun = tvee_martyr_fun,
+      pos = self.pos,
+      dir = targ_dir(self))
+    let self = spawn(self, 17, [move(sat, at_max_dist(self, 120))])
+    self
+
+  // Space
+  |TVEE_DASH
+    animate(self, 0, TVEE_IDLE_000, 5, 10)
+
+  // E
+  |TVEE_TAUNT
+    animate(self, 0, TVEE_TAUNT_000, 28, 56)
+
+  else self
+
+tvee_martyr_fun(self: Thing) : Thing
+  animate_die(self, 0, TVEE_MARTYR_SATALLITE_000, 21, 42)
+
+tvee_esf_fun(self: Thing) : Thing
+  animate_die(self, 0, TVEE_ESF_000, 3, 9)
