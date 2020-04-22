@@ -24,6 +24,11 @@ STEVE_TNT_TIMER : Bits
 MANDO_WEAPON_KEY : Bits 
   001101111010b
 
+enum 
+| LOW_ROOT 
+| MEDIUM_ROOT
+| HIGH_ROOT
+
 // Slow
 enum
 | SLOW_00
