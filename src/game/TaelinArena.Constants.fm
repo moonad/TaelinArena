@@ -13,10 +13,55 @@ DARTHVADER_FORCE_AWAKENS_KEY : Bits
 GON_AFTER_ULT : Bits
   001101111010b
 
-
 // Steve
 STEVE_BLOCK_TIMER : Bits 
   000b
 
 STEVE_TNT_TIMER : Bits
   001b
+
+// Mando & Baby Yoda
+MANDO_WEAPON_KEY : Bits 
+  001101111010b
+
+// Slow
+enum
+| SLOW_00
+| SLOW_10
+| SLOW_20
+| SLOW_30
+| SLOW_40
+| SLOW_50
+| SLOW_60
+| SLOW_70
+| SLOW_80
+| SLOW_90
+
+
+enum
+| SPEED_00
+| SPEED_10
+| SPEED_20
+| SPEED_30
+| SPEED_40
+| SPEED_50
+| SPEED_60
+| SPEED_70
+| SPEED_80
+| SPEED_90
+
+
+// DAMAGE
+// ------
+enum
+| DMG_LV_0
+| DMG_LV_1
+| DMG_LV_2
+| DMG_LV_3
+| DMG_LV_4
+| DMG_LV_5
+| DMG_LV_6
+| DMG_LV_7
+| DMG_LV_8
+| DMG_LV_9
+| DMG_LV_10

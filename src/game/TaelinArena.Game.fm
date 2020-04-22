@@ -1,6 +1,7 @@
 import Base#kqQ2
 import TaelinArena.Geometry
 import TaelinArena.ModelIds
+import TaelinArena.Constants
 
 PlayerId : Type
   Number
@@ -30,6 +31,7 @@ T Effect
 | silence(dur: Number)
 | root(dur: Number)
 | stun(dur: Number)
+| teleport(to_pos: V3, all: Number) // 1: can teleport everybody, 0: only team mates
 
 T Buff
 | shielded(dur: Number, val: Number) // shields are hit before hp
@@ -593,7 +595,24 @@ is_rooted(self: Thing) : Bool
   | none => false 
   | some => true
 
-
+has_shield(self: Thing) : Bool 
+  case self |thing 
+  let is_shielded_buff = (buff: Buff) => 
+    case buff 
+    | shielded => true  
+    | slowed   => false  
+    | hasted   => false 
+    | silenced => false  
+    | rooted   => false 
+    | stuned   => false  
+  case find(Buff; is_shielded_buff, self.buf) as res 
+  | none => false 
+  | some => true
+  // Q: Why this code doesn't work?
+  // let filtered_list = filter(Buff; is_shielded_buff, self.buf)
+  // case filtered_list
+  // | nil  => false
+  // | cons => true 
 
 T Ordering 
 | LT 
@@ -612,7 +631,7 @@ use_shields(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff)
   case acc |pair 
   case buff
   | shielded => 
-    if acc.fst === 0 then 
+    if acc.fst === 0 then // no damage
       acc 
     else 
       case compare_numbers(acc.fst, buff.val) as res  
@@ -632,13 +651,13 @@ use_shields(buff: Buff, acc: Pair(Number, List(Buff))) : Pair(Number, List(Buff)
   | rooted   => pair(__ acc.fst, cons(_ buff, acc.snd))
   | stuned   => pair(__ acc.fst, cons(_ buff, acc.snd))
 
-
+// Checks if there are shields to be used and update it if have
 handle_shields(hit_dmg: Number, self: Thing) : Thing 
   case self |thing 
   let init_val      = pair(__ hit_dmg, nil(_))
   let res           = fold(__ init_val, use_shields, self.buf) 
-  let remaining_dmg = pair_fst(__ res) + self.dmg 
-  let remaining_buf = pair_snd(__ res)
+  let remaining_dmg = pair_fst(__ res) + self.dmg // Number actual damage taken
+  let remaining_buf = pair_snd(__ res) // List(Buff)
   self <= thing(dmg = remaining_dmg, buf = remaining_buf)  
 
 
@@ -683,8 +702,10 @@ POS_Y_KEY: Bits
 set_stt_value_v3(self: Thing, v3: V3) : Thing
   case self |thing
   case v3 |v3
-  let self = self <= thing(stt=insert(_ POS_X_KEY, v3.x, self.stt))
-  let self = self <= thing(stt=insert(_ POS_Y_KEY, v3.y, self.stt))
+  // let self = self <= thing(stt=insert(_ POS_X_KEY, v3.x, self.stt))
+  let self = set_thing_stt(self, insert(_ POS_X_KEY, v3.x, self.stt))
+  let self = set_thing_stt(self, insert(_ POS_X_KEY, v3.y, self.stt))
+  // let self = self <= thing(stt=insert(_ POS_Y_KEY, v3.y, self.stt))
   // let self = self <= thing(stt=insert(_ POS_Z_KEY, v3.z, self.stt))
   self
 

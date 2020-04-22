@@ -39,8 +39,11 @@ import TaelinArena.Thing.Squirtle
 import TaelinArena.Thing.SrMadruga
 import TaelinArena.Thing.Steve
 import TaelinArena.Thing.Teichi
+import TaelinArena.Thing.Teresa
+import TaelinArena.Thing.TonyStark
 import TaelinArena.Thing.Tophoro
 import TaelinArena.Thing.Tupitree
+import TaelinArena.Thing.Tvee
 import TaelinArena.Thing.Weedle
 import TaelinArena.Thing.XululuChild
 import TaelinArena.Thing.Zagatur

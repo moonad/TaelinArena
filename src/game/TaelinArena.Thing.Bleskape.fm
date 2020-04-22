@@ -21,7 +21,7 @@ bleskape_fun(self: Thing) : Thing
 
   |BLESKAPE_SHOCK_BALL
     let self = animate(self, 0, BLESKAPE_SHOCK_BALL_000, 15, 30)
-    let effs = [damage(3), impulse(12, self.dir)]
+    let effs = [damage(DMG_LV_3), impulse(12, self.dir)]
     let hits = [
       hit(effs, at_dist(self, 40), self.dir, cbox(20)),
       hit(effs, at_dist(self, 80), self.dir, cbox(24))]
@@ -36,21 +36,21 @@ bleskape_fun(self: Thing) : Thing
 
   |BLESKAPE_SHOCK_GROUND_WAVE
     let self = animate(self, 0, BLESKAPE_SHOCK_GROUND_WAVE_000, 12, 24)
-    let effs = [damage(5)]
+    let effs = [damage(DMG_LV_5)]
     let hits = [hit(effs, self.pos, self.dir, cbox(58))]
     let self = cast(self, 20, hits)
     self
 
   |BLESKAPE_SUPREME_PUNCH_SEQUENCE
     let self = animate(self, 0, BLESKAPE_SUPREME_PUNCH_SEQUENCE_000, 25, 50)
-    let effs = [damage(1)]
+    let effs = [damage(DMG_LV_1)]
     let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
     let self = cast(self, 26, hits)
     let self = cast(self, 30, hits)
     let self = cast(self, 34, hits)
     let self = cast(self, 38, hits)
     let self = cast(self, 42, hits)
-    let effs = [damage(2), impulse(18, self.dir)]
+    let effs = [damage(DMG_LV_2), impulse(18, self.dir)]
     let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
     let self = cast(self, 46, hits)
     self
@@ -58,7 +58,7 @@ bleskape_fun(self: Thing) : Thing
   | BLESKAPE_DASH
     let self = animate(self, 0, BLESKAPE_DASH_000, 15, 30)
     let self = dash(self, 8, 15, 25)
-    let effs = [damage(1), repulse(8)]
+    let effs = [damage(DMG_LV_1), repulse(8)]
     let hits = [hit(effs, at_dist(self, 32), self.dir, cbox(32))]
     let self = cast(self, 17, hits)
     let self = cast(self, 20, hits)

@@ -1,13 +1,18 @@
 [
   {
     "name": "Benfix",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Bleskape",
     "attack": "1",
     "recently_updated": "0"
+  },
+  {
+    "name": "Chamusco",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "DarthVader",
@@ -30,6 +35,11 @@
     "recently_updated": "0"
   },
   {
+    "name": "Escanor",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Finn",
     "attack": "1",
     "recently_updated": "0"
@@ -48,6 +58,11 @@
     "name": "Greninja",
     "attack": "0",
     "recently_updated": "0"
+  },
+  {
+    "name": "Green Lantern",
+    "attack": "0",
+    "recently_updated": "1"
   },
   {
     "name": "Grimer",
@@ -82,12 +97,12 @@
   {
     "name": "KingDedede",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Kirby",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Konan",
@@ -101,7 +116,7 @@
   },
   {
     "name": "Link",
-    "attack": "0",
+    "attack": "1",
     "recently_updated": "0"
   },
   {
@@ -121,13 +136,13 @@
   },
   {
     "name": "Mando",
-    "attack": "0",
+    "attack": "1",
     "recently_updated": "0"
   },
   {
     "name": "MarthaLynch",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Mechwarrior",
@@ -150,12 +165,17 @@
     "recently_updated": "0"
   },
   {
-    "name": "PPG",
-    "attack": "1",
+    "name": "Pichu",
+    "attack": "0",
+    "recently_updated": "0"
+  },
+  {
+    "name": "Pingo",
+    "attack": "0",
     "recently_updated": "1"
   },
   {
-    "name": "Pichu",
+    "name": "PPG",
     "attack": "1",
     "recently_updated": "0"
   },
@@ -180,6 +200,11 @@
     "recently_updated": "0"
   },
   {
+    "name": "Shonkie",
+    "attack": "0",
+    "recently_updated": "1"
+  },
+  {
     "name": "Squirtle",
     "attack": "1",
     "recently_updated": "0"
@@ -202,12 +227,12 @@
   {
     "name": "Teresa",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "TonyStark",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Tvee",

@@ -1,4 +1,5 @@
 import TaelinArena.Game
+import TaelinArena.Constants
 
 punchingbag_fun(self: Thing) : Thing
   let smhp = 32
@@ -48,7 +49,7 @@ puddledmg_fun(self: Thing) : Thing
   let self = animate(self, 0, DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000, 29, 58)
   let hits = [
     hit([
-      damage(1), 
+      damage(DMG_LV_1), 
       // stun(4*ONE_SEC)
       // silence(5*ONE_SEC)
       // slow(3*ONE_SEC, 0.7)

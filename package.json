@@ -7,7 +7,8 @@
     "build_models": "node src/models/script.js; webpack --config models.webpack.config.js",
     "build": "webpack",
     "upload": "rsync -rvhz docs TA:~/TA",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build_models_low_mem": "node --max-old-space-size=512 `which npm` run build_models"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,7 @@
     "inferno": "^7.3.3",
     "inferno-hyperscript": "^7.3.3",
     "raw-loader": "^4.0.0",
-    "webpack": "^4.41.6",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.1"
   },
@@ -39,7 +40,7 @@
     "cors": "^2.8.5",
     "ethers": "^4.0.43",
     "express": "^4.17.1",
-    "formality-lang": "^0.1.252",
+    "formality-lang": "^0.1.254",
     "navigator": "^1.0.1",
     "peerjs": "^1.2.0",
     "simple-peer": "^9.6.2",
