@@ -184,7 +184,7 @@ magneton_fun(self: Thing) : Thing
       hit([damage(2)],  at_dist(self, 108), self.dir, cbox(12)),
     ]
     let self = cast(self, 11, horizontal_hits)
-    let self = spawn(self, 22, [move(thunder_ver, at_max_dist(self, 100))])
+    let self = spawn(self, 22, [move(thunder_ver, at_dist(self, 110))])
     let vertical_hits = [hit([damage(2), stun(ONE_SEC)], at_dist(self, 108), self.dir, cbox(12))]
     let self = cast(self,  25, vertical_hits)
     let self = cast(self,  29, vertical_hits)
@@ -250,7 +250,7 @@ magneton_sonic_boom_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_SONIC_BOOM_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(1)], self.pos, self.dir, cbox(30))]
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(20))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
@@ -273,7 +273,7 @@ magneton_thunder_wave_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_THUNDER_WAVE_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(30))]
+  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(25))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)

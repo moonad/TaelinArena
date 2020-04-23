@@ -24,8 +24,8 @@ tophoro_fun(self: Thing) : Thing
   // !! TODO !! add cooldown
   |TOPHORO_HIGHER_GROUND
     let self      = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
-    let explosion = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_init_fun)
-    let arc       = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun)
+    let explosion = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_init_fun, sid = self.sid)
+    let arc       = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun, sid = self.sid)
     let self      = spawn(self, 13, [move(explosion, self.pos)])
     let self      = spawn(self, 15, [move(arc, self.pos)])
     self
@@ -54,7 +54,7 @@ tophoro_fun(self: Thing) : Thing
   // !! TODO !! add cooldown
   |TOPHORO_EARTH_RISE
     let self = animate(self, 0, TOPHORO_EARTH_RISE_000, 8, 16)
-    let rock = new_thing <= thing(fun=tophoro_eath_rise_effect_fun, box=nbox)
+    let rock = new_thing <= thing(fun=tophoro_eath_rise_effect_fun, box=nbox, sid = self.sid)
     let self = spawn(self, 14, [move(rock, at_max_dist(self, 150))])
     self
 
@@ -64,7 +64,8 @@ tophoro_fun(self: Thing) : Thing
     let hand = new_thing <= thing(
       fun = tophoro_ground_force_fun, 
       box = nbox,
-      dir = rot90_v3(targ_dir(self)))
+      dir = rot90_v3(targ_dir(self)),
+      sid = self.sid)
     let self = spawn(self, 1, [move(hand, at_max_dist(self, 100))])
     self
 

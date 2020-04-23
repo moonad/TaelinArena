@@ -34,7 +34,7 @@ loki_fun(self: Thing) : Thing
     let self = animate(self, 0, LOKI_DODGER_CASTING_000, 11, 22) 
     let shield = new_thing <= thing(
       fun = loki_dodger_effect,
-      pos = at_dist(self, 0),
+      pos = self.pos,
       dir = targ_dir(self),
       vel = scale_v3(0, targ_dir(self)),
       box = nbox)
@@ -48,7 +48,7 @@ loki_fun(self: Thing) : Thing
     let ball = new_thing <= thing(
       sid = self.sid,
       fun = loki_runic_curse_fun,
-      pos = at_dist(self, 120),
+      pos = at_max_dist(self, 120),
       vel = scale_v3(0, targ_dir(self)))
     let self = spawn(self, 10, [ball])
     self
@@ -63,14 +63,12 @@ loki_fun(self: Thing) : Thing
       vel = scale_v3(0, targ_dir(self)))
     let self = spawn(self, 10, [ball])
     self
-
-
     
   // Space
   |LOKI_DASH
     let self = animate_between(self, 0, LOKI_TELEPORT_IN_000, 5, 0, 10)
     let self = animate_between(self, 0, LOKI_TELEPORT_OUT_000, 3, 10, 19)
-    let self = blink(self, 10, self.trg)
+    let self = blink(self, 10, at_max_dist(self, 200))
     let self = reset(self, 19)
     self
 
