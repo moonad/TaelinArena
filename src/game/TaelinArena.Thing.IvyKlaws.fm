@@ -1,0 +1,123 @@
+import TaelinArena.Game
+
+enum
+| IVYKLAWS_IDLE
+| IVYKLAWS_DUAL_SLICE
+| IVYKLAWS_GLOVES
+| IVYKLAWS_RIP_AND_TEAR
+| IVYKLAWS_DIG
+| IVYKLAWS_DASH
+| IVYKLAWS_TAUNT
+
+ivyklaws_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 4.3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |IVYKLAWS_IDLE
+    if is_walking(self)
+    then animate(self, 1, IVY_KLAWS_WALK_GLOVES_OFF_000, 10, 20)
+    else animate(self, 0, IVY_KLAWS_IDLE_GLOVES_OFF_000, 5, 10)
+
+  // Left 
+  |IVYKLAWS_DUAL_SLICE
+    let self = animate_with_blink(self, 1, IVY_KLAWS_LEFT_GLOVES_OFF_000, IVY_KLAWS_IDLE_GLOVES_OFF_000, 18, 0, 36)
+    let self = reset(self, 36)
+    let self = dash(self, 2, 12, 36)
+    self
+    
+  // Middle
+  |IVYKLAWS_GLOVES
+    let self = animate(self, 0, IVY_KLAWS_MIDDLE_EQUIP_GLOVES_000, 4, 8)
+    let self = create_at(self, 7, ivyklawsglove_fun) 
+    self
+
+  // Right
+  |IVYKLAWS_RIP_AND_TEAR
+    let self = animate_between(self, 1, IVY_KLAWS_RIGHT_CAST_GLOVES_OFF_000, 11, 0, 22)
+    let self = animate_between(self, 0, IVY_KLAWS_RIGHT_EFFECT_GLOVES_OFF_000, 20, 22, 62)
+    let self = reset(self, 62)
+    self
+
+  // Q
+  |IVYKLAWS_DIG
+    animate(self, 0, IVY_KLAWS_IDLE_GLOVES_OFF_000, 5, 10)
+    
+  // Space
+  |IVYKLAWS_DASH
+    animate(self, 0, IVY_KLAWS_IDLE_GLOVES_OFF_000, 5, 10)
+
+  // E
+  |IVYKLAWS_TAUNT
+    animate(self, 0, IVY_KLAWS_TAUNT_GLOVES_OFF_000, 21, 42)
+
+  else self
+
+// Ivy Klaws Gloves On
+
+enum
+| IVYKLAWSON_IDLE
+| IVYKLAWSON_DUAL_SLICE
+| IVYKLAWSON_GLOVES
+| IVYKLAWSON_RIP_AND_TEAR
+| IVYKLAWSON_DIG
+| IVYKLAWSON_DASH
+| IVYKLAWSON_TAUNT
+
+ivyklawsglove_fun(self: Thing) : Thing
+  let self = self <= thing(mov = 3, mhp = 24)
+
+  case self |thing switch self.act
+
+  |IVYKLAWSON_IDLE
+    if is_walking(self)
+    then animate(self, 1, IVY_KLAWS_WALK_GLOVES_ON_000, 10, 20)
+    else animate(self, 0, IVY_KLAWS_IDLE_GLOVES_ON_000, 5, 10)
+
+  // Left 
+  |IVYKLAWSON_DUAL_SLICE
+    let self = animate_with_blink(self, 1, IVY_KLAWS_LEFT_GLOVES_ON_000, IVY_KLAWS_IDLE_GLOVES_ON_000, 18, 0, 36)
+    let self = reset(self, 36)
+    let self = dash(self, 2, 12, 36)
+    self
+
+  // Middle
+  |IVYKLAWSON_GLOVES
+    let self = animate(self, 0, IVY_KLAWS_MIDDLE_UNEQUIP_GLOVES_CAST_000, 8, 16)
+    let glove = new_thing <= thing(fun = ivy_unequip_fun, sid = self.sid, dir = targ_dir(self))
+    let self = spawn(self, 8, [move(glove, at_dist(self, 0))])
+    let self = create_at(self, 15, ivyklaws_fun) 
+    self
+
+  // Right
+  |IVYKLAWSON_RIP_AND_TEAR
+    let self = animate_between(self, 1, IVY_KLAWS_RIGHT_CAST_GLOVES_ON_000, 11, 0, 22)
+    let self = animate_between(self, 0, IVY_KLAWS_RIGHT_EFFECT_GLOVES_ON_000, 20, 22, 62)
+    let self = reset(self, 62)
+    self
+
+  // Q
+  |IVYKLAWSON_DIG
+    let self = animate_between(self, 1, IVY_KLAWS_ULTIMATE_CAST_000, 17, 0, 30)
+    let self = animate_between(self, 1, IVY_KLAWS_ULTIMATE_EFFECT_000, 13, 30, 50)
+    let self = reset(self, 50)
+    self    
+    
+  // Space
+  |IVYKLAWSON_DASH
+    let self = animate_with_blink(self, 1, IVY_KLAWS_DASH_000, IVY_KLAWS_IDLE_GLOVES_ON_000, 13, 0, 13)
+    let self = reset(self, 13)
+    let self = dash(self, 8, 2, 13)
+    self
+
+
+  // E
+  |IVYKLAWSON_TAUNT
+    animate(self, 0, IVY_KLAWS_TAUNT_GLOVES_ON_000, 14, 28)
+
+  else self
+
+ivy_unequip_fun(self: Thing) : Thing
+  animate_die(self, 0, IVY_KLAWS_MIDDLE_UNEQUIP_GLOVES_EFFECT_000, 8, 16)
+
+

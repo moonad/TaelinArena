@@ -505,6 +505,7 @@ var heroes = [
   "Gon",
   "Greninja",
   "Grimer",
+  "IvyKlaws",
   "Jacquin",
   "Jinx",
   "Kakashi",
