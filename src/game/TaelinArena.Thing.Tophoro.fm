@@ -21,32 +21,52 @@ tophoro_fun(self: Thing) : Thing
     else animate(self, 1, TOPHORO_IDLE_000, 5, 10)
 
   // Left 
+  // !! TODO !! add cooldown
   |TOPHORO_HIGHER_GROUND
-    let self = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
-    // let self = spawn(self, 17, self.pos, new_thing <= thing(fun=tophoro_higher_ground_init_fun))
-    let self = spawn(self, 14, [move(new_thing <= thing(fun=tophoro_higher_ground_effect_fun), self.pos)])
+    let self      = animate(self, 0, TOPHORO_HIGHER_GROUND_000, 8, 16)
+    let explosion = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_init_fun, sid = self.sid)
+    let arc       = new_thing <= thing(box = nbox, fun = tophoro_higher_ground_effect_fun, sid = self.sid)
+    let self      = spawn(self, 13, [move(explosion, self.pos)])
+    let self      = spawn(self, 15, [move(arc, self.pos)])
     self
 
   // Middle
+  // !! TODO !! add cooldown
   |TOPHORO_EARTH_WALL
     let self = animate(self, 1, TOPHORO_EARTH_WALL_000, 6, 16)
-    let rock = new_thing <= thing(fun=tophoro_earth_wall_fun)
-    let rock = rock <= thing(dir = targ_dir(self))
-    let self = spawn(self, 10, [move(rock, self.trg)])
+    let wall_width = 8
+    let wall_length = 45
+    let wall_box = pbox([ 
+      v3(wall_width * -1, wall_length * -1, 0), 
+      v3(wall_width * -1, wall_length *  1, 0), 
+      v3(wall_width *  1, wall_length *  1, 0), 
+      v3(wall_width *  1, wall_length * -1, 0), 
+    ])
+    let wall = new_thing <= thing(
+      fun = tophoro_earth_wall_fun, 
+      box = wall_box,
+      dir = targ_dir(self)
+    )
+    let self = spawn(self, 10, [move(wall, at_max_dist(self, 150))])
     self
 
   // Right
+  // !! TODO !! add cooldown
   |TOPHORO_EARTH_RISE
     let self = animate(self, 0, TOPHORO_EARTH_RISE_000, 8, 16)
-    let self = spawn(self, 14, [move(new_thing <= thing(fun=tophoro_eath_rise_effect_fun), self.trg)])
+    let rock = new_thing <= thing(fun=tophoro_eath_rise_effect_fun, box=nbox, sid = self.sid)
+    let self = spawn(self, 14, [move(rock, at_max_dist(self, 150))])
     self
 
   // Q
   |TOPHORO_GROUND_FORCE
     let self = animate(self, 0, TOPHORO_GROUND_FORCE_000, 23, 23)
-    let hand = new_thing <= thing(fun=tophoro_ground_force_fun)
-    let hand = hand <= thing(dir = rot90_v3(targ_dir(self)))
-    let self = spawn(self, 1, [move(hand, self.trg)])
+    let hand = new_thing <= thing(
+      fun = tophoro_ground_force_fun, 
+      box = nbox,
+      dir = rot90_v3(targ_dir(self)),
+      sid = self.sid)
+    let self = spawn(self, 1, [move(hand, at_max_dist(self, 100))])
     self
 
   // Space
@@ -65,23 +85,62 @@ tophoro_higher_ground_init_fun(self: Thing) : Thing
   self
 
 tophoro_higher_ground_effect_fun(self: Thing) : Thing
-  let self = animate_die(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 30)
+  case self | thing 
+  let self = animate_die(self, 1, TOPHORO_HIGHER_GROUND_STONE_ARC_000, 15, 90)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(40))]
+  let self = cast(self, 10, hits)
+  let self = cast(self, 15, hits)
+  let self = cast(self, 20, hits)
+  let self = cast(self, 25, hits)
+  let self = cast(self, 30, hits)
+  let self = cast(self, 35, hits)
+  let self = cast(self, 40, hits)
+  let self = cast(self, 45, hits)
+  let self = cast(self, 50, hits)
+  let self = cast(self, 55, hits)
+  let self = cast(self, 60, hits)
+  let self = cast(self, 65, hits)
+  let self = cast(self, 70, hits)
+  let self = cast(self, 75, hits)
+  let self = cast(self, 80, hits)
+  let self = cast(self, 85, hits)
+  let self = cast(self, 90, hits)
   self
 
+// Earth Wall
 tophoro_earth_wall_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 9, 18)
-  self
+  let self = animate_between(self, 0, TOPHORO_EARTH_WALL_BARRIER_000, 5, 0,   5)
+  let self = animate_between(self, 0, TOPHORO_EARTH_WALL_BARRIER_005, 4, 53, 57)
+  die(self, 58)
 
 // Earth Rise
 tophoro_eath_rise_rock_formation_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, TOPHORO_EARTH_RISE_ROCK_FORMATION_000, 1, 4)
+  case self |thing 
+  let self = animate_die(self, 0, TOPHORO_EARTH_RISE_ROCK_FORMATION_000, 1, 2*ONE_SEC)
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(20))]
+  let self = cast(self, 12, hits)
+  let self = cast(self, 24, hits)
+  let self = cast(self, 36, hits)
+  let self = cast(self, 47, hits)
   self
 
+
 tophoro_eath_rise_effect_fun(self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, TOPHORO_EARTH_RISE_ROCK_000, 5, 10)
+  let rock_formation = new_thing <= thing(
+    fun = tophoro_eath_rise_rock_formation_fun, 
+    box = nbox, 
+    pos = self.pos)
+  let hits0 = [hit([damage(2), stun(ONE_SEC)], self.pos, self.dir, cbox(20))]
+  let self = cast(self,  8, hits0)
+  let self = spawn(self, 9, [rock_formation])
   self
 
 // Ground force
 tophoro_ground_force_fun(self: Thing) : Thing
+  case self |thing 
   let self = animate_die(self, 0, TOPHORO_GROUND_FORCE_HAND_000, 8, 25)
+  let hits = [hit([damage(4), root(3*ONE_SEC)], self.pos, self.dir, cbox(25))]
+  let self = cast(self, 15, hits)
   self

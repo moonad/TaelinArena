@@ -10,7 +10,7 @@ enum
 | TUPITREE_TAUNT
 
 tupitree_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2, mhp = 24)
+  let self = self <= thing(mov = 2.5)
 
   case self |thing switch self.act
 
@@ -44,10 +44,12 @@ tupitree_fun(self: Thing) : Thing
 
   // Middle
   |TUPITREE_POINTED_ROOT
-    animate(self, 0, TUPITREE_POINTED_ROOT_000, 14, 18)
+    let self = animate(self, 0, TUPITREE_POINTED_ROOT_000, 14, 18)
+    let hits = [hit([damage(DMG_LV_4)], at_dist(self, 40), self.dir, cbox(15))]
+    let self = cast(self, 15, hits)
+    self
 
   // Right
-  // TODO: calculate the maximun distance to spawn. Only spawn if hits an enemy in the area
   |TUPITREE_ENTANGLING
     let self = animate(self, 0, TUPITREE_ENTANGLING_ANIM_000, 18, 18)
     let tang = new_thing <= thing(fun=tupitree_entangling_fun, dir=self.dir)
@@ -63,10 +65,12 @@ tupitree_fun(self: Thing) : Thing
    
   // Space
   |TUPITREE_BLOCK
+    let shield_buff = shielded(25, 100)
+    let self = set_thing_buf(self, cons(_ shield_buff, self.buf))
     let self = animate(self, 0, TUPITREE_BLOCK_000, 13, 26)
-    let effs = [damage(DMG_LV_1), repulse(6)]
-    let hits = [hit(effs, self.pos, self.dir, cbox(60))]
-    let self = cast(self, 16, hits)
+    let effs = [damage(DMG_LV_2), repulse(6)]
+    let hits = [hit(effs, self.pos, self.dir, cbox(45))]
+    let self = cast(self, 20, hits)
     self
 
   // E
@@ -85,15 +89,24 @@ tupitree_vine_whip_hit_fun(self: Thing) : Thing
   self
 
 tupitree_entangling_fun(self: Thing) : Thing
-  let self = animate_die(self, 0, TUPITREE_ENTANGLING_FX_000, 11, 11)
+  case self |thing
+  let self = animate_die(self, 0, TUPITREE_ENTANGLING_FX_000, 11, 22)
   let self = self <= thing(box = nbox)
+  let effs = [damage(DMG_LV_3), root(ONE_SEC)]
+  let hits = [hit(effs, self.pos, self.dir, cbox(13))]
+  let self = cast(self, 10, hits)
   self
 
 tupitree_natures_revenge_fun(self: Thing) : Thing
   case self |thing
-  let self = animate_die(self, 0, TUPITREE_NATURE_REVENGE_ALL_000, 6, 12)
+  let self = animate_die(self, 0, TUPITREE_NATURE_REVENGE_ALL_000, 6, 24)
   let self = self <= thing(box = nbox)
-  let effs = [damage(DMG_LV_5)]
-  let hits = [hit(effs, self.pos, self.dir, cbox(60))]
-  let self = cast(self, 6, hits)
+  let effs = [damage(DMG_LV_2)]
+  let h0   = [hit(effs, self.pos, self.dir, cbox(40))]
+  let h1   = [hit(effs, self.pos, self.dir, cbox(70))]
+  let h2   = [hit(effs, self.pos, self.dir, cbox(90))]
+  let self = cast(self, 6, h0)
+  let self = cast(self, 12, h1)
+  let self = cast(self, 18, h1)
+  let self = cast(self, 23, h2)
   self

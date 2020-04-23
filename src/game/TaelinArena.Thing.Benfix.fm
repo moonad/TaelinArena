@@ -10,7 +10,7 @@ enum
 | BENFIX_TAUNT
 
 benfix_fun(self: Thing) : Thing
-  let self = self <= thing(mov = 2, mhp = 24)
+  let self = self <= thing(mov = 2)
 
   case self |thing switch self.act
 
@@ -21,20 +21,45 @@ benfix_fun(self: Thing) : Thing
 
   // Left 
   |BENFIX_DOUBLE_ATTACK
-    animate(self, 0, BENFIX_TRIPLE_ATTACK_1_000, 16, 32)
+    let self = animate(self, 0, BENFIX_TRIPLE_ATTACK_1_000, 16, 32)
+    let h0 = [hit([damage(DMG_LV_1)], at_dist(self, 30), self.dir, cbox(20))]
+    let h1 = [hit([damage(DMG_LV_3)], at_dist(self, 30), self.dir, cbox(20))]
+    let self = cast(self, 14, h0)
+    let self = cast(self, 18, h0)
+    let self = cast(self, 22, h0)
+    let self = cast(self, 28, h1)
+    self
 
   // Middle
   |BENFIX_SEISMIC_JUMP
-    animate(self, 0, BENFIX_SEISMIC_JUMP_000, 10, 30)
+    let self = animate(self, 0, BENFIX_SEISMIC_JUMP_000, 10, 30)
+    let h0 = [hit([damage(DMG_LV_1)], at_dist(self, 40), self.dir, cbox(20))]
+    let h1 = [hit([damage(DMG_LV_2), slow(2, SLOW_50)], at_dist(self, 30), self.dir, cbox(40))]
+    let self = cast(self, 20, h0)
+    let self = cast(self, 22, h0)
+    let self = cast(self, 24, h1)
+    self
 
   // Right
   |BENFIX_STEEL_TORNADO
-    animate(self, 1, BENFIX_STEEL_TORNADO_000, 4, 12)
+    let self = animate(self, 1, BENFIX_STEEL_TORNADO_000, 4, 12)
+    let h0 = [hit([damage(DMG_LV_1)], self.pos, self.dir, cbox(40))]
+    let self = cast(self, 2, h0)
+    let self = cast(self, 4, h0)
+    let self = cast(self, 6, h0)
+    let self = cast(self, 8, h0)
+    let self = cast(self, 10, h0)
+    let self = cast(self, 11, h0)
+    self
 
   // Q
   |BENFIX_GIGA_DASH
     let self = animate(self, 1, BENFIX_GIGA_DASH_000, 22, 22)
     let self = dash(self, 4, 0, 22)
+    let h0 = [hit([damage(DMG_LV_2), stun(1)], at_dist(self, 30), self.dir, cbox(20))]
+    let self = cast(self, 10, h0)
+    let self = cast(self, 15, h0)
+    let self = cast(self, 20, h0)
     self
     
   // Space
