@@ -149,7 +149,7 @@ enum
 | MAGNETON_THUNDER_WAVE
 | MAGNETON_SONIC_BOOM
 | MAGNETON_FLASH_CANNON
-| MAGNETON_EVOLVE
+| MAGNETON_LIGHT_SCREEN
 | MAGNETON_TAUNT
 
 magneton_fun(self: Thing) : Thing
@@ -226,8 +226,10 @@ magneton_fun(self: Thing) : Thing
     self
 
   // Space
-  | MAGNETON_EVOLVE
-    animate(self, 0, MAGNETON_IDLE_000, 7, 21)  
+  | MAGNETON_LIGHT_SCREEN
+    let self = animate_with_blink(self, 0, MAGNETON_LIGHT_SCREEN_000, MAGNETON_IDLE_000, 10, 0, 10)  
+    let self = blink(self, 10, at_dist(self, 100))
+    self 
 
   // E
   | MAGNETON_TAUNT
@@ -246,7 +248,7 @@ magneton_sonic_boom_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_SONIC_BOOM_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(1)], self.pos, self.dir, cbox(36))]
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(30))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
