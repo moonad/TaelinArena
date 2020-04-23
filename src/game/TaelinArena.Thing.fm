@@ -20,6 +20,7 @@ import TaelinArena.Thing.Kirby
 import TaelinArena.Thing.Konan
 import TaelinArena.Thing.LinaInverse
 import TaelinArena.Thing.Link
+import TaelinArena.Thing.Loki
 import TaelinArena.Thing.Luffy
 import TaelinArena.Thing.Magnamite
 import TaelinArena.Thing.Mando

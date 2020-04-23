@@ -20,22 +20,39 @@ magnamite_fun(self: Thing) : Thing
     else animate(self, 1, MAGNAMITE_IDLE_000, 6, 12)
 
   // Left
+  // Todo: add chance of paralyzing?
   | MAGNAMITE_THUNDER_SHOCK
-   // animate(self, 0, MAGNAMITE_THUNDER_SHOCK_CAST_000, 13, 26)
     let self = animate(self, 0, MAGNAMITE_THUNDER_SHOCK_CAST_000, 13, 26)
     let hit = new_thing <= thing(
       sid = self.sid,
+      box = nbox,
       fun = magnamite_thunder_shock)
-    let self = spawn(self, 9, [move(hit, at_dist(self, 26))])
+    let self = spawn(self, 10, [
+      move(hit, at_dist(self, 24)),
+      move(hit, at_dist(self, 48)),
+    ])
+    let self = spawn(self, 15, [
+      move(hit, at_dist(self, 24)),
+      move(hit, at_dist(self, 48)),
+    ])
+    let self = spawn(self, 20, [
+      move(hit, at_dist(self, 24)),
+      move(hit, at_dist(self, 48)),
+    ])
     self
 
   // Middle 
   | MAGNAMITE_THUNDER_WAVE
-    animate(self, 0, MAGNAMITE_THUNDER_WAVE_CAST_000, 14, 28)
+    let self     = animate(self, 0, MAGNAMITE_THUNDER_WAVE_CAST_000, 14, 28)
+    let wave_box = pbox([v3(6,12,0), v3(50,30,0), v3(50,-30,0), v3(6,-12,0)])
+    let wave     = [hit([damage(2),root(1 * ONE_SEC)], at_dist(self, 10), self.dir, wave_box)]
+    let self     = cast(self,  8, wave)
+    let self     = cast(self, 16, wave)
+    let self     = cast(self, 24, wave)
+    self 
 
   // Right
   | MAGNAMITE_SONIC_BOOM
-//    animate(self, 0, MAGNAMITE_SONIC_BOOM_CAST_000, 10, 20)
     let self = animate(self, 0, MAGNAMITE_SONIC_BOOM_CAST_000, 10, 20)
     let fire = new_thing <= thing(
       sid = self.sid,
@@ -74,8 +91,7 @@ magnamite_fun(self: Thing) : Thing
 
 magnamite_thunder_shock(self: Thing) : Thing
   case self |thing
-  let self = self <= thing(box = nbox)
-  let self = cast(self, 0, [hit([damage(3)], self.pos, self.dir, cbox(35))])
+  let self = cast(self, 0, [hit([damage(1)], self.pos, self.dir, cbox(12))])
   let self = die(self, 11)
   self
 
@@ -133,7 +149,7 @@ enum
 | MAGNETON_THUNDER_WAVE
 | MAGNETON_SONIC_BOOM
 | MAGNETON_FLASH_CANNON
-| MAGNETON_EVOLVE
+| MAGNETON_LIGHT_SCREEN
 | MAGNETON_TAUNT
 
 magneton_fun(self: Thing) : Thing
@@ -148,20 +164,31 @@ magneton_fun(self: Thing) : Thing
 
   // Left
   | MAGNETON_THUNDER_SHOCK
-    let self = animate(self, 0, MAGNETON_THUNDER_SHOCK_CAST_000, 17, 34)
-    let hits0 = [hit([damage(3)], at_dist(self, 45), self.dir, cbox(15))]
-    let self = cast(self, 12, hits0)
-    let self = animate(self, 0, MAGNETON_THUNDER_SHOCK_CAST_000, 17, 34)
-    let shock0 = new_thing <= thing(
-      fun = magneton_thunder_shock_effect0_fun,
-      pos = self.pos,
-      dir = targ_dir(self))
-    let shock1 = new_thing <= thing(
-      fun = magneton_thunder_shock_effect1_fun,
-      pos = self.pos,
-      dir = targ_dir(self))
-    let self = spawn(self, 5, [move(shock0, at_dist(self, 60))])
-    let self = spawn(self, 10, [move(shock1, at_dist(self, 125))])
+    let self    = animate(self, 0, MAGNETON_THUNDER_SHOCK_CAST_000, 17, 34)
+    let thunder_hor = new_thing <= thing(
+      fun = magneton_horizontal_thunder_shock, 
+      dir = targ_dir(self),
+      box = nbox)
+    let thunder_ver = new_thing <= thing(
+      fun = magneton_vertical_thunder_shock, 
+      dir = targ_dir(self),
+      box = nbox)
+    let self = spawn(self, 10, [
+      move(thunder_hor, at_dist(self, 60)),
+    ])
+    let horizontal_hits = [
+      hit([damage(2)],  at_dist(self,  12), self.dir, cbox(12)),
+      hit([damage(2)],  at_dist(self,  36), self.dir, cbox(12)),
+      hit([damage(2)],  at_dist(self,  60), self.dir, cbox(12)),
+      hit([damage(2)],  at_dist(self,  84), self.dir, cbox(12)),
+      hit([damage(2)],  at_dist(self, 108), self.dir, cbox(12)),
+    ]
+    let self = cast(self, 11, horizontal_hits)
+    let self = spawn(self, 22, [move(thunder_ver, at_dist(self, 110))])
+    let vertical_hits = [hit([damage(2), stun(ONE_SEC)], at_dist(self, 108), self.dir, cbox(12))]
+    let self = cast(self,  25, vertical_hits)
+    let self = cast(self,  29, vertical_hits)
+    let self = cast(self,  32, vertical_hits)
     self
 
   // Middle 
@@ -201,8 +228,10 @@ magneton_fun(self: Thing) : Thing
     self
 
   // Space
-  | MAGNETON_EVOLVE
-    animate(self, 0, MAGNETON_IDLE_000, 7, 21)  
+  | MAGNETON_LIGHT_SCREEN
+    let self = animate_with_blink(self, 0, MAGNETON_LIGHT_SCREEN_000, MAGNETON_IDLE_000, 10, 0, 10)  
+    let self = blink(self, 10, at_dist(self, 100))
+    self 
 
   // E
   | MAGNETON_TAUNT
@@ -211,11 +240,17 @@ magneton_fun(self: Thing) : Thing
 
   else self
 
+magneton_horizontal_thunder_shock(self: Thing) : Thing 
+  animate_die(self, 0, MAGNETON_THUNDER_SHOCK_PROJECT_000, 6, 12)
+
+magneton_vertical_thunder_shock(self: Thing) : Thing 
+  animate_die(self, 0, MAGNETON_THUNDER_SHOCK_EFFECT_000, 7, 14)
+
 magneton_sonic_boom_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_SONIC_BOOM_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(1)], self.pos, self.dir, cbox(36))]
+  let hits = [hit([damage(1)], self.pos, self.dir, cbox(20))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
@@ -238,7 +273,7 @@ magneton_thunder_wave_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_THUNDER_WAVE_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(36))]
+  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(25))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)

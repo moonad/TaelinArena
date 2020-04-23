@@ -1,8 +1,8 @@
 [
   {
     "name": "Benfix",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Bleskape",
@@ -132,7 +132,7 @@
   {
     "name": "Magnamite",
     "attack": "1",
-    "recently_updated": "0"
+    "recently_updated": "1"
   },
   {
     "name": "Mando",
@@ -196,8 +196,8 @@
   },
   {
     "name": "Shao",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Shonkie",
@@ -216,8 +216,8 @@
   },
   {
     "name": "Steve",
-    "attack": "0",
-    "recently_updated": "0"
+    "attack": "1",
+    "recently_updated": "1"
   },
   {
     "name": "Teichi",
@@ -247,7 +247,7 @@
   {
     "name": "Tupitree",
     "attack": "1",
-    "recently_updated": "0"
+    "recently_updated": "1"
   },
   {
     "name": "Weedle",
