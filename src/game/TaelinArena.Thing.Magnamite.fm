@@ -176,17 +176,19 @@ magneton_fun(self: Thing) : Thing
     let self = spawn(self, 10, [
       move(thunder_hor, at_dist(self, 60)),
     ])
-    let self = cast(self, 11, [
+    let horizontal_hits = [
       hit([damage(2)],  at_dist(self,  12), self.dir, cbox(12)),
       hit([damage(2)],  at_dist(self,  36), self.dir, cbox(12)),
       hit([damage(2)],  at_dist(self,  60), self.dir, cbox(12)),
       hit([damage(2)],  at_dist(self,  84), self.dir, cbox(12)),
       hit([damage(2)],  at_dist(self, 108), self.dir, cbox(12)),
-    ])
+    ]
+    let self = cast(self, 11, horizontal_hits)
     let self = spawn(self, 22, [move(thunder_ver, at_max_dist(self, 100))])
-    let self = cast(self,  25, [hit([damage(2)], at_dist(self, 108), self.dir, cbox(12))])
-    let self = cast(self,  29, [hit([damage(2)], at_dist(self, 108), self.dir, cbox(12))])
-    let self = cast(self,  32, [hit([damage(2)], at_dist(self, 108), self.dir, cbox(12))])
+    let vertical_hits = [hit([damage(2), stun(ONE_SEC)], at_dist(self, 108), self.dir, cbox(12))]
+    let self = cast(self,  25, vertical_hits)
+    let self = cast(self,  29, vertical_hits)
+    let self = cast(self,  32, vertical_hits)
     self
 
   // Middle 
