@@ -1,5 +1,6 @@
 Taelin Arena
 ============
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Taelin Arena is an Multiplayer Online Battle Arena
 (MOBA) developed by [Sunshine
