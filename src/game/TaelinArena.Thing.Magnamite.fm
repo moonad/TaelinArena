@@ -269,7 +269,7 @@ magneton_thunder_wave_fun(self: Thing) : Thing
   case self |thing
   let self = animate_die(self, 0, MAGNETON_THUNDER_WAVE_PROJECT_000, 1, 16)
   let self = self <= thing(box = nbox)
-  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(36))]
+  let hits = [hit([damage(0.5)], self.pos, self.dir, cbox(30))]
   let self = cast(self, 0, hits)
   let self = cast(self, 1, hits)
   let self = cast(self, 2, hits)
