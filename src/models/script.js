@@ -76,14 +76,17 @@
     console.log("updated " + packs_js_path);
     fs.writeFileSync(packs_js_path, packs_text);
 
-    // Updates TaelinArena.Models.fm
+    // Updates TaelinArena.ModelsIds.fmc
     var model_fm_path = "/../game/TaelinArena.ModelIds.fm";
     var model_fm_path = path.join(__dirname, model_fm_path);
-    var model_fm_text = "enum\n| " + model_names
-      .map(name => name
-        .replace(new RegExp("/","g"), "_")
-        .toUpperCase())
-      .join("\n| ");
+    var model_fm_text = "";
+    for (var i = 0; i < model_names.length; ++i){
+      let name = model_names[i];
+      let model_name = name.replace(new RegExp("/","g"), "_").toUpperCase();
+      let fmc_code = ": F64 " + `F64.parse("${i}")\n`;
+      model_fm_text += model_name + fmc_code;
+    }
+
     console.log("updated " + model_fm_path);
     fs.writeFileSync(model_fm_path, model_fm_text);
 

@@ -1,0 +1,26 @@
+TaelinArena.Thing.character_name_fun: 
+  (self: TaelinArena.Game.Thing) -> 
+  TaelinArena.Game.Thing
+  (self)
+  let self = TaelinArena.Game.set_thing_mov(self)(F64.parse("2"))
+  let self = TaelinArena.Game.set_thing_mhp(self)(F64.parse("24"))
+  let self.act = TaelinArena.Game.get_thing_act(self)
+  let self.dir = TaelinArena.Game.get_thing_dir(self)
+
+  Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.0))
+  | # CHAR_NAME_IDLE# self ;
+  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.1))
+    | # CHAR_NAME_SHOCK_BALL# self ;
+    | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.2))
+      | # CHAR_NAME_DEFENSE_MODE# self ;
+      | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("3")))
+        | # CHAR_NAME_SHOCK_GROUND_WAVE# self ;
+        | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("4")))
+          | # CHAR_NAME_SUPREME_PUNCH_SEQUENCE# self ;
+          | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("5")))
+            | # CHAR_NAME_DASH# self ;
+            | # CHAR_NAME_TAUNT# self ;;
+        ;
+      ;
+    ;
+  ;
