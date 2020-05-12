@@ -1,0 +1,15 @@
+{
+  "name": "moonad-taelinarena-parser",
+  "version": "0.0.1",
+  "description": "Exports all relevant files related to TaelinArena",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "formality-core": "^0.2.85",
+    "glob": "^7.1.6",
+    "file-loader": "^5.1.0"
+  }
+}
