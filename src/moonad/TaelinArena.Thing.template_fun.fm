@@ -2,7 +2,6 @@ TaelinArena.Thing.character_name_fun
   : (self: TaelinArena.Game.Thing) -> 
     TaelinArena.Game.Thing
   (self)
-  let self = TaelinArena.Game.new_thing
   let self = TaelinArena.Game.set_thing_mov(self)(F64.parse("2"))
   let self = TaelinArena.Game.set_thing_mhp(self)(F64.parse("24"))
   let self.act = TaelinArena.Game.get_thing_act(self)
