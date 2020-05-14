@@ -1,47 +1,47 @@
-TaelinArena.Thing.character_name_fun
-  : (self: TaelinArena.Game.Thing) -> 
-    TaelinArena.Game.Thing
+TA.Thing.character_name_fun
+  : (self: TA.Thing) -> 
+    TA.Thing
   (self)
-  let self = TaelinArena.Game.set_thing_mov(self)(F64.parse("2"))
-  let self = TaelinArena.Game.set_thing_mhp(self)(F64.parse("24"))
-  let self.act = TaelinArena.Game.get_thing_act(self)
-  let self.dir = TaelinArena.Game.get_thing_dir(self)
+  let self = TA.Thing.set_mov(self)(F64.parse("2"))
+  let self = TA.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = TA.Thing.get_act(self)
+  let self.dir = TA.Thing.get_dir(self)
 
-  Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.0)) 
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
   | #CHAR_NAME_IDLE# // Walk
-    // F64.if<>(TaelinArena.Game.is_walking(self))
-    // | TaelinArena.Game.animate(self)(F64.1)(DILMA_WALK_000)
+    // F64.if<>(TA.Game.is_walking(self))
+    // | TA.Thing.animate(self)(F64.1)(DILMA_WALK_000)
     //   | F64.parse("8");
     //   | F64.parse("16");
     // ;
-    // | TaelinArena.Game.animate(self)(F64.1)(DILMA_IDLE_000)
+    // | TA.Thing.animate(self)(F64.1)(DILMA_IDLE_000)
     //   | F64.parse("4");
     //   | F64.parse("16");
     // ;
     self  // TODO: add code
   ;
 
-  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.1))
+  | Bool.if<>(F64.eql(self.act)(F64.1))
     | #CHAR_N_SKILL_NAME# // Left
       self // TODO: add code
     ;
     
-  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.2)) 
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
     | #CHAR_N_SKILL_NAME# // Middle
       self // TODO: add code
     ;
 
-  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("3")))
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
     | #CHAR_N_SKILL_NAME# // Right
       self // TODO: add code
     ;
 
-  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("4"))) 
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
     | #CHAR_N_SKILL_NAME# // Q
       self // TODO: add code
     ;
     
-  | Bool.if<TaelinArena.Game.Thing>(F64.eql(self.act)(F64.parse("5"))) 
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
     | #CHAR_N_SKILL_NAME# // Space
       self // TODO: add code
     ;
@@ -52,38 +52,57 @@ TaelinArena.Thing.character_name_fun
   ;;;;;
 
 // Add auxiliar functions on other file following the name: 
-// TaelinArena.Thing.char_name.skill_name_fun.fm
+// TA.Thing.char_name.skill_name_fun.fm
 
 // Some basic functions:
 
 // let self = 
-//   TaelinArena.Game.animate(self)(F64.0)(DILMA_SALUTING_THE_CASSAVA_000)
+//   TA.Thing.animate(self)(F64.0)(DILMA_SALUTING_THE_CASSAVA_000)
 //   | F64.parse("18");
 //   | F64.parse("54");
 
 //  let self = 
-//     TaelinArena.Game.animate_between(self)(F64.0)
+//     TA.Thing.animate_between(self)(F64.0)
 //     | DILMA_PROTECTION_000;
 //     | F64.parse("6");
 //     | F64.parse("3");
 //     | F64.parse("7");
 
-//  let self = TaelinArena.Game.reset(self)(F64.parse("63"))
+//  let self = TA.Thing.reset(self)(F64.parse("63"))
 
-// let speech = TaelinArena.Thing.new_thing
-    // let speech = TaelinArena.Game.set_thing_fun(speech)
-    //   | TaelinArena.Thing.dilma.confusion_fun;
-    // let speech = TaelinArena.Game.set_thing_dir(speech)
-    //   | TaelinArena.Game.targ_dir(self);
-    // let self = TaelinArena.Game.spawn(self)(F64.parse("34"))
-    //   | [TaelinArena.Game.Thing; 
-    //     TaelinArena.Game.move(speech)
-    //     | TaelinArena.Game.at_max_dist(self)(F64.parse("100"));
+// let speech = TA.Thing.new_thing
+    // let speech = TA.Thing.set_fun(speech)
+    //   | TA.Thing.dilma.confusion_fun;
+    // let speech = TA.Thing.set_dir(speech)
+    //   | TA.Game.targ_dir(self);
+    // let self = TA.Thing.spawn(self)(F64.parse("34"))
+    //   | [TA.Thing; 
+    //     TA.Thing.move(speech)
+    //     | TA.Thing.at_max_dist(self)(F64.parse("100"));
     //     ];
 
 // let self = 
-//   TaelinArena.Game.spawn(self)(F64.parse("34"))
-//   | [TaelinArena.Game.Thing; 
-//     TaelinArena.Game.move(speech)
-//     | TaelinArena.Game.at_max_dist(self)(F64.parse("100"));
+//   TA.Thing.spawn(self)(F64.parse("34"))
+//   | [TA.Thing; 
+//     TA.Thing.move(speech)
+//     | TA.Thing.at_max_dist(self)(F64.parse("100"));
 //     ];
+
+//  let effs = [
+//       TA.Game.Effect; 
+//       TA.Game.Effect.damage(F64.parse("3")),
+//       TA.Game.Effect.impulse(F64.parse("12"))(self.dir)
+//     ]
+  // let hits = [
+  //   TA.Game.Hit;
+  //   TA.Game.Hit.new
+  //   | effs;
+  //   | TA.Thing.at_dist(self)(F64.parse("40"));
+  //   | self.dir;
+  //   | TA.Game.Hitbox.cbox(F64.parse("20"));,
+  //   TA.Game.Hit.new
+  //   | effs;
+  //   | TA.Thing.at_dist(self)(F64.parse("40"));
+  //   | self.dir;
+  //   | TA.Game.Hitbox.cbox(F64.parse("20"));
+  // ]  
