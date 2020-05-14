@@ -19,16 +19,32 @@ module.exports = {
     "from": 403,
     "til": 581
   },
-  "poste": {
+  "dr_strange": {
     "from": 581,
-    "til": 582
+    "til": 721
+  },
+  "eric_jacquin": {
+    "from": 721,
+    "til": 938
+  },
+  "finn": {
+    "from": 938,
+    "til": 1048
+  },
+  "gon_freecs": {
+    "from": 1048,
+    "til": 1295
+  },
+  "poste": {
+    "from": 1295,
+    "til": 1296
   },
   "punchingbag": {
-    "from": 582,
-    "til": 606
+    "from": 1296,
+    "til": 1320
   },
   "wall": {
-    "from": 606,
-    "til": 607
+    "from": 1320,
+    "til": 1321
   }
 }

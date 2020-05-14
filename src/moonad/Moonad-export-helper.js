@@ -124,7 +124,7 @@
         exports_TA_text += exports_code +"<"+type+">("+name+")\n";
       }
       exports_TA_text += "  | Exports.new";
-      for (var i = 0; i < (characters.length + 23); ++i) {
+      for (var i = 0; i < (characters.length + 24); ++i) {
         exports_TA_text += i%80 === 0 ? "\n  ;" : ";";
       }
       exports_TA_text += ")";
