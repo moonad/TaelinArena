@@ -1,5 +1,5 @@
 if (typeof window !== "undefined") {
-  var TA = require("./game/TaelinArena.fm.js");
+  var TA = require("./TaelinArena.fm.js");
   var heroes_info = require('./assets/char-info.json');
 
   // Loads all models
@@ -234,9 +234,10 @@ function render_game({game, canvox, canhud, cam}) {
 
   // Gets the current time
   var T = now();
-
+  
   // Gets the main hero position
   var hero_pos = TA["TA.Game.get_position_by_pid"](0, game);
+  console.log("TaelinArena.js/render_game: hero_pos: ", hero_pos);
 
   // Renders each game thing
   TA["TA.Game.map_stage"](thing=>render_thing(thing,hud,lights))(game);
@@ -406,6 +407,7 @@ function execute_command(inp, game) {
     let x = inp.params.dir.x;
     let y = inp.params.dir.y;
     let d = v3 => v3(x)(y)(0);
+    // cmd = TA.command(inp.player)(TA.sdir(d));
     cmd = TA["TA.Game.Command.new"](inp.player)(TA["TA.Game.Input.sdir"](d));
   } else if (inp.input === "TEXT") {
     console.log(new Error("Not implemented."));
