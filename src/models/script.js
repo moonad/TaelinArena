@@ -77,7 +77,7 @@
     fs.writeFileSync(packs_js_path, packs_text);
 
     const model_fm_path = (pack_num) => {
-      var model_fm_path = "/../game/TA.ModelsId"+pack_num+".fm";
+      var model_fm_path = "/../game/Arelin.ModelsId"+pack_num+".fm";
       return path.join(__dirname, model_fm_path);
     }
     

@@ -178,39 +178,6 @@
       console.log("\033[4m\x1b[1mAll terms check.\x1b[0m");
     };
   
-    // If there is no error nor unresolved equation, write `.fmc` file
-    if (errors.length === 0) {
-      var fm_code = "";
-      for (var name in synt) {
-        fm_code += name + ": ";
-        fm_code += fm.synt.stringify(synt[name].type) + "\n  ";
-        fm_code += fm.synt.stringify(synt[name].term) + "\n\n";
-      };
-      fs.writeFileSync(".fmc", fm_code);
-      var fm_code = "";
-      for (var name in synt) {
-        fm_code += name + ": ";
-        fm_code += fm.lang.stringify(synt[name].type) + "\n  ";
-        fm_code += fm.lang.stringify(synt[name].term) + "\n\n";
-      };
-      fs.writeFileSync(".fml", fm_code);
-    };
-  
-    // If user asked to evaluate main, do it
-    if (synt[main]) {
-      console.log("");
-      console.log("\033[4m\x1b[1mEvaluating main:\x1b[0m");
-      try {
-        console.log(show(fm.synt.normalize(synt[main].term, synt, {}, true)));
-      } catch (e) {
-        error("Error.", exit_code);
-      }
-    };
-  
-    // If there are errors or unresolved equations, exits with an error
-    if (errors.length > 0) {
-      error("", exit_code);
-    }
   };
 
 })();

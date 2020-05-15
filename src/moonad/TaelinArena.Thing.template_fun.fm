@@ -1,6 +1,5 @@
 TA.Thing.character_name_fun
-  : (self: TA.Thing) -> 
-    TA.Thing
+  : TxFunction
   (self)
   let self = TA.Thing.set_mov(self)(F64.parse("2"))
   let self = TA.Thing.set_mhp(self)(F64.parse("24"))
@@ -9,7 +8,7 @@ TA.Thing.character_name_fun
 
   Bool.if<>(F64.eql(self.act)(F64.0)) 
   | #CHAR_NAME_IDLE# // Walk
-    // F64.if<>(TA.Game.is_walking(self))
+    // F64.if<>(TA.Thing.is_walking(self))
     // | TA.Thing.animate(self)(F64.1)(DILMA_WALK_000)
     //   | F64.parse("8");
     //   | F64.parse("16");
