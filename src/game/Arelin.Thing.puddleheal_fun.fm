@@ -1,0 +1,33 @@
+Arelin.Thing.puddleheal_fun : Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let new_pos = F64.V3.new(F64.parse("130"))(F64.parse("80"))(F64.0)
+  let self = Arelin.Thing.set_pos(self)(new_pos)
+  let new_dir = F64.V3.new(F64.parse("0.7071"))(F64.parse("0.7071"))(F64.0)
+  let self = Arelin.Thing.set_dir(self)(new_dir)
+  let self = Arelin.Thing.set_sid(self)(F64.0)
+  let self = Arelin.Thing.set_box(self)(Arelin.Game.Hitbox.nbox)
+  let self = Arelin.Thing.set_mid(self)(DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_015)
+  let self = 
+    Arelin.Thing.animate(self)(F64.0)
+    | DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_015;
+    | F64.parse("9");
+    | F64.parse("36");
+  let effs =
+    List.cons<Arelin.Game.Effect>
+      | Arelin.Game.Effect.heal(F64.parse("2"));
+      | List.nil<Arelin.Game.Effect>;;
+  let hits = 
+    List.cons<Arelin.Game.Hit>
+    | Arelin.Game.Hit.new
+      | effs;
+      | self.pos;
+      | self.dir;
+      | Arelin.Game.Hitbox.cbox(F64.parse("42"));;
+    | List.nil<Arelin.Game.Hit>;
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  self

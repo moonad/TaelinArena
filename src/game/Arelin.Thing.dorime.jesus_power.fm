@@ -1,0 +1,19 @@
+Arelin.Thing.dorime.jesus_power
+  : Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.nbox;
+  let effs = [Arelin.Game.Effect; Arelin.Game.Effect.heal(F64.parse("5"))]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.0)(hits)
+  let self = Arelin.Thing.die(self)(F64.parse("6"))
+  self

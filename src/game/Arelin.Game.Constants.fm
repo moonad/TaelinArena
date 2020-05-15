@@ -1,0 +1,3 @@
+Arelin.Game.Constants.ONE_SEC: F64 F64.parse("24")
+Arelin.Game.Constants.POS_X_KEY : Bits Bits.from_string("01011101b")
+Arelin.Game.Constants.POS_Y_KEY : Bits Bits.from_string("01110101b")

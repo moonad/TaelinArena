@@ -1,0 +1,19 @@
+Arelin.Thing.dorime.leptospirose_puddle_pot_fun
+  : Arelin.Game.TxFunction
+  (self)
+  let self.sid = Arelin.Thing.get_sid(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = Arelin.Thing.animate_die(self)(F64.0)
+    | DORIME_LEPTOSPIROSE_CURSE_POT_000;
+    | F64.1;
+    | F64.parse("10");
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+  let pudd = Arelin.Thing.new_thing
+  let pudd = Arelin.Thing.set_sid(pudd)(self.sid)
+  let pudd = Arelin.Thing.set_fun(pudd)
+    | Arelin.Thing.dorime.leptospirose_puddle_fun;
+  let pudd = Arelin.Thing.set_pos(pudd)(self.pos)
+  let self = Arelin.Thing.spawn(self)(F64.parse("9"))
+    | [Arelin.Thing; pudd];
+  self

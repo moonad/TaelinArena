@@ -1,0 +1,26 @@
+Arelin.Thing.punchingbag_fun : Arelin.Game.TxFunction
+  (self)
+  let self.dmg = Arelin.Thing.get_dmg(self)
+  let self.tik = Arelin.Thing.get_tik(self)
+
+  let smhp = F64.parse("32")
+  let self = Arelin.Thing.set_mhp(self)(smhp)
+  let self = 
+    Arelin.Thing.set_dir(self)
+    | F64.V3.new
+      | F64.parse("0.707");
+      | F64.parse("-0.707");
+      | F64.0;
+    ;
+  let div_aux = F64.div(F64.parse("2"))(F64.parse("24"))
+  let self = 
+    Arelin.Thing.set_dmg(self)(F64.sub(self.dmg)(div_aux))
+  let self = 
+    Arelin.Thing.set_mid(self)
+    | let pow = F64.max(F64.0)(F64.min(F64.1)(F64.div(self.dmg)(smhp)))
+      let sin = F64.sin(F64.div(self.tik)(F64.parse("6")))
+      let re0 = F64.mul(F64.mul(sin)(F64.parse("12")))(pow)
+      let re1 = F64.add(F64.add(re0)(F64.parse("24")))(F64.parse("0.5"))
+      let ang = F64.mod(re1)(F64.parse("24"))
+      F64.add(PUNCHINGBAG_IDLE_000)(F64.floor(ang));
+  self

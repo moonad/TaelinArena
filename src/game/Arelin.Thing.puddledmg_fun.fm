@@ -1,0 +1,49 @@
+Arelin.Thing.puddledmg_fun : Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let new_pos = F64.V3.new(F64.parse("100"))(F64.parse("-100"))(F64.0)
+  let self = Arelin.Thing.set_pos(self)(new_pos)
+  let new_dir = F64.V3.new(F64.parse("0.7071"))(F64.parse("0.7071"))(F64.0)
+  let self = Arelin.Thing.set_dir(self)(new_dir)
+  let self = Arelin.Thing.set_box(self)(Arelin.Game.Hitbox.nbox)
+  let self = Arelin.Thing.set_mid(self)(DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000)
+  let self = 
+    Arelin.Thing.animate(self)(F64.0)
+    | DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000;
+    | F64.parse("29");
+    | F64.parse("58");
+  let effs = [
+    Arelin.Game.Effect;
+    Arelin.Game.Effect.damage(F64.1)
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("48"));
+  ]
+  let eff_slow = [
+    Arelin.Game.Effect;
+    Arelin.Game.Effect.slow  
+    | F64.mul(Arelin.ConsArelinnts.ONE_SEC)(F64.parse("3"));
+    | F64.parse("0.7");
+  ]
+  let slow = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | eff_slow;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("48"));
+  ]
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(slow)
+  let self = Arelin.Thing.cast(self)(F64.parse("18"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("26"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("30"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("38"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("44"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("52"))(hits)
+  self

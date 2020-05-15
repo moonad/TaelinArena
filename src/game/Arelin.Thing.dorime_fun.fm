@@ -1,0 +1,140 @@
+Arelin.Thing.dorime_fun
+  : Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.sid = Arelin.Thing.get_sid(self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("2.2"))
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.cbox(F64.parse("8"));
+  let self = Arelin.Thing.set_mhp(self)(F64.parse("32"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.sid = Arelin.Thing.get_sid(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #DORIME_IDLE# // Walk
+    F64.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(DORIME_WALK_CYCLE_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(DORIME_IDLE_000)
+      | F64.parse("5");
+      | F64.parse("15");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+    | #DORIME_BLESSING_FOR_WHO_DESERVE# // Left
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(DORIME_BLESSING_FOR_WHO_DESERVE_000)
+        | F64.parse("14");
+        | F64.parse("28");
+      let fire = Arelin.Thing.new_thing
+      let fire = Arelin.Thing.set_sid(fire)(self.sid)
+      let fire = Arelin.Thing.set_fun(fire)
+        | Arelin.Thing.dorime.blessing_fun;
+      let fire = Arelin.Thing.set_vel(fire)
+        | F64.V3.scale(F64.parse("8"))(Arelin.Thing.Arelinrg_dir(self));
+      let fire = Arelin.Thing.set_dir(fire)
+        | Arelin.Thing.Arelinrg_dir(self);
+      let fire = Arelin.Thing.set_pos(fire)(self.pos)
+      let self = Arelin.Thing.spawn(self)(F64.parse("8"))
+        | [Arelin.Thing; fire];
+      let self = Arelin.Thing.spawn(self)(F64.parse("16"))
+        | [Arelin.Thing; fire];
+      let self = Arelin.Thing.spawn(self)(F64.parse("22"))
+        | [Arelin.Thing; fire];
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+    | #DORIME_LEPTOSPIROSE_CURSE# // Middle
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)
+        | DORIME_LEPTOSPIROSE_CURSE_CAST_ANIMATION_000;
+        | F64.parse("5");
+        | F64.parse("15"); 
+      let pot = Arelin.Thing.new_thing
+      let pot = Arelin.Thing.set_sid(pot)(self.sid)
+      let pot = Arelin.Thing.set_fun(pot)
+        | Arelin.Thing.dorime.leptospirose_puddle_pot_fun;
+      let pot = Arelin.Thing.set_pos(pot)(self.pos)
+      let pot = Arelin.Thing.set_vel(pot)
+        | F64.V3.scale(F64.parse("14"))(Arelin.Thing.Arelinrg_dir(self));
+      let self = Arelin.Thing.spawn(self)(F64.parse("14"))
+      | [Arelin.Thing; pot];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #DORIME_HOLY_FLAME# // Right
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)
+        | DORIME_HOLY_FLAME_CAST_ANIMATION_000;
+        | F64.parse("8");
+        | F64.parse("16"); 
+      let flame = Arelin.Thing.new_thing
+      let flame = Arelin.Thing.set_sid(flame)(self.sid)
+      let flame = Arelin.Thing.set_fun(flame)
+        | Arelin.Thing.dorime.holy_flame_fun;
+      let self = Arelin.Thing.spawn(self)(F64.parse("5"))
+        | [Arelin.Thing;
+           Arelin.Thing.move(flame)
+           | Arelin.Thing.at_max_dist(self)(F64.parse("128"));];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+    | #DORIME_JESUS_POWER# // Q
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)
+        | DORIME_JESUS_POWER_000;
+        | F64.parse("21");
+        | F64.parse("21");
+      let hit = Arelin.Thing.new_thing
+      let hit = Arelin.Thing.set_sid(hit)(self.sid)
+      let hit = Arelin.Thing.set_fun(hit)
+        | Arelin.Thing.dorime.jesus_power;
+      let self = Arelin.Thing.spawn(self)(F64.parse("18"))
+        | [Arelin.Thing;
+           Arelin.Thing.move(hit)
+           | Arelin.Thing.at_dist(self)(F64.parse("30"));];
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+    | #DORIME_GODS_CHAMBER# // Space
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)
+        | DORIME_GODS_CHAMBER_CAST_ANIMATION_000;
+        | F64.parse("9");
+        | F64.parse("27");
+      let heal = Arelin.Thing.new_thing
+      let heal = Arelin.Thing.set_sid(heal)(self.sid)
+      let heal = Arelin.Thing.set_fun(heal)
+        | Arelin.Thing.dorime.gods_chamber_fun;
+      let self = Arelin.Thing.spawn(self)(F64.parse("9"))
+        | [Arelin.Thing;
+           Arelin.Thing.move(heal)
+           | Arelin.Thing.at_max_dist(self)(F64.parse("128"));];
+      self
+    ;
+
+    | #DORIME_ArelinUNT# // E
+     let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DORIME_ArelinUNT_000;
+        | F64.parse("3");
+        | F64.parse("0");
+        | F64.parse("6");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DORIME_ArelinUNT_002;
+        | F64.parse("1");
+        | F64.parse("6");
+        | F64.parse("36");
+      let self = Arelin.Thing.reset(self)(F64.parse("36"))
+      self 
+    ;
+  ;;;;;
