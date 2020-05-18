@@ -1,4 +1,4 @@
-Arelin.Thing.puddledmg_fun : Arelin.Game.TxFunction
+Arelin.Thing.puddledmg_fun: Arelin.Game.TxFunction
   (self)
   let self.pos = Arelin.Thing.get_pos(self)
   let self.dir = Arelin.Thing.get_dir(self)

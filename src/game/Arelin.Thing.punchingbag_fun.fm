@@ -1,4 +1,4 @@
-Arelin.Thing.punchingbag_fun : Arelin.Game.TxFunction
+Arelin.Thing.punchingbag_fun: Arelin.Game.TxFunction
   (self)
   let self.dmg = Arelin.Thing.get_dmg(self)
   let self.tik = Arelin.Thing.get_tik(self)

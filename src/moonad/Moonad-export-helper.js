@@ -81,42 +81,45 @@
   glob(files, {}, async (er, file_names) => {
     var info = files_info();
     
-    var exports_TA_path = "Exports.TA.fm";
+    var exports_TA_path = "Arelin.Exports.fm";
     var exports_TA_path = path.join(__dirname, exports_TA_path);
     if (info) {
       const characters = info.filter(entry => {
-        if (entry.name.startsWith("TA.Thing") && entry.name.endsWith("_fun")){
+        if (entry.name.startsWith("Arelin.Thing") && entry.name.endsWith("_fun")){
           return entry;
         }
       });
       // 22 Expors.add entries
       var exports_TA_text = 
-      `Exports.TA: Exports
+      `Arelin.Exports: Exports
   ( Exports.add<<A: Type> -> List(A)>(List.nil)
   | Exports.add<<A: Type> -> (head: A) -> (tail: List(A)) -> List(A)>(List.cons)
   | Exports.add<(F64.V3 -> F64.V3 -> List(F64.V3) -> List(F64.Segment))>(F64.V3.polygon_to_segments)
   | Exports.add<F64.V3 -> F64.V3 -> F64.V3 -> F64.V3>(F64.V3.look_at)
-  | Exports.add<TA.Game.PlayerId -> TA.Game.Game -> F64.V3 >(TA.Game.get_position_by_pid)
-  | Exports.add<(TA.Thing -> TA.Thing) -> TA.Game.Game -> TA.Game.Game>(TA.Game.map_stage)
-  | Exports.add<TA.Game.PlayerId -> TA.Game.Input -> TA.Game.Command>(TA.Game.Command.new)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.sdir)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key0)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key1)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key2)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key3)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key4)
-  | Exports.add<F64.V3 -> TA.Game.Input>(TA.Game.Input.key5)
-  | Exports.add<TA.Game.Command -> TA.Game.Game -> TA.Game.Game>(TA.exec_command)
-  | Exports.add<TA.Game.TxFunction -> TA.Game.PlayerId -> TA.Game.ModelId -> TA.Game.ActionId -> TA.Game.SideId -> Map(F64) -> String -> List(TA.Game.Light) -> F64 -> F64.V3 -> F64 -> F64 -> F64.V3 -> F64.V3 -> F64.V3 -> F64.V3 -> TA.Game.Hitbox -> F64 -> F64 -> F64 -> F64.V3 -> List(TA.Game.Buff) -> List(TA.Thing) -> List(TA.Game.Hit) -> Bool -> Bool -> TA.Thing>(TA.Thing.new)
-  | Exports.add<(thi: TA.Thing) -> (new_fun: TA.Game.TxFunction) -> TA.Thing>(TA.Thing.set_fun)
-  | Exports.add<(thi: TA.Thing) -> (new_sid: TA.Game.SideId) -> TA.Thing>(TA.Thing.set_sid )
-  | Exports.add<(thi: TA.Thing) -> (new_pid: TA.Game.PlayerId) -> TA.Thing>(TA.Thing.set_pid)
-  | Exports.add<(thi: TA.Thing) -> (new_pos: F64.V3) -> TA.Thing>(TA.Thing.set_pos)
-  | Exports.add<(thi: TA.Thing) -> (new_nam: String) -> TA.Thing>(TA.Thing.set_nam)
-  | Exports.add<List(TA.Thing) -> TA.Game.Game>(TA.Game.Game.new)
-  | Exports.add<TA.Game.Game -> TA.Game.Game>(TA.exec_turn)
-  | Exports.add<TA.Game.PlayerId -> TA.Game.Game -> F64.V3>(TA.Game.get_position_by_pid)
-      `
+  | Exports.add<Arelin.Game.PlayerId -> Arelin.Game.Game -> F64.V3 >(Arelin.Game.get_position_by_pid)
+  | Exports.add<(Arelin.Thing -> Arelin.Thing) -> Arelin.Game.Game -> Arelin.Game.Game>(Arelin.Game.map_stage)
+  | Exports.add<Arelin.Game.PlayerId -> Arelin.Game.Input -> Arelin.Game.Command>(Arelin.Game.Command.new)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.sdir)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key0)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key1)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key2)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key3)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key4)
+  | Exports.add<F64.V3 -> Arelin.Game.Input>(Arelin.Game.Input.key5)
+  | Exports.add<Arelin.Game.Command -> Arelin.Game.Game -> Arelin.Game.Game>(Arelin.exec_command)
+  | Exports.add<Arelin.Game.TxFunction -> Arelin.Game.PlayerId -> Arelin.Game.ModelId -> Arelin.Game.ActionId -> Arelin.Game.SideId -> Map(F64) -> String -> List(Arelin.Game.Light) -> F64 -> F64.V3 -> F64 -> F64 -> F64.V3 -> F64.V3 -> F64.V3 -> F64.V3 -> Arelin.Game.Hitbox -> F64 -> F64 -> F64 -> F64.V3 -> List(Arelin.Game.Buff) -> List(Arelin.Thing) -> List(Arelin.Game.Hit) -> Bool -> Bool -> Arelin.Thing>(Arelin.Thing.new)
+  | Exports.add<(thi: Arelin.Thing) -> (new_fun: Arelin.Game.TxFunction) -> Arelin.Thing>(Arelin.Thing.set_fun)
+  | Exports.add<(thi: Arelin.Thing) -> (new_sid: Arelin.Game.SideId) -> Arelin.Thing>(Arelin.Thing.set_sid )
+  | Exports.add<(thi: Arelin.Thing) -> (new_pid: Arelin.Game.PlayerId) -> Arelin.Thing>(Arelin.Thing.set_pid)
+  | Exports.add<(thi: Arelin.Thing) -> (new_pos: F64.V3) -> Arelin.Thing>(Arelin.Thing.set_pos)
+  | Exports.add<(thi: Arelin.Thing) -> (new_nam: String) -> Arelin.Thing>(Arelin.Thing.set_nam)
+  | Exports.add<List(Arelin.Thing) -> Arelin.Game.Game>(Arelin.Game.Game.new)
+  | Exports.add<Arelin.Game.Game -> Arelin.Game.Game>(Arelin.exec_turn)
+  | Exports.add<Arelin.Game.PlayerId -> Arelin.Game.Game -> F64.V3>(Arelin.Game.get_position_by_pid)
+  | Exports.add<String -> F64>(Arelin.Game.Constants.ONE_SEC)
+  | Exports.add<String -> F64>(Arelin.Game.Constants.POS_X_KEY)
+  | Exports.add<String -> F64>(Arelin.Game.Constants.POS_Y_KEY)
+  `
       for(var i = 0; i < characters.length; ++i) {
         const exports_code = (i === 0) ? "\n  | Exports.add" : "  | Exports.add";
         const name = characters[i].name;
@@ -124,8 +127,8 @@
         exports_TA_text += exports_code +"<"+type+">("+name+")\n";
       }
       exports_TA_text += "  | Exports.new";
-      for (var i = 0; i < (characters.length + 24); ++i) {
-        exports_TA_text += i%80 === 0 ? "\n  ;" : ";";
+      for (var i = 0; i < (characters.length + 27); ++i) {
+        exports_TA_text += i%75 === 0 ? "\n  ;" : ";";
       }
       exports_TA_text += ")";
       // console.log("Exports: ");

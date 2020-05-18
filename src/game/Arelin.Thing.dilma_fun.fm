@@ -101,8 +101,8 @@ Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
         | F64.parse("16");
       ;
 
-      | #DILMA_ArelinUNT# 
-        Arelin.Thing.animate(self)(F64.0)(DILMA_ArelinUNT_000)
+      | #DILMA_TAUNT# 
+        Arelin.Thing.animate(self)(F64.0)(DILMA_TAUNT_000)
         | F64.parse("6");
         | F64.parse("18");
       ;
@@ -112,17 +112,13 @@ Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
   ;
   ;
 
-Arelin.Thing.dilma.stocking_wind_fun
-  : Arelin.Thing ->
-    Arelin.Thing
+Arelin.Thing.dilma.stocking_wind_fun: Arelin.Game.TxFunction
   (self)
   Arelin.Thing.animate_die(self)(F64.0)(DILMA_STOCKING_WIND_ANIM_000)
   | F64.parse("3");
   | F64.parse("15");
   
-Arelin.Thing.dilma.confusion_fun
-  : Arelin.Thing ->
-    Arelin.Thing
+Arelin.Thing.dilma.confusion_fun: Arelin.Game.TxFunction
   (self)
   Arelin.Thing.animate_die(self)(F64.0)(DILMA_CONFUSION_ANIM_000)
   | F64.parse("4");

@@ -1,0 +1,142 @@
+Arelin.Thing.jacquin_fun: TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
+  let self = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #JACQUIN_IDLE# // Walk
+    F64.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_WALK_000)
+      | F64.parse("7");
+      | F64.parse("14");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_IDLE_000)
+      | F64.parse("14");
+      | F64.parse("14");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+    | #JACQUIN_SHAME_OF_THE_PROFESSION# // Left
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(ERIC_JACQUIN_SHAME_OF_THE_PROFESSION_CASTING_000)
+        | F64.parse("22");
+        | F64.parse("22");
+      let shame = Arelin.Thing.new_thing
+      let shame = Arelin.Thing.set_fun(shame)
+        | Arelin.Thing.jacquin.shame_of_the_profession_fun;
+      let shame = Arelin.Thing.set_pos(shame)
+        | Arelin.Thing.at_dist(self)(F64.parse("30"));
+      let shame = Arelin.Thing.set_dir(shame)(Arelin.Thing.targ_dir(self))
+      let shame = Arelin.Thing.set_vel(shame)
+        | F64.V3.scale(F64.parse("10"))(Arelin.Thing.targ_dir(self));
+      let shame = Arelin.Thing.set_box(shame)(Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self)(F64.parse("16"))
+        | [Arelin.Thing; 
+            shame 
+          ];
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+    | #JACQUIN_TURN_OFF_THE_NIGHT_FREEZER# // Middle
+      let self = 
+        Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_TURN_OFF_THE_NIGHT_FREEZER_CASTING_000)
+        | F64.parse("29");
+        | F64.parse("29");
+      let freezer = Arelin.Thing.new_thing
+      let freezer = Arelin.Thing.set_fun(freezer)
+        | Arelin.Thing.jacquin.freezer_fun;
+      let freezer = Arelin.Thing.set_pos(freezer)
+        | Arelin.Thing.at_dist(self)(F64.parse("140"));
+      let freezer = Arelin.Thing.set_dir(freezer)(Arelin.Thing.targ_dir(self))
+      let freezer = Arelin.Thing.set_vel(freezer)
+        | F64.V3.scale(F64.parse("10"))(Arelin.Thing.targ_dir(self));
+      let freezer = Arelin.Thing.set_box(freezer)(Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self)(F64.parse("28"))
+        | [Arelin.Thing; 
+            freezer 
+          ];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #JACQUIN_SHUT_YOUR_MOUTH# // Right
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(ERIC_JACQUIN_SHUT_YOUR_MOUTH_CASTING_000)
+        | F64.parse("30");
+        | F64.parse("60");
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+    | #JACQUIN_JACQUIN_WRATH# // Q
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | ERIC_JACQUIN_JACQUIN_WRATH_CASTING_ONE_000;
+        | F64.parse("30");
+        | F64.parse("0");
+        | F64.parse("30");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | ERIC_JACQUIN_JACQUIN_WRATH_CASTING_TWO_000;
+        | F64.parse("28");
+        | F64.parse("30");
+        | F64.parse("58");
+      let self = Arelin.Thing.reset(self)(F64.parse("57"))
+      let self = Arelin.Thing.create_at(self)(F64.parse("57"))
+        | Arelin.Thing.jacquin.giant_jacquin_fun;
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+    | #JACQUIN_DASH# // Space
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(ERIC_JACQUIN_DASH_000)
+        | F64.parse("18");
+        | F64.parse("18");
+      let self = Arelin.Thing.dash(self)(F64.parse("4"))(F64.parse("0"))
+        | (F64.parse("17"));
+      self
+    ;
+
+    | #JACQUIN_TAUNT# // E
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(ERIC_JACQUIN_TAUNT_000)
+        | F64.parse("8");
+        | F64.parse("16");
+      self
+    ;
+  ;;;;;
+
+// Auxiliar functions
+Arelin.Thing.jacquin.shame_of_the_profession_fun: Arelin.Game.TxFunction
+  Arelin.Thing.animate_die(self)(F64.0)(ERIC_JACQUIN_SHAME_OF_THE_PROFESSION_EFFECT_000)
+  | F64.parse("5");
+  | F64.parse("10");
+
+Arelin.Thing.jacquin.freezer_fun: Arelin.Game.TxFunction
+  Arelin.Thing.animate_die(self)(F64.0)(ERIC_JACQUIN_TURN_OFF_THE_NIGHT_FREEZER_EFFECT_000)
+  | F64.parse("3");
+  | F64.parse("18");
+
+
+// Giant Jacquin
+// -------------
+Arelin.Thing.jacquin.giant_jacquin_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("1.5"))
+  let self = Arelin.Thing.end_thing(self)(Arelin.Thing.jacquin_fun)
+    | F64.mul(Arelin.Constants.ONE_SEC)(F64.parse("7"));
+    | Arelin.Constants.UlT_TIME;
+  F64.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_JACQUIN_WRATH_WALK_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_JACQUIN_WRATH_IDLE_000)
+      | F64.parse("14");
+      | F64.parse("28");
+    ;

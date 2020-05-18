@@ -1,7 +1,6 @@
 Arelin.Thing.poste_fun: Arelin.Game.TxFunction
   (self)
   let self.pos = Arelin.Thing.get_pos(self)
-
   let new_pos = F64.V3.new(F64.0)(F64.0)(F64.0)
   let self = Arelin.Thing.set_pos(self)(new_pos)
   let self = Arelin.Thing.set_mid(self)(POSTE_IDLE_000)

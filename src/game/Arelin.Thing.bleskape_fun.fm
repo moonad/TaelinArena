@@ -1,4 +1,4 @@
-Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
+Arelin.Thing.bleskape_fun: Arelin.Game.TxFunction
   (self)
   let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
   let self = Arelin.Thing.set_mhp(self)(F64.parse("24"))
@@ -45,7 +45,7 @@ Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
     self
   ;
 
-  | Bool.if<Arelin.Thing>(F64.eql(self.act)(F64.2))
+  | Bool.if<>(F64.eql(self.act)(F64.parse("2")))
     | #BLESKAPE_DEFENSE_MODE#
       let self = 
         Arelin.Thing.animate_between(self)(F64.1)
@@ -63,7 +63,7 @@ Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
       self
     ;
 
-  | Bool.if<Arelin.Thing>(F64.eql(self.act)(F64.parse("3")))
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
     | #BLESKAPE_SHOCK_GROUND_WAVE# 
       let self = 
         Arelin.Thing.animate(self)(F64.0)(BLESKAPE_SHOCK_GROUND_WAVE_000)
@@ -86,7 +86,7 @@ Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
       self
     ;
 
-  | Bool.if<Arelin.Thing>(F64.eql(self.act)(F64.parse("4")))
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4")))
     | #BLESKAPE_SUPREME_PUNCH_SEQUENCE#  
       let self = 
         Arelin.Thing.animate(self)(F64.0)(BLESKAPE_SUPREME_PUNCH_SEQUENCE_000)
@@ -126,7 +126,7 @@ Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
       self
     ;
 
-    | Bool.if<Arelin.Thing>(F64.eql(self.act)(F64.parse("5")))
+    | Bool.if<>(F64.eql(self.act)(F64.parse("5")))
     | #BLESKAPE_DASH# 
       let self = 
         Arelin.Thing.animate(self)(F64.0)(BLESKAPE_DASH_000)
@@ -153,8 +153,8 @@ Arelin.Thing.bleskape_fun: (self: Arelin.Thing) -> Arelin.Thing
       self
     ;
 
-    | #BLESKAPE_ArelinUNT#  
-      Arelin.Thing.animate(self)(F64.0)(BLESKAPE_ArelinUNT_000)
+    | #BLESKAPE_TAUNT#  
+      Arelin.Thing.animate(self)(F64.0)(BLESKAPE_TAUNT_000)
       | F64.parse("10");
       | F64.parse("20");
     ;;;;;;

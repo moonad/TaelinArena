@@ -1,5 +1,4 @@
-Arelin.Thing.dorime_fun
-  : Arelin.Game.TxFunction
+Arelin.Thing.dorime_fun: Arelin.Game.TxFunction
   (self)
   let self.pos = Arelin.Thing.get_pos(self)
   let self.sid = Arelin.Thing.get_sid(self)
@@ -48,7 +47,7 @@ Arelin.Thing.dorime_fun
       self
     ;
     
-  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+  | Bool.if<>(F64.eql(self.act)(F64.parse("2"))) 
     | #DORIME_LEPTOSPIROSE_CURSE# // Middle
       let self = 
         Arelin.Thing.animate(self)(F64.0)
@@ -121,16 +120,16 @@ Arelin.Thing.dorime_fun
       self
     ;
 
-    | #DORIME_ArelinUNT# // E
+    | #DORIME_TAUNT# // E
      let self = 
         Arelin.Thing.animate_between(self)(F64.0)
-        | DORIME_ArelinUNT_000;
+        | DORIME_TAUNT_000;
         | F64.parse("3");
         | F64.parse("0");
         | F64.parse("6");
       let self = 
         Arelin.Thing.animate_between(self)(F64.0)
-        | DORIME_ArelinUNT_002;
+        | DORIME_TAUNT_002;
         | F64.parse("1");
         | F64.parse("6");
         | F64.parse("36");
@@ -138,3 +137,185 @@ Arelin.Thing.dorime_fun
       self 
     ;
   ;;;;;
+
+Arelin.Thing.dorime.blessing_fun: Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = Arelin.Thing.animate_die(self)(F64.0)
+    | DORIME_BLESSING_FOR_WHO_DESERVE_PROJECTILE_000;
+    | F64.1;
+    | F64.parse("16");
+  let self = Arelin.Thing.set_box(self)(Arelin.Game.Hitbox.nbox)
+  let effs = [
+      Arelin.Game.Effect; 
+      Arelin.Game.Effect.damage(F64.1)
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("4"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.0)(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("2"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("4"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("6"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("8"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("12"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("14"))(hits)
+  self
+
+
+Arelin.Thing.dorime.gods_chamber_fun : Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = 
+    Arelin.Thing.animate_between(self)(F64.0)
+    | DORIME_GODS_CHAMBER_HEAL_CIRCLE_000;
+    | F64.parse("17");
+    | F64.parse("0");
+    | F64.parse("34");
+  let self = 
+    Arelin.Thing.animate_between(self)(F64.0)
+    | DORIME_GODS_CHAMBER_HEAL_CIRCLE_IDLE_000;
+    | F64.parse("29");
+    | F64.parse("34");
+    | F64.parse("92");
+  let effs = [Arelin.Game.Effect; Arelin.Game.Effect.heal(F64.1)]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("52"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.parse("34"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("38"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("42"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("46"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("50"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("54"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("62"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("66"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("70"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("74"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("78"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("82"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("86"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("90"))(hits)
+  let self = Arelin.Thing.die(self)(F64.parse("92"))
+  self
+
+
+Arelin.Thing.dorime.holy_flame_fun: Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = 
+    Arelin.Thing.animate_die(self)(F64.0)(DORIME_HOLY_FLAME_PILLAR_000)
+    | F64.parse("5");
+    | F64.parse("15");
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.nbox;
+  let effs = [
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage(F64.parse("3"))
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.0)(hits)
+  self
+
+
+  Arelin.Thing.dorime.jesus_power: Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.nbox;
+  let effs = [Arelin.Game.Effect; Arelin.Game.Effect.heal(F64.parse("5"))]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.0)(hits)
+  let self = Arelin.Thing.die(self)(F64.parse("6"))
+  self
+
+
+Arelin.Thing.dorime.leptospirose_puddle_fun: Arelin.Game.TxFunction
+  (self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.nbox;
+  let self = 
+    Arelin.Thing.animate_between(self)(F64.0)
+    | DORIME_LEPTOSPIROSE_CURSE_PUDDLE_000;
+    | F64.parse("10");
+    | F64.parse("0");
+    | F64.parse("10");
+  let self = 
+    Arelin.Thing.animate_between(self)(F64.0)
+    | DORIME_LEPTOSPIROSE_CURSE_PUDDLE_IDLE_000;
+    | F64.parse("29");
+    | F64.parse("10");
+    | F64.parse("39");
+  let effs = [
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage(F64.parse("1"))
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("48"));
+  ]  
+  let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("14"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("18"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("22"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("26"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("30"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("34"))(hits)
+  let self = Arelin.Thing.cast(self)(F64.parse("38"))(hits)
+  let self = Arelin.Thing.die(self)(F64.parse("39"))
+  self
+
+
+Arelin.Thing.dorime.leptospirose_puddle_pot_fun: Arelin.Game.TxFunction
+  (self)
+  let self.sid = Arelin.Thing.get_sid(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = Arelin.Thing.animate_die(self)(F64.0)
+    | DORIME_LEPTOSPIROSE_CURSE_POT_000;
+    | F64.1;
+    | F64.parse("10");
+  let self = Arelin.Thing.set_box(self)
+    | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+  let pudd = Arelin.Thing.new_thing
+  let pudd = Arelin.Thing.set_sid(pudd)(self.sid)
+  let pudd = Arelin.Thing.set_fun(pudd)
+    | Arelin.Thing.dorime.leptospirose_puddle_fun;
+  let pudd = Arelin.Thing.set_pos(pudd)(self.pos)
+  let self = Arelin.Thing.spawn(self)(F64.parse("9"))
+    | [Arelin.Thing; pudd];
+  self
