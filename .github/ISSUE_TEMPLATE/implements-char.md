@@ -6,6 +6,7 @@ labels: dev
 assignees: ''
 
 ---
+
 Implements Issue *add_number*
 
 ### Tasks
