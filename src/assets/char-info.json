@@ -7,12 +7,12 @@
   {
     "name": "Bleskape",
     "attack": "1",
-    "recently_updated": "0"
+    "recently_updated": "1"
   },
   {
     "name": "Chamusco",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "DarthVader",
@@ -22,12 +22,12 @@
   {
     "name": "Dilma",
     "attack": "0",
-    "recently_updated": "0"
+    "recently_updated": "1"
   },
   {
     "name": "Dorime",
     "attack": "1",
-    "recently_updated": "0"
+    "recently_updated": "1"
   },
   {
     "name": "DrStrange",
@@ -37,7 +37,7 @@
   {
     "name": "Escanor",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Finn",
@@ -62,7 +62,7 @@
   {
     "name": "Green Lantern",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Grimer",
@@ -72,7 +72,7 @@
   {
     "name": "IvyKlaws",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Jacquin",
@@ -122,7 +122,7 @@
   {
     "name": "Loki",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Luffy",
@@ -132,7 +132,7 @@
   {
     "name": "Magnamite",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Mando",
@@ -172,7 +172,7 @@
   {
     "name": "Pingo",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "PPG",
@@ -197,12 +197,12 @@
   {
     "name": "Shao",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Shonkie",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Squirtle",
@@ -217,7 +217,7 @@
   {
     "name": "Steve",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Teichi",
@@ -237,7 +237,7 @@
   {
     "name": "Tvee",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Tophoro",
@@ -247,7 +247,7 @@
   {
     "name": "Tupitree",
     "attack": "1",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Weedle",
@@ -262,7 +262,7 @@
   {
     "name": "Yusuke",
     "attack": "0",
-    "recently_updated": "1"
+    "recently_updated": "0"
   },
   {
     "name": "Zagatur",

@@ -1,5 +1,5 @@
 if (typeof window !== "undefined") {
-  var TA = require("./game/TaelinArena.fm");
+  var TA = require("./TaelinArena.fm.js");
   var heroes_info = require('./assets/char-info.json');
 
   // Loads all models
@@ -48,9 +48,9 @@ function slist_to_array(slist) {
 };
 
 function array_to_slist(array) {
-  var slist = TA.nil;
+  var slist = TA["List.nil"];
   for (var i = array.length-1; i >= 0; --i) {
-    slist = TA.cons(array[i])(slist);
+    slist = TA["List.cons"](array[i])(slist);
   };
   return slist;
 };
@@ -100,7 +100,7 @@ function render_hitbox(pos, dir, box, col = 0xA0A0F0FF) {
     }
   };
   let case_pbox = (pts) => {
-    var segs = slist_to_array(TA.polygon_to_segments(pos)(dir)(pts));
+    var segs = slist_to_array(TA["F64.V3.polygon_to_segments"](pos)(dir)(pts));
     for (var i = 0; i < segs.length; ++i) {
       var [p0,p1] = segs[i](a => b => ([
         a(x => y => z => ({x,y,z})),
@@ -198,7 +198,7 @@ function render_thing(thing) {
     // Renders model voxels
     var max_z = 0;
     if (mid !== 0xFFFFFFFF) {
-      let look_dir = act === 0 ? dir : TA.lookat_v3(pos)(trg)(dir);
+      let look_dir = act === 0 ? dir : TA["F64.V3.look_at"](pos)(trg)(dir);
       max_z = render_model(pos, look_dir, mid);
     }
 
@@ -234,12 +234,13 @@ function render_game({game, canvox, canhud, cam}) {
 
   // Gets the current time
   var T = now();
-
+  
   // Gets the main hero position
-  var hero_pos = TA.get_position_by_pid(0, game);
+  var hero_pos = TA["TA.Game.get_position_by_pid"](0, game);
+  console.log("TaelinArena.js/render_game: hero_pos: ", hero_pos);
 
   // Renders each game thing
-  TA.map_stage(thing=>render_thing(thing,hud,lights))(game);
+  TA["TA.Game.map_stage"](thing=>render_thing(thing,hud,lights))(game);
 
   canvox.draw({voxels, lights, stage, cam});
   if (canhud) {
@@ -406,7 +407,8 @@ function execute_command(inp, game) {
     let x = inp.params.dir.x;
     let y = inp.params.dir.y;
     let d = v3 => v3(x)(y)(0);
-    cmd = TA.command(inp.player)(TA.sdir(d));
+    // cmd = TA.command(inp.player)(TA.sdir(d));
+    cmd = TA["TA.Game.Command.new"](inp.player)(TA["TA.Game.Input.sdir"](d));
   } else if (inp.input === "TEXT") {
     console.log(new Error("Not implemented."));
     throw "TODO";
@@ -416,36 +418,36 @@ function execute_command(inp, game) {
     let p = v3 => v3(x)(y)(0);
     var f = null;
     switch (inp.input) {
-      case "KEY0": keyx = TA.key0; break;
-      case "KEY1": keyx = TA.key1; break;
-      case "KEY2": keyx = TA.key2; break;
-      case "KEY3": keyx = TA.key3; break;
-      case "KEY4": keyx = TA.key4; break;
-      case "KEY5": keyx = TA.key5; break;
+      case "KEY0": keyx = TA["TA.Game.Input.key0"]; break;
+      case "KEY1": keyx = TA["TA.Game.Input.key1"]; break;
+      case "KEY2": keyx = TA["TA.Game.Input.key2"]; break;
+      case "KEY3": keyx = TA["TA.Game.Input.key3"]; break;
+      case "KEY4": keyx = TA["TA.Game.Input.key4"]; break;
+      case "KEY5": keyx = TA["TA.Game.Input.key5"]; break;
     }
-    cmd = TA.command(inp.player)(keyx(p));
+    cmd = TA["TA.Game.Command.new"](inp.player)(keyx(p));
   }
-  return TA.exec_command(cmd)(game);
+  return TA["TA.exec_command"](cmd)(game);
 }
 
 function make_thing([name, {pid,sid,pos,nam}]) {
   var thing;
   name = name.toLowerCase();
-  thing = TA.new_thing;
+  thing = TA["TA.Thing.new_thing"];
   if (TA[name+"_fun"]) {
-    thing = TA.set_thing_fun(thing)(TA[name+"_fun"]);
+    thing = TA["TA.Thing.set_fun"](thing)(TA["TA.Thing."+name+"_fun"]);
   }
   if (sid !== undefined) {
-    thing = TA.set_thing_sid(thing)(sid);
+    thing = TA["TA.Thing.set_sid"](thing)(sid);
   }
   if (pid !== undefined) {
-    thing = TA.set_thing_pid(thing)(pid);
+    thing = TA["TA.Thing.set_pid"](thing)(pid);
   }
   if (pos !== undefined) {
-    thing = TA.set_thing_pos(thing)(v3 => v3(pos.x)(pos.y)(pos.z));
+    thing = TA["TA.Thing.set_pos"](thing)(v3 => TA["F64.V3.new"](pos.x)(pos.y)(pos.z));
   }
   if (nam !== undefined) {
-    thing = TA.set_thing_nam(thing)(string_to_sstring(nam)); 
+    thing = TA["TA.Thing.set_nam"](thing)(string_to_sstring(nam)); 
   }
   return thing;
 };
@@ -453,12 +455,12 @@ function make_thing([name, {pid,sid,pos,nam}]) {
 function GameRunner(gid, things) {
   var self = {};
   self.gid = gid;
-  self.state = TA.game(array_to_slist(things.map(make_thing)));
+  self.state = TA["TA.Game.Game.new"](array_to_slist(things.map(make_thing)));
   self.turns = [];
 
   function turn() {
     if (self.state) {
-      self.state = TA.exec_turn(self.state);
+      self.state = TA["TA.exec_turn"](self.state);
     }
   }
 
@@ -480,7 +482,7 @@ function GameRunner(gid, things) {
           for (var j = 0; j < new_turns[i].length; ++j) {
             self.state = execute_command(new_turns[i][j], self.state);
           }
-          self.state = TA.exec_turn(self.state);
+          self.state = TA["TA.exec_turn"](self.state);
         }
       }
     }
@@ -496,53 +498,53 @@ function GameRunner(gid, things) {
 var heroes = [
   "Benfix",
   "Bleskape",
-  "DarthVader",
+  // "DarthVader",
   "Dilma",
   "Dorime",
-  "DrStrange",
-  "Finn",
-  "Gastly",
-  "Gon",
-  "Greninja",
-  "Grimer",
-  "Jacquin",
-  "Jinx",
-  "Kakashi",
-  "Kenko",
-  "Kirby",
-  "KingDedede",
-  "Konan",
-  "LinaInverse",
-  "Link",
-  "Loki",
-  "Luffy",
-  "Magnamite",
-  "Mando",
-  "MarthaLynch",
-  "Mechwarrior",
-  "Mikegator",
-  "Min",
-  "Monica",
-  "PPG",
-  "Pichu",
-  "Ray",
-  "Ryu",
-  "Scorpion",  
-  "Shao",
-  "Squirtle",
-  "SrMadruga",
-  "Steve",
-  "Teichi",
-  "Teresa",
-  "TonyStark",
-  "Tophoro",
-  "Tupitree",
-  "Tvee",
-  "Weedle",
-  "XululuChild",
-  "Zagatur",
-  "Zed",
-  "Zoio",
+  // "DrStrange",
+  // "Finn",
+  // "Gastly",
+  // "Gon",
+  // "Greninja",
+  // "Grimer",
+  // "Jacquin",
+  // "Jinx",
+  // "Kakashi",
+  // "Kenko",
+  // "Kirby",
+  // "KingDedede",
+  // "Konan",
+  // "LinaInverse",
+  // "Link",
+  // "Loki",
+  // "Luffy",
+  // "Magnamite",
+  // "Mando",
+  // "MarthaLynch",
+  // "Mechwarrior",
+  // "Mikegator",
+  // "Min",
+  // "Monica",
+  // "PPG",
+  // "Pichu",
+  // "Ray",
+  // "Ryu",
+  // "Scorpion",  
+  // "Shao",
+  // "Squirtle",
+  // "SrMadruga",
+  // "Steve",
+  // "Teichi",
+  // "Teresa",
+  // "TonyStark",
+  // "Tophoro",
+  // "Tupitree",
+  // "Tvee",
+  // "Weedle",
+  // "XululuChild",
+  // "Zagatur",
+  // "Zed",
+  // "Zoio",
 ];
 
 var hero_name = {};

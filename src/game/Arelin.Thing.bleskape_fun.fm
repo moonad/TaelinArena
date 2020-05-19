@@ -1,0 +1,156 @@
+Arelin.Thing.bleskape_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
+  let self = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0))
+  | #BLESKAPE_IDLE#
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(BLESKAPE_WALK_000)
+      | F64.parse("4");
+      | F64.parse("16");;
+    | Arelin.Thing.animate(self)(F64.1)(BLESKAPE_IDLE_000)
+      | F64.parse("4");
+      | F64.parse("16");;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+  | #BLESKAPE_SHOCK_BALL#
+    let self = Arelin.Thing.animate(self)(F64.0)(BLESKAPE_SHOCK_BALL_000)
+      | F64.parse("15");
+      | F64.parse("30");
+    let effs = [
+      Arelin.Game.Effect; 
+      Arelin.Game.Effect.damage(F64.parse("3")),
+      Arelin.Game.Effect.impulse(F64.parse("12"))(self.dir)
+    ]
+    let hits = [
+      Arelin.Game.Hit;
+      Arelin.Game.Hit.new(effs)(Arelin.Thing.at_dist(self)(F64.parse("40")))
+      | self.dir;
+      | Arelin.Game.Hitbox.cbox(F64.parse("20"));,
+      Arelin.Game.Hit.new(effs)(Arelin.Thing.at_dist(self)(F64.parse("40")))
+      | self.dir;
+      | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+    ]  
+
+    let self = Arelin.Thing.cast(self)(F64.parse("18"))(hits)
+    self
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("2")))
+    | #BLESKAPE_DEFENSE_MODE#
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.1)
+        | BLESKAPE_DEFENSE_MODE_000;
+        | F64.parse("3");
+        | F64.0;
+        | F64.parse("3");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.1)
+        | BLESKAPE_DEFENSE_MODE_002;
+        | F64.1;
+        | F64.parse("3");
+        | F64.parse("12");
+      let self = Arelin.Thing.reset(self)(F64.parse("12"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #BLESKAPE_SHOCK_GROUND_WAVE# 
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(BLESKAPE_SHOCK_GROUND_WAVE_000)
+        | F64.parse("12");
+        | F64.parse("24");
+      let effs = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(F64.parse("5"))
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | effs;
+        | self.pos;
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("58"));
+      ]
+
+      let self = Arelin.Thing.cast(self)(F64.parse("20"))(hits)
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4")))
+    | #BLESKAPE_SUPREME_PUNCH_SEQUENCE#  
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(BLESKAPE_SUPREME_PUNCH_SEQUENCE_000)
+        | F64.parse("25");
+        | F64.parse("50");
+      let effs = [
+        Arelin.Game.Effect;
+        Arelin.Game.Effect.damage(F64.parse("1"))
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | effs;
+        | Arelin.Thing.at_dist(self)(F64.parse("32"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("32"));
+      ]
+      let self = Arelin.Thing.cast(self)(F64.parse("26"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("30"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("34"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("38"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("42"))(hits)
+      let effes = [
+        Arelin.Game.Effect;
+        Arelin.Game.Effect.impulse(F64.parse("18"))(self.dir),
+        Arelin.Game.Effect.impulse(F64.parse("18"))(self.dir)
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | effs;
+        | Arelin.Thing.at_dist(self)(F64.parse("32"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("32"));
+      ]
+      let self = Arelin.Thing.cast(self)(F64.parse("46"))(hits)
+      self
+    ;
+
+    | Bool.if<>(F64.eql(self.act)(F64.parse("5")))
+    | #BLESKAPE_DASH# 
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(BLESKAPE_DASH_000)
+        | F64.parse("15");
+        | F64.parse("30");
+      let self = Arelin.Thing.dash(self)(F64.parse("8"))
+        | F64.parse("15");
+        | F64.parse("25");
+      let effs = [
+        Arelin.Game.Effect;
+        Arelin.Game.Effect.damage(F64.parse("1")),
+        Arelin.Game.Effect.repulse(F64.parse("8"))
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new(effs)
+        | Arelin.Thing.at_dist(self)(F64.parse("32"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("32"));
+      ]
+      let self = Arelin.Thing.cast(self)(F64.parse("17"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("20"))(hits)
+      let self = Arelin.Thing.cast(self)(F64.parse("23"))(hits)
+      self
+    ;
+
+    | #BLESKAPE_TAUNT#  
+      Arelin.Thing.animate(self)(F64.0)(BLESKAPE_TAUNT_000)
+      | F64.parse("10");
+      | F64.parse("20");
+    ;;;;;;
