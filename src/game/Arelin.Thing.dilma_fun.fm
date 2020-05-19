@@ -1,0 +1,125 @@
+Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #DILMA_IDLE# 
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(DILMA_WALK_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(DILMA_IDLE_000)
+      | F64.parse("4");
+      | F64.parse("16");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1)) // Left
+    | #DILMA_PROTECTION# 
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DILMA_PROTECTION_000;
+        | F64.parse("6");
+        | F64.parse("3");
+        | F64.parse("7");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DILMA_PROTECTION_007;
+        | F64.parse("5");
+        | F64.parse("28");
+        | F64.parse("14");
+      let self = Arelin.Thing.reset(self)(F64.parse("27"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.2)) // Middle
+    | #DILMA_CONFUSION#  
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DILMA_CONFUSION_CASTING_000;
+        | F64.parse("17");
+        | F64.parse("0");
+        | F64.parse("34");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | DILMA_CONFUSION_CASTING_016;
+        | F64.parse("3");
+        | F64.parse("34");
+        | F64.parse("64");
+      let self = Arelin.Thing.reset(self)(F64.parse("63"))
+      let speech = Arelin.Thing.new_thing
+      let speech = Arelin.Thing.set_fun(speech)
+        | Arelin.Thing.dilma.confusion_fun;
+      let speech = Arelin.Thing.set_dir(speech)
+        | Arelin.Thing.targ_dir(self);
+      let self = Arelin.Thing.spawn(self)(F64.parse("34"))
+        | [Arelin.Thing; 
+           Arelin.Thing.move(speech)
+           | Arelin.Thing.at_max_dist(self)(F64.parse("100"));
+          ];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3"))) // Right
+    | #DILMA_SALUTING_THE_CASSAVA#  
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(DILMA_SALUTING_THE_CASSAVA_000)
+        | F64.parse("18");
+        | F64.parse("54");
+      self
+    ;
+
+    | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) // Q
+      | #DILMA_STOCKING_WIND#
+        let self =  
+          Arelin.Thing.animate(self)(F64.0)(DILMA_STOCKING_WIND_CASTING_000)
+          | F64.parse("10");
+          | F64.parse("30");
+        let wind = Arelin.Thing.new_thing
+        let wind = Arelin.Thing.set_fun(wind)
+          | Arelin.Thing.dilma.stocking_wind_fun;
+        let wind = Arelin.Thing.set_pos(wind)(self.pos)
+        let wind = Arelin.Thing.set_dir(wind)
+          | Arelin.Thing.targ_dir(self);
+        let wind = Arelin.Thing.set_vel(wind)
+          | F64.V3.scale(F64.parse("6"))(Arelin.Thing.targ_dir(self));
+        let wind = Arelin.Thing.set_box(wind)
+          | Arelin.Game.Hitbox.nbox;
+        let self = Arelin.Thing.spawn(self)(F64.parse("8"))
+          | [Arelin.Thing; wind];
+        self
+      ;
+
+    | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) // Space
+      | #DILMA_EXTRA#  
+        Arelin.Thing.animate(self)(F64.1)(DILMA_IDLE_000)
+        | F64.parse("4");
+        | F64.parse("16");
+      ;
+
+      | #DILMA_TAUNT# 
+        Arelin.Thing.animate(self)(F64.0)(DILMA_TAUNT_000)
+        | F64.parse("6");
+        | F64.parse("18");
+      ;
+    ;
+    ;
+  ;
+  ;
+  ;
+
+Arelin.Thing.dilma.stocking_wind_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(DILMA_STOCKING_WIND_ANIM_000)
+  | F64.parse("3");
+  | F64.parse("15");
+  
+Arelin.Thing.dilma.confusion_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(DILMA_CONFUSION_ANIM_000)
+  | F64.parse("4");
+  | F64.parse("40");
