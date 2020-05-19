@@ -8,7 +8,7 @@ Arelin.Thing.bleskape_fun: Arelin.Game.TxFunction
 
   Bool.if<>(F64.eql(self.act)(F64.0))
   | #BLESKAPE_IDLE#
-    F64.if<>(Arelin.Thing.is_walking(self))
+    Bool.if<>(Arelin.Thing.is_walking(self))
     | Arelin.Thing.animate(self)(F64.1)(BLESKAPE_WALK_000)
       | F64.parse("4");
       | F64.parse("16");;
@@ -29,14 +29,10 @@ Arelin.Thing.bleskape_fun: Arelin.Game.TxFunction
     ]
     let hits = [
       Arelin.Game.Hit;
-      Arelin.Game.Hit.new
-      | effs;
-      | Arelin.Thing.at_dist(self)(F64.parse("40"));
+      Arelin.Game.Hit.new(effs)(Arelin.Thing.at_dist(self)(F64.parse("40")))
       | self.dir;
       | Arelin.Game.Hitbox.cbox(F64.parse("20"));,
-      Arelin.Game.Hit.new
-      | effs;
-      | Arelin.Thing.at_dist(self)(F64.parse("40"));
+      Arelin.Game.Hit.new(effs)(Arelin.Thing.at_dist(self)(F64.parse("40")))
       | self.dir;
       | Arelin.Game.Hitbox.cbox(F64.parse("20"));
     ]  

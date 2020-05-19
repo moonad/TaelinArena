@@ -7,7 +7,7 @@ Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
 
   Bool.if<>(F64.eql(self.act)(F64.0)) 
   | #DILMA_IDLE# 
-    F64.if<>(Arelin.Thing.is_walking(self))
+    Bool.if<>(Arelin.Thing.is_walking(self))
     | Arelin.Thing.animate(self)(F64.1)(DILMA_WALK_000)
       | F64.parse("8");
       | F64.parse("16");
@@ -55,7 +55,7 @@ Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
       let speech = Arelin.Thing.set_fun(speech)
         | Arelin.Thing.dilma.confusion_fun;
       let speech = Arelin.Thing.set_dir(speech)
-        | Arelin.Thing.Arelinrg_dir(self);
+        | Arelin.Thing.targ_dir(self);
       let self = Arelin.Thing.spawn(self)(F64.parse("34"))
         | [Arelin.Thing; 
            Arelin.Thing.move(speech)
@@ -84,9 +84,9 @@ Arelin.Thing.dilma_fun: Arelin.Thing -> Arelin.Thing
           | Arelin.Thing.dilma.stocking_wind_fun;
         let wind = Arelin.Thing.set_pos(wind)(self.pos)
         let wind = Arelin.Thing.set_dir(wind)
-          | Arelin.Thing.Arelinrg_dir(self);
+          | Arelin.Thing.targ_dir(self);
         let wind = Arelin.Thing.set_vel(wind)
-          | F64.V3.scale(F64.parse("6"))(Arelin.Thing.Arelinrg_dir(self));
+          | F64.V3.scale(F64.parse("6"))(Arelin.Thing.targ_dir(self));
         let wind = Arelin.Thing.set_box(wind)
           | Arelin.Game.Hitbox.nbox;
         let self = Arelin.Thing.spawn(self)(F64.parse("8"))

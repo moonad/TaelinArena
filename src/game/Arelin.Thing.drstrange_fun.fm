@@ -4,10 +4,11 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
   let self.act = Arelin.Thing.get_act(self)
   let self.dir = Arelin.Thing.get_dir(self)
   let self.stt = Arelin.Thing.get_stt(self)
+  let self.sid = Arelin.Thing.get_sid(self)
 
   Bool.if<>(F64.eql(self.act)(F64.0)) 
   | #DR_STRANGE_IDLE# // Walk
-    F64.if<>(Arelin.Thing.is_walking(self))
+    Bool.if<>(Arelin.Thing.is_walking(self))
     | Arelin.Thing.animate(self)(F64.1)(DR_STRANGE_WALK_000)
       | F64.parse("4");
       | F64.parse("16");
@@ -16,7 +17,6 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
       | F64.parse("5");
       | F64.parse("15");
     ;
-    self
   ;
 
   | Bool.if<>(F64.eql(self.act)(F64.1))
@@ -81,8 +81,8 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
       let pos_p0 = Arelin.Thing.at_dist(self)(F64.parse("70"))
       let pos_p1 = Arelin.Thing.at_dist(self)(F64.parse("-120")) //at_max_dist(self, 200)
 
-      let portal_0 = 
-        use pos_p1.x pos_p1.y pos_p1.z = case pos_p1
+      let portal_0 =
+        get pos_p1.x pos_p1.y pos_p1.z = pos_p1
         let portal_0 = Arelin.Thing.new_thing
         let portal_0 = Arelin.Thing.set_sid(portal_0)(self.sid)
         let portal_0 = Arelin.Thing.set_fun(portal_0)
@@ -90,13 +90,13 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
         let portal_0 = Arelin.Thing.set_dir(portal_0)(self.dir)
         let portal_0 = Arelin.Thing.set_box(portal_0)(Arelin.Game.Hitbox.nbox)
         let portal_0 = Arelin.Thing.set_stt(portal_0)
-          | Map.set<>(Arelin.Constants.POS_X_KEY)(pos_p1.x)(self.stt);
+          | Map.set<>(Arelin.Game.Constants.POS_X_KEY)(pos_p1.x)(self.stt);
         let portal_0.stt = Arelin.Thing.get_stt(portal_0)
         Arelin.Thing.set_stt(portal_0)
-          | Map.set<>(Arelin.Constants.POS_Y_KEY)(pos_p1.y)(portal_0.stt);
+          | Map.set<>(Arelin.Game.Constants.POS_Y_KEY)(pos_p1.y)(portal_0.stt);
       
       let portal_1 = 
-        use pos_p0.x pos_p0.y pos_p0.z = case pos_p0
+        get pos_p0.x pos_p0.y pos_p0.z = pos_p0
         let portal_1 = Arelin.Thing.new_thing
         let portal_1 = Arelin.Thing.set_sid(portal_1)(self.sid)
         let portal_1 = Arelin.Thing.set_fun(portal_1)
@@ -104,10 +104,10 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
         let portal_1 = Arelin.Thing.set_dir(portal_1)(self.dir)
         let portal_1 = Arelin.Thing.set_box(portal_1)(Arelin.Game.Hitbox.nbox)
         let portal_1 = Arelin.Thing.set_stt(portal_1)
-          | Map.set<>(Arelin.Constants.POS_X_KEY)(pos_p0.x)(self.stt);
+          | Map.set<>(Arelin.Game.Constants.POS_X_KEY)(pos_p0.x)(self.stt);
         let portal_1.stt = Arelin.Thing.get_stt(portal_1)
         Arelin.Thing.set_stt(portal_1)
-          | Map.set<>(Arelin.Constants.POS_Y_KEY)(pos_p0.y)(portal_1.stt);
+          | Map.set<>(Arelin.Game.Constants.POS_Y_KEY)(pos_p0.y)(portal_1.stt);
      
       let self = Arelin.Thing.spawn(self)(F64.parse("20"))
         | [Arelin.Thing; Arelin.Thing.move(portal_0)(pos_p0)];
@@ -126,26 +126,26 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
     ;
   ;;;;;
 
-Arelin.Game.mystic_beam_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.mystic_beam_fun: Arelin.Game.TxFunction
   (self)
   Arelin.Thing.animate_die(self)(F64.0)(DR_STRANGE_MYSTIC_BEAM_EFFECT_000)
   | F64.parse("9");
   | F64.parse("18");
 
-Arelin.Game.portal_fun_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.portal_fun: Arelin.Game.TxFunction
   (self)
   Arelin.Thing.animate_die(self)(F64.0)(DR_STRANGE_PORTAL_EFFECT_000)
   | F64.parse("31");
   | F64.parse("31");
 
-Arelin.Game.time_stone_power_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.time_stone_power_fun: Arelin.Game.TxFunction
   (self)
   Arelin.Thing.animate_die(self)(F64.0)(DR_STRANGE_TIME_STONE_POWER_EFFECT_000)
   | F64.parse("29");
   | F64.parse("58");
 
 // Portal to p1
-Arelin.Game.chronostasis_p0_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.chronostasis_p0_fun: Arelin.Game.TxFunction
   (self)
   let self.tik = Arelin.Thing.get_tik(self)
   let self = 
@@ -153,12 +153,12 @@ Arelin.Game.chronostasis_p0_fun: Arelin.Game.TxFunction
     | F64.parse("26");
     | F64.parse("78");
     Bool.if<>(F64.eql(self.tik)(F64.parse("51")))
-    | Arelin.Thing.set_die(self)(Bool.True);
+    | Arelin.Thing.set_die(self)(Bool.true);
     | 
       let p1_pos = Arelin.Thing.get_stt_value_v3(self)
       let effs = [
         Arelin.Game.Effect; 
-        Arelin.Game.Effect.teleport(p1_pos)(F64.0)
+        Arelin.Game.Effect.teleport_to(p1_pos)(F64.0)
       ]
       let telep = [
         Arelin.Game.Hit;
@@ -175,19 +175,21 @@ Arelin.Game.chronostasis_p0_fun: Arelin.Game.TxFunction
     ;
 
 // Portal to p1
-Arelin.Game.chronostasis_p0_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.chronostasis_p0_fun: Arelin.Game.TxFunction
   (self)
   let self.tik = Arelin.Thing.get_tik(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
   let self = 
     Arelin.Thing.animate(self)(F64.0)(DR_STRANGE_CHRONOSTASIS_EFFECT_000)
     | F64.parse("26");
     | F64.parse("78");
   Bool.if<>(F64.eql(self.tik)(F64.parse("51")))
-  | Arelin.Thing.set_die(self)(Bool.True);
+  | Arelin.Thing.set_die(self)(Bool.true);
   | let p1_pos = Arelin.Thing.get_stt_value_v3(self)
     let effs = [
       Arelin.Game.Effect; 
-      Arelin.Game.Effect.teleport(p1_pos)(F64.0)
+      Arelin.Game.Effect.teleport_to(p1_pos)(F64.0)
     ]
     let telep = [
       Arelin.Game.Hit;
@@ -204,19 +206,21 @@ Arelin.Game.chronostasis_p0_fun: Arelin.Game.TxFunction
   ;
 
 // Portal to p0
-Arelin.Game.chronostasis_p1_fun: Arelin.Game.TxFunction
+Arelin.Thing.drstrange.chronostasis_p1_fun: Arelin.Game.TxFunction
   (self)
   let self.tik = Arelin.Thing.get_tik(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.dir = Arelin.Thing.get_dir(self)
   let self = 
     Arelin.Thing.animate(self)(F64.0)(DR_STRANGE_CHRONOSTASIS_EFFECT_000)
     | F64.parse("26");
     | F64.parse("78");
   Bool.if<>(F64.eql(self.tik)(F64.parse("51")))
-  | Arelin.Thing.set_die(self)(Bool.True);
+  | Arelin.Thing.set_die(self)(Bool.true);
   | let p0_pos = Arelin.Thing.get_stt_value_v3(self)
     let effs = [
       Arelin.Game.Effect; 
-      Arelin.Game.Effect.teleport(p0_pos)(F64.0)
+      Arelin.Game.Effect.teleport_to(p0_pos)(F64.0)
     ]
     let telep = [
       Arelin.Game.Hit;
@@ -230,62 +234,3 @@ Arelin.Game.chronostasis_p1_fun: Arelin.Game.TxFunction
     let self = Arelin.Thing.cast(self)(F64.parse("50"))(telep)
     self
   ;
-
-
-
-
-// Add auxiliar functions on other file following the name: 
-// Arelin.Thing.char_name.skill_name_fun.fm
-
-// Some basic functions:
-
-// let self = 
-//   Arelin.Thing.animate(self)(F64.0)(DILMA_SALUTING_THE_CASSAVA_000)
-//   | F64.parse("18");
-//   | F64.parse("54");
-
-//  let self = 
-//     Arelin.Thing.animate_between(self)(F64.0)
-//     | DILMA_PROTECTION_000;
-//     | F64.parse("6");
-//     | F64.parse("3");
-//     | F64.parse("7");
-
-//  let self = Arelin.Thing.reset(self)(F64.parse("63"))
-
-// let speech = Arelin.Thing.new_thing
-    // let speech = Arelin.Thing.set_fun(speech)
-    //   | Arelin.Thing.dilma.confusion_fun;
-    // let speech = Arelin.Thing.set_dir(speech)
-    //   | Arelin.Game.targ_dir(self);
-    // let self = Arelin.Thing.spawn(self)(F64.parse("34"))
-    //   | [Arelin.Thing; 
-    //     Arelin.Thing.move(speech)
-    //     | Arelin.Thing.at_max_dist(self)(F64.parse("100"));
-    //     ];
-
-// let self = 
-//   Arelin.Thing.spawn(self)(F64.parse("34"))
-//   | [Arelin.Thing; 
-//     Arelin.Thing.move(speech)
-//     | Arelin.Thing.at_max_dist(self)(F64.parse("100"));
-//     ];
-
-//  let effs = [
-//       Arelin.Game.Effect; 
-//       Arelin.Game.Effect.damage(F64.parse("3")),
-//       Arelin.Game.Effect.impulse(F64.parse("12"))(self.dir)
-//     ]
-  // let hits = [
-  //   Arelin.Game.Hit;
-  //   Arelin.Game.Hit.new
-  //   | effs;
-  //   | Arelin.Thing.at_dist(self)(F64.parse("40"));
-  //   | self.dir;
-  //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));,
-  //   Arelin.Game.Hit.new
-  //   | effs;
-  //   | Arelin.Thing.at_dist(self)(F64.parse("40"));
-  //   | self.dir;
-  //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));
-  // ]  

@@ -1,4 +1,4 @@
-Arelin.Thing.jacquin_fun: TxFunction
+Arelin.Thing.jacquin_fun: Arelin.Game.TxFunction
   (self)
   let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
   let self = Arelin.Thing.set_mhp(self)(F64.parse("24"))
@@ -7,7 +7,7 @@ Arelin.Thing.jacquin_fun: TxFunction
 
   Bool.if<>(F64.eql(self.act)(F64.0)) 
   | #JACQUIN_IDLE# // Walk
-    F64.if<>(Arelin.Thing.is_walking(self))
+    Bool.if<>(Arelin.Thing.is_walking(self))
     | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_WALK_000)
       | F64.parse("7");
       | F64.parse("14");
@@ -131,9 +131,9 @@ Arelin.Thing.jacquin.giant_jacquin_fun: Arelin.Game.TxFunction
   (self)
   let self = Arelin.Thing.set_mov(self)(F64.parse("1.5"))
   let self = Arelin.Thing.end_thing(self)(Arelin.Thing.jacquin_fun)
-    | F64.mul(Arelin.Constants.ONE_SEC)(F64.parse("7"));
-    | Arelin.Constants.UlT_TIME;
-  F64.if<>(Arelin.Thing.is_walking(self))
+    | F64.mul(Arelin.Game.Constants.ONE_SEC)(F64.parse("7"));
+    | Arelin.Game.Constants.ULT_TIME;
+  Bool.if<>(Arelin.Thing.is_walking(self))
     | Arelin.Thing.animate(self)(F64.1)(ERIC_JACQUIN_JACQUIN_WRATH_WALK_000)
       | F64.parse("8");
       | F64.parse("16");
