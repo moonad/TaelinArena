@@ -1,51 +1,51 @@
 Arelin.Thing.character_name_fun: Arelin.Game.TxFunction
   (self)
-  let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
-  let self = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self = Arelin.Thing.set_mov(self, F64.parse("2"))
+  let self = Arelin.Thing.set_mhp(self, F64.parse("24"))
   let self.act = Arelin.Thing.get_act(self)
   let self.dir = Arelin.Thing.get_dir(self)
 
-  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  Bool.if<>(F64.eql(self.act, F64.0)) 
   | #CHAR_NAME_IDLE# // Walk
-    // F64.if<>(Arelin.Thing.is_walking(self))
-    // | Arelin.Thing.animate(self)(F64.1)(DILMA_WALK_000)
+    // Bool.if<>(Arelin.Thing.is_walking(self))
+    // | Arelin.Thing.animate(self, F64.1, DILMA_WALK_000)
     //   | F64.parse("8");
     //   | F64.parse("16");
     // ;
-    // | Arelin.Thing.animate(self)(F64.1)(DILMA_IDLE_000)
+    // | Arelin.Thing.animate(self, F64.1, DILMA_IDLE_000)
     //   | F64.parse("4");
     //   | F64.parse("16");
     // ;
-    self  // TODO: add code
+    self
   ;
 
-  | Bool.if<>(F64.eql(self.act)(F64.1))
+  | Bool.if<>(F64.eql(self.act, F64.1))
     | #CHAR_N_SKILL_NAME# // Left
-      self // TODO: add code
+      self 
     ;
     
-  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+  | Bool.if<>(F64.eql(self.act, F64.2)) 
     | #CHAR_N_SKILL_NAME# // Middle
-      self // TODO: add code
+      self
     ;
 
-  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+  | Bool.if<>(F64.eql(self.act, F64.parse("3")))
     | #CHAR_N_SKILL_NAME# // Right
-      self // TODO: add code
+      self
     ;
 
-  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+  | Bool.if<>(F64.eql(self.act, F64.parse("4"))) 
     | #CHAR_N_SKILL_NAME# // Q
-      self // TODO: add code
+      self
     ;
     
-  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+  | Bool.if<>(F64.eql(self.act, F64.parse("5"))) 
     | #CHAR_N_SKILL_NAME# // Space
-      self // TODO: add code
+      self
     ;
 
     | #CHAR_N_SKILL_NAME# // E
-      self // TODO: add code
+      self
     ;
   ;;;;;
 
@@ -55,52 +55,52 @@ Arelin.Thing.character_name_fun: Arelin.Game.TxFunction
 // Some basic functions:
 
 // let self = 
-//   Arelin.Thing.animate(self)(F64.0)(DILMA_SALUTING_THE_CASSAVA_000)
+//   Arelin.Thing.animate(self, F64.0, DILMA_SALUTING_THE_CASSAVA_000)
 //   | F64.parse("18");
 //   | F64.parse("54");
 
 //  let self = 
-//     Arelin.Thing.animate_between(self)(F64.0)
+//     Arelin.Thing.animate_between(self, F64.0)
 //     | DILMA_PROTECTION_000;
 //     | F64.parse("6");
 //     | F64.parse("3");
 //     | F64.parse("7");
 
-//  let self = Arelin.Thing.reset(self)(F64.parse("63"))
+//  let self = Arelin.Thing.reset(self, F64.parse("63"))
 
-// let speech = Arelin.Thing.new_thing
-    // let speech = Arelin.Thing.set_fun(speech)
-    //   | Arelin.Thing.dilma.confusion_fun;
-    // let speech = Arelin.Thing.set_dir(speech)
-    //   | Arelin.Game.targ_dir(self);
-    // let self = Arelin.Thing.spawn(self)(F64.parse("34"))
-    //   | [Arelin.Thing; 
-    //     Arelin.Thing.move(speech)
-    //     | Arelin.Thing.at_max_dist(self)(F64.parse("100"));
-    //     ];
-
-// let self = 
-//   Arelin.Thing.spawn(self)(F64.parse("34"))
-//   | [Arelin.Thing; 
-//     Arelin.Thing.move(speech)
-//     | Arelin.Thing.at_max_dist(self)(F64.parse("100"));
-//     ];
+// let fire = Arelin.Thing.new_thing
+// let fire = Arelin.Thing.set_fun(fire, Arelin.Thing.gon.t_paper_fun)
+// let fire = Arelin.Thing.set_pos(fire, Arelin.Thing.at_dist(self, F64.parse("20")))
+// let fire = Arelin.Thing.set_dir(fire, Arelin.Thing.targ_dir(self))
+// let fire = Arelin.Thing.set_vel(fire)
+//   | F64.V3.scale(F64.parse("12"), Arelin.Thing.targ_dir(self));
+// let fire = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+// let self = Arelin.Thing.spawn(self, F64.parse("12"))
+//   | [ Arelin.Thing; fire ];
+// let self =
+//   Arelin.Thing.spawn(self, F64.parse("5"))
+//   | [ Arelin.Thing;
+//       Arelin.Thing.move(flame)
+//       | Arelin.Thing.at_max_dist(self, F64.parse("128"));];
 
 //  let effs = [
 //       Arelin.Game.Effect; 
 //       Arelin.Game.Effect.damage(F64.parse("3")),
-//       Arelin.Game.Effect.impulse(F64.parse("12"))(self.dir)
+//       Arelin.Game.Effect.impulse(F64.parse("12"), self.dir)
 //     ]
   // let hits = [
   //   Arelin.Game.Hit;
   //   Arelin.Game.Hit.new
   //   | effs;
-  //   | Arelin.Thing.at_dist(self)(F64.parse("40"));
+  //   | Arelin.Thing.at_dist(self, F64.parse("40"));
   //   | self.dir;
   //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));,
   //   Arelin.Game.Hit.new
   //   | effs;
-  //   | Arelin.Thing.at_dist(self)(F64.parse("40"));
+  //   | Arelin.Thing.at_dist(self, F64.parse("40"));
   //   | self.dir;
   //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));
   // ]  
+
+  // let fire = Arelin.Thing.set_vel(fire)
+  //       | F64.V3.scale(F64.parse("8"), Arelin.Thing.targ_dir(self));
