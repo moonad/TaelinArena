@@ -8,10 +8,6 @@ assignees: ''
 ---
 
 ### Tasks
- - [ ] [LEFT] 
- - [ ] [MIDDLE] 
- - [ ] [RIGHT] 
- - [ ] [SPACE] 
- - [ ] [Q]
- - [ ] [E]
- - [ ] Test all characters' files locally on Moonad repository
+ - [ ] Basic skills
+ - [ ] Auxiliar functions
+ - [ ] [MoonadPR]*TODO: add link*
