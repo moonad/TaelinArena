@@ -76,30 +76,18 @@
     console.log("updated " + packs_js_path);
     fs.writeFileSync(packs_js_path, packs_text);
 
-    const model_fm_path = (pack_num) => {
-      var model_fm_path = "/../game/Arelin.ModelsId"+pack_num+".fm";
-      return path.join(__dirname, model_fm_path);
-    }
-    
-    var pack_num = 0;
-    var pack_max = 0;
-
-    // Updates TaelinArena.ModelsIds.fmc
+    // Updates Arelin.ModelsIds.fm
+    var model_fm_path = path.join(__dirname, "/../game/Arelin.ModelsId.fm");
     var model_fm_text = "";
     for (var i = 0; i < model_names.length; ++i){
       let name = model_names[i];
       let model_name = name.replace(new RegExp("/","g"), "_").toUpperCase();
-      let fmc_code = ": F64 " + `F64.parse("${i}")\n`;
-      model_fm_text += model_name + fmc_code;
-      if ((i > 0) &&
-         (i % 300) === 0 || (i === (model_names.length - 1))) {
-        console.log("Updated " + model_fm_path(pack_num));
-        fs.writeFileSync(model_fm_path(pack_num), model_fm_text);
-        pack_num++;
-        model_fm_text = "";
-      }
+      let fm_code = ": F64 " + `F64.parse("${i}")\n`;
+      model_fm_text += model_name + fm_code;
     }
-
+    console.log("Updated " + model_fm_path);
+    fs.writeFileSync(model_fm_path, model_fm_text)
+    
     // Done!
     console.log("\nAll done.");
   });
