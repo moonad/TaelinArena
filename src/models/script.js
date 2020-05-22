@@ -14,15 +14,8 @@
   var model_hash_js_path = path.join(__dirname, "/../models/models_hash.json");
   var files = path.join(__dirname,"../../models/**/*.vox");
 
-  const has_file_changed = (file_path, file_actual_hash) => {
-    if (fs.existsSync(model_hash_js_path)) {
-      var data = fs.readFileSync(model_hash_js_path, "utf8");
-      var file_data = JSON.parse(data);
-
-      var file_hash = file_data[file_path];
-      return file_hash !== file_actual_hash;
-    } else { return true }
-  } 
+  var models_hash = fs.readFileSync(model_hash_js_path, "utf8");
+  var models_hash_data = JSON.parse(models_hash);
 
   const checksum_file = (algorithm, path) => {
     return new Promise((resolve, reject) =>
@@ -65,7 +58,7 @@
 
         const hash = await checksum_file("md5", file_path);
 
-        if (has_file_changed(model_name, hash)){
+        if (hash !== models_hash_data[model_name]){
           var {json,removed,length} = await conv.vox_to_json(file, pivot);
           total_removed += removed;
           console.log("built \x1b[2m"+short_path+"\x1b[0m"

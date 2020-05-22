@@ -19,6 +19,6 @@ module.exports = {
       name: 'models',
       path: './docs/models.json'
     }),
-    new CompressionWebpackPlugin(),
+    // new CompressionWebpackPlugin(),
   ]
 };
