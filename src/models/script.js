@@ -6,15 +6,40 @@
   var glob = require("glob");
   var path = require("path");
   var fs = require("fs");
-  var md5 = require('md5-file');
+  // var md5 = require('md5-file');
+  var crypto = require('crypto');
 
   var model_names = [];
 
+  var model_hash_js_path = path.join(__dirname, "/../models/models_hash.json");
   var files = path.join(__dirname,"../../models/**/*.vox");
+
+  const has_file_changed = (file_path, file_actual_hash) => {
+    if (fs.existsSync(model_hash_js_path)) {
+      var data = fs.readFileSync(model_hash_js_path, "utf8");
+      var file_data = JSON.parse(data);
+
+      var file_hash = file_data[file_path];
+      return file_hash !== file_actual_hash;
+    } else { return true }
+  } 
+
+  const checksum_file = (algorithm, path) => {
+    return new Promise((resolve, reject) =>
+      fs.createReadStream(path)
+        .on('error', reject)
+        .pipe(crypto.createHash(algorithm)
+          .setEncoding('hex'))
+        .once('finish', function () {
+          resolve(this.read())
+        })
+    )
+  }
+
   glob(files, {}, async (er, file_names) => {
 
-    var hashes = new Map();
-    var hashes2 = [""];
+    var hashes = {};
+
     // Converts all .vox to .json
     var total_removed = 0;
     var total_length = 0;
@@ -32,44 +57,37 @@
         }
         var new_path = file_path.replace(".vox",".json");
         var short_path = new_path.slice(new_path.indexOf("models"));
-        var {json,removed,length} = await conv.vox_to_json(file, pivot);
-        total_removed += removed;
 
-        console.log("built \x1b[2m"+short_path+"\x1b[0m"
+        var model_name = new_path
+        .replace(new RegExp(".json","g"), "")
+        .slice(new_path.indexOf("models")+7);
+        model_names.push(model_name);
+
+        const hash = await checksum_file("md5", file_path);
+
+        if (has_file_changed(model_name, hash)){
+          var {json,removed,length} = await conv.vox_to_json(file, pivot);
+          total_removed += removed;
+          console.log("built \x1b[2m"+short_path+"\x1b[0m"
           +", removing \x1b[2m"+removed+"\x1b[0m"
           +" of \x1b[2m"+length+"\x1b[0m voxels"
           +" (\x1b[2m"+(removed/length*100).toFixed(2)+"%\x1b[0m)");
-        fs.writeFileSync(new_path, '"'+json+'"');
-        var model_name = new_path
-          .replace(new RegExp(".json","g"), "")
-          .slice(new_path.indexOf("models")+7);
-        model_names.push(model_name);
+          fs.writeFileSync(new_path, '"'+json+'"');
+          hashes[model_name] = hash;
+        } else {
+          console.log("Nothing changed in \x1b[2m"+short_path+"\x1b[0m");
+          hashes[model_name] = hash;
+        }
 
-        const hash = md5.sync(file_path);
-        hashes.set(model_name, hash);
-        hashes2.push(hash);
       };
     };
-
-    // Updates models_hash.js
-    var model_hash_js_path = "/../models/models_hash.txt";
-    var model_hash_js_path = path.join(__dirname, model_hash_js_path);
-    var stream = fs.createWriteStream(model_hash_js_path, {flags:'a'});
-    // stream.write("{")
-    for (var [key, value] of hashes) {
-      console.log(key, value);
-      const entry = key+":"+value+"\n";
-      stream.write(entry);
-    }
-    // stream.write("}")
-    stream.end();
-    // console.log(hashes2);
-    // fs.writeFileSync(model_hash_js_path, JSON.stringify(hashes));
-
 
     console.log("removed total of "
       + "\x1b[2m"+total_removed+"\x1b[0m from "
       + "\x1b[2m"+total_length+"\x1b[0m voxels!");
+
+    // Updates models_hash.js
+    fs.writeFileSync(model_hash_js_path, JSON.stringify(hashes, null, 2));
 
     // Updates models.js
     var model_js_path = "/../models/models.js";
