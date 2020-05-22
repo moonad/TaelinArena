@@ -6,7 +6,6 @@
   var glob = require("glob");
   var path = require("path");
   var fs = require("fs");
-  // var md5 = require('md5-file');
   var crypto = require('crypto');
 
   var model_names = [];
