@@ -41,6 +41,7 @@
     "ethers": "^4.0.43",
     "express": "^4.17.1",
     "formality-lang": "^0.1.254",
+    "md5-file": "^5.0.0",
     "navigator": "^1.0.1",
     "peerjs": "^1.2.0",
     "simple-peer": "^9.6.2",

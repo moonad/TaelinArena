@@ -6,15 +6,19 @@
   var glob = require("glob");
   var path = require("path");
   var fs = require("fs");
+  var md5 = require('md5-file');
 
   var model_names = [];
 
   var files = path.join(__dirname,"../../models/**/*.vox");
   glob(files, {}, async (er, file_names) => {
 
+    var hashes = new Map();
+    var hashes2 = [""];
     // Converts all .vox to .json
     var total_removed = 0;
     var total_length = 0;
+    
     for (let i = 0; i < file_names.length; ++i) {
       var file_path = file_names[i];
       if (file_path.indexOf("__old__") === -1) {
@@ -30,7 +34,7 @@
         var short_path = new_path.slice(new_path.indexOf("models"));
         var {json,removed,length} = await conv.vox_to_json(file, pivot);
         total_removed += removed;
-        total_length += length;
+
         console.log("built \x1b[2m"+short_path+"\x1b[0m"
           +", removing \x1b[2m"+removed+"\x1b[0m"
           +" of \x1b[2m"+length+"\x1b[0m voxels"
@@ -40,8 +44,29 @@
           .replace(new RegExp(".json","g"), "")
           .slice(new_path.indexOf("models")+7);
         model_names.push(model_name);
+
+        const hash = md5.sync(file_path);
+        hashes.set(model_name, hash);
+        hashes2.push(hash);
       };
     };
+
+    // Updates models_hash.js
+    var model_hash_js_path = "/../models/models_hash.txt";
+    var model_hash_js_path = path.join(__dirname, model_hash_js_path);
+    var stream = fs.createWriteStream(model_hash_js_path, {flags:'a'});
+    // stream.write("{")
+    for (var [key, value] of hashes) {
+      console.log(key, value);
+      const entry = key+":"+value+"\n";
+      stream.write(entry);
+    }
+    // stream.write("}")
+    stream.end();
+    // console.log(hashes2);
+    // fs.writeFileSync(model_hash_js_path, JSON.stringify(hashes));
+
+
     console.log("removed total of "
       + "\x1b[2m"+total_removed+"\x1b[0m from "
       + "\x1b[2m"+total_length+"\x1b[0m voxels!");
@@ -90,6 +115,7 @@
     
     // Done!
     console.log("\nAll done.");
+    // stream.end();
   });
 
 })();
