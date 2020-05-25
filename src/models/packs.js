@@ -11,364 +11,376 @@ module.exports = {
     "from": 229,
     "til": 333
   },
-  "danthy_pistol_form": {
+  "beedrill": {
     "from": 333,
-    "til": 476
+    "til": 411
+  },
+  "blastoise": {
+    "from": 411,
+    "til": 575
+  },
+  "bleskape": {
+    "from": 575,
+    "til": 677
+  },
+  "danthy_pistol_form": {
+    "from": 677,
+    "til": 820
   },
   "danthy_sword_form": {
-    "from": 476,
-    "til": 571
+    "from": 820,
+    "til": 915
   },
   "darth_vader": {
-    "from": 571,
-    "til": 675
+    "from": 915,
+    "til": 1019
   },
   "deku": {
-    "from": 675,
-    "til": 728
+    "from": 1019,
+    "til": 1072
   },
   "dilma": {
-    "from": 728,
-    "til": 814
+    "from": 1072,
+    "til": 1158
   },
   "dorime": {
-    "from": 814,
-    "til": 992
+    "from": 1158,
+    "til": 1336
   },
   "dr_strange": {
-    "from": 992,
-    "til": 1132
+    "from": 1336,
+    "til": 1476
   },
   "elliot": {
-    "from": 1132,
-    "til": 1329
+    "from": 1476,
+    "til": 1673
   },
   "eric_jacquin": {
-    "from": 1329,
-    "til": 1546
+    "from": 1673,
+    "til": 1890
   },
   "escanor": {
-    "from": 1546,
-    "til": 1664
+    "from": 1890,
+    "til": 2008
   },
   "eschor": {
-    "from": 1664,
-    "til": 1953
+    "from": 2008,
+    "til": 2297
   },
   "fae_pixie_form": {
-    "from": 1953,
-    "til": 1963
+    "from": 2297,
+    "til": 2307
   },
   "fae": {
-    "from": 1963,
-    "til": 2058
+    "from": 2307,
+    "til": 2402
   },
   "faisca": {
-    "from": 2058,
-    "til": 2205
+    "from": 2402,
+    "til": 2549
   },
   "finn": {
-    "from": 2205,
-    "til": 2315
+    "from": 2549,
+    "til": 2659
   },
   "gastly": {
-    "from": 2315,
-    "til": 2415
+    "from": 2659,
+    "til": 2759
   },
   "gengar": {
-    "from": 2415,
-    "til": 2491
+    "from": 2759,
+    "til": 2835
   },
   "gon_freecs": {
-    "from": 2491,
-    "til": 2738
+    "from": 2835,
+    "til": 3082
   },
   "goron": {
-    "from": 2738,
-    "til": 2775
+    "from": 3082,
+    "til": 3119
   },
   "green_lantern": {
-    "from": 2775,
-    "til": 2943
+    "from": 3119,
+    "til": 3287
   },
   "greninja": {
-    "from": 2943,
-    "til": 3096
+    "from": 3287,
+    "til": 3440
   },
   "greymon": {
-    "from": 3096,
-    "til": 3104
+    "from": 3440,
+    "til": 3448
   },
   "grimer": {
-    "from": 3104,
-    "til": 3233
+    "from": 3448,
+    "til": 3577
   },
   "hatsune_miku": {
-    "from": 3233,
-    "til": 3377
+    "from": 3577,
+    "til": 3721
   },
   "haunter": {
-    "from": 3377,
-    "til": 3463
+    "from": 3721,
+    "til": 3807
   },
   "iron_man": {
-    "from": 3463,
-    "til": 3571
+    "from": 3807,
+    "til": 3915
   },
   "ivy_klaws": {
-    "from": 3571,
-    "til": 3799
+    "from": 3915,
+    "til": 4143
   },
   "jinx": {
-    "from": 3799,
-    "til": 3918
+    "from": 4143,
+    "til": 4262
   },
   "kakashi": {
-    "from": 3918,
-    "til": 4048
+    "from": 4262,
+    "til": 4392
   },
   "kakuna": {
-    "from": 4048,
-    "til": 4079
+    "from": 4392,
+    "til": 4423
   },
   "kaze_the_samurai": {
-    "from": 4079,
-    "til": 4196
+    "from": 4423,
+    "til": 4540
   },
   "kenko": {
-    "from": 4196,
-    "til": 4369
+    "from": 4540,
+    "til": 4713
   },
   "king_dedede": {
-    "from": 4369,
-    "til": 4545
+    "from": 4713,
+    "til": 4879
   },
   "kirby": {
-    "from": 4545,
-    "til": 4623
+    "from": 4879,
+    "til": 4957
   },
   "konan": {
-    "from": 4623,
-    "til": 4735
+    "from": 4957,
+    "til": 5069
   },
   "kregor": {
-    "from": 4735,
-    "til": 4908
+    "from": 5069,
+    "til": 5242
   },
   "lars": {
-    "from": 4908,
-    "til": 5084
+    "from": 5242,
+    "til": 5418
   },
   "lina_inverse": {
-    "from": 5084,
-    "til": 5191
+    "from": 5418,
+    "til": 5525
   },
   "link": {
-    "from": 5191,
-    "til": 5337
+    "from": 5525,
+    "til": 5671
   },
   "loki": {
-    "from": 5337,
-    "til": 5486
+    "from": 5671,
+    "til": 5820
   },
   "luffy": {
-    "from": 5486,
-    "til": 5587
+    "from": 5820,
+    "til": 5921
   },
   "magnamite": {
-    "from": 5587,
-    "til": 5696
+    "from": 5921,
+    "til": 6030
   },
   "magneton": {
-    "from": 5696,
-    "til": 5818
+    "from": 6030,
+    "til": 6152
   },
   "mando": {
-    "from": 5818,
-    "til": 6000
+    "from": 6152,
+    "til": 6334
   },
   "martha_lynch": {
-    "from": 6000,
-    "til": 6233
+    "from": 6334,
+    "til": 6567
   },
   "mechwarrior": {
-    "from": 6233,
-    "til": 6340
+    "from": 6567,
+    "til": 6674
   },
   "metal_greymon": {
-    "from": 6340,
-    "til": 6356
+    "from": 6674,
+    "til": 6690
   },
   "mikegator": {
-    "from": 6356,
-    "til": 6428
+    "from": 6690,
+    "til": 6762
   },
   "min": {
-    "from": 6428,
-    "til": 6500
+    "from": 6762,
+    "til": 6834
   },
   "monica": {
-    "from": 6500,
-    "til": 6615
+    "from": 6834,
+    "til": 6949
   },
   "moshy": {
-    "from": 6615,
-    "til": 6831
+    "from": 6949,
+    "til": 7165
   },
   "muk": {
-    "from": 6831,
-    "til": 6956
+    "from": 7165,
+    "til": 7290
   },
   "nilo_kieza": {
-    "from": 6956,
-    "til": 7042
+    "from": 7290,
+    "til": 7376
   },
   "pichu": {
-    "from": 7042,
-    "til": 7145
+    "from": 7376,
+    "til": 7479
   },
   "pikachu": {
-    "from": 7145,
-    "til": 7250
+    "from": 7479,
+    "til": 7584
   },
   "pingado": {
-    "from": 7250,
-    "til": 7424
+    "from": 7584,
+    "til": 7758
   },
   "pingo_stressed": {
-    "from": 7424,
-    "til": 7555
+    "from": 7758,
+    "til": 7889
   },
   "poste": {
-    "from": 7555,
-    "til": 7556
+    "from": 7889,
+    "til": 7890
   },
   "ppg": {
-    "from": 7556,
-    "til": 7718
+    "from": 7890,
+    "til": 8052
   },
   "punchingbag": {
-    "from": 7718,
-    "til": 7742
+    "from": 8052,
+    "til": 8076
   },
   "raichu": {
-    "from": 7742,
-    "til": 7845
+    "from": 8076,
+    "til": 8179
   },
   "ray": {
-    "from": 7845,
-    "til": 7919
+    "from": 8179,
+    "til": 8253
   },
   "robot_r06": {
-    "from": 7919,
-    "til": 8069
+    "from": 8253,
+    "til": 8403
   },
   "ryu": {
-    "from": 8069,
-    "til": 8232
+    "from": 8403,
+    "til": 8566
   },
   "samson_armor": {
-    "from": 8232,
-    "til": 8325
+    "from": 8566,
+    "til": 8659
   },
   "scorpion": {
-    "from": 8325,
-    "til": 8428
+    "from": 8659,
+    "til": 8762
   },
   "shao": {
-    "from": 8428,
-    "til": 8535
+    "from": 8762,
+    "til": 8869
   },
   "sheldon": {
-    "from": 8535,
-    "til": 8721
+    "from": 8869,
+    "til": 9055
   },
   "shonkie": {
-    "from": 8721,
-    "til": 8838
+    "from": 9055,
+    "til": 9172
   },
   "squirtle": {
-    "from": 8838,
-    "til": 8970
+    "from": 9172,
+    "til": 9304
   },
   "sr_madruga": {
-    "from": 8970,
-    "til": 9092
+    "from": 9304,
+    "til": 9426
   },
   "steve": {
-    "from": 9092,
-    "til": 9224
+    "from": 9426,
+    "til": 9558
   },
   "tai_evolution_effect": {
-    "from": 9224,
-    "til": 9254
+    "from": 9558,
+    "til": 9588
   },
   "tai": {
-    "from": 9254,
-    "til": 9301
+    "from": 9588,
+    "til": 9635
   },
   "teichi": {
-    "from": 9301,
-    "til": 9431
+    "from": 9635,
+    "til": 9765
   },
   "teresa": {
-    "from": 9431,
-    "til": 9556
+    "from": 9765,
+    "til": 9890
   },
   "tony_stark": {
-    "from": 9556,
-    "til": 9655
+    "from": 9890,
+    "til": 9989
   },
   "tophoro": {
-    "from": 9655,
-    "til": 9776
+    "from": 9989,
+    "til": 10110
   },
   "tupitree": {
-    "from": 9776,
-    "til": 9930
+    "from": 10110,
+    "til": 10264
   },
   "tvee": {
-    "from": 9930,
-    "til": 10026
+    "from": 10264,
+    "til": 10360
   },
   "wall": {
-    "from": 10026,
-    "til": 10027
+    "from": 10360,
+    "til": 10361
   },
   "wartortle": {
-    "from": 10027,
-    "til": 10165
+    "from": 10361,
+    "til": 10499
   },
   "weedle": {
-    "from": 10165,
-    "til": 10220
+    "from": 10499,
+    "til": 10554
   },
   "xululu_child": {
-    "from": 10220,
-    "til": 10372
+    "from": 10554,
+    "til": 10706
   },
   "young_link": {
-    "from": 10372,
-    "til": 10401
+    "from": 10706,
+    "til": 10735
   },
   "yusuke": {
-    "from": 10401,
-    "til": 10559
+    "from": 10735,
+    "til": 10893
   },
   "zagatur": {
-    "from": 10559,
-    "til": 10647
+    "from": 10893,
+    "til": 10981
   },
   "zed": {
-    "from": 10647,
-    "til": 10782
+    "from": 10981,
+    "til": 11116
   },
   "zoio": {
-    "from": 10782,
-    "til": 10881
+    "from": 11116,
+    "til": 11215
   },
   "zora": {
-    "from": 10881,
-    "til": 10923
+    "from": 11215,
+    "til": 11257
   }
 }
