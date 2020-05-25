@@ -127,7 +127,7 @@
       let fm_code = ": F64 " + `F64.parse("${i}")\n`;
       model_fm_text += model_name + fm_code;
       if((i > 0) && 
-        (i % 300) === 0 || (i === (model_names.length - 1))) {
+        (i % 550) === 0 || (i === (model_names.length - 1))) {
         console.log("Updated " + model_fm_path(pack_num));
         fs.writeFileSync(model_fm_path(pack_num), model_fm_text);
         pack_num++;
