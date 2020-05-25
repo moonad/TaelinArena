@@ -28,6 +28,13 @@
     )
   }
 
+  const get_skill_name = (path) => {
+    var skill_aux = path.split("/").length;
+    var character = path.split("/")[skill_aux - 3];
+    var skill_name = path.split("/")[skill_aux - 2];
+    return character+"/"+skill_name;
+  }
+
   glob(files, {}, async (er, file_names) => {
 
     var hashes = {};
@@ -38,14 +45,22 @@
     
     for (let i = 0; i < file_names.length; ++i) {
       var file_path = file_names[i];
+      var skill_name = get_skill_name(file_path);
+      pivot_changed = false;
+
       if (file_path.indexOf("__old__") === -1) {
         var file = fs.readFileSync(file_path);
         var pivot_path = file_path.split("/").slice(0,-1).join("/") + "/pivot.json";
         if (fs.existsSync(pivot_path)) {
           var ppath = fs.readFileSync(pivot_path,"utf8");
           var pivot = JSON.parse(ppath);
+          const hash_pivot = await checksum_file("md5", pivot_path);
+          const pivot_key = get_skill_name(pivot_path)+"/pivot";
+          pivot_changed = hash_pivot !== models_hash_data[pivot_key];
+          hashes[pivot_key] = hash_pivot;
         } else {
           var pivot = null;
+          pivot_changed = false;
         }
         var new_path = file_path.replace(".vox",".json");
         var short_path = new_path.slice(new_path.indexOf("models"));
@@ -57,7 +72,7 @@
 
         const hash = await checksum_file("md5", file_path);
 
-        if (hash !== models_hash_data[model_name]){
+        if ((hash !== models_hash_data[model_name]) || pivot_changed){
           var {json,removed,length} = await conv.vox_to_json(file, pivot);
           total_removed += removed;
           console.log("built \x1b[2m"+short_path+"\x1b[0m"
