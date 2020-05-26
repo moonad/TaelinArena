@@ -96,26 +96,36 @@
     // Updates models_hash.js
     fs.writeFileSync(model_hash_js_path, JSON.stringify(hashes, null, 2));
 
-    // Updates models.js
-    var model_js_path = "/../models/models.js";
-    var model_js_path = path.join(__dirname, model_js_path);
-    var model_js_text
-      = "module.exports = [\n"
-      + model_names.map(name => {
-        var model_key = name.replace(new RegExp("/","g"), "_");
-        var file_path = "./../../models/"+name+".json";
-        var file_load = "()=>import(\""+file_path+"\")";
-        return "  "+file_load+",";
-      }).join("\n")
-      + "\n];";
-    console.log("updated " + model_js_path);
-    fs.writeFileSync(model_js_path, model_js_text);
+    const debug_mode = (bool) => {
+      return bool ? 400 : models_name.length;
+    }
+    var pack_num = 0;
 
+    // Updates models.js
+    const model_js_path = (pack_num) => {
+      var pack_path = "/../models/models_" + pack_num +".js";
+      return path.join(__dirname, pack_path);
+    }
+
+    var model_js_text = "module.exports = [\n";
+    for (var i = 0; i < debug_mode(true); ++i) {
+      var name =  model_names[i];
+      var model_key = name.replace(new RegExp("/","g"), "_");
+      var file_path = "./../../models/"+name+".json";
+      var file_load = "()=>import(\""+file_path+"\")";
+      model_js_text += "\n  "+file_load+",";
+      if((i > 0) && ( (i % 500) === 0 || i === (debug_mode(true) - 1)) ) {
+        model_js_text += "\n];";
+        fs.writeFileSync(model_js_path(pack_num), model_js_text);
+        pack_num++;
+        model_js_text = "module.exports = [\n";
+      }
+    }
     // Updates packs.js
     var packs_js_path = "/../models/packs.js";
     var packs_js_path = path.join(__dirname, packs_js_path);
     var packs = {};
-    for (var i = 0; i < model_names.length; ++i) {
+    for (var i = 0; i < debug_mode(true); ++i) {
       var pack = model_names[i].split("/")[0];
       if (!packs[pack]) {
         packs[pack] = {from: i, til: i};
@@ -123,33 +133,32 @@
       packs[pack].til = i+1;
     };
     var packs_text = "module.exports = "+JSON.stringify(packs,null,2);
-    console.log("updated " + packs_js_path);
+    // console.log("updated " + packs_js_path);
     fs.writeFileSync(packs_js_path, packs_text);
 
     // Updates Arelin.ModelsIds.fm
-    var pack_num = 0;
-    var pack_max = 0; 
+    pack_num = 0
 
     const model_fm_path = (pack_num) => {
-      var model_fm_path = "/../game/Arelin.ModelsId" + pack_num +".fm"
-      return path.join(__dirname, model_fm_path)
+      var model_fm_path = "/../game/Arelin.ModelsId" + pack_num +".fm";
+      return path.join(__dirname, model_fm_path);
     }
 
     var model_fm_text = "";
-    for (var i = 0; i < model_names.length; ++i){
+    for (var i = 0; i < debug_mode(true); ++i){
       let name = model_names[i];
       let model_name = name.replace(new RegExp("/","g"), "_").toUpperCase();
       let fm_code = ": F64 " + `F64.parse("${i}")\n`;
       model_fm_text += model_name + fm_code;
       if((i > 0) && 
-        (i % 550) === 0 || (i === (model_names.length - 1))) {
-        console.log("Updated " + model_fm_path(pack_num));
+        (i % 550) === 0 || (i === (debug_mode(true) - 1))) {
+        // console.log("Updated " + model_fm_path(pack_num));
         fs.writeFileSync(model_fm_path(pack_num), model_fm_text);
         pack_num++;
         model_fm_text = "";
       }     
     }
-    
+
     // Done!
     console.log("\nAll done.");
     // stream.end();
