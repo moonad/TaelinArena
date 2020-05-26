@@ -6,7 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   context: process.cwd(),
   entry: {
-    models: ['./src/models/models.js'],
+    models: ['./src/models/models_0.js'],
   },
   output: {
     path: path.resolve(__dirname, './docs'),

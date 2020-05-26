@@ -7,7 +7,7 @@ const fs = require("fs");
 
 module.exports = {
   mode: 'production',
-  optimization: {minimize: true},
+  optimization: {minimize: false},
   //devtool: "source-map",
   entry: './src/index.js',
   module: {
