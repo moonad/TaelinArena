@@ -1,0 +1,296 @@
+Arelin.Thing.kakashi_fun(self: Arelin.Thing): Arelin.Thing
+  let self     = Arelin.Thing.set_mov(self, F64.parse("3"))
+  let self     = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  
+  case F64.eql(self.act, F64.0):
+  | #KAKASHI_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | KAKASHI_RUN_000;
+      | F64.parse("6");
+      | F64.parse("12");
+    ;
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | KAKASHI_IDLE_000;
+      | F64.parse("13");
+      | F64.parse("39");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #KAKASHI_PAKKUN_ATTACK#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | GASTLY_ATTACK_LICK_000;
+      | F64.parse("10");
+      | F64.parse("20");
+    let max_dist = F64.parse("90")
+    let hits0 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | Arelin.Thing.at_dist(self, F64.mul(max_dist, F64.parse("0.5")));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits1 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | Arelin.Thing.at_dist(self, F64.mul(max_dist, F64.parse("0.7")));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits2 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_4) 
+          ];
+        | Arelin.Thing.at_dist(self, max_dist);
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("15"));
+      ]
+    let self = Arelin.Thing.cast(self, F64.parse("36"), hits0) 
+    let self = Arelin.Thing.cast(self, F64.parse("40"), hits1) 
+    let self = Arelin.Thing.cast(self, F64.parse("42"), hits2) 
+    self
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #KAKASHI_TELEPORT#
+    let self =
+      Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | KAKASHI_TELEPORT_000;
+      | F64.parse("14");
+      | F64.parse("28");
+
+    let self = 
+      Arelin.Thing.blink
+      | self;
+      | F64.parse("18");
+      | Arelin.Thing.at_max_dist(self, F64.parse("100"));
+
+    self 
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #KAKASHI_FIREBALL_CASTING#
+    let self =
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | KAKASHI_FIREBALL_CASTING_000;
+      | F64.parse("9");
+      | F64.parse("18");
+    
+    let hits0 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_3) ];
+        | Arelin.Thing.at_dist(self, F64.parse("45"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("15"));
+      ]
+    let hits1 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_3),
+            Arelin.Game.Effect.repulse(F64.parse("10"))
+          ];
+        | Arelin.Thing.at_dist(self, F64.parse("90"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("30"));
+      ]
+    let self = Arelin.Thing.cast(self, F64.parse("9"), hits0)
+    let self = Arelin.Thing.cast(self, F64.parse("16"), hits1)
+    let fire = Arelin.Thing.new_thing
+    let fire = 
+      Arelin.Thing.set_fun
+      | fire;
+      | Arelin.Thing.kakashi.fire_ball_effect;
+    let fire = 
+      Arelin.Thing.set_pos
+      | self;
+      | Arelin.Thing.at_dist(self, F64.parse("35"));
+    let fire = 
+      Arelin.Thing.set_dir
+      | self;
+      | Arelin.Thing.targ_dir(self);
+    let fire = 
+      Arelin.Thing.set_vel
+      | self;
+      | F64.V3.scale(F64.parse("4"), Arelin.Thing.targ_dir(self));
+    let fire = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+    let self = 
+      Arelin.Thing.spawn
+      | self;
+      | F64.parse("5");
+      | [ Arelin.Thing; fire ];
+    
+    self  
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #KAKASHI_RAIKIRI#
+    let self = 
+      Arelin.Thing.animate_with_blink
+      | self;
+      | F64.0;
+      | KAKASHI_RAIKIRI_000;
+      | KAKASHI_IDLE_000;
+      | F64.parse("24");
+      | F64.0;
+      | F64.parse("48");
+    let self = Arelin.Thing.reset(self, F64.parse("48"))
+    let dist0 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.1, F64.parse("12")));
+    let dist1 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.parse("3"), F64.parse("12")));
+    let dist2 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.parse("5"), F64.parse("12")));
+    let dist3 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.parse("7"), F64.parse("12")));
+    let dist4 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.parse("9"), F64.parse("12")));
+    let dist5 = 
+      Arelin.Thing.at_dist
+      | self;
+      | F64.mul(F64.parse("90"), F64.div(F64.parse("11"), F64.parse("12")));
+    let dist6 = Arelin.Thing.at_dist(self, F64.parse("100"))
+    
+    let hits0 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)  
+          ];
+        | dist0;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits1 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)
+          ];
+        | dist1;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits2 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | dist2;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits3 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | dist3;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits4 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | dist4;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits5 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2) 
+          ];
+        | dist5;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+    let hits6 = 
+      [ Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | [ Arelin.Game.Effect; 
+            Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)
+          ];
+        | dist6;   
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("15"));
+      ]
+
+    let self = Arelin.Thing.cast(self, F64.parse("34"), hits0)
+    let self = Arelin.Thing.cast(self, F64.parse("35"), hits1)
+    let self = Arelin.Thing.cast(self, F64.parse("36"), hits2)
+    let self = Arelin.Thing.cast(self, F64.parse("37"), hits3)
+    let self = Arelin.Thing.cast(self, F64.parse("38"), hits4)
+    let self = Arelin.Thing.cast(self, F64.parse("39"), hits5)
+    let self = Arelin.Thing.cast(self, F64.parse("40"), hits6)
+    let self = 
+      Arelin.Thing.blink
+      | self;
+      | F64.parse("48");
+      | Arelin.Thing.at_dist(self, F64.parse("90"));
+
+    self
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #KAKASHI_BLOCK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | KAKASHI_BLOCK_000;
+    | F64.parse("15");
+    | F64.parse("30");
+  ;
+  | #GASTLY_TAUNT#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | KAKASHI_TAUNT_000;
+    | F64.parse("19");
+    | F64.parse("19");
+  ;;;;;;
+
+
+Arelin.Thing.kakashi.fire_ball_effect(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate
+  | self;
+  | F64.0;
+  | KAKASHI_FIREBALL_EFFECT_000;
+  | F64.parse("11");
+  | F64.parse("22");

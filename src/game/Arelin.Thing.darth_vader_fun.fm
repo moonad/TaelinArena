@@ -1,0 +1,233 @@
+Arelin.Thing.darth_vader_fun : Arelin.Game.TxFunction
+  (self) 
+  let self     = Arelin.Thing.set_mov(self)(F64.parse("2"))
+  let self     = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = 
+    Arelin.Thing.update_buff
+    | self;
+    | Arelin.Constants.DARTH_VADER_USING_FORCE;
+
+  case F64.eql(self.act, F64.0):
+  | #DARTH_VADER_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | let is_using_buff =
+       Arelin.Thing.is_using_buff
+       | self;
+       | Arelin.Constants.DARTH_VADER_USING_FORCE;
+
+      case is_using_buff:
+      | Arelin.Thing.animate(self)
+        | F64.parse("1.6");
+        | DARTH_VADER_WALK_CYCLE_000;
+        | F64.parse("8");
+        | F64.parse("16");
+      ;
+      | Arelin.Thing.animate(self)
+        | F64.1;
+        | DARTH_VADER_WALK_CYCLE_000;
+        | F64.parse("8");
+        | F64.parse("16");
+      ;
+    ;
+
+    | Arelin.Thing.animate(self)(F64.1)(DARTH_VADER_IDLE_000)
+      | F64.parse("5");
+      | F64.parse("10");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #DARTH_VADER_THE_FORCE_AWAKENS#
+    let value = 
+      Arelin.Thing.get_stt_value
+      | self;
+      | Arelin.Constants.DARTH_VADER_USING_FORCE;
+    
+    let inc = ((x) F64.add(F64.1)(x)) :: F64 -> F64
+    let tik = Arelin.Thing.get_tik(self)
+    let self = 
+      case F64.eql(tik, F64.0):
+      | Arelin.Thing.map_stt_key
+        | self;
+        | Arelin.Constants.FORCE_AWAKENS_KEY;
+        | inc;;
+      | self;
+
+    let self = 
+      case F64.eql(F64.mod(value, F64.parse("2")), F64.0):
+      | Arelin.Thing.animate(self, F64.0)
+        | DARTH_VADER_THE_FORCE_AWAKENS_VAR_1_000;
+        | F64.parse("8");
+        | F64.parse("16");
+      ;
+      | case F64.eql(F64.mod(value, F64.parse("3")), F64.0):
+        | Arelin.Thing.animate(self)(F64.0)
+          | DARTH_VADER_THE_FORCE_AWAKENS_VAR_2_000;
+          | F64.parse("8");
+          | F64.parse("16");
+        ; 
+        | Arelin.Thing.animate(self, F64.0)
+          | DARTH_VADER_THE_FORCE_AWAKENS_VAR_3_000;
+          | F64.parse("8");
+          | F64.parse("24");
+        ;
+      ;
+
+    let self = 
+      Arelin.Thing.dash(self)
+      | F64.parse("2");
+      | F64.0;
+      | F64.parse("20");
+
+    self
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #DARTH_VADER_THE_EMPIRE_STRICKES_BACK# 
+    let set_timer = 
+      (() F64.mul(F64.parse("5"))(Arelin.Constants.ONE_SEC)) :: F64 -> F64
+
+    let self = 
+      Arelin.Thing.map_stt_key
+      | self;
+      | Arelin.Constants.DARTH_VADER_USING_FORCE;
+      | set_timer;
+
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | DARTH_VADER_IDLE_000;
+      | F64.parse("5");
+      | F64.parse("10");
+    
+    self
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #DARTH_VADER_THE_RISE_OF_SKYWALKER# 
+    let self = 
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | DARTH_VADER_THE_RISE_OF_SKYWALKER_CAST_ANIMATION_000;
+      | F64.parse("3");
+      | F64.0;
+      | F64.parse("12");
+
+    let self = 
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | DARTH_VADER_THE_RISE_OF_SKYWALKER_CAST_ANIMATION_002;
+      | F64.1;
+      | F64.parse("12");
+      | F64.parse("18");
+
+    let self  = Arelin.Thing.reset(self, F64.parse("17"))
+    let force = Arelin.Thing.new_thing
+    let force = 
+      Arelin.Thing.set_fun
+      | force;
+      | Arelin.Thing.darth_vader.rise_skywalker_fun;
+
+    let self.sid = Arelin.Thing.get_sid(self)
+    let force = Arelin.Thing.set_sid(force, self.sid)
+    let self = 
+      Arelin.Thing.spawn
+      | self;
+      | F64.parse("10");
+      | [ Arelin.Thing; 
+          Arelin.Thing.move
+          | force;
+          | Arelin.Thing.at_max_dist(self, F64.parse("150"));
+        ];
+    self
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #DARTH_VADER_THE_PHANTOM_MENACE# 
+    let self = 
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | DARTH_VADER_THE_PHANTOM_MENACE_CAST_ANIMATION_000;
+      | F64.parse("4");
+      | F64.0;
+      | F64.parse("12");
+
+    let self = 
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | DARTH_VADER_THE_PHANTOM_MENACE_CAST_ANIMATION_004;
+      | F64.1;
+      | F64.parse("12");
+      | F64.parse("18");
+
+    let self     = Arelin.Thing.reset(self, F64.parse("17"))
+    let self.sid = Arelin.Thing.get_sid(self)
+    let targ_dir = Arelin.Thing.targ_dir(self)
+    let saber    = Arelin.Thing.new_thing
+    let saber    = Arelin.Thing.set_sid(saber, self.sid)
+    let saber = 
+      Arelin.Thing.set_fun
+      | saber;
+      | Arelin.Thing.darth_vader.phanton_menace_twisting_fun;
+    let saber = Arelin.Thing.set_pos(saber, self.pos)
+    let saber = Arelin.Thing.set_dir(saber, targ_dir)
+    let saber = 
+      Arelin.Thing.set_vel
+      | saber;
+      | F64.V3.scale(F64.parse("10"), targ_dir);
+    let saber = Arelin.Thing.set_box(saber, Arelin.Game.Hitbox.nbox)
+    let self  = 
+      Arelin.Thing.spawn(self, F64.parse("14"), [ Arelin.Thing; saber ])
+    self
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #DARTH_VADER_ROGUE_ONE#
+    let self = 
+      Arelin.Thing.animate_with_blink
+      | self;
+      | F64.0;
+      | DARTH_VADER_ROGUE_ONE_000;
+      | DARTH_VADER_IDLE_000;
+      | F64.parse("10");
+      | F64.0;
+      | F64.parse("20");
+
+    let self = Arelin.Thing.reset(self, F64.parse("20"))
+    let self = 
+      Arelin.Thing.blink
+      | self;
+      | F64.parse("20");
+      | Arelin.Thing.at_dist(self, F64.parse("75"));
+
+    self 
+  ;
+  | #DARTH_VADER_EXTRA# 
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | DARTH_VADER_IDLE_000;
+    | F64.parse("5"); 
+    | F64.parse("10"); 
+  ;;;;;;
+
+Arelin.Thing.darth_vader.phanton_menace_twisting_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | DARTH_VADER_THE_PHANTOM_MENACE_SABER_TWISTING_000;
+  | F64.parse("5");
+  | F64.parse("30");
+
+Arelin.Thing.darth_vader.rise_skywalker_fun : Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | DARTH_VADER_THE_RISE_OF_SKYWALKER_EFFECT_ANIMATION_000;
+  | F64.parse("4");
+  | F64.parse("12"); 

@@ -1,0 +1,378 @@
+Arelin.Thing.grimer.base_earth_ball_dmg : F64 Arelin.Constants.DMG_LV_2
+Arelin.Thing.grimer.base_mud_tsunami_dmg: F64 Arelin.Constants.DMG_LV_3
+
+Arelin.Thing.grimer_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self, F64.parse("2.5"))
+  let self = Arelin.Thing.set_mhp(self, F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.buf = Arelin.Thing.get_buf(self)
+
+  Bool.if<>(F64.eql(self.act, F64.0)) 
+  | #GRIMER_IDLE# // Walk
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self, F64.1, GRIMER_WALK_000)
+      | F64.parse("7");
+      | F64.parse("14");
+    ;
+    | Arelin.Thing.animate(self, F64.1, GRIMER_IDLE_000)
+      | F64.parse("7");
+      | F64.parse("14");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act, F64.1))
+    | #GRIMER_EARTH_BALL# // Left
+      let self = 
+        Arelin.Thing.animate(self, F64.1, GRIMER_EARTH_BALL_CAST_000)
+        | F64.parse("11");
+        | F64.parse("22");
+      let ball = Arelin.Thing.new_thing
+      let ball = Arelin.Thing.set_fun(ball, Arelin.Thing.grimer.earth_ball_fun)
+      let ball = Arelin.Thing.set_pos(ball, self.pos)
+      let ball = Arelin.Thing.set_dir(ball, self.dir)
+      let ball = Arelin.Thing.set_vel(ball)
+        | F64.V3.scale(F64.parse("10"), Arelin.Thing.targ_dir(self));
+      let ball = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self, F64.parse("8"))
+        | [ Arelin.Thing; ball ];
+      self 
+    ;
+    
+  | Bool.if<>(F64.eql(self.act, F64.2)) 
+    | #GRIMER_INVINCIBLE_MUD# // Middle
+      //an ignorant amount 
+      let shield_buff = Arelin.Game.Buff.shielded(F64.parse("31"), F64.parse("1000"))
+      let self = Arelin.Thing.set_buf(self)
+        | List.cons<>(shield_buff, self.buf);
+      let self = 
+        Arelin.Thing.animate_between(self, F64.0)
+        | GRIMER_INVINCIBLE_MUD_000;
+        | F64.parse("6");
+        | F64.parse("0");
+        | F64.parse("6");
+      let self = 
+        Arelin.Thing.animate_between(self, F64.0)
+        | GRIMER_INVINCIBLE_MUD_006;
+        | F64.parse("7");
+        | F64.parse("6");
+        | F64.parse("24");
+      let self = 
+        Arelin.Thing.animate_between(self, F64.0)
+        | GRIMER_INVINCIBLE_MUD_012;
+        | F64.parse("7");
+        | F64.parse("24");
+        | F64.parse("31");
+      let self = Arelin.Thing.reset(self, F64.parse("31"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act, F64.parse("3")))
+    | #GRIMER_MUD_SHIELD# // Right
+      let shield_buff = Arelin.Game.Buff.shielded(F64.parse("30"), F64.parse("1000"))
+      let self = Arelin.Thing.set_buf(self)
+        | List.cons<>(shield_buff, self.buf);
+      let self = 
+        Arelin.Thing.animate(self, F64.0, GRIMER_MUD_SHIELD_000)
+        | F64.parse("30");
+        | F64.parse("60");
+      let shield_box = 
+        Arelin.Game.Hitbox.pbox
+        | [ F64.V3; 
+            F64.V3.new(F64.0, F64.0, F64.0),
+            F64.V3.new(F64.parse("15"), F64.parse("45"), F64.0),
+            F64.V3.new(F64.parse("25"), F64.parse("45"), F64.0),
+            F64.V3.new(F64.parse("25"), F64.parse("-45"), F64.0),
+            F64.V3.new(F64.parse("15"), F64.parse("-45"), F64.0)
+          ];
+      let self = Arelin.Thing.set_box(self, shield_box)
+      //requires reset to set cbox(12)
+      let self = Arelin.Thing.reset(self, F64.parse("60"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act, F64.parse("4"))) 
+    | #GRIMER_MUD_TSUNAMI# // Q
+      Arelin.Thing.grimer.mud_tsunami_fun(self)
+    ;
+    
+  | Bool.if<>(F64.eql(self.act, F64.parse("5"))) 
+    | #GRIMER_EXTRA# // Space
+      let self = 
+        Arelin.Thing.animate(self, F64.1, GRIMER_TRANSFORMATION_000)
+        | F64.parse("13");
+        | F64.parse("26");
+      let self = Arelin.Thing.create_at(self, F64.parse("25"), Arelin.Thing.muk_fun)
+      let evolved = Arelin.Thing.set_nam(self)("Muk")
+      evolved
+    ;
+
+    | #GRIMER_TAUNT# // E
+      Arelin.Thing.animate(self, F64.1, GRIMER_TAUNT_000)
+      | F64.parse("15");
+      | F64.parse("30");
+    ;
+  ;;;;;
+
+Arelin.Thing.grimer.earth_ball_fun: Arelin.Game.TxFunction
+  (self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = 
+    Arelin.Thing.animate_die(self, F64.0, GRIMER_EARTH_BALL_EFFECT_000)
+    | F64.parse("7");
+    | F64.parse("14");
+  let self = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+  let effs = [ 
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage(Arelin.Thing.grimer.base_earth_ball_dmg)
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  ]
+  let self = Arelin.Thing.cast(self, F64.parse(" 4"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse(" 8"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("12"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("16"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("20"), hits)
+  self
+
+Arelin.Thing.grimer.mud_tsunami_fun: Arelin.Game.TxFunction
+  (self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = 
+    Arelin.Thing.animate(self, F64.1, GRIMER_MUD_TSUNAMI_000)
+    | F64.parse("17");
+    | F64.parse("34");
+  let effs = [ 
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage(Arelin.Thing.grimer.base_mud_tsunami_dmg)
+  ]
+  let hits = ((size)
+  [ Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(size);
+  ]) :: F64 -> List(Arelin.Game.Hit)
+  let self = Arelin.Thing.cast(self, F64.parse("10"), hits(F64.parse("30")))
+  let self = Arelin.Thing.cast(self, F64.parse("20"), hits(F64.parse("40")))
+  self
+
+
+// MUK
+// ---- 
+Arelin.Thing.muk_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self, F64.parse("2"))
+  let self = Arelin.Thing.set_mhp(self, F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self.buf = Arelin.Thing.get_buf(self)
+
+  Bool.if<>(F64.eql(self.act, F64.0)) 
+  | #MUK_IDLE# // Walk
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self, F64.1, MUK_WALK_000)
+      | F64.parse("8");
+      | F64.parse("24");
+    ;
+    | Arelin.Thing.animate(self, F64.1, MUK_IDLE_000)
+      | F64.parse("8");
+      | F64.parse("24");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act, F64.1))
+    | #MUK_EARTH_BALL# // Left
+      let self = 
+        Arelin.Thing.animate(self, F64.1, MUK_EARTH_BALL_CAST_000)
+        | F64.parse("12");
+        | F64.parse("24");
+      let ball = Arelin.Thing.new_thing
+      let ball = Arelin.Thing.set_fun(ball, Arelin.Thing.muk.earth_ball_fun)
+      let ball = Arelin.Thing.set_pos(ball, self.pos)
+      let ball = Arelin.Thing.set_dir(ball, self.dir)
+      let ball = Arelin.Thing.set_vel(ball)
+        | F64.V3.scale(F64.parse("10"), Arelin.Thing.targ_dir(self));
+      let ball = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self, F64.parse("8"))
+        | [ Arelin.Thing; ball ];
+      self 
+    ;
+    
+  | Bool.if<>(F64.eql(self.act, F64.2)) 
+    | #MUK_INVINCIBLE_MUD# // Middle
+      let shield_buff = Arelin.Game.Buff.shielded(F64.parse("26"), F64.parse("1000"))
+      let self = Arelin.Thing.set_buf(self)
+        | List.cons<>(shield_buff, self.buf);
+      let self = 
+        Arelin.Thing.animate(self, F64.0, MUK_INVINCIBLE_MUD_000)
+        | F64.parse("26");
+        | F64.parse("52");
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act, F64.parse("3")))
+    | #MUK_MUD_SHIELD# // Right
+      let shield_buff = Arelin.Game.Buff.shielded(F64.parse("30"), F64.parse("1000"))
+      let self = Arelin.Thing.set_buf(self)
+        | List.cons<>(shield_buff, self.buf);
+      let self = 
+        Arelin.Thing.animate(self, F64.0, MUK_MUD_SHIELD_000)
+        | F64.parse("24");
+        | F64.parse("48");
+      let shield_box = 
+        Arelin.Game.Hitbox.pbox
+        | [ F64.V3; 
+            F64.V3.new(F64.0, F64.0, F64.0),
+            F64.V3.new(F64.parse("15"), F64.parse("45"), F64.0),
+            F64.V3.new(F64.parse("25"), F64.parse("45"), F64.0),
+            F64.V3.new(F64.parse("25"), F64.parse("-45"), F64.0),
+            F64.V3.new(F64.parse("15"), F64.parse("-45"), F64.0)
+          ];
+      let self = Arelin.Thing.set_box(self, shield_box)
+      let self = Arelin.Thing.reset(self, F64.parse("60"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act, F64.parse("4"))) 
+    | #MUK_MUD_TSUNAMI# // Q
+      Arelin.Thing.muk.mud_tsunami_fun(self)
+    ;
+    
+  | Bool.if<>(F64.eql(self.act, F64.parse("5"))) 
+    | #MUK_EXTRA# // Space
+      Arelin.Thing.animate(self, F64.1, MUK_IDLE_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+
+    | #MUK_TAUNT# // E
+      Arelin.Thing.animate(self, F64.0, MUK_TAUNT_000)
+      | F64.parse("18");
+      | F64.parse("36");
+    ;
+  ;;;;;
+
+Arelin.Thing.muk.earth_ball_fun: Arelin.Game.TxFunction
+  (self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = 
+    Arelin.Thing.animate_die(self, F64.0, MUK_EARTH_BALL_EFFECT_000)
+    | F64.parse("7");
+    | F64.parse("14");
+  let self = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+  let effs = [ 
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage
+    | F64.mul(Arelin.Thing.grimer.base_earth_ball_dmg, F64.parse("2"));
+  ]
+  let hits = [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  ]
+  let self = Arelin.Thing.cast(self, F64.parse(" 4"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse(" 8"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("12"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("16"), hits)
+  let self = Arelin.Thing.cast(self, F64.parse("20"), hits)
+  self
+
+Arelin.Thing.muk.mud_tsunami_fun: Arelin.Game.TxFunction
+  (self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  let self = 
+    Arelin.Thing.animate(self, F64.1, MUK_MUD_TSUNAMI_000)
+    | F64.parse("19");
+    | F64.parse("38");
+  let effs = [ 
+    Arelin.Game.Effect; 
+    Arelin.Game.Effect.damage
+    | F64.mul(Arelin.Thing.grimer.base_mud_tsunami_dmg, F64.parse("2"));
+  ]
+  let hits = ((size)
+  [
+    Arelin.Game.Hit;
+    Arelin.Game.Hit.new
+    | effs;
+    | self.pos;
+    | self.dir;
+    | Arelin.Game.Hitbox.cbox(size);
+  ]) :: F64 -> List(Arelin.Game.Hit)
+  let self = Arelin.Thing.cast(self, F64.parse("10"), hits(F64.parse("30")))
+  let self = Arelin.Thing.cast(self, F64.parse("20"), hits(F64.parse("60")))
+  self
+
+
+// Add auxiliar functions on other file following the name: 
+// Arelin.Thing.char_name.skill_name_fun.fm
+
+// Some basic functions:
+
+// let self = 
+//   Arelin.Thing.animate(self, F64.0, DILMA_SALUTING_THE_CASSAVA_000)
+//   | F64.parse("18");
+//   | F64.parse("54");
+
+//  let self = 
+//     Arelin.Thing.animate_between(self, F64.0)
+//     | DILMA_PROTECTION_000;
+//     | F64.parse("6");
+//     | F64.parse("3");
+//     | F64.parse("7");
+
+//  let self = Arelin.Thing.reset(self, F64.parse("63"))
+
+// let ball = Arelin.Thing.new_thing
+// let ball = Arelin.Thing.set_fun(ball, Arelin.Thing.gon.t_paper_fun)
+// let ball = Arelin.Thing.set_pos(ball, Arelin.Thing.at_dist(self, F64.parse("20")))
+// let ball = Arelin.Thing.set_dir(ball, Arelin.Thing.targ_dir(self))
+// let ball = Arelin.Thing.set_vel(ball)
+//   | F64.V3.scale(F64.parse("12"), Arelin.Thing.targ_dir(self));
+// let ball = Arelin.Thing.set_box(self, Arelin.Game.Hitbox.nbox)
+// let self = Arelin.Thing.spawn(self, F64.parse("12"))
+//   | [ Arelin.Thing; ball ];
+// let self =
+//   Arelin.Thing.spawn(self, F64.parse("5"))
+//   | [Arelin.Thing;
+//       Arelin.Thing.move(flame)
+//       | Arelin.Thing.at_max_dist(self, F64.parse("128"));];
+
+//  let effs = [
+//       Arelin.Game.Effect; 
+//       Arelin.Game.Effect.damage(F64.parse("3")),
+//       Arelin.Game.Effect.impulse(F64.parse("12"), self.dir)
+//     ]
+  // let hits = [
+  //   Arelin.Game.Hit;
+  //   Arelin.Game.Hit.new
+  //   | effs;
+  //   | Arelin.Thing.at_dist(self, F64.parse("40"));
+  //   | self.dir;
+  //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));,
+  //   Arelin.Game.Hit.new
+  //   | effs;
+  //   | Arelin.Thing.at_dist(self, F64.parse("40"));
+  //   | self.dir;
+  //   | Arelin.Game.Hitbox.cbox(F64.parse("20"));
+  // ]  
+
+  // let ball = Arelin.Thing.set_vel(ball)
+  //       | F64.V3.scale(F64.parse("8"), Arelin.Thing.targ_dir(self));

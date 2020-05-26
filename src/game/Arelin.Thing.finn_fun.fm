@@ -1,0 +1,170 @@
+Arelin.Thing.finn_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("4"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #FINN_IDLE# // Walk
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(FINN_WALK_CYCLE_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(FINN_IDLE_000)
+      | F64.parse("5");
+      | F64.parse("10");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+    | #FINN_TRIPLE_TAKE# // Left
+      let self = Arelin.Thing.animate(self)(F64.1)(FINN_TRIPLE_TAKE_000)
+        | F64.parse("17");
+        | F64.parse("34");
+      let effs = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)
+      ]
+      let eff_crit = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_4)
+      ]
+      let hits = ((effs)
+        [ Arelin.Game.Hit;
+          Arelin.Game.Hit.new
+          | effs;
+          | Arelin.Thing.at_dist(self)(F64.parse("35"));
+          | self.dir;
+          | Arelin.Game.Hitbox.cbox(F64.parse("20")); ]
+      ) :: List(Arelin.Game.Effect) -> List(Arelin.Game.Hit)
+      let self = Arelin.Thing.cast(self)(F64.0)(hits(effs))
+      let self = Arelin.Thing.cast(self)(F64.parse("10"))(hits(effs))
+      let self = Arelin.Thing.cast(self)(F64.parse("30"))(hits(eff_crit))
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+    | #FINN_BMO_S_FLASH# // Middle
+      let self = Arelin.Thing.animate(self)(F64.0)(FINN_BMO_S_FLASH_000)
+        | F64.parse("13");
+        | F64.parse("26");
+      let effs = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | effs;
+        | Arelin.Thing.at_dist(self)(F64.parse("45"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("25"));
+      ]
+      let self = Arelin.Thing.cast(self)(F64.parse("16"))(hits)
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #FINN_BOW# // Right
+      let self = Arelin.Thing.animate(self)(F64.0)(FINN_BOW_CAST_ANIMATION_000)
+        | F64.parse("7");
+        | F64.parse("14");
+      let effs = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_3)
+      ]
+      let hits = [
+        Arelin.Game.Hit;
+        Arelin.Game.Hit.new
+        | effs;
+        | Arelin.Thing.at_dist(self)(F64.parse("140"));
+        | self.dir;
+        | Arelin.Game.Hitbox.cbox(F64.parse("10"));
+      ]
+      let proj = Arelin.Thing.new_thing
+      let proj = Arelin.Thing.set_fun(proj)(Arelin.Thing.finn.arrow_fun)
+      let proj = Arelin.Thing.set_dir(proj)(self.dir)
+      let proj = Arelin.Thing.set_pos(proj)(self.pos)
+      let proj = Arelin.Thing.set_vel(proj)
+        | F64.V3.scale(F64.parse("15"))(Arelin.Thing.targ_dir(self));
+      let proj = Arelin.Thing.set_box(proj)(Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self)(F64.parse("3"))([Arelin.Thing; proj])
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+    | #FINN_JAKES_FURY# // Q
+      let self = Arelin.Thing.animate(self)(F64.0)(FINN_TAUNT_000)
+        | F64.parse("17");
+        | F64.parse("34");
+      let jake = Arelin.Thing.new_thing
+      let jake = Arelin.Thing.set_fun(jake)(Arelin.Thing.finn.jakes_fury_fun)
+      let jake = Arelin.Thing.set_dir(jake)(Arelin.Thing.targ_dir(self))
+      let self = 
+        Arelin.Thing.spawn(self)(F64.parse("14"))
+        | [Arelin.Thing; 
+          Arelin.Thing.move(jake)
+          | Arelin.Thing.at_dist(self)(F64.parse("35"));
+          ];
+
+      let effs = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_2)
+      ]
+      let eff_crit = [
+        Arelin.Game.Effect; 
+        Arelin.Game.Effect.damage(Arelin.Constants.DMG_LV_4),
+        Arelin.Game.Effect.impulse(F64.parse("10"))(self.dir)
+      ]
+      let hits = ((effs) (dist)
+        [ Arelin.Game.Hit;
+          Arelin.Game.Hit.new
+          | effs;
+          | Arelin.Thing.at_dist(self)(dist);
+          | self.dir;
+          | Arelin.Game.Hitbox.cbox(F64.parse("15")); ]
+      ) :: List(Arelin.Game.Effect) -> F64 -> List(Arelin.Game.Hit)
+
+      let self = Arelin.Thing.cast(self)(F64.parse("15"))
+        | hits(effs)(F64.parse("35"));
+      let self = Arelin.Thing.cast(self)(F64.parse("20"))
+        | hits(effs)(F64.parse("45"));
+      let self = Arelin.Thing.cast(self)(F64.parse("25"))
+        | hits(effs)(F64.parse("60"));
+      let self = Arelin.Thing.cast(self)(F64.parse("30"))
+        | hits(eff_crit)(F64.parse("80"));
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+    | #FINN_EVADE# // Space
+      let self = 
+        Arelin.Thing.animate(self)(F64.1)(FINN_EVADE_000)
+        | F64.parse("6");
+        | F64.parse("12");
+      let self = Arelin.Thing.dash(self)(F64.parse("4"))(F64.0)(F64.parse("12"))
+      self
+    ;
+
+    | #FINN_TAUNT# // E
+      Arelin.Thing.animate(self)(F64.0)(FINN_TAUNT_000)
+      | F64.parse("17");
+      | F64.parse("34");
+    ;
+  ;;;;;
+
+// Effects
+Arelin.Thing.finn.arrow_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(FINN_BOW_PROJECTILE_000)
+  | F64.parse("1");
+  | F64.parse("10");
+
+// TODO: second attack out of position
+Arelin.Thing.finn.jakes_fury_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(FINN_JAKE_S_FURY_000)
+  | F64.parse("26");
+  | F64.parse("26");

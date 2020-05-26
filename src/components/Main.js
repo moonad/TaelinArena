@@ -714,7 +714,7 @@ class Main extends Component {
       },
     }, [
       top_menu,
-      selection_screen,
+      // selection_screen,
       bottom_panel,
     ])
 

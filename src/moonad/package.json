@@ -8,7 +8,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "formality-core": "^0.2.90",
+    "formality-lang": "^0.4.4",
     "glob": "^7.1.6",
     "file-loader": "^5.1.0"
   }
