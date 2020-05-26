@@ -1,0 +1,289 @@
+Arelin.Thing.jinx_fun(self: Arelin.Thing): Arelin.Thing
+  let self     = Arelin.Thing.set_mov(self, F64.parse("3"))
+  let self     = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  
+  case F64.eql(self.act, F64.0):
+  | #JINX_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | JINX_WALK_000;
+      | F64.parse("7");
+      | F64.parse("14");
+    ;
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | JINX_IDLE_000;
+      | F64.parse("4");
+      | F64.parse("16");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #JINX_GATLING#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | JINX_GATLING_CAST_ANIMATION_000;
+      | F64.parse("4");
+      | F64.parse("12");
+    
+    let proj = Arelin.Thing.new_thing
+    let proj = Arelin.Thing.set_fun(proj, Arelin.Thing.jinx.gatling_fun)
+    let proj = Arelin.Thing.set_pos(proj, self.pos)
+    let proj = Arelin.Thing.set_dir(proj, Arelin.Thing.targ_dir(self))
+    let proj = 
+      Arelin.Thing.set_vel
+      | proj;
+      | F64.V3.scale(F64.parse("15"), Arelin.Thing.targ_dir(self));
+    let proj = Arelin.Thing.set_box(proj, Arelin.Game.Hitbox.nbox)
+    let self = Arelin.Thing.spawn(self, F64.parse("8"), [Arelin.Thing; proj])
+    self
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #JINX_FLAMING_BITE#
+    let self =
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | JINX_FLAMING_BITE_CAST_ANIMATION_000;
+      | F64.parse("6");
+      | F64.parse("0");
+      | F64.parse("10");
+
+    let self =
+      Arelin.Thing.animate_between
+      | self;
+      | F64.0;
+      | JINX_IDLE_000;
+      | F64.parse("4");
+      | F64.parse("10");
+      | F64.parse("24");
+
+    let self  = Arelin.Thing.reset(self, F64.parse("23"))
+    
+    let trap0 = Arelin.Thing.new_thing
+    let trap0 = Arelin.Thing.set_fun(trap0, Arelin.Thing.jinx.flaming_bite) 
+    let trap0 = 
+      Arelin.Thing.set_pos
+      | trap0;
+      | Arelin.Thing.at_dist(self, F64.parse("60"));
+    let trap0 = Arelin.Thing.set_dir(trap0, Arelin.Thing.targ_dir(self))
+    let trap0 = Arelin.Thing.set_box(trap0, Arelin.Game.Hitbox.nbox)
+
+    let trap1 = Arelin.Thing.new_thing
+    let trap1 = Arelin.Thing.set_fun(trap1, Arelin.Thing.jinx.flaming_bite_idle) 
+    let trap1 = 
+      Arelin.Thing.set_pos
+      | trap1;
+      | Arelin.Thing.at_dist(self, F64.parse("60"));
+    let trap1 = Arelin.Thing.set_dir(trap1, Arelin.Thing.targ_dir(self))
+    let trap1 = Arelin.Thing.set_box(trap1, Arelin.Game.Hitbox.nbox)
+
+    let trap2 = Arelin.Thing.new_thing
+    let trap2 = Arelin.Thing.set_fun(trap1, Arelin.Thing.jinx.flaming_bite_end) 
+    let trap2 = 
+      Arelin.Thing.set_pos
+      | trap2;
+      | Arelin.Thing.at_dist(self, F64.parse("60"));
+    let trap2 = Arelin.Thing.set_dir(trap1, Arelin.Thing.targ_dir(self))
+    let trap2 = Arelin.Thing.set_box(trap1, Arelin.Game.Hitbox.nbox)
+    let self  = Arelin.Thing.spawn(self,  F64.parse("3"), [Arelin.Thing; trap0])
+    let self  = Arelin.Thing.spawn(self, F64.parse("10"), [Arelin.Thing; trap1])
+    let self  = Arelin.Thing.spawn(self, F64.parse("23"), [Arelin.Thing; trap2])
+    self 
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #JINX_POW#
+    let self =
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | JINX_POW_CAST_ANIMATION_000;
+      | F64.parse("5");
+      | F64.parse("15");
+    
+    let proj = Arelin.Thing.new_thing
+    let proj = Arelin.Thing.set_fun(proj, Arelin.Thing.jinx.pow_proj)
+    let proj = Arelin.Thing.set_pos(proj, self.pos)
+    let proj = Arelin.Thing.set_dir(proj, Arelin.Thing.targ_dir(self))
+    let proj = 
+      Arelin.Thing.set_vel
+      | proj;
+      | F64.V3.scale(F64.parse("12"), Arelin.Thing.targ_dir(self));
+    let proj = Arelin.Thing.set_box(proj, Arelin.Game.Hitbox.nbox)
+
+    let explo = Arelin.Thing.new_thing
+    let explo = Arelin.Thing.set_fun(explo, Arelin.Thing.jinx.pow_explosion)
+    let explo = Arelin.Thing.set_pos(explo, self.pos)
+    let explo = Arelin.Thing.set_dir(explo, Arelin.Thing.targ_dir(self))
+    let explo = Arelin.Thing.set_box(explo, Arelin.Game.Hitbox.nbox)
+
+    let self = Arelin.Thing.spawn(self, F64.parse("5"), [Arelin.Thing; proj])
+    let self = Arelin.Thing.spawn(self, F64.parse("14"), [Arelin.Thing; explo])
+    
+    self  
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_CAST_ANIMATION_000;
+      | F64.parse("12");
+      | F64.parse("36");
+
+    let proj = Arelin.Thing.new_thing
+    let proj = Arelin.Thing.set_fun(proj, Arelin.Thing.jinx.ulti_proj)
+    let proj = Arelin.Thing.set_pos(proj, self.pos)
+    let proj = Arelin.Thing.set_dir(proj, Arelin.Thing.targ_dir(self))
+    let proj = 
+      Arelin.Thing.set_vel
+      | proj;
+      | F64.V3.scale(F64.parse("10"), Arelin.Thing.targ_dir(self));
+    let proj = Arelin.Thing.set_box(proj, Arelin.Game.Hitbox.nbox)
+
+    let explo = Arelin.Thing.new_thing
+    let explo = Arelin.Thing.set_fun(explo, Arelin.Thing.jinx.ulti_explosion)
+    let explo = 
+      Arelin.Thing.set_pos
+      | explo;
+      | Arelin.Thing.at_dist(self, F64.parse("10"));
+    let explo = Arelin.Thing.set_dir(explo, Arelin.Thing.targ_dir(self))
+    let explo = Arelin.Thing.set_box(explo, Arelin.Game.Hitbox.nbox)
+
+    let self = Arelin.Thing.spawn(self, F64.parse("22"), [Arelin.Thing; proj])
+    let self = Arelin.Thing.spawn(self, F64.parse("35"), [Arelin.Thing; explo])
+
+    self
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #JINX_ZAP#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.0;
+      | JINX_ZAP_CAST_ANIMATION_000;
+      | F64.parse("11");
+      | F64.parse("22");
+
+    let proj = Arelin.Thing.new_thing
+    let proj = Arelin.Thing.set_fun(proj, Arelin.Thing.jinx.zap_proj)
+    let proj = Arelin.Thing.set_pos(proj, self.pos)
+    let proj = Arelin.Thing.set_dir(proj, Arelin.Thing.targ_dir(self))
+    let proj = 
+      Arelin.Thing.set_vel
+      | proj;
+      | F64.V3.scale(F64.parse("15"), Arelin.Thing.targ_dir(self));
+    let proj = Arelin.Thing.set_box(proj, Arelin.Game.Hitbox.nbox)
+
+    let path = Arelin.Thing.new_thing
+    let path = Arelin.Thing.set_fun(path, Arelin.Thing.jinx.zap_path)
+    let path = 
+      Arelin.Thing.set_pos
+      | path;
+      | Arelin.Thing.at_dist(self, F64.parse("30"));
+    let path = Arelin.Thing.set_dir(path, Arelin.Thing.targ_dir(self))
+    let path = Arelin.Thing.set_box(path, Arelin.Game.Hitbox.nbox)
+
+    let self = Arelin.Thing.spawn(self, F64.parse("6"), [Arelin.Thing;  proj])
+    let self = Arelin.Thing.spawn(self, F64.parse("13"), [Arelin.Thing; path])
+
+    self     
+  ;
+  | #JINX_TAUNT#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | JINX_TAUNT_000;
+    | F64.parse("12");
+    | F64.parse("24");
+  ;;;;;;
+
+
+Arelin.Thing.jinx.gatling_fun(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_GATLING_PROJECTILE_000;
+  | F64.parse("3");
+  | F64.parse("6");
+
+Arelin.Thing.jinx.flaming_bite(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_FLAMING_BITE_TRAP_HITTING_THE_FLOOR_000;
+  | F64.parse("4");
+  | F64.parse("8");
+
+Arelin.Thing.jinx.flaming_bite_idle(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_FLAMING_BITE_TRAP_IDLE_000;
+  | F64.parse("3");
+  | F64.parse("18");
+
+Arelin.Thing.jinx.flaming_bite_end(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_FLAMING_BITE_TRAP_END_000;
+  | F64.parse("6");
+  | F64.parse("12");
+
+Arelin.Thing.jinx.pow_proj(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_POW_PROJECTILE_000;
+  | F64.parse("3");
+  | F64.parse("9");
+
+Arelin.Thing.jinx.pow_explosion(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_POW_EXPLOSION_000;
+  | F64.parse("4");
+  | F64.parse("8");
+
+
+Arelin.Thing.jinx.zap_proj(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_ZAP_PROJECTILE_000;
+  | F64.parse("3");
+  | F64.parse("12");
+
+Arelin.Thing.jinx.zap_path(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_ZAP_PATH_000;
+  | F64.parse("5");
+  | F64.parse("5");
+
+Arelin.Thing.jinx.ulti_proj(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_PROJECTILE_000;
+  | F64.parse("8");
+  | F64.parse("16");
+
+Arelin.Thing.jinx.ulti_explosion(self: Arelin.Thing): Arelin.Thing
+  Arelin.Thing.animate_die
+  | self;
+  | F64.0;
+  | JINX_SUPER_ULTRA_MEGA_MISSILE_OF_DEATH_COLISSION_000;
+  | F64.parse("9");
+  | F64.parse("18");

@@ -1,0 +1,253 @@
+Arelin.Thing.gastly_fun(self: Arelin.Thing): Arelin.Thing
+  let self     = Arelin.Thing.set_mov(self, F64.parse("3"))
+  let self     = Arelin.Thing.set_mhp(self)(F64.parse("24"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  
+  case F64.eql(self.act, F64.0):
+  | #GASTLY_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | GASTLY_WALK_000;
+      | F64.parse("6");
+      | F64.parse("12");
+    ;
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | GASTLY_IDLE_000;
+      | F64.parse("13");
+      | F64.parse("39");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #GASTLY_LICK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GASTLY_ATTACK_LICK_000;
+    | F64.parse("10");
+    | F64.parse("20");
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #GASTLY_MEAN_LOOK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GASTLY_ATTACK_MEAN_LOOK_000;
+    | F64.parse("16");
+    | F64.parse("32");
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #GASTLY_DREAM_EATER#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GASTLY_ATTACK_DREAM_EATER_000;
+    | F64.parse("10");
+    | F64.parse("20");
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #GASTLY_INVISIBILITY#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | GASTLY_ULTIMATE_INVISIBILITY_000;
+    | F64.parse("12");
+    | F64.parse("50");
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #GASTLY_EVOLVE#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | GASTLY_EVOLUTION_000;
+      | F64.parse("11");
+      | F64.parse("22");
+
+    let self = 
+      Arelin.Thing.create_at
+      | self;
+      | F64.parse("21");
+      | Arelin.Thing.haunter_fun;
+
+    self 
+  ;
+  | #GASTLY_TAUNT#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | GASTLY_TAUNT_000;
+    | F64.parse("18");
+    | F64.parse("36");
+  ;;;;;;
+
+Arelin.Thing.haunter_fun(self: Arelin.Thing): Arelin.Thing
+  let self     = Arelin.Thing.set_mov(self, F64.parse("3"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  
+  case F64.eql(self.act, F64.0):
+  | #HAUNTER_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | HAUNTER_WALK_000;
+      | F64.parse("4");
+      | F64.parse("8");
+    ;
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | HAUNTER_IDLE_000;
+      | F64.parse("5");
+      | F64.parse("15");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #HAUNTER_LICK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | HAUNTER_ATTACK_LICK_000;
+    | F64.parse("9");
+    | F64.parse("18");
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #HAUNTER_MEAN_LOOK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | HAUNTER_ATTACK_MEAN_LOOK_000;
+    | F64.parse("14");
+    | F64.parse("28");
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #HAUNTER_DREAM_EATER#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | HAUNTER_ATTACK_DREAM_EATER_000;
+    | F64.parse("10");
+    | F64.parse("20");
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #HAUNTER_INVISIBILITY#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | HAUNTER_ULTIMATE_INVISIBILITY_000;
+    | F64.parse("12");
+    | F64.parse("40");
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #HAUNTER_EVOLVE#
+    let self = 
+      Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | HAUNTER_EVOLUTION_000;
+      | F64.parse("13");
+      | F64.parse("26");
+
+    let self = 
+      Arelin.Thing.create_at
+      | self;
+      | F64.parse("25");
+      | Arelin.Thing.gengar_fun;
+
+    self 
+  ;
+  | #HAUNTER_TAUNT#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | HAUNTER_TAUNT_000;
+    | F64.parse("18");
+    | F64.parse("36");
+  ;;;;;;
+
+Arelin.Thing.gengar_fun(self: Arelin.Thing): Arelin.Thing
+  let self     = Arelin.Thing.set_mov(self, F64.parse("3"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+  
+  case F64.eql(self.act, F64.0):
+  | #GENGAR_IDLE#
+    case Arelin.Thing.is_walking(self):
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | GENGAR_WALK_000;
+      | F64.parse("3");
+      | F64.parse("6");
+    ;
+    | Arelin.Thing.animate
+      | self;
+      | F64.1;
+      | GENGAR_IDLE_000;
+      | F64.parse("7");
+      | F64.parse("21");
+    ;
+  ;
+  | case F64.eql(self.act, F64.1):
+  | #GENGAR_LICK#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GENGAR_ATTACK_LICK_000;
+    | F64.parse("9");
+    | F64.parse("18");
+  ;
+  | case F64.eql(self.act, F64.2):
+  | #GENGAR_HYPNOSIS#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GENGAR_ATTACK_HYPNOSIS_000;
+    | F64.parse("14");
+    | F64.parse("28");
+  ;
+  | case F64.eql(self.act, F64.parse("3")):
+  | #GENGAR_DREAM_EATER#
+    Arelin.Thing.animate
+    | self;
+    | F64.0;
+    | GENGAR_ATTACK_DREAM_EATER_000;
+    | F64.parse("12");
+    | F64.parse("24");
+  ;
+  | case F64.eql(self.act, F64.parse("4")):
+  | #GENGAR_INVISIBILITY#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | GENGAR_ULTIMATE_INVISIBILITY_000;
+    | F64.parse("10");
+    | F64.parse("30");
+  ;
+  | case F64.eql(self.act, F64.parse("5")):
+  | #GENGAR_EVOLVE#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | GENGAR_IDLE_000;
+    | F64.parse("7");
+    | F64.parse("14");
+  ;
+  | #GENGAR_TAUNT#
+    Arelin.Thing.animate
+    | self;
+    | F64.1;
+    | GENGAR_TAUNT_000;
+    | F64.parse("18");
+    | F64.parse("40");
+  ;;;;;;
+  

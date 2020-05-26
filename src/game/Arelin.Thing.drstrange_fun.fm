@@ -90,10 +90,10 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
         let portal_0 = Arelin.Thing.set_dir(portal_0)(self.dir)
         let portal_0 = Arelin.Thing.set_box(portal_0)(Arelin.Game.Hitbox.nbox)
         let portal_0 = Arelin.Thing.set_stt(portal_0)
-          | Map.set<>(Arelin.Game.Constants.POS_X_KEY)(pos_p1.x)(self.stt);
+          | Map.set<>(Arelin.Constants.POS_X_KEY)(pos_p1.x)(self.stt);
         let portal_0.stt = Arelin.Thing.get_stt(portal_0)
         Arelin.Thing.set_stt(portal_0)
-          | Map.set<>(Arelin.Game.Constants.POS_Y_KEY)(pos_p1.y)(portal_0.stt);
+          | Map.set<>(Arelin.Constants.POS_Y_KEY)(pos_p1.y)(portal_0.stt);
       
       let portal_1 = 
         get pos_p0.x pos_p0.y pos_p0.z = pos_p0
@@ -104,10 +104,10 @@ Arelin.Thing.drstrange_fun: Arelin.Game.TxFunction
         let portal_1 = Arelin.Thing.set_dir(portal_1)(self.dir)
         let portal_1 = Arelin.Thing.set_box(portal_1)(Arelin.Game.Hitbox.nbox)
         let portal_1 = Arelin.Thing.set_stt(portal_1)
-          | Map.set<>(Arelin.Game.Constants.POS_X_KEY)(pos_p0.x)(self.stt);
+          | Map.set<>(Arelin.Constants.POS_X_KEY)(pos_p0.x)(self.stt);
         let portal_1.stt = Arelin.Thing.get_stt(portal_1)
         Arelin.Thing.set_stt(portal_1)
-          | Map.set<>(Arelin.Game.Constants.POS_Y_KEY)(pos_p0.y)(portal_1.stt);
+          | Map.set<>(Arelin.Constants.POS_Y_KEY)(pos_p0.y)(portal_1.stt);
      
       let self = Arelin.Thing.spawn(self)(F64.parse("20"))
         | [Arelin.Thing; Arelin.Thing.move(portal_0)(pos_p0)];

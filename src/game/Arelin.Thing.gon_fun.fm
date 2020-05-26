@@ -1,0 +1,238 @@
+Arelin.Thing.gon_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("3"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+  let self.sid = Arelin.Thing.get_sid(self)
+  let self.pos = Arelin.Thing.get_pos(self)
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #GON_IDLE# // Walk
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_WALK_000)
+      | F64.parse("6");
+      | F64.parse("12");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_IDLE_000)
+      | F64.parse("16");
+      | F64.parse("32");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+    | #GON_STONE# // Left
+      Arelin.Thing.animate(self)(F64.0)(GON_FREECS_JAJANKEN_STONE_000)
+      | F64.parse("23");
+      | F64.parse("46");
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+    | #GON_PAPER# // Middle
+      let self =  
+        Arelin.Thing.animate(self)(F64.0)(GON_FREECS_JAJANKEN_PAPER_CASTING_000)
+        | F64.parse("17");
+        | F64.parse("17");
+      let fire = Arelin.Thing.new_thing
+      let fire = Arelin.Thing.set_fun(fire)(Arelin.Thing.gon.paper_fun)
+      let fire = Arelin.Thing.set_pos(fire)(Arelin.Thing.at_dist(self)(F64.parse("20")))
+      let fire = Arelin.Thing.set_dir(fire)(Arelin.Thing.targ_dir(self))
+      let fire = Arelin.Thing.set_vel(fire)
+        | F64.V3.scale(F64.parse("12"))(Arelin.Thing.targ_dir(self));
+      let fire = Arelin.Thing.set_box(self)(Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self)(F64.parse("12"))
+        | [ Arelin.Thing; fire ];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #GON_SCISSOR# // Right
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | GON_FREECS_JAJANKEN_SCISSORS_000;
+        | F64.parse("12");
+        | F64.parse("0");
+        | F64.parse("12");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | GON_FREECS_JAJANKEN_SCISSORS_012;
+        | F64.parse("5");
+        | F64.parse("12");
+        | F64.parse("22");
+      let self = Arelin.Thing.reset(self)(F64.parse("21"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+    | #GON_MAX_POWER# // Q
+      let self =  
+        Arelin.Thing.animate(self)(F64.0)(GON_FREECS_ULTIMATE_TRANSFORMATION_000)
+        | F64.parse("16");
+        | F64.parse("32");
+      let self = Arelin.Thing.create_at(self)(F64.parse("31"))
+        | Arelin.Thing.gon.transformed_fun;
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+    | #GON_INTENSIFICATION# // Space
+      Arelin.Thing.animate(self)(F64.1)(GON_FREECS_INTENSIFICATION_000)
+      | F64.parse("10");
+      | F64.parse("30");
+    ;
+
+    | #GON_TAUNT# // E
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(GON_FREECS_TAUNT_000)
+        | F64.parse("16");
+        | F64.parse("32");
+      let text = Arelin.Thing.new_thing
+      let text = Arelin.Thing.set_fun(text)(Arelin.Thing.gon.taunt_text_fun)
+      let text = Arelin.Thing.set_sid(text)(self.sid)
+      let self =
+        Arelin.Thing.spawn(self)(F64.parse("20"))
+        | [ Arelin.Thing; Arelin.Thing.move(text)(self.pos)];
+      self
+    ;
+  ;;;;;
+
+Arelin.Thing.gon.paper_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(GON_FREECS_JAJANKEN_PAPER_PROJECTILE_000)
+  | F64.parse("8");
+  | F64.parse("16");
+
+Arelin.Thing.gon.taunt_text_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(GON_FREECS_TAUNT_TEXT_000)
+  | F64.parse("1");
+  | F64.parse("10");
+
+
+// Transformed Gon
+// ---------------
+Arelin.Thing.gon.transformed_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("3"))
+  let self.act = Arelin.Thing.get_act(self)
+  let self.dir = Arelin.Thing.get_dir(self)
+
+  // Back to normal Gon after 30 seconds
+  let self = Arelin.Thing.end_thing(self)(Arelin.Thing.gon.tired_fun)
+    | F64.mul(Arelin.Constants.ONE_SEC)(F64.parse("30"));
+    | Arelin.Constants.ULT_TIME;
+
+  Bool.if<>(F64.eql(self.act)(F64.0)) 
+  | #GON_IDLE# // Walk
+    Bool.if<>(Arelin.Thing.is_walking(self))
+    | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_TRANSFORMED_WALK_000)
+      | F64.parse("8");
+      | F64.parse("16");
+    ;
+    | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_TRANFORMED_IDLE_000)
+      | F64.parse("9");
+      | F64.parse("27");
+    ;
+  ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.1))
+    | #GON_STONE# // Left
+      let self = 
+        Arelin.Thing.animate_with_blink(self)(F64.0)
+        | GON_FREECS_TRANSFORMED_JAJANKEN_STONE_000;
+        | GON_FREECS_TRANFORMED_IDLE_000;
+        | F64.parse("17");
+        | F64.0;
+        | F64.parse("34");
+      let self = Arelin.Thing.reset(self)(F64.parse("34"))
+      let self = Arelin.Thing.blink(self)(F64.parse("34"))
+        | Arelin.Thing.at_max_dist(self)(F64.parse("78"));
+      self
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.2)) 
+    | #GON_PAPER# // Middle
+      let self = 
+        Arelin.Thing.animate(self)(F64.0)(GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_000)
+        | F64.parse("17");
+        | F64.parse("34");
+      let fire = Arelin.Thing.new_thing
+      let fire = Arelin.Thing.set_fun(fire)(Arelin.Thing.gon.t_paper_fun)
+      let fire = Arelin.Thing.set_pos(fire)(Arelin.Thing.at_dist(self)(F64.parse("20")))
+      let fire = Arelin.Thing.set_dir(fire)(Arelin.Thing.targ_dir(self))
+      let fire = Arelin.Thing.set_vel(fire)
+        | F64.V3.scale(F64.parse("12"))(Arelin.Thing.targ_dir(self));
+      let fire = Arelin.Thing.set_box(self)(Arelin.Game.Hitbox.nbox)
+      let self = Arelin.Thing.spawn(self)(F64.parse("28"))
+        | [ Arelin.Thing; fire ];
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("3")))
+    | #GON_SCISSOR# // Right
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_000;
+        | F64.parse("12");
+        | F64.parse("0");
+        | F64.parse("13");
+      let self = 
+        Arelin.Thing.animate_between(self)(F64.0)
+        | GON_FREECS_TRANFORMED_JAJANKEN_SCISSOR_012;
+        | F64.parse("7");
+        | F64.parse("13");
+        | F64.parse("26");
+      let self = Arelin.Thing.reset(self)(F64.parse("25"))
+      self
+    ;
+
+  | Bool.if<>(F64.eql(self.act)(F64.parse("4"))) 
+    | #GON_MAX_POWER# // Q
+      Arelin.Thing.animate(self)(F64.1)(GON_FREECS_TRANFORMED_IDLE_000)
+      | F64.parse("9");
+      | F64.parse("27");
+    ;
+    
+  | Bool.if<>(F64.eql(self.act)(F64.parse("5"))) 
+    | #GON_INTENSIFICATION# // Space
+      Arelin.Thing.animate(self)(F64.1)(GON_FREECS_TRANFORMED_IDLE_000)
+      | F64.parse("9");
+      | F64.parse("18");
+    ;
+
+    | #GON_TAUNT# // E
+      Arelin.Thing.animate(self)(F64.1)(GON_FREECS_TRANFORMED_IDLE_000)
+      | F64.parse("9");
+      | F64.parse("18");
+    ;
+  ;;;;;
+
+Arelin.Thing.gon.t_paper_fun: Arelin.Game.TxFunction
+  (self)
+  Arelin.Thing.animate_die(self)(F64.0)(GON_FREECS_TRANSFORMED_JAJANKEN_PAPER_PROJETIL_000)
+  | F64.parse("8");
+  | F64.parse("16");
+  
+
+// Tired Gon
+// ---------
+// After using his ultimate, Gon gets tired. He can't use any skill 
+// and have the mov reduced
+Arelin.Thing.gon.tired_fun: Arelin.Game.TxFunction
+  (self)
+  let self = Arelin.Thing.set_mov(self)(F64.parse("2"))
+
+  // Back to normal Gon after 30 seconds
+  let self = Arelin.Thing.end_thing(self)(Arelin.Thing.gon_fun)
+    | F64.mul(Arelin.Constants.ONE_SEC)(F64.parse("5"));
+    | Arelin.Constants.GON_AFTER_ULT;
+
+  // TODO: Add tired energy to follow him
+  Bool.if<>(Arelin.Thing.is_walking(self))
+  | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_AFTER_ULTIMATE_WALK_000)
+    | F64.parse("12");
+    | F64.parse("24");
+  ;
+  | Arelin.Thing.animate(self)(F64.1)(GON_FREECS_AFTER_ULTIMATE_IDLE_000)
+    | F64.parse("8");
+    | F64.parse("16");
+  ;

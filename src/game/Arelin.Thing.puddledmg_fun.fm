@@ -28,7 +28,7 @@ Arelin.Thing.puddledmg_fun: Arelin.Game.TxFunction
   let eff_slow = [
     Arelin.Game.Effect;
     Arelin.Game.Effect.slow  
-    | F64.mul(Arelin.Game.Constants.ONE_SEC)(F64.parse("3"));
+    | F64.mul(Arelin.Constants.ONE_SEC)(F64.parse("3"));
     | F64.parse("0.7");
   ]
   let slow = [
