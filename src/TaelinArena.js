@@ -136,6 +136,10 @@ function render_hits(hits) {
 };
 
 function render_model(pos, dir, mid) {
+  console.log("Inside render_model");
+  console.log("pos: ", pos);
+  console.log("dir: ", dir);
+  console.log("mid: ", pos);
   var [dir_x,dir_y,dir_z] = dir(x=>y=>z=>([x,y,z]));
   var [pos_x,pos_y,pos_z] = pos(x=>y=>z=>([x,y,z]));
   var ang = Math.atan2(dir_y, dir_x);
@@ -236,11 +240,11 @@ function render_game({game, canvox, canhud, cam}) {
   var T = now();
   
   // Gets the main hero position
-  var hero_pos = TA["TA.Game.get_position_by_pid"](0, game);
+  var hero_pos = TA["Arelin.Game.get_position_by_pid"](0, game);
   console.log("TaelinArena.js/render_game: hero_pos: ", hero_pos);
 
   // Renders each game thing
-  TA["TA.Game.map_stage"](thing=>render_thing(thing,hud,lights))(game);
+  TA["Arelin.Game.map_stage"](thing=>render_thing(thing,hud,lights))(game);
 
   canvox.draw({voxels, lights, stage, cam});
   if (canhud) {
@@ -407,8 +411,8 @@ function execute_command(inp, game) {
     let x = inp.params.dir.x;
     let y = inp.params.dir.y;
     let d = v3 => v3(x)(y)(0);
-    // cmd = TA.command(inp.player)(TA.sdir(d));
-    cmd = TA["TA.Game.Command.new"](inp.player)(TA["TA.Game.Input.sdir"](d));
+    // cmd = Arelin.command(inp.player)(Arelin.sdir(d));
+    cmd = TA["Arelin.Game.Command.new"](inp.player)(TA["Arelin.Game.Input.sdir"](d));
   } else if (inp.input === "TEXT") {
     console.log(new Error("Not implemented."));
     throw "TODO";
@@ -418,49 +422,52 @@ function execute_command(inp, game) {
     let p = v3 => v3(x)(y)(0);
     var f = null;
     switch (inp.input) {
-      case "KEY0": keyx = TA["TA.Game.Input.key0"]; break;
-      case "KEY1": keyx = TA["TA.Game.Input.key1"]; break;
-      case "KEY2": keyx = TA["TA.Game.Input.key2"]; break;
-      case "KEY3": keyx = TA["TA.Game.Input.key3"]; break;
-      case "KEY4": keyx = TA["TA.Game.Input.key4"]; break;
-      case "KEY5": keyx = TA["TA.Game.Input.key5"]; break;
+      case "KEY0": keyx = TA["Arelin.Game.Input.key0"]; break;
+      case "KEY1": keyx = TA["Arelin.Game.Input.key1"]; break;
+      case "KEY2": keyx = TA["Arelin.Game.Input.key2"]; break;
+      case "KEY3": keyx = TA["Arelin.Game.Input.key3"]; break;
+      case "KEY4": keyx = TA["Arelin.Game.Input.key4"]; break;
+      case "KEY5": keyx = TA["Arelin.Game.Input.key5"]; break;
     }
-    cmd = TA["TA.Game.Command.new"](inp.player)(keyx(p));
+    cmd = TA["Arelin.Game.Command.new"](inp.player)(keyx(p));
   }
-  return TA["TA.exec_command"](cmd)(game);
+  return TA["Arelin.exec_command"](cmd)(game);
 }
 
 function make_thing([name, {pid,sid,pos,nam}]) {
   var thing;
   name = name.toLowerCase();
-  thing = TA["TA.Thing.new_thing"];
+  thing = TA["Arelin.Thing.new_thing"];
   if (TA[name+"_fun"]) {
-    thing = TA["TA.Thing.set_fun"](thing)(TA["TA.Thing."+name+"_fun"]);
+    thing = TA["Arelin.Thing.set_fun"](thing)(TA["Arelin.Thing."+name+"_fun"]);
   }
   if (sid !== undefined) {
-    thing = TA["TA.Thing.set_sid"](thing)(sid);
+    // console.log(TA["Arelin.Thing.set_sid"]);
+    thing = TA["Arelin.Thing.set_sid"](thing)(sid);
   }
   if (pid !== undefined) {
-    thing = TA["TA.Thing.set_pid"](thing)(pid);
+    thing = TA["Arelin.Thing.set_pid"](thing)(pid);
   }
   if (pos !== undefined) {
-    thing = TA["TA.Thing.set_pos"](thing)(v3 => TA["F64.V3.new"](pos.x)(pos.y)(pos.z));
+    console.log("Inside make_thing, pos: ", TA["Arelin.Thing.set_pos"]);
+    thing = TA["Arelin.Thing.set_pos"](thing)(v3 => TA["F64.V3.new"](pos.x)(pos.y)(pos.z));
   }
   if (nam !== undefined) {
-    thing = TA["TA.Thing.set_nam"](thing)(string_to_sstring(nam)); 
+    thing = TA["Arelin.Thing.set_nam"](thing)(string_to_sstring(nam)); 
   }
   return thing;
 };
 
 function GameRunner(gid, things) {
+  console.log("Inside GameRunner");
   var self = {};
   self.gid = gid;
-  self.state = TA["TA.Game.Game.new"](array_to_slist(things.map(make_thing)));
+  self.state = TA["Arelin.Game.new"](array_to_slist(things.map(make_thing)));
   self.turns = [];
 
   function turn() {
     if (self.state) {
-      self.state = TA["TA.exec_turn"](self.state);
+      self.state = TA["Arelin.exec_turn"](self.state);
     }
   }
 
@@ -482,7 +489,7 @@ function GameRunner(gid, things) {
           for (var j = 0; j < new_turns[i].length; ++j) {
             self.state = execute_command(new_turns[i][j], self.state);
           }
-          self.state = TA["TA.exec_turn"](self.state);
+          self.state = TA["Arelin.exec_turn"](self.state);
         }
       }
     }

@@ -100,7 +100,7 @@ module.exports = (function (){
   var $Bit$0 = ($o=>($i=>$o));
   var $Bit$1 = ($o=>($i=>$i));
   var $String$nil = inst_string(($nil=>($cons=>$nil)));
-  var $F64$parse = $F64$parse;
+  var $F64$parse = a=>Number(a); // JS numbers
   var $Arelin$Constants$ONE_SEC = $F64$parse(`24`);
   var $Bits$nil = inst_bits(($be=>($b0=>($b1=>$be))));
   var $Cmp$ltn = ($ltn=>($eql=>($gtn=>$ltn)));
@@ -148,7 +148,7 @@ module.exports = (function (){
   var $F64$eql = ($x=>($y=>elim_f64($x)(($x$word=>elim_f64($y)(($y$word=>$Word$eql($x$word)($y$word)))))));
   var $F64$0 = $F64$parse_binary(`0000000000000000000000000000000000000000000000000000000000000000`);
   var $Arelin$Thing$get_pad = ($thi=>$thi(($thi$fun=>($thi$pid=>($thi$mid=>($thi$act=>($thi$sid=>($thi$stt=>($thi$nam=>($thi$lit=>($thi$tik=>($thi$pos=>($thi$mov=>($thi$bst=>($thi$pad=>($thi$dir=>($thi$trg=>($thi$vel=>($thi$box=>($thi$wei=>($thi$mhp=>($thi$dmg=>($thi$knk=>($thi$buf=>($thi$chi=>($thi$hit=>($thi$rst=>($thi$die=>$thi$pad))))))))))))))))))))))))))));
-  var $F64$cmp = $F64$cmp;
+  var $F64$cmp = a=>b=>a===b;
   var $F64$gtn = ($a=>($b=>$F64$cmp($a)($b)($Bool$false)($Bool$false)($Bool$true)));
   var $F64$add = a=>b=>a+b;
   var $F64$mul = a=>b=>a*b;

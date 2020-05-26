@@ -38,7 +38,7 @@ class Main extends Component {
     this.peer = null;
     //this.setup_canvox();
     this.char_selection = false;
-    this.pick_hero("TonyStark");
+    this.pick_hero("Dorime");
     this.login();
   }
 
@@ -202,7 +202,11 @@ class Main extends Component {
           }];
         });
       };
-      this.game = TA.GameRunner(gid, things);
+      if (things){
+        this.game = TA.GameRunner(gid, things);
+      } else {
+        console.err("I can't read 'things' on Main.js");
+      }
     }
   }
 
