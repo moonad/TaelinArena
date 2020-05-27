@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build_models": "node src/models/script.js; webpack --config models.webpack.config.js",
+    "build_models": "node src/models/script.js; webpack --config models0.webpack.config.js; webpack --config models1.webpack.config.js",
     "build": "webpack",
     "upload": "rsync -rvhz docs TA:~/TA",
     "test": "echo \"Error: no test specified\" && exit 1",

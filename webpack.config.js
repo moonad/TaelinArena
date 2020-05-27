@@ -12,11 +12,11 @@ module.exports = {
   entry: './src/index.js',
   module: {
     rules: [
-      {
-        test: /\.fm$/, 
-        loader: 'formality-loader',  
-        options: { typeCheckMode: 'none' }
-      },
+      // {
+      //   test: /\.fm$/, 
+      //   loader: 'formality-loader',  
+      //   options: { typeCheckMode: 'none' }
+      // },
       {
         test: /\.vox$/i,
         use: 'arraybuffer-loader',
@@ -40,7 +40,7 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000
   },
-  resolve: { plugins: [formalityResolver] },
+  // resolve: { plugins: [formalityResolver] },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html', 
