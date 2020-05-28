@@ -1,13 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const formalityResolver = require('formality-loader').resolver
+// const formalityResolver = require('formality-loader').resolver
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const webpack = require("webpack");
 const fs = require("fs");
 
 module.exports = {
   mode: 'production',
-  optimization: {minimize: false},
+  optimization: {minimize: true}, // comment to "false" for development mode
   //devtool: "source-map",
   entry: './src/index.js',
   module: {
