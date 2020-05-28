@@ -1,22 +1,22 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const formalityResolver = require('formality-loader').resolver
+// const formalityResolver = require('formality-loader').resolver
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const webpack = require("webpack");
 const fs = require("fs");
 
 module.exports = {
   mode: 'production',
-  optimization: {minimize: true},
+  optimization: {minimize: true}, // comment to "false" for development mode
   //devtool: "source-map",
   entry: './src/index.js',
   module: {
     rules: [
-      {
-        test: /\.fm$/, 
-        loader: 'formality-loader',  
-        options: { typeCheckMode: 'none' }
-      },
+      // {
+      //   test: /\.fm$/, 
+      //   loader: 'formality-loader',  
+      //   options: { typeCheckMode: 'none' }
+      // },
       {
         test: /\.vox$/i,
         use: 'arraybuffer-loader',
@@ -40,7 +40,7 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000
   },
-  resolve: { plugins: [formalityResolver] },
+  // resolve: { plugins: [formalityResolver] },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html', 

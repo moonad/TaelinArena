@@ -1,10 +1,10 @@
 {
-  "name": "inferno-hello-world",
+  "name": "TaelinArena",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build_models": "node src/models/script.js; webpack --config models.webpack.config.js",
+    "build_models": "node src/models/script.js; webpack --config models0.webpack.config.js; webpack --config models1.webpack.config.js",
     "build": "webpack",
     "upload": "rsync -rvhz docs TA:~/TA",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maiavictor/inferno-hello-world.git"
+    "url": "git+https://github.com/moonad/TaelinArena.git"
   },
   "author": "Victor Maia",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maiavictor/inferno-hello-world/issues"
+    "url": "https://github.com/moonad/TaelinArena/issues"
   },
-  "homepage": "https://github.com/maiavictor/inferno-hello-world#readme",
+  "homepage": "https://github.com/moonad/TaelinArena#readme",
   "devDependencies": {
     "compression-webpack-plugin": "^3.1.0",
     "express-static-gzip": "^2.0.6",
@@ -32,7 +32,7 @@
     "raw-loader": "^4.0.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.1"
+    "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
     "arraybuffer-loader": "^1.0.8",
