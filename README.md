@@ -1,4 +1,4 @@
-Taelin Arena
+Taelin Arena 
 ============
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -9,6 +9,8 @@ Cybernetics](http://sunshinecybernetics.com/).
 ![Test render!](https://media.giphy.com/media/iFIbmfxlFkcNv4ygVW/giphy.gif)
 
 ![Test render!](https://media.giphy.com/media/TL11C3bEnJn4rzE1RQ/giphy.gif)
+
+**This game is outdated and not running due to Formality updated. We plan to come back to it in 2021**
 
 ### Fully modable
 
@@ -47,7 +49,7 @@ game aspects to be formally verified for correctness, making
 serious bugs and errors scarse. In other words, it achieves
 the highest score of code quality humanly possible.
 
-### Usage
+### Usage 
 1. You must have [Formality](https://github.com/moonad/formality)(v0.1.252 or latest), [NodeJS](https://nodejs.org)(v.13.8.0 or latest) and [npm](http://npmjs.com)(v.6.14.1 or latest) installed
 2. Clone this repo
 3. Run `npm i`
