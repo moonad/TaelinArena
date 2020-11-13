@@ -10,7 +10,7 @@ Cybernetics](http://sunshinecybernetics.com/).
 
 ![Test render!](https://media.giphy.com/media/TL11C3bEnJn4rzE1RQ/giphy.gif)
 
-**This game is outdated and not running due to Formality updated. We plan to come back to it in 2021**
+**Note: This game is outdated and not running due to Formality updates. We plan to come back to it in 2021**
 
 ### Fully modable
 
