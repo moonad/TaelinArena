@@ -81,7 +81,7 @@ app.post("/new_game", async (req, res) => {
   // Validates game name
   var name = req.body.name;
   if (!gs.is_valid_name(name)) {
-    return res.send(JSON.parse({
+    return res.send(JSON.stringify({
       ctr: "err",
       err: "Invalid game name.",
     }));
